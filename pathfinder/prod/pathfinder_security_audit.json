@@ -1,0 +1,53 @@
+{
+  "pathfinderVersion": "1.0.0",
+  "generatedAt": "2025-08-05T02:08:41.278Z",
+  "tribalSpecialists": [
+    "War Chief Qwen",
+    "Spider",
+    "Eagle Eye",
+    "Crawdad",
+    "Gecko",
+    "Peace Chief Claude",
+    "Turtle",
+    "Coyote"
+  ],
+  "totalEvents": 3,
+  "criticalEvents": 1,
+  "events": [
+    {
+      "id": "0a29be10-7b45-4168-8c5f-19d79fdcc101",
+      "type": "prompt_proposal_signed",
+      "specialist": "Spider",
+      "data": {
+        "keyId": "d2a9e698fc0ff3a2",
+        "culturalClearance": "knowledge_access"
+      },
+      "timestamp": "2025-08-05T02:08:41.278Z",
+      "pathfinderSecurityLevel": "info"
+    },
+    {
+      "id": "4b5861ba-b6ad-4c67-97ff-6ab80b2e3822",
+      "type": "proposal_verification",
+      "specialist": "Spider",
+      "data": {
+        "valid": true,
+        "specialist": "Spider",
+        "keyId": "d2a9e698fc0ff3a2",
+        "culturalClearance": "knowledge_access",
+        "verifiedAt": "2025-08-05T02:08:41.278Z"
+      },
+      "timestamp": "2025-08-05T02:08:41.278Z",
+      "pathfinderSecurityLevel": "info"
+    },
+    {
+      "id": "05a0af3c-344a-42f0-b6f3-b510cbad1f2a",
+      "type": "cultural_boundary_violation",
+      "specialist": "Spider",
+      "data": {
+        "violation": "sensitive_cultural_content_sacred"
+      },
+      "timestamp": "2025-08-05T02:08:41.278Z",
+      "pathfinderSecurityLevel": "critical"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "pathfinderVersion": "1.0.0",
+  "cherokeeLanguageEnhancement": true,
+  "generatedAt": "2025-08-05T14:41:00.535Z",
+  "syllabaryEntries": 11,
+  "culturalConcepts": 9,
+  "conceptRelationships": 9,
+  "languagePatterns": 4,
+  "spiritualCategories": 3,
+  "culturalDepthLevels": [
+    "surface",
+    "meaningful",
+    "significant",
+    "profound"
+  ],
+  "accessibilityLevels": [
+    "public",
+    "culturally_guided",
+    "restricted"
+  ]
+}

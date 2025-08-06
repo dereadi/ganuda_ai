@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+npm-debug.log
+
+# Audio files (large)
+*.mp3
+*.wav
+
+# Sensitive data
+*.key
+*.pem
+*.env
+.env
+
+# Database credentials
+*jawaseatlasers2*
+*password*
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# War Chief sanitization check
+# IMPORTANT: All database passwords and IPs must be environment variables
+# Never commit actual credentials!
