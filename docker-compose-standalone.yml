@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # 🔥 OLLAMA - The heart of the Cherokee Council
+  ollama:
+    image: ollama/ollama:latest
+    container_name: cherokee-ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_NUM_PARALLEL=4
+      - OLLAMA_MAX_LOADED_MODELS=4
+    deploy:
+      resources:
+        limits:
+          memory: 64G  # BigMac can handle this easily
+        reservations:
+          memory: 32G
+    restart: unless-stopped
+    command: serve
+
+  # Model Downloader - Run this first to get all models
+  model-setup:
+    image: ollama/ollama:latest
+    container_name: model-downloader
+    depends_on:
+      - ollama
+    volumes:
+      - ./setup_models_standalone.sh:/setup_models.sh
+      - ollama_data:/root/.ollama
+    entrypoint: /bin/sh /setup_models.sh
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - ENABLE_LARGE_MODELS=${ENABLE_LARGE_MODELS:-true}
+    profiles:
+      - setup
+
+  # Simple API Server for testing
+  api-server:
+    image: python:3.11-slim
+    container_name: cherokee-api
+    depends_on:
+      - ollama
+    volumes:
+      - ./council_api_simple.py:/app/main.py
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    command: |
+      sh -c "
+      pip install httpx fastapi uvicorn ollama &&
+      python -m uvicorn main:app --host 0.0.0.0 --port 8000
+      "
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
+    driver: local
+
+networks:
+  default:
+    name: cherokee-network
+    driver: bridge
