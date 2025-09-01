@@ -1,0 +1,159 @@
+version: '3.8'
+
+services:
+  # 🔥 CHEROKEE CONSTITUTIONAL AI COUNCIL SERVICES
+  
+  # Ollama for running local LLMs
+  ollama:
+    image: ollama/ollama:latest
+    container_name: cherokee-ollama
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./models:/models
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_NUM_PARALLEL=4
+      - OLLAMA_MAX_LOADED_MODELS=4
+      - OLLAMA_MODELS=/models
+    deploy:
+      resources:
+        limits:
+          memory: 64G  # Adjust based on model sizes
+        reservations:
+          memory: 32G
+    restart: unless-stopped
+    command: serve
+
+  # Council Orchestrator - Coordinates all LLMs
+  council-orchestrator:
+    build: 
+      context: .
+      dockerfile: Dockerfile.council
+    container_name: cherokee-council
+    depends_on:
+      - ollama
+      - postgres
+      - redis
+    volumes:
+      - ./council:/app
+      - ./thermal_memory:/thermal_memory
+      - ./sacred_fire:/sacred_fire
+    ports:
+      - "8000:8000"  # API endpoint
+      - "8001:8001"  # WebSocket for real-time
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - DB_HOST=postgres
+      - DB_NAME=cherokee_council
+      - DB_USER=council
+      - DB_PASSWORD=sacredfire2025
+      - REDIS_HOST=redis
+      - THERMAL_MEMORY_PATH=/thermal_memory
+      - COUNCIL_MODE=DEMOCRATIC
+    restart: unless-stopped
+
+  # PostgreSQL for Thermal Memory
+  postgres:
+    image: postgres:15-alpine
+    container_name: cherokee-postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_DB=cherokee_council
+      - POSTGRES_USER=council
+      - POSTGRES_PASSWORD=sacredfire2025
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  # Redis for caching and queues
+  redis:
+    image: redis:7-alpine
+    container_name: cherokee-redis
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+  # MCP Server for Tool Integration
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: cherokee-mcp
+    depends_on:
+      - ollama
+    volumes:
+      - ./mcp:/app
+      - ./tools:/tools
+    ports:
+      - "3000:3000"  # MCP protocol port
+    environment:
+      - MCP_MODE=LOCAL
+      - OLLAMA_HOST=http://ollama:11434
+      - TOOL_PATH=/tools
+    restart: unless-stopped
+
+  # Trading Intelligence Service
+  trading-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.trading
+    container_name: cherokee-trading
+    depends_on:
+      - council-orchestrator
+      - postgres
+    volumes:
+      - ./trading:/app
+      - ./strategies:/strategies
+    environment:
+      - COUNCIL_API=http://council-orchestrator:8000
+      - DB_HOST=postgres
+      - PAPER_TRADING=true  # Set to false for live
+      - SACRED_FIRE_THRESHOLD=70
+    restart: unless-stopped
+
+  # Web Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: cherokee-dashboard
+    depends_on:
+      - council-orchestrator
+      - trading-bot
+    ports:
+      - "3001:3000"  # Web UI
+    environment:
+      - API_URL=http://council-orchestrator:8000
+      - WS_URL=ws://council-orchestrator:8001
+    restart: unless-stopped
+
+  # Model Downloader (runs once to get models)
+  model-setup:
+    image: ollama/ollama:latest
+    container_name: model-downloader
+    depends_on:
+      - ollama
+    volumes:
+      - ./scripts/setup_models.sh:/setup_models.sh
+    entrypoint: /setup_models.sh
+    profiles:
+      - setup
+
+volumes:
+  ollama_data:
+    driver: local
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: cherokee-network
+    driver: bridge
