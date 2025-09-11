@@ -36,3 +36,27 @@ Thumbs.db
 # War Chief sanitization check
 # IMPORTANT: All database passwords and IPs must be environment variables
 # Never commit actual credentials!
+# Virtual environments
+quantum_crawdad_env/
+venv/
+env/
+.env/
+
+# Large directories
+dertech-cherokee-ai/
+
+# Build outputs
+guardian_reports/
+knowledge_base/
+llm_dreams/
+
+# Pathfinder subdirectories with embedded repos
+pathfinder/pathfinder-clean/
+pathfinder/test/
+
+# Git submodules (separate repos)
+cherokee-discord-llm/
+discord-vc-llm/
+ganuda_repository/
+llmcord/
+robin_stocks/
