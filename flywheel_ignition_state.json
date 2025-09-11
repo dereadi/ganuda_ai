@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-08-25T20:23:50.844837",
+  "phase": "IGNITION",
+  "btc_price": 109719.94,
+  "eth_price": 4378.58,
+  "available_usd": 1.5077432652918912,
+  "trend_signal": "NEUTRAL",
+  "position_size": 0.7538716326459456,
+  "targets": [
+    {
+      "price": 109171.3403,
+      "size": 0.7538716326459456
+    },
+    {
+      "price": 110268.5397,
+      "size": 0.7538716326459456
+    }
+  ],
+  "momentum_metrics": {
+    "trades_completed": 0,
+    "profitable_trades": 0,
+    "total_profit": 0,
+    "momentum_score": 0,
+    "phase_transition_ready": false
+  }
+}

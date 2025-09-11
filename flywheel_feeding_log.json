@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-08-27T20:40:54.687073",
+  "event": "flywheel_feeding",
+  "usd_generated": 280.38717606496016,
+  "strategy": "council_approved_bleeding",
+  "targets": [
+    [
+      "MATIC",
+      500,
+      "Large position, can spare liquidity"
+    ],
+    [
+      "DOGE",
+      500,
+      "Memecoin profits for serious trading"
+    ],
+    [
+      "AVAX",
+      10,
+      "Take some profits from AVAX gains"
+    ]
+  ],
+  "deployment_plan": {
+    "quick_scalps": 112.15487042598407,
+    "crawdad_swarm": 84.11615281948805,
+    "volatility_surf": 56.077435212992036,
+    "reserve": 28.038717606496018
+  }
+}

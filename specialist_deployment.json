@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-08-31T10:20:01.332740",
+  "specialists_deployed": 5,
+  "deployment_details": [
+    {
+      "name": "Gap Specialist",
+      "path": "/home/dereadi/scripts/claude/gap_specialist.py",
+      "pid": "2807864",
+      "status": "DEPLOYED"
+    },
+    {
+      "name": "Trend Specialist",
+      "path": "/home/dereadi/scripts/claude/trend_specialist.py",
+      "pid": "2807866",
+      "status": "DEPLOYED"
+    },
+    {
+      "name": "Volatility Specialist",
+      "path": "/home/dereadi/scripts/claude/volatility_specialist.py",
+      "pid": "2807868",
+      "status": "DEPLOYED"
+    },
+    {
+      "name": "Breakout Specialist",
+      "path": "/home/dereadi/scripts/claude/breakout_specialist.py",
+      "pid": "2807870",
+      "status": "DEPLOYED"
+    },
+    {
+      "name": "Mean Reversion Specialist",
+      "path": "/home/dereadi/scripts/claude/mean_reversion_specialist.py",
+      "pid": "2807872",
+      "status": "DEPLOYED"
+    }
+  ]
+}

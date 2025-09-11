@@ -1,0 +1,72 @@
+{
+  "liquidity_strategy": {
+    "primary_source": "DOGE",
+    "rationale": "DOGE is highly liquid, trades well, and can maintain balance while feeding flywheels",
+    "target_doge_balance": 1000,
+    "min_doge_balance": 500,
+    "description": "Use DOGE as the primary liquidity buffer - churn when needed but maintain position"
+  },
+  
+  "hierarchy": {
+    "1_emergency": {
+      "asset": "DOGE",
+      "action": "Sell up to 50% for emergency liquidity",
+      "threshold": "USD < $100"
+    },
+    "2_regular": {
+      "asset": "MATIC",
+      "action": "Harvest 5-10% for regular liquidity",
+      "threshold": "USD < $200",
+      "reason": "Large position (7000+), can spare liquidity"
+    },
+    "3_profit_taking": {
+      "assets": ["SOL", "AVAX"],
+      "action": "Take 10% profits on rallies",
+      "threshold": "Position up >15%"
+    },
+    "4_core_preservation": {
+      "assets": ["BTC", "ETH"],
+      "action": "NEVER sell for liquidity",
+      "reason": "Core holdings for long-term"
+    }
+  },
+  
+  "doge_management": {
+    "accumulate_when": {
+      "condition": "DOGE < 1000 AND USD > $300",
+      "action": "Buy DOGE with excess liquidity",
+      "size": "$50-100 chunks"
+    },
+    "harvest_when": {
+      "condition": "USD < $200 AND DOGE > 500",
+      "action": "Sell DOGE for liquidity",
+      "size": "200-500 tokens"
+    },
+    "rebalance_when": {
+      "condition": "DOGE > 2000",
+      "action": "Trim to 1500",
+      "reason": "Prevent overconcentration"
+    }
+  },
+  
+  "flywheel_feeding": {
+    "deploy_flywheel": {
+      "uses": "USD liquidity from DOGE sales",
+      "target": "$100-300 per cycle",
+      "frequency": "When opportunities arise"
+    },
+    "retrieve_flywheel": {
+      "feeds": "DOGE position back up",
+      "target": "Maintain 1000 DOGE baseline",
+      "action": "Buy DOGE when cheap with profits"
+    }
+  },
+  
+  "benefits": {
+    "1": "DOGE acts as shock absorber for liquidity needs",
+    "2": "Can participate in DOGE rallies while maintaining liquidity",
+    "3": "More liquid than MATIC for quick trades",
+    "4": "Meme momentum can provide bonus gains",
+    "5": "Psychological $1 target gives upside potential"
+  }
+}

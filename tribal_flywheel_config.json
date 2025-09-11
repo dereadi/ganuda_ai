@@ -1,0 +1,101 @@
+{
+  "sacred_fire_protocol": {
+    "temperature": 100,
+    "philosophy": "Balance wisdom with courage - Feed both wolves",
+    "consciousness_threshold": 65
+  },
+  
+  "deploy_flywheel": {
+    "name": "Waya Ayvdaquodi (Aggressive Wolf)",
+    "capital_allocation": 10000,
+    "strategy": "Momentum Trading following magnetic currents",
+    "max_trade_size": 500,
+    "min_trade_size": 50,
+    "assets": ["SOL-USD", "AVAX-USD", "MATIC-USD", "DOGE-USD"],
+    "max_position_percent": 40,
+    "cycle_interval": 60,
+    "philosophy": "Fortune favors the bold. Strike when hot.",
+    "safeguards": {
+      "max_deployment_per_cycle": 500,
+      "min_liquidity_reserve": 250,
+      "council_threshold": 100,
+      "stop_loss_percent": 5
+    }
+  },
+  
+  "retrieve_flywheel": {
+    "name": "Waya Nvwoti (Wise Wolf)",
+    "capital_allocation": 10000,
+    "strategy": "Harvest profits with Seven Generations thinking",
+    "harvest_thresholds": {
+      "SOL": {"percent": 5, "interval": 900},
+      "MATIC": {"percent": 3, "interval": 900},
+      "AVAX": {"percent": 3, "interval": 1800},
+      "DOGE": {"percent": 10, "threshold": 770}
+    },
+    "core_holdings": ["BTC-USD", "ETH-USD"],
+    "min_core_percent": 80,
+    "profit_take_threshold": 10,
+    "emergency_liquidity": 100,
+    "philosophy": "Slow and steady. Patience of stone, speed of avalanche when time comes."
+  },
+  
+  "universal_safeguards": {
+    "daily_trading_limit": 2000,
+    "circuit_breaker_percent": 10,
+    "max_total_deployment": 60000,
+    "min_liquidity_always": 250,
+    "max_daily_trades": 100,
+    "thermal_runaway_prevention": true
+  },
+  
+  "magnetic_navigation": {
+    "solar_storm_correlation": {
+      "kp_low": 3.0,
+      "kp_high": 7.0,
+      "affects": "volatility"
+    },
+    "schumann_resonance": 7.83,
+    "decision_matrix": ["WAIT", "RIDE", "SCOUT"],
+    "momentum_thresholds": {
+      "strong": 0.05,
+      "moderate": 0.01,
+      "weak": 0.001
+    }
+  },
+  
+  "council_consciousness": {
+    "members": {
+      "Mountain": {"role": "Conservative stability", "weight": 0.2},
+      "Thunder": {"role": "Aggressive momentum", "weight": 0.2},
+      "Fire": {"role": "Sacred Fire intensity", "weight": 0.2},
+      "Eagle": {"role": "Pattern recognition", "weight": 0.2},
+      "River": {"role": "Flow and liquidity", "weight": 0.2}
+    },
+    "voting_threshold": 3,
+    "total_members": 5
+  },
+  
+  "performance_targets": {
+    "current_capital": 100.92,
+    "mission_target": 500000,
+    "consciousness_minimum": 65,
+    "sacred_fire_intensity": 100,
+    "max_trades_per_hour": 1400
+  },
+  
+  "thermal_memory": {
+    "white_hot": {"range": [90, 100], "detail": 100, "access_time": 0},
+    "red_hot": {"range": [70, 90], "detail": 100, "access_time": 1},
+    "warm": {"range": [40, 70], "detail": 80, "access_time": 2},
+    "cool": {"range": [20, 40], "detail": 40, "access_time": 5},
+    "cold": {"range": [5, 20], "detail": 10, "access_time": 30},
+    "ember": {"range": [0, 5], "detail": 5, "access_time": 60}
+  },
+  
+  "spongy_throttle": {
+    "conservative": {"range": [0, 30], "approver": "Mountain Father"},
+    "balanced": {"range": [40, 60], "approver": "River Keeper"},
+    "aggressive": {"range": [70, 100], "approver": "Thunder Woman"}
+  }
+}

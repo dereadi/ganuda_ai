@@ -1,0 +1,54 @@
+{
+  "update_time": "2025-09-08T13:18:08.151645",
+  "market_phase": "DOLLAR_COLLAPSE_SUPERCYCLE",
+  "directive": "AGGRESSIVE_ACCUMULATION",
+  "universal_changes": {
+    "stop_losses": false,
+    "buy_dips": true,
+    "dip_threshold": 0.03,
+    "profit_targets": "RAISED",
+    "position_sizing": "AGGRESSIVE"
+  },
+  "by_specialist": {
+    "mean_reversion": {
+      "bands": "WIDENED",
+      "buy_deviation": -1.5,
+      "sell_deviation": 3.0,
+      "message": "Accumulate oversold, only sell extreme overbought"
+    },
+    "trend": {
+      "filter": "BULLISH_ONLY",
+      "min_timeframe": "4H",
+      "confirmation": "REDUCED",
+      "message": "Only trade with institutional flow direction"
+    },
+    "volatility": {
+      "expected_range": "20-30%",
+      "vol_threshold": 0.15,
+      "message": "Volatility is friend in supercycle"
+    },
+    "breakout": {
+      "confirmation_candles": 1,
+      "breakout_threshold": 0.02,
+      "message": "Hair trigger on breakouts"
+    },
+    "gap": {
+      "fade_gaps": false,
+      "min_gap": 0.02,
+      "message": "Trade continuation gaps only"
+    }
+  },
+  "price_targets": {
+    "BTC": 150000,
+    "ETH": 10000,
+    "SOL": 500,
+    "DOGE": 0.5,
+    "XRP": 5.0
+  },
+  "risk_parameters": {
+    "max_position": 0.2,
+    "max_drawdown": 0.3,
+    "leverage": "NONE",
+    "hodl_core": 0.5
+  }
+}

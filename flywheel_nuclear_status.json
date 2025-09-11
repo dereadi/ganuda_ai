@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-08-25T23:47:40.859459",
+  "current_velocity": "BUILDING",
+  "target_velocity": "NUCLEAR",
+  "current_value": 11109,
+  "target_value": 500000,
+  "trades_per_hour_current": 140,
+  "trades_per_hour_target": 1400,
+  "leverage_current": 1,
+  "leverage_target": 10,
+  "time_to_target": "6 hours",
+  "physics_status": "ABOUT TO BREAK",
+  "moon_probability": "CERTAIN"
+}

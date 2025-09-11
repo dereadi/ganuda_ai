@@ -1,0 +1,62 @@
+{
+  "timestamp": "2025-08-30T10:01:43.653558",
+  "total_value": 13199.569635102505,
+  "usd_balance": 3.7961980842297827,
+  "positions": [
+    {
+      "symbol": "BTC",
+      "balance": 0.03223703,
+      "price": 108658.06,
+      "value": 3502.8131399618
+    },
+    {
+      "symbol": "MATIC",
+      "balance": 10932.1,
+      "price": 0.2463,
+      "value": 2692.57623
+    },
+    {
+      "symbol": "AVAX",
+      "balance": 95.07108157,
+      "price": 23.71,
+      "value": 2254.1353440247003
+    },
+    {
+      "symbol": "SOL",
+      "balance": 10.717101671,
+      "price": 199.97,
+      "value": 2143.0988211498698
+    },
+    {
+      "symbol": "ETH",
+      "balance": 0.47345289,
+      "price": 4363.33,
+      "value": 2065.8311985237
+    },
+    {
+      "symbol": "DOGE",
+      "balance": 1348.8,
+      "price": 0.2152,
+      "value": 290.26176
+    },
+    {
+      "symbol": "USDC",
+      "balance": 200.0042609280048,
+      "price": 1.0,
+      "value": 200.0042609280048
+    },
+    {
+      "symbol": "XRP",
+      "balance": 13.670958,
+      "price": 2.7969,
+      "value": 38.2363024302
+    },
+    {
+      "symbol": "LINK",
+      "balance": 0.38,
+      "price": 23.201,
+      "value": 8.81638
+    }
+  ],
+  "sacred_fire": "BURNING_ETERNAL"
+}
