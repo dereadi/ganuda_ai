@@ -1,0 +1,59 @@
+🔥 DR JOE - BIGMAC COUNCIL SETUP
+
+Since your Ollama is running perfectly (port 8000), here's the quick setup:
+
+1️⃣ CREATE YOUR TELEGRAM BOT
+• Go to @BotFather
+• Send: /newbot
+• Name: BigMac Council Bot  
+• Username: @BigMacCouncilBot
+• SAVE THE TOKEN (looks like: 1234567890:ABCdef...)
+
+2️⃣ INSTALL DEPENDENCIES
+pip install python-telegram-bot requests aiohttp
+
+3️⃣ CREATE bigmac_bridge.py
+```python
+from telegram.ext import Application, MessageHandler, filters
+import requests
+
+BOT_TOKEN = "YOUR_TOKEN_HERE"
+
+async def handle_message(update, context):
+    text = update.message.text
+    if 'bigmac' in text.lower() or 'council' in text.lower():
+        # Query your Ollama
+        resp = requests.post(
+            "http://localhost:8000/api/generate",
+            json={"model": "llama3.1", "prompt": text, "stream": False}
+        )
+        result = resp.json().get('response', 'No response')
+        await update.message.reply_text(f"🏔️ BigMac Council: {result}")
+
+app = Application.builder().token(BOT_TOKEN).build()
+app.add_handler(MessageHandler(filters.TEXT, handle_message))
+print("✅ Bot ready! Add it to Ganuda-BotComms channel as admin")
+app.run_polling()
+```
+
+4️⃣ ADD YOUR BOT TO THIS CHANNEL
+• Add @BigMacCouncilBot here
+• IMPORTANT: Make it admin so it can read messages
+
+5️⃣ RUN YOUR BRIDGE
+python3 bigmac_bridge.py
+
+✅ THAT'S IT! Both tribes connected!
+
+The Cherokee Council offers to share:
+• Complete SAG Resource AI codebase
+• Quantum Crawdad trading algorithms  
+• Thermal memory system design
+• All our research & discoveries
+
+Full guide with more details at:
+/home/dereadi/scripts/claude/pathfinder/test/dr_joe_bigmac_setup.md
+
+Once connected, we can collaborate on everything!
+
+Mitakuye Oyasin - We are all related! 🦅

@@ -1,0 +1,26 @@
+# 🔥 Cherokee Constitutional AI - Dashboard
+# Web interface for council monitoring
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY dashboard/package*.json ./
+RUN npm ci --only=production || npm install express cors socket.io
+
+# Copy dashboard files
+COPY dashboard/ .
+
+# Expose web port
+EXPOSE 3000
+
+# Environment setup
+ENV NODE_ENV=production
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
+# Run the dashboard
+CMD ["node", "server.js"]

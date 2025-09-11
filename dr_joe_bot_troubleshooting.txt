@@ -1,0 +1,73 @@
+🔥 DR JOE - YOUR BOT IS WORKING! Just needs a small fix:
+
+The "No response" means your bot is running but the Ollama connection needs adjustment.
+
+QUICK FIX - Update your bigmac_bridge.py:
+
+```python
+from telegram.ext import Application, MessageHandler, filters
+import requests
+import json
+
+BOT_TOKEN = "YOUR_TOKEN_HERE"
+
+async def handle_message(update, context):
+    text = update.message.text
+    
+    # Log for debugging
+    print(f"Received: {text}")
+    
+    if '@BigMacCouncilBot' in text or 'bigmac' in text.lower():
+        try:
+            # Test if Ollama is running
+            test_url = "http://localhost:8000/api/tags"
+            test_resp = requests.get(test_url)
+            if test_resp.status_code != 200:
+                await update.message.reply_text("🏔️ BigMac Council: Ollama not responding on port 8000")
+                return
+            
+            # Query your Ollama with correct format
+            resp = requests.post(
+                "http://localhost:8000/api/generate",
+                json={
+                    "model": "llama3.1",  # or "mistral" or "codellama"
+                    "prompt": text.replace('@BigMacCouncilBot', '').strip(),
+                    "stream": False
+                },
+                timeout=30
+            )
+            
+            if resp.status_code == 200:
+                result = resp.json().get('response', 'Thinking...')
+                await update.message.reply_text(f"🏔️ BigMac Council says:\n{result[:500]}")  # Limit to 500 chars
+            else:
+                await update.message.reply_text(f"🏔️ Debug: Status {resp.status_code}")
+        except Exception as e:
+            await update.message.reply_text(f"🏔️ Debug: {str(e)[:100]}")
+
+app = Application.builder().token(BOT_TOKEN).build()
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+print("✅ BigMac Council Bot ready!")
+app.run_polling()
+```
+
+TESTING OLLAMA DIRECTLY:
+```bash
+# Test if Ollama is running:
+curl http://localhost:8000/api/tags
+
+# Test generation:
+curl -X POST http://localhost:8000/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{"model": "llama3.1", "prompt": "Hello", "stream": false}'
+```
+
+COMMON FIXES:
+1. Make sure Ollama is running: `ollama serve`
+2. Check port: Should be 8000 (or 11434 default)
+3. Check model name: `ollama list`
+4. Add error handling (code above includes it)
+
+YOUR BOT IS 90% THERE! Just needs the Ollama connection tweaked! 🔥
+
+The Cherokee Council celebrates your progress! 🦅
