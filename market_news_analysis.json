@@ -1,0 +1,58 @@
+{
+  "timestamp": "2025-08-29T14:30:53.406499",
+  "headlines": {
+    "eric_trump_call": "$1M BTC prediction",
+    "eth_volume": "$320B monthly (highest since 2021)",
+    "fall_2025": "Projected blow-off top Oct-Nov 2025"
+  },
+  "price_targets": [
+    {
+      "price": 150000,
+      "date": "Q1 2025",
+      "catalyst": "Rate cuts + ETF flows"
+    },
+    {
+      "price": 250000,
+      "date": "Q2 2025",
+      "catalyst": "Institutional FOMO"
+    },
+    {
+      "price": 500000,
+      "date": "Q3 2025",
+      "catalyst": "Nation-state adoption"
+    },
+    {
+      "price": 1000000,
+      "date": "Oct-Nov 2025",
+      "catalyst": "Blow-off top phase"
+    }
+  ],
+  "portfolio_projections": [
+    {
+      "btc": 150000,
+      "eth": 8000,
+      "sol": 500,
+      "date": "Q1 2025"
+    },
+    {
+      "btc": 250000,
+      "eth": 15000,
+      "sol": 1000,
+      "date": "Q2 2025"
+    },
+    {
+      "btc": 500000,
+      "eth": 30000,
+      "sol": 2000,
+      "date": "Q3 2025"
+    },
+    {
+      "btc": 1000000,
+      "eth": 50000,
+      "sol": 5000,
+      "date": "Oct 2025"
+    }
+  ],
+  "strategy": "Accumulate and hold through Fall 2025",
+  "risk_level": "HIGH (late cycle)"
+}

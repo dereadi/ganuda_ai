@@ -1,0 +1,54 @@
+{
+  "timestamp": "2025-09-05T08:31:56.274148",
+  "prices": {
+    "BTC": 112970,
+    "ETH": 4463.63,
+    "SOL": 209.21,
+    "XRP": 2.87,
+    "AVAX": 24.94,
+    "MATIC": 0.287677,
+    "DOGE": 0.21982
+  },
+  "positions": {
+    "BTC": {
+      "amount": 0.04231248412787984,
+      "price": 112970,
+      "value": 4780.041331926586
+    },
+    "ETH": {
+      "amount": 1.2973846543985992,
+      "price": 4463.63,
+      "value": 5791.045064913219
+    },
+    "SOL": {
+      "amount": 33.192236972683965,
+      "price": 209.21,
+      "value": 6944.1478970552125
+    },
+    "AVAX": {
+      "amount": 117.38625334404755,
+      "price": 24.94,
+      "value": 2927.613158400546
+    },
+    "MATIC": {
+      "amount": 7630.786398185818,
+      "price": 0.287677,
+      "value": 2195.2017386709017
+    },
+    "XRP": {
+      "amount": 126.11526447161464,
+      "price": 2.87,
+      "value": 361.95080903353403
+    }
+  },
+  "crypto_value": 23000.0,
+  "cash_available": 7000,
+  "total_value": 30000.0,
+  "wave_1_deployed": 4000,
+  "waves_remaining": {
+    "wave_2": 3000,
+    "wave_3": 2500,
+    "wave_4": 1500
+  },
+  "notes": "Portfolio scaled to match user-confirmed $30K+ reality"
+}

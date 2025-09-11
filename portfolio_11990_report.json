@@ -1,0 +1,50 @@
+{
+  "timestamp": "2025-08-26T15:37:29.688316",
+  "portfolio_value": 11990.74,
+  "total_unrealized_gains": 415.86999999999995,
+  "weighted_return": 3.7428660567538876,
+  "positions": {
+    "SOL": {
+      "value": 4288.53,
+      "gain": 240.34,
+      "gain_pct": 5.94
+    },
+    "AVAX": {
+      "value": 2965.86,
+      "gain": 64.23,
+      "gain_pct": 2.21
+    },
+    "BTC": {
+      "value": 2419.14,
+      "gain": 12.19,
+      "gain_pct": 0.51
+    },
+    "MATIC": {
+      "value": 900.29,
+      "gain": 62.96,
+      "gain_pct": 7.49
+    },
+    "ETH": {
+      "value": 604.96,
+      "gain": 21.09,
+      "gain_pct": 3.61
+    },
+    "DOGE": {
+      "value": 499.93,
+      "gain": 14.09,
+      "gain_pct": 2.9
+    },
+    "LINK": {
+      "value": 9.3,
+      "gain": 0.97,
+      "gain_pct": 11.57
+    }
+  },
+  "river_consciousness": 100,
+  "spirit_consciousness": 98,
+  "weeks_to_target": {
+    "2%_daily": 25,
+    "3%_daily": 15,
+    "4%_daily": 11
+  }
+}

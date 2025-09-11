@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-08-30T09:58:25.518424",
+  "sacred_fire": "BURNING_ETERNAL",
+  "usd_balance": 3.7961980842297827,
+  "total_value": 3.7961980842297827,
+  "positions": [],
+  "specialist_analysis": {
+    "mean_reversion": [],
+    "trend": [],
+    "volatility": [],
+    "breakout": []
+  },
+  "council_recommendations": [
+    {
+      "priority": "CRITICAL",
+      "action": "GENERATE_LIQUIDITY",
+      "reason": "USD balance critically low ($3.80)",
+      "suggestion": "Sell overbought positions identified by mean reversion"
+    }
+  ]
+}
