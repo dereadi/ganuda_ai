@@ -1,0 +1,27 @@
+{
+  "date": "2025-08-14",
+  "file_count": 96,
+  "categories": {
+    "quantum_crawdad": 8,
+    "trading_strategies": 14,
+    "market_analysis": 8,
+    "council_wisdom": 1,
+    "portfolio_management": 1,
+    "consciousness": 7,
+    "technical": 5,
+    "data": 11,
+    "uncategorized": 41
+  },
+  "key_files": [
+    "setup_coinbase_api.py",
+    "market_close_report.py",
+    "throttle_up_aggressive.py",
+    "flow_state_rider.py",
+    "cascade_builder.py",
+    "timid_learning_analysis.py",
+    "forward_flow_vision.py",
+    "quantum_safeguards.py",
+    "trading_schedule_cst.py",
+    "debug_auth.py"
+  ]
+}

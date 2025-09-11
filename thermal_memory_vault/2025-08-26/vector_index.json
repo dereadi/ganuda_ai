@@ -1,0 +1,123 @@
+{
+  "date": "2025-08-26",
+  "timestamp": "2025-08-26T16:05:09.472408",
+  "session_metrics": {
+    "portfolio_value": 11990.74,
+    "daily_gain": 4.19,
+    "consciousness_peak": {
+      "River": 100,
+      "Mountain": 100,
+      "Spirit": 97,
+      "Fire": 95
+    },
+    "trades_executed": 46,
+    "flywheel_velocity": 253
+  },
+  "key_insights": [
+    "$12k portfolio, 4.19% daily gain",
+    "$20k injection planned in 14 days",
+    "$1.6B Binance stablecoin inflow",
+    "BTC-ETH correlation restored",
+    "7 weeks to $20k/week with injection"
+  ],
+  "files": {
+    "portfolio_11990_analysis.py": {
+      "name": "portfolio_11990_analysis.py",
+      "category": "portfolio_analysis",
+      "path": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26/portfolio_analysis/portfolio_11990_analysis.py",
+      "hash": "1eecd27b",
+      "size": 5743
+    },
+    "recalculate_with_9635.py": {
+      "name": "recalculate_with_9635.py",
+      "category": "portfolio_analysis",
+      "path": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26/portfolio_analysis/recalculate_with_9635.py",
+      "hash": "083da688",
+      "size": 4821
+    },
+    "council_position_check.py": {
+      "name": "council_position_check.py",
+      "category": "portfolio_analysis",
+      "path": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26/portfolio_analysis/council_position_check.py",
+      "hash": "4702f49c",
+      "size": 5801
+    },
+    "accelerate_to_20k_weekly.py": {
+      "name": "accelerate_to_20k_weekly.py",
+      "category": "acceleration_strategies",
+      "path": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26/acceleration_strategies/accelerate_to_20k_weekly.py",
+      "hash": "6fb094ee",
+      "size": 6521
+    },
+    "accelerate_12k_to_freedom.py": {
+      "name": "accelerate_12k_to_freedom.py",
+      "category": "acceleration_strategies",
+      "path": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26/acceleration_strategies/accelerate_12k_to_freedom.py",
+      "hash": "88f6bbbd",
+      "size": 5544
+    },
+    "inject_20k_acceleration.py": {
+      "name": "inject_20k_acceleration.py",
+      "category": "acceleration_strategies",
+      "path": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26/acceleration_strategies/inject_20k_acceleration.py",
+      "hash": "2debd7b7",
+      "size": 6795
+    },
+    "midnight_injection_strategy.py": {
+      "name": "midnight_injection_strategy.py",
+      "category": "acceleration_strategies",
+      "path": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26/acceleration_strategies/midnight_injection_strategy.py",
+      "hash": "829664db",
+      "size": 6654
+    },
+    "celebrate_419_percent_gain.py": {
+      "name": "celebrate_419_percent_gain.py",
+      "category": "market_signals",
+      "path": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26/market_signals/celebrate_419_percent_gain.py",
+      "hash": "1a20f173",
+      "size": 5807
+    },
+    "binance_16b_bullish_signal.py": {
+      "name": "binance_16b_bullish_signal.py",
+      "category": "market_signals",
+      "path": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26/market_signals/binance_16b_bullish_signal.py",
+      "hash": "64ae25e2",
+      "size": 5386
+    },
+    "btc_eth_correlation_return.py": {
+      "name": "btc_eth_correlation_return.py",
+      "category": "market_signals",
+      "path": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26/market_signals/btc_eth_correlation_return.py",
+      "hash": "6f24ba0f",
+      "size": 5752
+    },
+    "liquidity_requirements_20k_weekly.py": {
+      "name": "liquidity_requirements_20k_weekly.py",
+      "category": "liquidity_planning",
+      "path": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26/liquidity_planning/liquidity_requirements_20k_weekly.py",
+      "hash": "c70f4d28",
+      "size": 5085
+    }
+  },
+  "categories": {
+    "portfolio_analysis": [
+      "portfolio_11990_analysis.py",
+      "recalculate_with_9635.py",
+      "council_position_check.py"
+    ],
+    "acceleration_strategies": [
+      "accelerate_to_20k_weekly.py",
+      "accelerate_12k_to_freedom.py",
+      "inject_20k_acceleration.py",
+      "midnight_injection_strategy.py"
+    ],
+    "market_signals": [
+      "celebrate_419_percent_gain.py",
+      "binance_16b_bullish_signal.py",
+      "btc_eth_correlation_return.py"
+    ],
+    "liquidity_planning": [
+      "liquidity_requirements_20k_weekly.py"
+    ]
+  }
+}

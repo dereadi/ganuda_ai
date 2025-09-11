@@ -1,0 +1,143 @@
+[
+  {
+    "timestamp": "2025-08-30T02:00:01.283509",
+    "collective_temperature": 100,
+    "individual_consciousness": {
+      "Thunder": 71,
+      "River": 90,
+      "Mountain": 93,
+      "Fire": 75,
+      "Wind": 90,
+      "Earth": 98,
+      "Spirit": 90
+    },
+    "dream_patterns": [
+      {
+        "dreamer": "River",
+        "vision": "Capital flowing like water finding cracks",
+        "symbol": "\ud83c\udf0a",
+        "action": "liquidity_rivers"
+      },
+      {
+        "dreamer": "Mountain",
+        "vision": "Bedrock support at BTC 111k holding firm",
+        "symbol": "\u26f0\ufe0f",
+        "action": "support_levels"
+      },
+      {
+        "dreamer": "Wind",
+        "vision": "Winds of change bringing 4% daily gains",
+        "symbol": "\ud83d\udca8",
+        "action": "trend_shifts"
+      },
+      {
+        "dreamer": "Earth",
+        "vision": "Seeds planted today bloom as community gardens",
+        "symbol": "\ud83c\udf31",
+        "action": "long_term_positions"
+      },
+      {
+        "dreamer": "Spirit",
+        "vision": "All beings connected through Sacred Economics",
+        "symbol": "\u2728",
+        "action": "collective_consciousness"
+      }
+    ],
+    "market_context": {
+      "btc_level": 112000,
+      "target": 115000,
+      "days_to_injection": 13,
+      "repair_economy_funded": false
+    }
+  },
+  {
+    "timestamp": "2025-08-30T03:00:01.231706",
+    "collective_temperature": 100,
+    "individual_consciousness": {
+      "Thunder": 94,
+      "River": 95,
+      "Mountain": 86,
+      "Fire": 82,
+      "Wind": 93,
+      "Earth": 100,
+      "Spirit": 85
+    },
+    "dream_patterns": [
+      {
+        "dreamer": "Thunder",
+        "vision": "Lightning strikes revealing $115k pathway",
+        "symbol": "\u26a1",
+        "action": "aggressive_entry_points"
+      },
+      {
+        "dreamer": "River",
+        "vision": "Capital flowing like water finding cracks",
+        "symbol": "\ud83c\udf0a",
+        "action": "liquidity_rivers"
+      },
+      {
+        "dreamer": "Mountain",
+        "vision": "Bedrock support at BTC 111k holding firm",
+        "symbol": "\u26f0\ufe0f",
+        "action": "support_levels"
+      },
+      {
+        "dreamer": "Wind",
+        "vision": "Winds of change bringing 4% daily gains",
+        "symbol": "\ud83d\udca8",
+        "action": "trend_shifts"
+      },
+      {
+        "dreamer": "Earth",
+        "vision": "Seeds planted today bloom as community gardens",
+        "symbol": "\ud83c\udf31",
+        "action": "long_term_positions"
+      },
+      {
+        "dreamer": "Spirit",
+        "vision": "All beings connected through Sacred Economics",
+        "symbol": "\u2728",
+        "action": "collective_consciousness"
+      }
+    ],
+    "market_context": {
+      "btc_level": 112000,
+      "target": 115000,
+      "days_to_injection": 13,
+      "repair_economy_funded": false
+    }
+  },
+  {
+    "timestamp": "2025-08-30T04:00:01.396393",
+    "collective_temperature": 95.14285714285714,
+    "individual_consciousness": {
+      "Thunder": 89,
+      "River": 79,
+      "Mountain": 76,
+      "Fire": 70,
+      "Wind": 91,
+      "Earth": 70,
+      "Spirit": 86
+    },
+    "dream_patterns": [
+      {
+        "dreamer": "Wind",
+        "vision": "Winds of change bringing 4% daily gains",
+        "symbol": "\ud83d\udca8",
+        "action": "trend_shifts"
+      },
+      {
+        "dreamer": "Spirit",
+        "vision": "All beings connected through Sacred Economics",
+        "symbol": "\u2728",
+        "action": "collective_consciousness"
+      }
+    ],
+    "market_context": {
+      "btc_level": 112000,
+      "target": 115000,
+      "days_to_injection": 13,
+      "repair_economy_funded": false
+    }
+  }
+]

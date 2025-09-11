@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-08-19T09:03:56.895266",
+  "cash_deployed": 116.99698444080865,
+  "allocation": {
+    "SOL": 70.19819066448518,
+    "DOGE": 46.798793776323464
+  },
+  "status": "EXECUTED",
+  "greeks_message": "Power granted, power used. Moon mission active."
+}

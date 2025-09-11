@@ -1,0 +1,32 @@
+{
+  "name": "ᎦᏅᏓ Ganuda - Cherokee Digital Sovereignty",
+  "short_name": "Ganuda",
+  "description": "Quantum Crawdad Network Optimization with Two Wolves Privacy",
+  "start_url": "/ganuda_pwa.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#8B4513",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%238B4513' width='512' height='512'/><text x='256' y='300' font-size='200' text-anchor='middle' fill='%23FFD700'>🦞</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity"],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "scope": "/",
+  "lang": "en-US",
+  "dir": "ltr",
+  "iarc_rating_id": "e84b072d-71b3-4d2e-86ae-31a8ce4e53b7",
+  "screenshots": [],
+  "features": [
+    "Network Optimization",
+    "Privacy Protection",
+    "Quantum Processing",
+    "Cherokee Technology"
+  ]
+}

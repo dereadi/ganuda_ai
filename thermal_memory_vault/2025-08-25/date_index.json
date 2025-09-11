@@ -1,0 +1,25 @@
+{
+  "date": "2025-08-25",
+  "file_count": 152,
+  "categories": {
+    "trading_strategies": 14,
+    "market_analysis": 14,
+    "council_wisdom": 3,
+    "portfolio_management": 5,
+    "technical": 1,
+    "data": 98,
+    "uncategorized": 17
+  },
+  "key_files": [
+    "check_orders_simple.py",
+    "nuclear_strike_executor.py",
+    "maximum_force_flywheel.py",
+    "emergency_council_500k_consultation.py",
+    "flywheel_ignition_physics.py",
+    "monitor_nuclear_strike.py",
+    "emergency_matic_to_usd.py",
+    "breakout_110k_alert.py",
+    "flywheel_ignition_surge.py",
+    "dollar_crypto_correlation.py"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "timestamp": "2025-08-28T16:15:31.767115",
+  "event": "BREAKING_UP_EXPLOSION",
+  "btc_price": 112110.25,
+  "portfolio_value": 12960.134807559287,
+  "full_portfolio": {
+    "XRP": {
+      "balance": 35.670958,
+      "price": 2.95212,
+      "value": 105.30494853095999
+    },
+    "DOGE": {
+      "balance": 2884.9,
+      "price": 0.22179,
+      "value": 639.841971
+    },
+    "LINK": {
+      "balance": 0.38,
+      "price": 24.628,
+      "value": 9.35864
+    },
+    "MATIC": {
+      "balance": 9068.8,
+      "price": 0.2444,
+      "value": 2216.4147199999998
+    },
+    "AVAX": {
+      "balance": 87.22333749,
+      "price": 24.36318,
+      "value": 2125.0378714696185
+    },
+    "SOL": {
+      "balance": 13.394195971,
+      "price": 213.1,
+      "value": 2854.3031614201
+    },
+    "USD": {
+      "balance": 6.147764920209927,
+      "price": 1,
+      "value": 6.147764920209927
+    },
+    "ETH": {
+      "balance": 0.42490703,
+      "price": 4471.6,
+      "value": 1900.0142753480002
+    },
+    "BTC": {
+      "balance": 0.02768446,
+      "price": 112110.24,
+      "value": 3103.7114548704003
+    }
+  },
+  "temperature": 100
+}

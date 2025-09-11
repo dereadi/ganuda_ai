@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-09-05T10:10:33.729257",
+  "core_positions": [
+    "BTC",
+    "ETH",
+    "SOL",
+    "XRP"
+  ],
+  "trading_mode": "concentrated_four",
+  "allocations": {
+    "BTC": 0.25,
+    "ETH": 0.25,
+    "SOL": 0.25,
+    "XRP": 0.25
+  },
+  "xrp_strategy": {
+    "entry_zone": "2.85-2.90",
+    "accumulate_below": 2.9,
+    "target_1": 3.0,
+    "target_2": 3.4,
+    "stop_loss": 2.65,
+    "reason": "Hated but valuable - contrarian play"
+  },
+  "signals": {
+    "user_wisdom": "XRP is hated but valuable",
+    "contrarian": "Maximum hate = Maximum opportunity",
+    "technical": "Coiling at $2.88 for breakout",
+    "fundamental": "Real utility, banks using"
+  }
+}

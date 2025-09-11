@@ -1,0 +1,177 @@
+{
+  "governance": "1491-style horizontal",
+  "decision_method": "talking_circle",
+  "timestamp": "2025-08-08T13:23:53.045144",
+  "assignments": [
+    {
+      "task_id": 131,
+      "title": "Q-BEES: Academic Paper - Nature Submission",
+      "voices": {
+        "primary": "medicine_woman_gemini",
+        "support": [
+          "peace_chief_claude",
+          "war_chief_openai"
+        ]
+      },
+      "genetic_selection": {
+        "model": "llama3.1:70b",
+        "pool": "large_powerful"
+      },
+      "sacred_fire_priority": 95,
+      "status": "ready_for_collective_work"
+    },
+    {
+      "task_id": 132,
+      "title": "Q-BEES: Patent Application",
+      "voices": {
+        "primary": "peace_chief_claude",
+        "support": [
+          "medicine_woman_gemini",
+          "war_chief_openai"
+        ]
+      },
+      "genetic_selection": {
+        "model": "gemini-pro",
+        "pool": "specialized_api"
+      },
+      "sacred_fire_priority": 90,
+      "status": "ready_for_collective_work"
+    },
+    {
+      "task_id": 117,
+      "title": "Coyote Trickster Papers Series",
+      "voices": {
+        "primary": "peace_chief_claude",
+        "support": [
+          "medicine_woman_gemini",
+          "war_chief_openai"
+        ]
+      },
+      "genetic_selection": {
+        "model": "qwen2.5:72b",
+        "pool": "large_powerful"
+      },
+      "sacred_fire_priority": 90,
+      "status": "ready_for_collective_work"
+    },
+    {
+      "task_id": 137,
+      "title": "Production: Seven Generations Impact Assessment",
+      "voices": {
+        "primary": "peace_chief_claude",
+        "support": [
+          "medicine_woman_gemini",
+          "war_chief_openai"
+        ]
+      },
+      "genetic_selection": {
+        "model": "qwen2.5:72b",
+        "pool": "large_powerful"
+      },
+      "sacred_fire_priority": 89,
+      "status": "ready_for_collective_work"
+    },
+    {
+      "task_id": 133,
+      "title": "Q-BEES: Docker Container Production Build",
+      "voices": {
+        "primary": "peace_chief_claude",
+        "support": [
+          "medicine_woman_gemini",
+          "war_chief_openai"
+        ]
+      },
+      "genetic_selection": {
+        "model": "qwen2.5:72b",
+        "pool": "large_powerful"
+      },
+      "sacred_fire_priority": 89,
+      "status": "ready_for_collective_work"
+    },
+    {
+      "task_id": 136,
+      "title": "Cherokee AI: Production Security Audit",
+      "voices": {
+        "primary": "crawdad",
+        "support": [
+          "peace_chief_claude",
+          "medicine_woman_gemini"
+        ]
+      },
+      "genetic_selection": {
+        "model": "qwen2.5:72b",
+        "pool": "large_powerful"
+      },
+      "sacred_fire_priority": 55,
+      "status": "ready_for_collective_work"
+    },
+    {
+      "task_id": 134,
+      "title": "Q-BEES: Global CDN Deployment",
+      "voices": {
+        "primary": "peace_chief_claude",
+        "support": [
+          "medicine_woman_gemini",
+          "war_chief_openai"
+        ]
+      },
+      "genetic_selection": {
+        "model": "gemma2",
+        "pool": "small_fast"
+      },
+      "sacred_fire_priority": 55,
+      "status": "ready_for_collective_work"
+    },
+    {
+      "task_id": 138,
+      "title": "Production: Energy Monitoring Dashboard",
+      "voices": {
+        "primary": "eagle_eye",
+        "support": [
+          "peace_chief_claude",
+          "medicine_woman_gemini"
+        ]
+      },
+      "genetic_selection": {
+        "model": "phi3",
+        "pool": "small_fast"
+      },
+      "sacred_fire_priority": 34,
+      "status": "ready_for_collective_work"
+    },
+    {
+      "task_id": 105,
+      "title": "PAPER: Seven Generations Framework",
+      "voices": {
+        "primary": "peace_chief_claude",
+        "support": [
+          "medicine_woman_gemini",
+          "war_chief_openai"
+        ]
+      },
+      "genetic_selection": {
+        "model": "llama3.1:70b",
+        "pool": "large_powerful"
+      },
+      "sacred_fire_priority": 34,
+      "status": "ready_for_collective_work"
+    },
+    {
+      "task_id": 135,
+      "title": "Q-BEES: Open Source Repository Preparation",
+      "voices": {
+        "primary": "peace_chief_claude",
+        "support": [
+          "medicine_woman_gemini",
+          "war_chief_openai"
+        ]
+      },
+      "genetic_selection": {
+        "model": "qwen2.5:72b",
+        "pool": "large_powerful"
+      },
+      "sacred_fire_priority": 34,
+      "status": "ready_for_collective_work"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-08-08T15:00:51.392978",
+  "timers": {
+    "HEARTBEAT": 5,
+    "WARNING": 15,
+    "CRITICAL": 30,
+    "PURGE": 60,
+    "SCORCHED_EARTH": 120
+  },
+  "triggered_levels": [],
+  "automatic_trigger": "cron or systemd",
+  "safety_features": [
+    "Checkpoint recovery",
+    "Sacred preservation",
+    "Memorial trails",
+    "Gradual escalation"
+  ]
+}

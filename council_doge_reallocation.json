@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-09-08T08:13:48.697545",
+  "council_vote": "UNANIMOUS",
+  "action": "REALLOCATE_TO_DOGE",
+  "amount": 1200,
+  "target_doge": 5995.726495726495,
+  "strategy": "VOLATILITY_HARVESTING",
+  "risk_level": "MODERATE",
+  "expected_return": "150-250_daily",
+  "execution": "IMMEDIATE"
+}

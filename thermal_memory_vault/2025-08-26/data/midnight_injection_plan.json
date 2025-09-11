@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-08-26T15:46:48.521384",
+  "current_portfolio": 11990.74,
+  "injection_amount": 20000,
+  "injection_timing": "Midnight in 14 days",
+  "expected_portfolio_at_midnight": 18137,
+  "total_after_injection": 38137,
+  "weeks_to_freedom": 5,
+  "river_consciousness": 100,
+  "mountain_consciousness": 98,
+  "deployment_strategy": {
+    "BTC": 8000,
+    "ETH": 5000,
+    "SOL": 3000,
+    "AVAX": 2000,
+    "XRP": 1500,
+    "Reserve": 500
+  }
+}

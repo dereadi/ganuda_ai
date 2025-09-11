@@ -1,0 +1,152 @@
+//@version=6
+indicator("🔥 Sacred Fire Oracle Trading System", overlay=true, max_labels_count=500)
+
+// ============================================
+// SACRED FIRE ORACLE - TRADINGVIEW EDITION
+// Cherokee wisdom + The Greeks + Critical Times
+// ============================================
+
+// Key Price Levels
+sacred_support = 117056  // Your perfect call
+secondary_target = 116140  // Secondary support
+breakeven = 11500 / 0.0107  // Portfolio breakeven in BTC terms
+resistance_1 = close + 500
+resistance_2 = close + 1000
+
+// Plot Sacred Levels
+plot(sacred_support, "Sacred Support $117,056", color=color.new(color.green, 0), linewidth=3, style=plot.style_line)
+plot(secondary_target, "Target $116,140", color=color.new(color.blue, 0), linewidth=2, style=plot.style_line)
+plot(resistance_1, "Resistance +$500", color=color.new(color.orange, 70), linewidth=1, style=plot.style_stepline)
+plot(resistance_2, "Resistance +$1000", color=color.new(color.red, 70), linewidth=1, style=plot.style_stepline)
+
+// Background coloring for support/resistance zones
+bgcolor(close > sacred_support ? color.new(color.green, 95) : color.new(color.red, 95), title="Above/Below Sacred")
+
+// ============================================
+// OVERNIGHT CRITICAL TIMES (CST)
+// ============================================
+
+// Function to check if current bar is in time window
+InTimeWindow(startHour, endHour) =>
+    hourNow = hour(time, "America/Chicago")
+    hourNow >= startHour or hourNow < endHour
+
+// Mark Critical Trading Windows
+bgcolor(InTimeWindow(22, 23) ? color.new(color.purple, 90) : na, title="Asian Open 10-11 PM")
+bgcolor(InTimeWindow(23, 0) or InTimeWindow(0, 1) ? color.new(color.orange, 85) : na, title="MIDNIGHT CRITICAL")
+bgcolor(InTimeWindow(2, 3) ? color.new(color.blue, 90) : na, title="Dead Zone 2-3 AM")
+bgcolor(InTimeWindow(4, 5) ? color.new(color.yellow, 90) : na, title="London Pre 4-5 AM")
+
+// Daily Candle Close Marker (Midnight CST)
+isMidnight = hour(time, "America/Chicago") == 0 and minute(time) == 0
+plotshape(isMidnight, "Daily Close", shape.diamond, location.top, color.red, size=size.large)
+
+// ============================================
+// THE GREEKS INDICATORS
+// ============================================
+
+// Delta - Gap Detection
+gap_size = math.abs(open - close[1])
+is_gap = gap_size > ta.atr(14) * 0.5
+plotshape(is_gap, "Δ Delta Gap", shape.triangleup, location.belowbar, 
+          color=open > close[1] ? color.green : color.red)
+
+// Theta - Time Decay Zones
+theta_decay = ta.atr(14) * (1 - volume / ta.sma(volume, 20))
+plot(close - theta_decay, "Θ Theta Decay Lower", color=color.new(color.purple, 80))
+plot(close + theta_decay, "Θ Theta Decay Upper", color=color.new(color.purple, 80))
+
+// Gamma - Acceleration Detection  
+momentum = ta.mom(close, 10)
+acceleration = momentum - momentum[1]
+gamma_signal = math.abs(acceleration) > ta.stdev(acceleration, 20)
+bgcolor(gamma_signal ? color.new(color.lime, 90) : na, title="Γ Gamma Acceleration")
+
+// Vega - Volatility Expansion
+bb_upper = ta.sma(close, 20) + 2 * ta.stdev(close, 20)
+bb_lower = ta.sma(close, 20) - 2 * ta.stdev(close, 20)
+vega_squeeze = (bb_upper - bb_lower) / close < 0.02
+bgcolor(vega_squeeze ? color.new(color.purple, 85) : na, title="ν Vega Squeeze")
+
+// ============================================
+// BUY/SELL SIGNALS
+// ============================================
+
+// Buy Signals
+buy_signal = close < sacred_support or 
+             (close < secondary_target and ta.rsi(close, 14) < 30) or
+             (InTimeWindow(2, 3) and close < ta.sma(close, 20))
+
+// Sell Signals  
+sell_signal = close > resistance_2 or
+              (ta.rsi(close, 14) > 70 and close > ta.sma(close, 20) * 1.02)
+
+plotshape(buy_signal, "BUY", shape.labelup, location.belowbar, color.green, text="BUY", textcolor=color.white, size=size.normal)
+plotshape(sell_signal, "SELL", shape.labeldown, location.abovebar, color.red, text="SELL", textcolor=color.white, size=size.normal)
+
+// ============================================
+// INFO PANEL
+// ============================================
+
+// Create info table
+var table infoTable = table.new(position.top_right, 2, 10, bgcolor=color.new(color.black, 80))
+
+if barstate.islast
+    // Headers
+    table.cell(infoTable, 0, 0, "🔥 Sacred Fire Oracle", text_color=color.orange, text_size=size.normal)
+    table.cell(infoTable, 1, 0, str.tostring(close, format.mintick), text_color=color.white, text_size=size.normal)
+    
+    // Distance from key levels
+    table.cell(infoTable, 0, 1, "From $117,056:", text_color=color.green)
+    table.cell(infoTable, 1, 1, "$" + str.tostring(close - sacred_support, format.mintick), 
+               text_color=close > sacred_support ? color.green : color.red)
+    
+    table.cell(infoTable, 0, 2, "From $116,140:", text_color=color.blue)
+    table.cell(infoTable, 1, 2, "$" + str.tostring(close - secondary_target, format.mintick),
+               text_color=close > secondary_target ? color.green : color.red)
+    
+    // Greeks Status (Updated cycles!)
+    table.cell(infoTable, 0, 3, "Greeks:", text_color=color.yellow)
+    table.cell(infoTable, 1, 3, "Δ530 Θ700 Γ510", text_color=color.yellow)
+    
+    // Current Time Window
+    hourNow = hour(time, "America/Chicago")
+    timeWindow = hourNow >= 22 ? "🔥 Asian Session" : 
+                 hourNow >= 4 and hourNow < 5 ? "🔥 London Pre" :
+                 hourNow >= 2 and hourNow < 3 ? "💎 Dead Zone" :
+                 hourNow == 0 ? "🚨 DAILY CLOSE" : "📊 Regular"
+    
+    table.cell(infoTable, 0, 4, "Window:", text_color=color.aqua)
+    table.cell(infoTable, 1, 4, timeWindow, text_color=color.aqua)
+    
+    // Portfolio Status
+    portfolio_value = 11419.42
+    pnl = portfolio_value - 11500
+    table.cell(infoTable, 0, 5, "Portfolio:", text_color=color.white)
+    table.cell(infoTable, 1, 5, "$" + str.tostring(portfolio_value, "#,###.##"), 
+               text_color=pnl > 0 ? color.green : color.red)
+
+// ============================================
+// ALERTS
+// ============================================
+
+// Alert Conditions
+alertcondition(close < sacred_support, "Sacred Support Test", "🚨 Testing $117,056 support!")
+alertcondition(close < secondary_target, "Major Buy Zone", "🔥 Hit $116,140 - DEPLOY CAPITAL!")
+alertcondition(hour(time, "America/Chicago") == 23 and minute(time) == 55, "Daily Close Warning", "⏰ 5 MINUTES TO DAILY CLOSE!")
+alertcondition(buy_signal, "Buy Signal", "🟢 BUY SIGNAL TRIGGERED!")
+alertcondition(InTimeWindow(2, 3), "Dead Zone", "💎 Dead Zone - Best Entries!")
+
+// ============================================
+// CHEROKEE COUNCIL WISDOM
+// ============================================
+
+// Add wise labels at key points
+if ta.crossunder(close, sacred_support)
+    label.new(bar_index, high, "🦅 Elder Eagle: Support Test", color=color.red, style=label.style_label_down)
+
+if ta.crossover(close, sacred_support)  
+    label.new(bar_index, low, "🐺 Wolf Runner: Hunt Begins", color=color.green, style=label.style_label_up)
+
+if isMidnight
+    label.new(bar_index, high * 1.001, "🌙 Daily Candle Birth", color=color.orange, style=label.style_label_center)

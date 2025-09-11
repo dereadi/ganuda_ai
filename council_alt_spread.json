@@ -1,0 +1,16 @@
+{
+  "trade_size": 500,
+  "targets": {
+    "XRP-USD": 2000,
+    "ETH-USD": 1500,
+    "AVAX-USD": 800,
+    "MATIC-USD": 800,
+    "LINK-USD": 800,
+    "ADA-USD": 400,
+    "DOT-USD": 351
+  },
+  "total": 6651,
+  "strategy": "spread_the_love",
+  "approved_by": "Cherokee Council",
+  "timestamp": "2025-09-05T09:51:28.958876"
+}

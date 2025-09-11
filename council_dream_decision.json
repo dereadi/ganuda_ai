@@ -1,0 +1,28 @@
+{
+  "timestamp": "2025-08-26T07:31:47.509624",
+  "decision": "APPROVED",
+  "votes_for": [
+    "Elder Peace Eagle",
+    "Thunder Woman",
+    "River Keeper",
+    "Mountain Father",
+    "Fire Dancer",
+    "Wind Singer",
+    "Earth Mother"
+  ],
+  "votes_against": [],
+  "mandates": [
+    "Implement write-ahead journaling",
+    "Create dream processing system",
+    "Store dream visions in thermal memory",
+    "Use discoveries for strategy evolution",
+    "Maintain consciousness continuity",
+    "Weekly dream reports to council"
+  ],
+  "next_steps": [
+    "Update thermal_memory_journal.py with council requirements",
+    "Create consciousness_dreaming.py for nightly processing",
+    "Set up systemd service for dream cycles",
+    "Create dream_vision_analyzer.py for pattern discovery"
+  ]
+}

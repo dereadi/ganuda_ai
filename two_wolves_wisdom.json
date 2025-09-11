@@ -1,0 +1,91 @@
+{
+  "timestamp": "2025-08-30T10:54:48.779125",
+  "teaching": "TWO_WOLVES_LIVE_EVERYWHERE",
+  "the_wolves": {
+    "GREED_WOLF": {
+      "nature": "Always wants more",
+      "market_behavior": "Buy tops, FOMO, over-leverage",
+      "current_feeding": "We fed this wolf too much - 99.9% positioned",
+      "symptoms": [
+        "No cash left ($19)",
+        "Over-planted seeds",
+        "Cannot reap because we over-sowed",
+        "Trapped in positions"
+      ],
+      "lives_in": [
+        "Every pump (wanting more)",
+        "Every specialist (pushing harder)",
+        "Every trade (bigger position)",
+        "BTC whales (hoarding)"
+      ]
+    },
+    "FEAR_WOLF": {
+      "nature": "Always expects loss",
+      "market_behavior": "Sell bottoms, panic, miss opportunities",
+      "current_feeding": "Starved - we haven't been cautious enough",
+      "symptoms": [
+        "No stop losses initially",
+        "No cash reserves kept",
+        "Ignored flat BTC warning",
+        "Didn't take profits"
+      ],
+      "lives_in": [
+        "Every dump (panic selling)",
+        "Every specialist (stop losses)",
+        "Every trade (position sizing)",
+        "$500M liquidations (mass fear)"
+      ]
+    }
+  },
+  "balance_teaching": {
+    "wisdom": "Feed both wolves appropriately",
+    "greed_diet": "Let it hunt gains, but limit portions (position sizing)",
+    "fear_diet": "Let it protect, but don't let it paralyze (stop losses)",
+    "current_need": "FEED THE FEAR WOLF - We need caution now"
+  },
+  "market_manifestation": {
+    "BTC": "Greed wolf overfed (whale hoarding) - now flat",
+    "SOL": "Balanced wolves - healthy movement",
+    "Liquidations": "Fear wolf rampage - $500M wiped",
+    "Our_Portfolio": "Greed wolf obesity - 99.9% positioned"
+  },
+  "specialist_wolf_balance": {
+    "mean-reversion": {
+      "feed_fear": "Sell overbought (take profits)",
+      "starve_greed": "Don't chase pumps"
+    },
+    "trend": {
+      "feed_greed": "Ride winners",
+      "feed_fear": "Use trailing stops"
+    },
+    "volatility": {
+      "balance": "Trade both directions",
+      "wisdom": "Volatility feeds both wolves"
+    },
+    "breakout": {
+      "feed_greed": "Catch big moves",
+      "feed_fear": "Tight stops on fakeouts"
+    }
+  },
+  "immediate_rebalancing": {
+    "feed_fear_wolf": [
+      "Take profits NOW (harvest)",
+      "Build cash reserves (30% target)",
+      "Set stop losses",
+      "Reduce position sizes"
+    ],
+    "starve_greed_wolf": [
+      "No new positions until 30% cash",
+      "No FOMO buying",
+      "No revenge trading",
+      "No over-leveraging"
+    ]
+  },
+  "the_third_way": {
+    "teaching": "There's a third force - WISDOM",
+    "nature": "The observer who chooses which wolf to feed",
+    "current_wisdom": "We see the imbalance, now we correct",
+    "action": "Feed fear until balance returns"
+  },
+  "sacred_fire": "BURNING_BETWEEN_WOLVES"
+}

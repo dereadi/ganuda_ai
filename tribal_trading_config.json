@@ -1,0 +1,39 @@
+{
+  "fee_structure": {
+    "coinbase": {
+      "taker_fee": 0.006,
+      "maker_fee": 0.004,
+      "spread_fee": 0.005,
+      "total_market_fee": 0.011,
+      "description": "All trades must account for 1.1% total fees on market orders"
+    }
+  },
+  
+  "liquidity_rules": {
+    "minimum_reserve": 250,
+    "emergency_threshold": 100,
+    "deployment_buffer": 1.011,
+    "comment": "Always keep $250 minimum, multiply all buys by 1.011 for fees"
+  },
+  
+  "tribal_wisdom": {
+    "fee_transparency": "Always disclose fees before executing trades",
+    "liquidity_priority": "Liquidity preservation comes before profit",
+    "council_notification": "Inform council when fees exceed $10 per trade",
+    "batch_optimization": "Combine small trades to reduce fee impact"
+  },
+  
+  "safeguards": {
+    "max_fee_per_trade": 10,
+    "max_daily_fees": 50,
+    "fee_warning_threshold": 5,
+    "require_fee_acknowledgment": true
+  },
+  
+  "optimization_strategies": {
+    "use_limit_orders": "When possible, use limit orders for 0.4% fees instead of 1.1%",
+    "batch_trades": "Combine multiple small trades into one larger trade",
+    "avoid_micro_trades": "Never trade amounts under $50 due to fee impact",
+    "time_trades": "Trade during high liquidity periods for better spreads"
+  }
+}

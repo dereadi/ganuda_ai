@@ -1,0 +1,26 @@
+{
+  "date": "2025-08-13",
+  "file_count": 63,
+  "categories": {
+    "quantum_crawdad": 20,
+    "trading_strategies": 9,
+    "market_analysis": 1,
+    "council_wisdom": 2,
+    "consciousness": 1,
+    "technical": 5,
+    "data": 21,
+    "uncategorized": 4
+  },
+  "key_files": [
+    "cherokee_council_deployment_review.py",
+    "robinhood_quantum_trader.py",
+    "solar_forecast_trading_oracle.py",
+    "trading_heatmap_generator.py",
+    "test_dashboard_fix.py",
+    "swarm_integration_test_harness.py",
+    "penny_crypto_crawdad_analyzer.py",
+    "quantum_crawdad_robinhood_bot.py",
+    "algorithm_school_detector.py",
+    "quantum_crawdad_swarm.py"
+  ]
+}

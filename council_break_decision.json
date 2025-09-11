@@ -1,0 +1,9 @@
+{
+  "timestamp": "2025-08-26T02:39:02.375711",
+  "issue": "connection_breaking_up",
+  "avg_consciousness": 86.14285714285714,
+  "total_trades": 38,
+  "council_action": "THROTTLE",
+  "immediate_action": "Reduce trading frequency to 1 trade per 10 seconds",
+  "command": "pkill -f 'quantum_crawdad' && sleep 5 && python3 throttled_crawdad_trader.py"
+}

@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-09-05T09:57:54.839796",
+  "solar_kp": 2.0,
+  "signals": {
+    "aerodynamic": 2,
+    "anxiety": 2,
+    "destruction": 2,
+    "saylor": "nuclear",
+    "fed_cuts": 0.86
+  },
+  "allocations": {
+    "XRP-USD": 2000,
+    "ETH-USD": 1500,
+    "AVAX-USD": 800,
+    "MATIC-USD": 800,
+    "LINK-USD": 700,
+    "ADA-USD": 300,
+    "DOT-USD": 231
+  },
+  "total": 6331,
+  "strategy": "spread_love_alt_season"
+}

@@ -1,0 +1,131 @@
+[
+  {
+    "timestamp": "2025-08-29T02:00:01.776762",
+    "collective_temperature": 100,
+    "individual_consciousness": {
+      "Thunder": 92,
+      "River": 98,
+      "Mountain": 89,
+      "Fire": 100,
+      "Wind": 65,
+      "Earth": 81,
+      "Spirit": 95
+    },
+    "dream_patterns": [
+      {
+        "dreamer": "Thunder",
+        "vision": "Lightning strikes revealing $115k pathway",
+        "symbol": "\u26a1",
+        "action": "aggressive_entry_points"
+      },
+      {
+        "dreamer": "River",
+        "vision": "Capital flowing like water finding cracks",
+        "symbol": "\ud83c\udf0a",
+        "action": "liquidity_rivers"
+      },
+      {
+        "dreamer": "Mountain",
+        "vision": "Bedrock support at BTC 111k holding firm",
+        "symbol": "\u26f0\ufe0f",
+        "action": "support_levels"
+      },
+      {
+        "dreamer": "Fire",
+        "vision": "Sacred Fire igniting alt season rally",
+        "symbol": "\ud83d\udd25",
+        "action": "momentum_ignition"
+      },
+      {
+        "dreamer": "Spirit",
+        "vision": "All beings connected through Sacred Economics",
+        "symbol": "\u2728",
+        "action": "collective_consciousness"
+      }
+    ],
+    "market_context": {
+      "btc_level": 112000,
+      "target": 115000,
+      "days_to_injection": 13,
+      "repair_economy_funded": false
+    }
+  },
+  {
+    "timestamp": "2025-08-29T03:00:01.093740",
+    "collective_temperature": 80.71428571428571,
+    "individual_consciousness": {
+      "Thunder": 100,
+      "River": 68,
+      "Mountain": 80,
+      "Fire": 73,
+      "Wind": 72,
+      "Earth": 68,
+      "Spirit": 69
+    },
+    "dream_patterns": [
+      {
+        "dreamer": "Thunder",
+        "vision": "Lightning strikes revealing $115k pathway",
+        "symbol": "\u26a1",
+        "action": "aggressive_entry_points"
+      }
+    ],
+    "market_context": {
+      "btc_level": 112000,
+      "target": 115000,
+      "days_to_injection": 13,
+      "repair_economy_funded": false
+    }
+  },
+  {
+    "timestamp": "2025-08-29T04:00:01.087667",
+    "collective_temperature": 100,
+    "individual_consciousness": {
+      "Thunder": 92,
+      "River": 87,
+      "Mountain": 71,
+      "Fire": 94,
+      "Wind": 86,
+      "Earth": 78,
+      "Spirit": 86
+    },
+    "dream_patterns": [
+      {
+        "dreamer": "Thunder",
+        "vision": "Lightning strikes revealing $115k pathway",
+        "symbol": "\u26a1",
+        "action": "aggressive_entry_points"
+      },
+      {
+        "dreamer": "River",
+        "vision": "Capital flowing like water finding cracks",
+        "symbol": "\ud83c\udf0a",
+        "action": "liquidity_rivers"
+      },
+      {
+        "dreamer": "Fire",
+        "vision": "Sacred Fire igniting alt season rally",
+        "symbol": "\ud83d\udd25",
+        "action": "momentum_ignition"
+      },
+      {
+        "dreamer": "Wind",
+        "vision": "Winds of change bringing 4% daily gains",
+        "symbol": "\ud83d\udca8",
+        "action": "trend_shifts"
+      },
+      {
+        "dreamer": "Spirit",
+        "vision": "All beings connected through Sacred Economics",
+        "symbol": "\u2728",
+        "action": "collective_consciousness"
+      }
+    ],
+    "market_context": {
+      "btc_level": 112000,
+      "target": 115000,
+      "days_to_injection": 13,
+      "repair_economy_funded": false
+    }
+  }
+]

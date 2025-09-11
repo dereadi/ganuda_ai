@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-08-27T20:35:33.241696",
+  "chosen_system": "profit_bleeder",
+  "votes": {
+    "profit_milking": 2,
+    "profit_bleeder": 3,
+    "fixed_bleeder": 2
+  },
+  "reasoning": "Council chose based on current portfolio state (0 USD, need liquidity)",
+  "implementation": "/home/dereadi/scripts/claude/profit_bleeder.py"
+}

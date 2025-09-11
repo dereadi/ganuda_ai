@@ -1,0 +1,24 @@
+{
+  "date": "2025-08-19",
+  "file_count": 27,
+  "categories": {
+    "trading_strategies": 2,
+    "market_analysis": 5,
+    "portfolio_management": 2,
+    "technical": 3,
+    "data": 6,
+    "uncategorized": 9
+  },
+  "key_files": [
+    "deploy_cash_now.py",
+    "greeks_deploy_cash_now.py",
+    "fix_coinbase_api.py",
+    "greeks_divest_20k_strategy.py",
+    "check_whale_activity.py",
+    "greeks_moon_mission_bot.py",
+    "parse_real_balances.py",
+    "free_for_a_day_moon_vibe.py",
+    "emergency_dip_buyer.py",
+    "greeks_reconnect_trading.py"
+  ]
+}

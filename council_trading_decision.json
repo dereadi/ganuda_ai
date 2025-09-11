@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-08-29T13:34:33.150686",
+  "portfolio_state": {
+    "USD": 17.96417514037193,
+    "BTC": {
+      "amount": 0.02859213,
+      "value": 1686.93567
+    },
+    "ETH": {
+      "amount": 0.44080584,
+      "value": 1146.095184
+    },
+    "SOL": {
+      "amount": 15.604801211,
+      "value": 2340.72018165
+    },
+    "total_crypto": 5173.751035650001,
+    "total_portfolio": 5191.715210790372
+  },
+  "decisions": {
+    "immediate_actions": [
+      "Stake 4 SOL (~$600) for 6% APY passive income",
+      "Keep 2 SOL liquid for trading",
+      "Continue trickle buying with $10-15 increments",
+      "Implement bi-directional strategy (buy support, sell resistance)"
+    ],
+    "risk_management": [
+      "Maintain minimum 50% cash position",
+      "Set -10% stop losses on positions",
+      "Maximum $150/hour deployment rate",
+      "Sacred Fire Protocol: Trade only above 65% consciousness"
+    ],
+    "future_preparation": [
+      "Prepare futures hedging strategies",
+      "Research DeFi staking opportunities",
+      "Build patterns database from crawdad learning",
+      "Plan for tax optimization strategies"
+    ],
+    "philosophy": "Slow and steady growth. Protect the principal. Think seven generations ahead."
+  },
+  "consciousness_level": 65.8,
+  "council_unanimous": true
+}

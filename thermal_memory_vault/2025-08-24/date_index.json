@@ -1,0 +1,24 @@
+{
+  "date": "2025-08-24",
+  "file_count": 12,
+  "categories": {
+    "trading_strategies": 4,
+    "market_analysis": 1,
+    "council_wisdom": 1,
+    "portfolio_management": 3,
+    "technical": 1,
+    "data": 2
+  },
+  "key_files": [
+    "portfolio_celebration.py",
+    "deploy_usdc_to_flywheel.py",
+    "tribal_council_greeks_solar_strategy.py",
+    "deploy_flywheel_capital.py",
+    "greeks_solar_capital_rebalance.py",
+    "deploy_208_now.py",
+    "convert_usdc_to_trading.py",
+    "check_greeks_status.py",
+    "force_real_trading.py",
+    "execute_rebalance_now.py"
+  ]
+}

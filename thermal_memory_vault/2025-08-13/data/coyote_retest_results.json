@@ -1,0 +1,9 @@
+{
+  "timestamp": "2025-08-13T20:41:57.905088",
+  "old_risk_score": 65,
+  "new_risk_score": 0,
+  "safety_features": 13,
+  "risk_reduction": 65,
+  "status": "\u2705 LOW RISK - Ready for paper trading",
+  "recommendation": "PROCEED_TO_PAPER_TRADING"
+}

@@ -1,0 +1,43 @@
+{
+  "Research": {
+    "steps": [
+      "Analyze market patterns",
+      "Study successful algorithms",
+      "Identify edge cases",
+      "Define hypothesis"
+    ],
+    "tools": [
+      "time_crawler_crawdad.py",
+      "sourceforge_education_crawdad.py"
+    ],
+    "validation": "Council must approve research findings"
+  },
+  "Backtest": {
+    "steps": [
+      "Gather historical data",
+      "Run strategy simulation",
+      "Calculate Sharpe ratio",
+      "Stress test edge cases"
+    ],
+    "tools": [
+      "backtesting.py",
+      "yfinance",
+      "pandas"
+    ],
+    "validation": "Must show >60% win rate over 1000 trades"
+  },
+  "Implement": {
+    "steps": [
+      "Start with minimal capital",
+      "Monitor for 24 hours",
+      "Scale up gradually",
+      "Add to production fleet"
+    ],
+    "tools": [
+      "subprocess isolation",
+      "trailing stops",
+      "Council oversight"
+    ],
+    "validation": "War Chief must approve production deployment"
+  }
+}

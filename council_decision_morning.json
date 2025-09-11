@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-08-29T08:32:15.857774",
+  "decision": "BUY_DIP",
+  "confidence": 0.73,
+  "btc_price": 110225.72,
+  "eth_price": 4377.15,
+  "sol_price": 210.92,
+  "action_items": [
+    "Deploy 30% of capital",
+    "Set support buy orders",
+    "Keep 70% reserve",
+    "Target 2-3% bounce",
+    "Compound profits"
+  ]
+}

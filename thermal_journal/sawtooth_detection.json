@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-08-28T15:56:26.544014",
+  "event": "SAWTOOTH_MANIPULATION_DETECTED",
+  "btc_price": 111967.3,
+  "pattern": "profit_taking_112k",
+  "council_response": "HOLD_AND_ACCUMULATE",
+  "temperature": 95
+}

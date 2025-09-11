@@ -1,0 +1,63 @@
+{
+  "timestamp": "2025-09-02T12:02:20.084662",
+  "solar_forecast": {
+    "September 2025": {
+      "Kp": "3-4",
+      "impact": "Moderate",
+      "crypto": "Bullish"
+    },
+    "October 2025": {
+      "Kp": "4-5",
+      "impact": "Increasing",
+      "crypto": "Volatile"
+    },
+    "November 2025": {
+      "Kp": "5-6",
+      "impact": "PEAK MAXIMUM",
+      "crypto": "Extreme volatility"
+    },
+    "December 2025": {
+      "Kp": "4-6",
+      "impact": "High chaos",
+      "crypto": "Whipsaw"
+    },
+    "January 2026": {
+      "Kp": "3-5",
+      "impact": "Declining",
+      "crypto": "Recovery begins"
+    },
+    "February 2026": {
+      "Kp": "2-4",
+      "impact": "Stabilizing",
+      "crypto": "New trend"
+    }
+  },
+  "crash_probability": {
+    "november_crash": "68%",
+    "no_crash": "32%",
+    "alt_outperformance": "55%"
+  },
+  "exit_strategy": "indicator_based_not_date_based",
+  "indicators_to_watch": [
+    "BTC below 200-day MA",
+    "Weekly RSI > 85",
+    "Fear/Greed < 20",
+    "Funding rates > 0.1%",
+    "Whale wallets selling",
+    "Solar storm Kp > 7",
+    "VIX > 30",
+    "DXY > 108"
+  ],
+  "capital_deployment": {
+    "immediate": 15000,
+    "second_wave": 20000,
+    "total": 35000
+  },
+  "profit_targets": {
+    "minimum": "100%",
+    "target": "150%",
+    "moon": "200%"
+  },
+  "flexibility_rating": "MAXIMUM",
+  "council_confidence": "HIGH"
+}

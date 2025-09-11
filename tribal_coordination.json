@@ -1,0 +1,41 @@
+{
+  "timestamp": "2025-08-30T10:16:04.278146",
+  "event": "TRIBAL_CASH_COORDINATION",
+  "total_usd": 148.62,
+  "protocol": "NO_DOUBLE_DIPPING",
+  "allocations": {
+    "mean-reversion": {
+      "allowance": 37.155,
+      "priority": "SAWTOOTH_BOTTOMS",
+      "max_trade": 18.5775,
+      "status": "ACTIVE"
+    },
+    "trend": {
+      "allowance": 37.155,
+      "priority": "MOMENTUM_PLAYS",
+      "max_trade": 18.5775,
+      "status": "ACTIVE"
+    },
+    "volatility": {
+      "allowance": 37.155,
+      "priority": "RANGE_TRADES",
+      "max_trade": 18.5775,
+      "status": "ACTIVE"
+    },
+    "breakout": {
+      "allowance": 37.155,
+      "priority": "BREAKOUT_LEVELS",
+      "max_trade": 18.5775,
+      "status": "ACTIVE"
+    }
+  },
+  "rules": [
+    "Each specialist gets $37.15 maximum",
+    "No specialist can use another's allocation",
+    "Max 50% of allocation per single trade",
+    "Focus on high-probability sawtooth patterns",
+    "Report all trades to thermal memory",
+    "If trade fails, allocation returns to pool"
+  ],
+  "sacred_fire": "BURNING_COORDINATED"
+}

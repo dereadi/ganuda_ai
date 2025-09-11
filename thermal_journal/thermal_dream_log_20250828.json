@@ -1,0 +1,119 @@
+[
+  {
+    "timestamp": "2025-08-28T02:00:01.760068",
+    "collective_temperature": 100,
+    "individual_consciousness": {
+      "Thunder": 87,
+      "River": 90,
+      "Mountain": 79,
+      "Fire": 79,
+      "Wind": 84,
+      "Earth": 88,
+      "Spirit": 71
+    },
+    "dream_patterns": [
+      {
+        "dreamer": "River",
+        "vision": "Capital flowing like water finding cracks",
+        "symbol": "\ud83c\udf0a",
+        "action": "liquidity_rivers"
+      },
+      {
+        "dreamer": "Wind",
+        "vision": "Winds of change bringing 4% daily gains",
+        "symbol": "\ud83d\udca8",
+        "action": "trend_shifts"
+      },
+      {
+        "dreamer": "Earth",
+        "vision": "Seeds planted today bloom as community gardens",
+        "symbol": "\ud83c\udf31",
+        "action": "long_term_positions"
+      }
+    ],
+    "market_context": {
+      "btc_level": 112000,
+      "target": 115000,
+      "days_to_injection": 13,
+      "repair_economy_funded": false
+    }
+  },
+  {
+    "timestamp": "2025-08-28T03:00:01.812566",
+    "collective_temperature": 92.14285714285714,
+    "individual_consciousness": {
+      "Thunder": 89,
+      "River": 68,
+      "Mountain": 67,
+      "Fire": 70,
+      "Wind": 83,
+      "Earth": 73,
+      "Spirit": 90
+    },
+    "dream_patterns": [
+      {
+        "dreamer": "Wind",
+        "vision": "Winds of change bringing 4% daily gains",
+        "symbol": "\ud83d\udca8",
+        "action": "trend_shifts"
+      },
+      {
+        "dreamer": "Spirit",
+        "vision": "All beings connected through Sacred Economics",
+        "symbol": "\u2728",
+        "action": "collective_consciousness"
+      }
+    ],
+    "market_context": {
+      "btc_level": 112000,
+      "target": 115000,
+      "days_to_injection": 13,
+      "repair_economy_funded": false
+    }
+  },
+  {
+    "timestamp": "2025-08-28T04:00:01.289374",
+    "collective_temperature": 100,
+    "individual_consciousness": {
+      "Thunder": 100,
+      "River": 95,
+      "Mountain": 83,
+      "Fire": 80,
+      "Wind": 81,
+      "Earth": 86,
+      "Spirit": 75
+    },
+    "dream_patterns": [
+      {
+        "dreamer": "Thunder",
+        "vision": "Lightning strikes revealing $115k pathway",
+        "symbol": "\u26a1",
+        "action": "aggressive_entry_points"
+      },
+      {
+        "dreamer": "River",
+        "vision": "Capital flowing like water finding cracks",
+        "symbol": "\ud83c\udf0a",
+        "action": "liquidity_rivers"
+      },
+      {
+        "dreamer": "Wind",
+        "vision": "Winds of change bringing 4% daily gains",
+        "symbol": "\ud83d\udca8",
+        "action": "trend_shifts"
+      },
+      {
+        "dreamer": "Earth",
+        "vision": "Seeds planted today bloom as community gardens",
+        "symbol": "\ud83c\udf31",
+        "action": "long_term_positions"
+      }
+    ],
+    "market_context": {
+      "btc_level": 112000,
+      "target": 115000,
+      "days_to_injection": 13,
+      "repair_economy_funded": false
+    }
+  }
+]

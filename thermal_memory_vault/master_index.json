@@ -1,0 +1,13 @@
+{
+  "created": "2025-08-26T16:05:09.472699",
+  "sessions": {
+    "2025-08-26": {
+      "path": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26",
+      "vector_index": "/home/dereadi/scripts/claude/thermal_memory_vault/2025-08-26/vector_index.json",
+      "portfolio_value": 11990.74,
+      "daily_gain": 4.19,
+      "key_event": "4.19% gain, $1.6B inflow signal",
+      "file_count": 11
+    }
+  }
+}

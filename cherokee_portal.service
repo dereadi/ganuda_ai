@@ -1,0 +1,15 @@
+[Unit]
+Description=Cherokee Constitutional AI Portal
+After=network.target
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/home/dereadi/scripts/claude
+Environment="PATH=/home/dereadi/scripts/claude/quantum_crawdad_env/bin"
+ExecStart=/home/dereadi/scripts/claude/quantum_crawdad_env/bin/python3 /home/dereadi/scripts/claude/cherokee_ai_portal.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

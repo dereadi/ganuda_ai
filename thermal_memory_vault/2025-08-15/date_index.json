@@ -1,0 +1,28 @@
+{
+  "date": "2025-08-15",
+  "file_count": 140,
+  "categories": {
+    "quantum_crawdad": 9,
+    "trading_strategies": 23,
+    "market_analysis": 30,
+    "council_wisdom": 2,
+    "portfolio_management": 3,
+    "sacred_economics": 1,
+    "consciousness": 1,
+    "technical": 9,
+    "data": 23,
+    "uncategorized": 39
+  },
+  "key_files": [
+    "sourceforge_education_crawdad.py",
+    "quantum_crawdads_live_final.py",
+    "overnight_watch_times.py",
+    "watch_crawdads.py",
+    "breakout_check.py",
+    "check_flywheel_status.py",
+    "time_crawler_crawdad.py",
+    "btc_cycle_bottom_alert.py",
+    "check_band_squeeze.py",
+    "solar_enhanced_projections.py"
+  ]
+}

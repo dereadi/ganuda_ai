@@ -1,0 +1,39 @@
+{
+  "timestamp": "2025-08-15T10:25:45.064851",
+  "total_capital": 100000,
+  "current_deployed": 2855.037093098201,
+  "wise_wolf": {
+    "name": "Wise Wolf (Waya Nvwoti)",
+    "capital": 10000,
+    "strategy": "Dollar Cost Average",
+    "trade_size": 100,
+    "interval": 300,
+    "coins": [
+      "BTC-USD",
+      "ETH-USD"
+    ],
+    "max_position": 0.2,
+    "philosophy": "Slow and steady. Seven Generations thinking."
+  },
+  "aggressive_wolf": {
+    "name": "Aggressive Wolf (Waya Ayvdaquodi)",
+    "capital": 10000,
+    "strategy": "Momentum Trading",
+    "trade_size": 500,
+    "interval": 60,
+    "coins": [
+      "SOL-USD",
+      "AVAX-USD",
+      "MATIC-USD"
+    ],
+    "max_position": 0.4,
+    "philosophy": "Fortune favors the bold. Strike when hot."
+  },
+  "risk_limits": {
+    "stop_loss": 0.05,
+    "daily_limit": 2000,
+    "circuit_breaker": 0.1,
+    "max_deployment": 60000
+  },
+  "philosophy": "Feed both wolves. Balance wisdom with courage."
+}

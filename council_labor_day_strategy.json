@@ -1,0 +1,52 @@
+{
+  "timestamp": "2025-08-29T08:39:59.990237",
+  "type": "LABOR_DAY_KNIFE_CATCH",
+  "total_capital": 850,
+  "tranches": [
+    [
+      "Immediate",
+      0.15,
+      "Current prices",
+      "BTC $109796, ETH $4355"
+    ],
+    [
+      "Level 1",
+      0.15,
+      "-1% from here",
+      "BTC $108698, ETH $4311"
+    ],
+    [
+      "Level 2",
+      0.15,
+      "-2% from here",
+      "BTC $107600, ETH $4267"
+    ],
+    [
+      "Level 3",
+      0.15,
+      "-3% from here",
+      "BTC $106502, ETH $4224"
+    ],
+    [
+      "Level 4",
+      0.1,
+      "-5% from here",
+      "BTC $104306, ETH $4137"
+    ],
+    [
+      "Monday Reserve",
+      0.2,
+      "Capitulation",
+      "Deploy on panic"
+    ],
+    [
+      "Emergency",
+      0.1,
+      "Black swan",
+      "Keep dry"
+    ]
+  ],
+  "btc_price": 109795.57,
+  "eth_price": 4354.56,
+  "sol_price": 210.37
+}

@@ -1,0 +1,35 @@
+[
+  {
+    "timestamp": "2025-08-27T11:23:23.998966",
+    "collective_temperature": 86.57142857142857,
+    "individual_consciousness": {
+      "Thunder": 71,
+      "River": 70,
+      "Mountain": 78,
+      "Fire": 78,
+      "Wind": 84,
+      "Earth": 86,
+      "Spirit": 69
+    },
+    "dream_patterns": [
+      {
+        "dreamer": "Wind",
+        "vision": "Winds of change bringing 4% daily gains",
+        "symbol": "\ud83d\udca8",
+        "action": "trend_shifts"
+      },
+      {
+        "dreamer": "Earth",
+        "vision": "Seeds planted today bloom as community gardens",
+        "symbol": "\ud83c\udf31",
+        "action": "long_term_positions"
+      }
+    ],
+    "market_context": {
+      "btc_level": 112000,
+      "target": 115000,
+      "days_to_injection": 13,
+      "repair_economy_funded": false
+    }
+  }
+]

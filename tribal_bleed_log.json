@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-09-07T13:33:12.841554",
+  "portfolio_before": {
+    "XRP": 1157.702607,
+    "USDC": 218.7001219280048,
+    "LINK": 0.38,
+    "MATIC": 0.3,
+    "AVAX": 0.28691157,
+    "SOL": 41.927003471,
+    "USD": 1.5153099347352528,
+    "ETH": 2.81931226,
+    "BTC": 0.02822252
+  },
+  "bleed_plan": [
+    {
+      "coin": "XRP",
+      "amount": 58.0,
+      "value": 165.551472801
+    },
+    {
+      "coin": "SOL",
+      "amount": 2.1,
+      "value": 423.46273505709996
+    },
+    {
+      "coin": "ETH",
+      "amount": 0.141,
+      "value": 603.0508924139999
+    },
+    {
+      "coin": "BTC",
+      "amount": 0.001411,
+      "value": 156.582774338
+    }
+  ],
+  "current_usd": 1.5153099347352528,
+  "tribal_note": "Working with VM specialists running since Aug 31"
+}

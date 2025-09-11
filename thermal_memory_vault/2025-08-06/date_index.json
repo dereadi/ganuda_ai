@@ -1,0 +1,11 @@
+{
+  "date": "2025-08-06",
+  "file_count": 2,
+  "categories": {
+    "data": 2
+  },
+  "key_files": [
+    "package-lock.json",
+    "package.json"
+  ]
+}

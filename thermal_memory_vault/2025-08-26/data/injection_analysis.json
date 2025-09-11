@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-08-26T15:42:10.371167",
+  "current_portfolio": 11990.74,
+  "injection_amount": 20000,
+  "injection_timing_days": 14,
+  "total_capital_after_injection": 36942.60171410297,
+  "weeks_to_target_without": 25,
+  "weeks_to_target_with": 7,
+  "time_saved_weeks": 18,
+  "earth_consciousness": 100,
+  "optimal_deployment": {
+    "BTC": 7000,
+    "ETH": 5000,
+    "SOL": 4000,
+    "AVAX": 2000,
+    "XRP": 1500,
+    "Others": 500
+  }
+}

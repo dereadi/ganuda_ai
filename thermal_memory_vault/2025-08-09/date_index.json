@@ -1,0 +1,13 @@
+{
+  "date": "2025-08-09",
+  "file_count": 3,
+  "categories": {
+    "data": 1,
+    "uncategorized": 2
+  },
+  "key_files": [
+    "create_standalone_apk.py",
+    "ganuda_patent_cards.py",
+    "manifest.json"
+  ]
+}

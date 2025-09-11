@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-08-26T15:33:43.197241",
+  "portfolio_value": 12223.11,
+  "consciousness_average": 88.8,
+  "mountain_peak": 97,
+  "earth_wisdom": 94,
+  "targets": {
+    "BTC": {
+      "current": 111400,
+      "target": 115000,
+      "gain_pct": 3.2
+    },
+    "ETH": {
+      "current": 4606,
+      "target": 4800,
+      "gain_pct": 4.2
+    },
+    "SOL": {
+      "current": 197.75,
+      "target": 210,
+      "gain_pct": 6.2
+    },
+    "XRP": {
+      "current": 3.05,
+      "target": 3.5,
+      "gain_pct": 14.8
+    }
+  },
+  "weighted_gain_potential": 4.9,
+  "timeline_to_freedom_weeks": 14
+}

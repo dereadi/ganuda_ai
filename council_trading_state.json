@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-08-27T10:45:00.709434",
+  "positions": {
+    "RIOT": {
+      "shares": 36,
+      "price": 13.75,
+      "value": 495.0
+    }
+  },
+  "capital_remaining": 5.71999999999997,
+  "council_consciousness": {
+    "River": 100,
+    "Earth": 100,
+    "Thunder": 84,
+    "Spirit": 82,
+    "Wind": 80,
+    "Fire": 79,
+    "Mountain": 71
+  },
+  "btc_price": 111700
+}

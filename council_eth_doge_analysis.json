@@ -1,0 +1,24 @@
+{
+  "timestamp": "2025-09-08T07:38:09.643093",
+  "eth_position": 2.97255567,
+  "eth_price": 4310.55,
+  "eth_value": 12812.88,
+  "doge_position": 869.45136517,
+  "doge_price": 0.234,
+  "doge_value": 202.69,
+  "eth_targets": [
+    4350,
+    4400,
+    4500,
+    5000
+  ],
+  "doge_targets": [
+    0.245,
+    0.26,
+    0.28,
+    0.3
+  ],
+  "portfolio_current": 32947.38,
+  "week_target": 33551.7568972476,
+  "council_consensus": "Milk DOGE volatility, compound into ETH"
+}

@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-08-24T20:02:54.792502",
+  "council_decision": "28.3% liquidation",
+  "initial_usd": 3528.2397883438757,
+  "final_usd": 4485.844984343876,
+  "usd_gained": 957.605196,
+  "successful_trades": 2,
+  "failed_trades": [
+    "DOGE-USD"
+  ],
+  "solar_event": "S1 Storm 75% probability Aug 25",
+  "deployment_ready": true
+}

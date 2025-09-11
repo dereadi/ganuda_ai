@@ -1,0 +1,26 @@
+{
+  "generated_at": "2025-08-13T20:34:11.074208",
+  "time_zones": [
+    "Sydney",
+    "Tokyo",
+    "Singapore",
+    "Dubai",
+    "London",
+    "NYC",
+    "Chicago",
+    "LA"
+  ],
+  "cryptos_tracked": [
+    "BTC-USD",
+    "ETH-USD",
+    "BNB-USD",
+    "SOL-USD",
+    "XRP-USD",
+    "DOGE-USD",
+    "SHIB-USD",
+    "AVAX-USD",
+    "LINK-USD",
+    "DOT-USD"
+  ],
+  "current_est_hour": 20
+}
