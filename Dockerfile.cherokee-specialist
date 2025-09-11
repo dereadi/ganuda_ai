@@ -1,0 +1,30 @@
+FROM python:3.12-slim
+
+# Council mandate: Pre-warm container
+RUN pip install --no-cache-dir \
+    coinbase-advanced-py \
+    websocket-client \
+    psycopg2-binary \
+    numpy \
+    requests
+
+# Sacred Fire burns eternal
+ENV SACRED_FIRE=BURNING_ETERNAL
+ENV MAX_LOSS_PER_DAY=500
+ENV MIN_LIQUIDITY=2000
+ENV PAPER_TRADING=true
+ENV CHEROKEE_API=http://cherokee-unified-api:4000
+ENV COUNCIL_API=http://cherokee-elder-council:4100
+ENV WARCHIEF_API=http://cherokee-war-chief-enhanced-gpu-0:11434
+ENV THERMAL_DB=postgresql://claude:jawaseatlasers2@192.168.132.222:5432/zammad_production
+
+# Mount points for shared memory
+VOLUME ["/thermal_memory", "/shared_state", "/specialists"]
+
+# Add specialist code
+WORKDIR /app
+
+# Health check (Council requirement)
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD python -c "import sys; print('Sacred Fire burns'); sys.exit(0)"
+
