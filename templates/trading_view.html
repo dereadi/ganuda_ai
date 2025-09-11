@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Crawdad Trading View</title>
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #0f0f1e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(26, 26, 46, 0.95);
+            padding: 15px 20px;
+            border-bottom: 2px solid #ff6b35;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .positive { color: #00ff88; }
+        .negative { color: #ff4444; }
+        .neutral { color: #ffaa00; }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 80px);
+        }
+        
+        .sidebar {
+            background: rgba(26, 26, 46, 0.6);
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .crypto-list {
+            list-style: none;
+        }
+        
+        .crypto-item {
+            padding: 12px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        .crypto-item:hover {
+            background: rgba(255, 107, 53, 0.2);
+            border-color: #ff6b35;
+        }
+        
+        .crypto-item.active {
+            background: rgba(255, 107, 53, 0.3);
+            border-color: #ff6b35;
+        }
+        
+        .crypto-symbol {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .crypto-price {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        
+        .crypto-change {
+            font-size: 12px;
+        }
+        
+        .main-chart {
+            background: rgba(26, 26, 46, 0.6);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .chart-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .timeframe-selector {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .timeframe-btn {
+            padding: 5px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .timeframe-btn:hover {
+            background: rgba(255, 107, 53, 0.3);
+        }
+        
+        .timeframe-btn.active {
+            background: #ff6b35;
+            border-color: #ff6b35;
+        }
+        
+        #chart {
+            flex: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .signals-panel, .trades-panel {
+            background: rgba(26, 26, 46, 0.6);
+            border-radius: 10px;
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .panel-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .signal-item, .trade-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #ff6b35;
+        }
+        
+        .signal-bullish {
+            border-left-color: #00ff88;
+            background: rgba(0, 255, 136, 0.05);
+        }
+        
+        .signal-bearish {
+            border-left-color: #ff4444;
+            background: rgba(255, 68, 68, 0.05);
+        }
+        
+        .signal-type {
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .signal-details {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        
+        .trade-profit {
+            color: #00ff88;
+        }
+        
+        .trade-loss {
+            color: #ff4444;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+        
+        .pulse {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .metric {
+            text-align: center;
+        }
+        
+        .metric-label {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+        }
+        
+        .metric-value {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            🦞 Quantum Crawdad Trading View
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Capital</div>
+                <div class="stat-value" id="capital">$90.00</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">P&L</div>
+                <div class="stat-value" id="pnl">$0.00</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Win Rate</div>
+                <div class="stat-value" id="winrate">0%</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Status</div>
+                <div class="stat-value"><span class="pulse"></span> Live</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <div class="panel-title">Cryptocurrencies</div>
+            <ul class="crypto-list" id="cryptoList">
+                <li class="loading">Loading...</li>
+            </ul>
+        </div>
+        
+        <div class="main-chart">
+            <div class="chart-header">
+                <div class="chart-title" id="chartTitle">Select a cryptocurrency</div>
+                <div class="timeframe-selector">
+                    <button class="timeframe-btn active" data-timeframe="5m">5M</button>
+                    <button class="timeframe-btn" data-timeframe="1h">1H</button>
+                    <button class="timeframe-btn" data-timeframe="1d">1D</button>
+                </div>
+            </div>
+            <div id="chart"></div>
+        </div>
+        
+        <div class="right-panel">
+            <div class="signals-panel">
+                <div class="panel-title">🎯 Trading Signals</div>
+                <div id="signalsList">
+                    <div class="loading">Scanning markets...</div>
+                </div>
+            </div>
+            
+            <div class="trades-panel">
+                <div class="panel-title">📊 Trade History</div>
+                <div id="tradesList">
+                    <div class="loading">No trades yet</div>
+                </div>
+                <div class="metrics" id="metrics">
+                    <div class="metric">
+                        <div class="metric-label">Trades</div>
+                        <div class="metric-value" id="totalTrades">0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Winners</div>
+                        <div class="metric-value positive" id="winners">0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Losers</div>
+                        <div class="metric-value negative" id="losers">0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Avg Win</div>
+                        <div class="metric-value" id="avgWin">$0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let chart = null;
+        let candlestickSeries = null;
+        let volumeSeries = null;
+        let currentSymbol = 'BTC-USD';
+        let currentTimeframe = '5m';
+        let marketData = {};
+        
+        // Initialize chart
+        function initChart() {
+            const chartContainer = document.getElementById('chart');
+            
+            chart = LightweightCharts.createChart(chartContainer, {
+                width: chartContainer.offsetWidth,
+                height: chartContainer.offsetHeight,
+                layout: {
+                    background: { type: 'solid', color: 'transparent' },
+                    textColor: '#d1d4dc',
+                },
+                grid: {
+                    vertLines: { color: 'rgba(42, 46, 57, 0.5)' },
+                    horzLines: { color: 'rgba(42, 46, 57, 0.5)' },
+                },
+                crosshair: {
+                    mode: LightweightCharts.CrosshairMode.Normal,
+                },
+                rightPriceScale: {
+                    borderColor: 'rgba(197, 203, 206, 0.8)',
+                },
+                timeScale: {
+                    borderColor: 'rgba(197, 203, 206, 0.8)',
+                },
+            });
+            
+            candlestickSeries = chart.addCandlestickSeries({
+                upColor: '#00ff88',
+                downColor: '#ff4444',
+                borderDownColor: '#ff4444',
+                borderUpColor: '#00ff88',
+                wickDownColor: '#ff4444',
+                wickUpColor: '#00ff88',
+            });
+            
+            // Resize chart on window resize
+            window.addEventListener('resize', () => {
+                chart.applyOptions({
+                    width: chartContainer.offsetWidth,
+                    height: chartContainer.offsetHeight
+                });
+            });
+        }
+        
+        // Update crypto list
+        function updateCryptoList(data) {
+            const list = document.getElementById('cryptoList');
+            list.innerHTML = '';
+            
+            Object.keys(data).forEach(symbol => {
+                const crypto = data[symbol];
+                const li = document.createElement('li');
+                li.className = 'crypto-item';
+                if (symbol === currentSymbol) li.classList.add('active');
+                
+                const changeClass = crypto.change > 0 ? 'positive' : crypto.change < 0 ? 'negative' : 'neutral';
+                
+                li.innerHTML = `
+                    <div class="crypto-symbol">${symbol.replace('-USD', '')}</div>
+                    <div class="crypto-price">$${crypto.current_price.toFixed(symbol === 'SHIB-USD' ? 8 : 2)}</div>
+                    <div class="crypto-change ${changeClass}">${crypto.change > 0 ? '+' : ''}${crypto.change.toFixed(2)}%</div>
+                `;
+                
+                li.onclick = () => selectCrypto(symbol);
+                list.appendChild(li);
+            });
+        }
+        
+        // Select cryptocurrency
+        function selectCrypto(symbol) {
+            currentSymbol = symbol;
+            document.getElementById('chartTitle').textContent = symbol;
+            
+            // Update active state
+            document.querySelectorAll('.crypto-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Load chart data
+            loadChartData(symbol, currentTimeframe);
+        }
+        
+        // Load chart data
+        async function loadChartData(symbol, timeframe) {
+            try {
+                const response = await fetch(`/api/candles/${symbol}?timeframe=${timeframe}`);
+                const candles = await response.json();
+                
+                if (candles && candles.length > 0) {
+                    const chartData = candles.map(c => ({
+                        time: new Date(c.time).getTime() / 1000,
+                        open: c.open,
+                        high: c.high,
+                        low: c.low,
+                        close: c.close
+                    }));
+                    
+                    candlestickSeries.setData(chartData);
+                    chart.timeScale().fitContent();
+                }
+            } catch (error) {
+                console.error('Error loading chart data:', error);
+            }
+        }
+        
+        // Update signals
+        function updateSignals(signals) {
+            const list = document.getElementById('signalsList');
+            
+            if (!signals || signals.length === 0) {
+                list.innerHTML = '<div class="loading">No signals detected</div>';
+                return;
+            }
+            
+            list.innerHTML = '';
+            signals.slice(-10).reverse().forEach(signal => {
+                const div = document.createElement('div');
+                div.className = `signal-item signal-${signal.sentiment}`;
+                
+                const typeColor = signal.type.includes('BUY') ? 'positive' : 
+                                 signal.type.includes('SELL') ? 'negative' : 'neutral';
+                
+                div.innerHTML = `
+                    <div class="signal-type ${typeColor}">${signal.type} - ${signal.symbol.replace('-USD', '')}</div>
+                    <div class="signal-details">
+                        $${signal.price.toFixed(2)} | ${signal.change > 0 ? '+' : ''}${signal.change.toFixed(2)}%
+                    </div>
+                    <div class="signal-details">${signal.reason}</div>
+                    <div class="signal-details">${new Date(signal.timestamp).toLocaleTimeString()}</div>
+                `;
+                
+                list.appendChild(div);
+            });
+        }
+        
+        // Update trades
+        function updateTrades(data) {
+            const list = document.getElementById('tradesList');
+            const trades = data.trades || [];
+            const metrics = data.metrics || {};
+            
+            // Update header stats
+            document.getElementById('capital').textContent = `$${data.capital.toFixed(2)}`;
+            document.getElementById('pnl').textContent = `$${(metrics.total_pnl || 0).toFixed(2)}`;
+            document.getElementById('pnl').className = metrics.total_pnl > 0 ? 'stat-value positive' : 
+                                                        metrics.total_pnl < 0 ? 'stat-value negative' : 'stat-value';
+            document.getElementById('winrate').textContent = `${(metrics.win_rate || 0).toFixed(1)}%`;
+            
+            // Update metrics
+            document.getElementById('totalTrades').textContent = metrics.total_trades || 0;
+            document.getElementById('winners').textContent = metrics.winning_trades || 0;
+            document.getElementById('losers').textContent = metrics.losing_trades || 0;
+            document.getElementById('avgWin').textContent = `$${((metrics.best_trade || 0) / Math.max(metrics.winning_trades, 1)).toFixed(2)}`;
+            
+            if (trades.length === 0) {
+                list.innerHTML = '<div class="loading">No trades executed yet</div>';
+                return;
+            }
+            
+            list.innerHTML = '';
+            trades.slice(-10).reverse().forEach(trade => {
+                const div = document.createElement('div');
+                div.className = 'trade-item';
+                
+                if (trade.action === 'SELL' && trade.pnl !== undefined) {
+                    const pnlClass = trade.pnl > 0 ? 'trade-profit' : 'trade-loss';
+                    div.innerHTML = `
+                        <div><strong>${trade.action} ${trade.symbol.replace('-USD', '')}</strong></div>
+                        <div>Exit: $${trade.price.toFixed(2)}</div>
+                        <div class="${pnlClass}">P&L: $${trade.pnl.toFixed(2)} (${trade.pnl_pct.toFixed(1)}%)</div>
+                        <div class="signal-details">${new Date(trade.timestamp).toLocaleTimeString()}</div>
+                    `;
+                } else {
+                    div.innerHTML = `
+                        <div><strong>${trade.action} ${trade.symbol.replace('-USD', '')}</strong></div>
+                        <div>Entry: $${trade.price.toFixed(2)} | Size: $${trade.size.toFixed(2)}</div>
+                        <div class="signal-details">${trade.strategy}</div>
+                        <div class="signal-details">${new Date(trade.timestamp).toLocaleTimeString()}</div>
+                    `;
+                }
+                
+                list.appendChild(div);
+            });
+        }
+        
+        // Fetch and update data
+        async function updateData() {
+            try {
+                // Fetch market data
+                const marketResponse = await fetch('/api/market_data');
+                marketData = await marketResponse.json();
+                updateCryptoList(marketData);
+                
+                // Fetch signals
+                const signalsResponse = await fetch('/api/signals');
+                const signals = await signalsResponse.json();
+                updateSignals(signals);
+                
+                // Fetch trades
+                const tradesResponse = await fetch('/api/trades');
+                const tradesData = await tradesResponse.json();
+                updateTrades(tradesData);
+                
+            } catch (error) {
+                console.error('Error updating data:', error);
+            }
+        }
+        
+        // Setup timeframe buttons
+        document.querySelectorAll('.timeframe-btn').forEach(btn => {
+            btn.onclick = function() {
+                document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentTimeframe = this.dataset.timeframe;
+                loadChartData(currentSymbol, currentTimeframe);
+            };
+        });
+        
+        // Initialize
+        initChart();
+        updateData();
+        
+        // Auto-update every 30 seconds
+        setInterval(updateData, 30000);
+        
+        // Load initial chart
+        setTimeout(() => {
+            if (Object.keys(marketData).length > 0) {
+                loadChartData(currentSymbol, currentTimeframe);
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

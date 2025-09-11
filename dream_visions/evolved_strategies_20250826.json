@@ -1,0 +1,29 @@
+[
+  {
+    "name": "dream_strategy_solar",
+    "based_on": "Solar storms create 11.9% volatility opportunities",
+    "confidence": 0.82,
+    "parameters": {}
+  },
+  {
+    "name": "dream_strategy_temporal",
+    "based_on": "Golden trading hours: [9, 10, 14, 15, 20, 21]",
+    "confidence": 0.91,
+    "parameters": {
+      "active_hours": "Golden trading hours: [9, 10, 14, 15, 20, 21]"
+    }
+  },
+  {
+    "name": "prophetic_vision",
+    "based_on": "Tomorrow's probable BTC: $108,211",
+    "confidence": 0.3291969395168407,
+    "parameters": {
+      "target_price": 108211,
+      "symbols": [
+        "MATIC",
+        "ETH",
+        "XRP"
+      ]
+    }
+  }
+]
