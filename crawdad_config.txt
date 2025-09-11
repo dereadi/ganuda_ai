@@ -1,0 +1,1 @@
+TRADE_SIZE=500

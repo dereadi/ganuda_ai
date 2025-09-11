@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-08-14T11:12:58.358240",
+  "capital": 300,
+  "traders": [
+    "Thunder",
+    "River",
+    "Mountain",
+    "Fire"
+  ],
+  "observers": [
+    "Wind",
+    "Earth",
+    "Spirit"
+  ],
+  "total_experiences": 16,
+  "patterns": {
+    "SELL_BTC": {
+      "success": 1,
+      "failure": 1
+    },
+    "BUY_ETH": {
+      "success": 3,
+      "failure": 2
+    },
+    "SELL_ETH": {
+      "success": 3,
+      "failure": 2
+    },
+    "BUY_SOL": {
+      "success": 2,
+      "failure": 0
+    },
+    "SELL_SOL": {
+      "success": 0,
+      "failure": 1
+    },
+    "BUY_BTC": {
+      "success": 0,
+      "failure": 1
+    }
+  }
+}

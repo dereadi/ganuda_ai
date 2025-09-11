@@ -1,0 +1,2081 @@
+[
+  {
+    "timestamp": "2025-08-13T19:48:24.346575",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 3.5461153463610198,
+    "price": 123745.4296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:48:24.346589",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 3.5461153463610198,
+    "price": 4731.5869140625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:48:24.346595",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 3.5461153463610198,
+    "price": 201.9495849609375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:48:54.609524",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 5.326877371378939,
+    "price": 123745.4296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:48:54.609535",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 5.326877371378939,
+    "price": 4731.5869140625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:48:54.609538",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 5.326877371378939,
+    "price": 201.9495849609375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:49:24.872626",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 6.31514263162194,
+    "price": 123745.4296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:49:24.872638",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 6.31514263162194,
+    "price": 4734.126953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:49:24.872641",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 6.31514263162194,
+    "price": 201.92945861816406,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:49:55.140129",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 3.0481125537372855,
+    "price": 123745.4296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:49:55.140142",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 3.0481125537372855,
+    "price": 4734.126953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:49:55.140145",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 3.0481125537372855,
+    "price": 201.92945861816406,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:50:25.386864",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 2.0493391095203113,
+    "price": 123737.7109375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:50:25.386876",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 2.0493391095203113,
+    "price": 4725.337890625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:50:25.386880",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 2.0493391095203113,
+    "price": 201.5582275390625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:50:55.660592",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 1.8298838888441469,
+    "price": 123737.7109375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:50:55.660604",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 1.8298838888441469,
+    "price": 4725.337890625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:50:55.660608",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 1.8298838888441469,
+    "price": 201.5582275390625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:51:25.960899",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 1.5948921778312426,
+    "price": 123737.7109375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:51:25.960910",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 1.5948921778312426,
+    "price": 4723.52490234375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:51:25.960912",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 1.5948921778312426,
+    "price": 201.4352264404297,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:51:56.440461",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.9244710313052992,
+    "price": 123737.7109375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:51:56.440472",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.9244710313052992,
+    "price": 4723.52490234375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:51:56.440475",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.9244710313052992,
+    "price": 201.4352264404297,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:52:26.743379",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 1.5087530694103148,
+    "price": 123682.6015625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:52:26.743391",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 1.5087530694103148,
+    "price": 4724.9716796875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:52:26.743395",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 1.5087530694103148,
+    "price": 201.40634155273438,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:52:57.000381",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.6276966629372851,
+    "price": 123682.6015625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:52:57.000394",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.6276966629372851,
+    "price": 4724.9716796875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:52:57.000397",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.6276966629372851,
+    "price": 201.40634155273438,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:53:27.272032",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.36186995347187045,
+    "price": 123641.75,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:53:27.272044",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.36186995347187045,
+    "price": 4724.65478515625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:53:27.272047",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.36186995347187045,
+    "price": 201.1334991455078,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:53:57.545330",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.3723551104957171,
+    "price": 123641.75,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:53:57.545342",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.3723551104957171,
+    "price": 4724.65478515625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:53:57.545345",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.3723551104957171,
+    "price": 201.1334991455078,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:54:27.804110",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.3583245458124013,
+    "price": 123603.4453125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:54:27.804122",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.3583245458124013,
+    "price": 4722.6552734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:54:27.804124",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.3583245458124013,
+    "price": 201.122802734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:54:58.074672",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.3581119982709352,
+    "price": 123603.4453125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:54:58.074685",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.3581119982709352,
+    "price": 4722.6552734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:54:58.074688",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.3581119982709352,
+    "price": 201.122802734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:55:28.385057",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.2785971456308338,
+    "price": 123603.4453125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:55:28.385069",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.2785971456308338,
+    "price": 4720.986328125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:55:28.385072",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.2785971456308338,
+    "price": 201.11819458007812,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:55:58.655544",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.36137221765317884,
+    "price": 123603.4453125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:55:58.655556",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.36137221765317884,
+    "price": 4720.986328125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:55:58.655559",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.36137221765317884,
+    "price": 201.11819458007812,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:56:28.906538",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.1395771086213084,
+    "price": 123644.859375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:56:28.906549",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.1395771086213084,
+    "price": 4718.28466796875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:56:28.906552",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.1395771086213084,
+    "price": 201.1128387451172,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:56:59.167357",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.3059973301570362,
+    "price": 123644.859375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:56:59.167370",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.3059973301570362,
+    "price": 4718.28466796875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:56:59.167374",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.3059973301570362,
+    "price": 201.1128387451172,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:57:29.490014",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.21222124457133668,
+    "price": 123842.171875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:57:29.490024",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.21222124457133668,
+    "price": 4724.17626953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:57:29.490027",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.21222124457133668,
+    "price": 201.2022705078125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:57:59.786993",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.08795600444936143,
+    "price": 123842.171875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:57:59.787009",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.08795600444936143,
+    "price": 4724.17626953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:57:59.787012",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.08795600444936143,
+    "price": 201.2022705078125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:58:30.042962",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.09988752886293294,
+    "price": 123802.5625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:58:30.042975",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.09988752886293294,
+    "price": 4721.67626953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:58:30.042982",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.09988752886293294,
+    "price": 201.2433624267578,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:59:00.306254",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.03755674130479284,
+    "price": 123802.5625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:59:00.306266",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.03755674130479284,
+    "price": 4721.67626953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:59:00.306270",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.03755674130479284,
+    "price": 201.2433624267578,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:59:30.568953",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.06611982814994478,
+    "price": 123810.921875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:59:30.568965",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.06611982814994478,
+    "price": 4721.20751953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T19:59:30.568969",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.06611982814994478,
+    "price": 201.47215270996094,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:00:00.860488",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.042280328536042994,
+    "price": 123810.921875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:00:00.860500",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.042280328536042994,
+    "price": 4721.20751953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:00:00.860504",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.042280328536042994,
+    "price": 201.47215270996094,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:00:31.125026",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.02818945931838609,
+    "price": 123810.921875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:00:31.125036",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.02818945931838609,
+    "price": 4716.66259765625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:00:31.125039",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.02818945931838609,
+    "price": 201.469970703125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:01:01.387892",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.02988359433192107,
+    "price": 123810.921875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:01:01.387905",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.02988359433192107,
+    "price": 4716.66259765625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:01:01.387909",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.02988359433192107,
+    "price": 201.469970703125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:02:34.088436",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.010601621133625004,
+    "price": 123905.2734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:02:34.088449",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.010601621133625004,
+    "price": 4718.44189453125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:02:34.088452",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.010601621133625004,
+    "price": 201.46766662597656,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:03:04.382333",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.01397983687136166,
+    "price": 123905.2734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:03:04.382344",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.01397983687136166,
+    "price": 4718.44189453125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:03:04.382351",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.01397983687136166,
+    "price": 201.46766662597656,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:03:34.649080",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.014011057027980662,
+    "price": 123905.2734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:03:34.649092",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.014011057027980662,
+    "price": 4716.51171875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:03:34.649096",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.014011057027980662,
+    "price": 201.40626525878906,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:04:04.919859",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.010303548668573156,
+    "price": 123905.2734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:04:04.919871",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.010303548668573156,
+    "price": 4716.51171875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:04:04.919874",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.010303548668573156,
+    "price": 201.40626525878906,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:04:35.183045",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.0074429218077328345,
+    "price": 123927.203125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:04:35.183058",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.0074429218077328345,
+    "price": 4715.66796875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:04:35.183062",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.0074429218077328345,
+    "price": 201.35787963867188,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:05:05.448689",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.005563527879551978,
+    "price": 123927.203125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:05:05.448702",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.005563527879551978,
+    "price": 4715.66796875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:05:05.448705",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.005563527879551978,
+    "price": 201.35787963867188,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:05:35.717298",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.0025877600356179033,
+    "price": 123945.828125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:05:35.717314",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.0025877600356179033,
+    "price": 4714.67529296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:05:35.717317",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.0025877600356179033,
+    "price": 201.17105102539062,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:06:05.974622",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.003552607394264029,
+    "price": 123945.828125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:06:05.974632",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.003552607394264029,
+    "price": 4714.67529296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:06:05.974635",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.003552607394264029,
+    "price": 201.17105102539062,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:08:07.025622",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.0020614977396791715,
+    "price": 123831.2265625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:08:07.025633",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.0020614977396791715,
+    "price": 4717.4716796875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:08:07.025636",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.0020614977396791715,
+    "price": 201.1671142578125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:08:37.293779",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.0022983457676963056,
+    "price": 123698.3984375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:08:37.293846",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.0022983457676963056,
+    "price": 4716.40869140625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:08:37.293850",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.0022983457676963056,
+    "price": 200.94700622558594,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:09:07.554730",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.0033151780648560795,
+    "price": 123698.3984375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:09:07.554744",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.0033151780648560795,
+    "price": 4716.40869140625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:09:07.554747",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.0033151780648560795,
+    "price": 201.01535034179688,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:09:37.826402",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.0019626927881167375,
+    "price": 123698.3984375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:09:37.826413",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.0019626927881167375,
+    "price": 4722.42626953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:09:37.826416",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.0019626927881167375,
+    "price": 201.01535034179688,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:10:08.102898",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.0026791927846570567,
+    "price": 123698.3984375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:10:08.102909",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.0026791927846570567,
+    "price": 4722.42626953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:10:08.102912",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.0026791927846570567,
+    "price": 201.01535034179688,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:10:38.434770",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.0023053167715217575,
+    "price": 123726.5078125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:10:38.434783",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.0023053167715217575,
+    "price": 4722.42626953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:10:38.434786",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.0023053167715217575,
+    "price": 201.01535034179688,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:11:08.742214",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.001456566876294523,
+    "price": 123726.5078125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:11:08.742226",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.001456566876294523,
+    "price": 4722.42626953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:11:08.742230",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.001456566876294523,
+    "price": 201.01535034179688,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:13:10.797603",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.0013050299019972292,
+    "price": 123647.6328125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:13:10.797615",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.0013050299019972292,
+    "price": 4720.67529296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:13:10.797619",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.0013050299019972292,
+    "price": 201.03829956054688,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:13:41.083969",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.0007087130474378277,
+    "price": 123647.6328125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:13:41.083983",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.0007087130474378277,
+    "price": 4720.67529296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:13:41.084035",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.0007087130474378277,
+    "price": 201.03829956054688,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:14:11.341768",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.00027781095067255866,
+    "price": 123740.6796875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:14:11.341782",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.00027781095067255866,
+    "price": 4723.5078125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:14:11.341786",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.00027781095067255866,
+    "price": 201.4266357421875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:14:41.605048",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.0003390653986434835,
+    "price": 123740.6796875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:14:41.605059",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.0003390653986434835,
+    "price": 4723.5078125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:14:41.605062",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.0003390653986434835,
+    "price": 201.4266357421875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:15:11.896538",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.00036696227510012505,
+    "price": 123700.9296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:15:11.896551",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.00036696227510012505,
+    "price": 4722.384765625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:15:11.896554",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.00036696227510012505,
+    "price": 201.44932556152344,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:15:42.152152",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.00018048245819558028,
+    "price": 123700.9296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:15:42.152165",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.00018048245819558028,
+    "price": 4722.384765625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:15:42.152168",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.00018048245819558028,
+    "price": 201.44932556152344,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:16:12.445938",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.0002925568254341891,
+    "price": 123700.9296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:16:12.445952",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.0002925568254341891,
+    "price": 4723.43017578125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:16:12.445955",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.0002925568254341891,
+    "price": 201.4470672607422,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:16:42.710300",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.00010693697461323927,
+    "price": 123700.9296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:16:42.710313",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.00010693697461323927,
+    "price": 4723.43017578125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:16:42.710316",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.00010693697461323927,
+    "price": 201.4470672607422,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:17:12.967198",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.00018336545900879476,
+    "price": 123624.609375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:17:12.967211",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.00018336545900879476,
+    "price": 4724.609375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:17:12.967216",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.00018336545900879476,
+    "price": 201.66522216796875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:17:43.243846",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.00011977910912541796,
+    "price": 123624.609375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:17:43.243860",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.00011977910912541796,
+    "price": 4724.609375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:17:43.243864",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.00011977910912541796,
+    "price": 201.66522216796875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:18:13.523800",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 6.397704358168354e-05,
+    "price": 123476.0546875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:18:13.523812",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 6.397704358168354e-05,
+    "price": 4724.22900390625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:18:13.523815",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 6.397704358168354e-05,
+    "price": 201.64187622070312,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:18:43.780974",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 0.00010758857028544425,
+    "price": 123476.0546875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:18:43.780993",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 0.00010758857028544425,
+    "price": 4724.22900390625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:18:43.780996",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 0.00010758857028544425,
+    "price": 201.64187622070312,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:22:16.111917",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 7.47678382793665e-05,
+    "price": 123614.0703125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:22:16.111929",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 7.47678382793665e-05,
+    "price": 4731.83740234375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:22:16.111932",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 7.47678382793665e-05,
+    "price": 201.87188720703125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:22:46.381992",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 4.35485697054714e-05,
+    "price": 123614.0703125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:22:46.382005",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 4.35485697054714e-05,
+    "price": 4731.83740234375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:22:46.382009",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 4.35485697054714e-05,
+    "price": 201.87188720703125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:23:16.642200",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 1.5596370291754325e-05,
+    "price": 123716.609375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:23:16.642213",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 1.5596370291754325e-05,
+    "price": 4730.66552734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:23:16.642216",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 1.5596370291754325e-05,
+    "price": 202.3955535888672,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:23:46.904989",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 2.8526698030241753e-05,
+    "price": 123716.609375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:23:46.905006",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 2.8526698030241753e-05,
+    "price": 4730.66552734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:23:46.905010",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 2.8526698030241753e-05,
+    "price": 202.3955535888672,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:24:17.186362",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 1.9754348216248473e-05,
+    "price": 123525.203125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:24:17.186378",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 1.9754348216248473e-05,
+    "price": 4724.287109375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:24:17.186386",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 1.9754348216248473e-05,
+    "price": 202.3085479736328,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:24:47.448141",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 6.455114966555789e-06,
+    "price": 123525.203125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:24:47.448154",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 6.455114966555789e-06,
+    "price": 4724.287109375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:24:47.448158",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 6.455114966555789e-06,
+    "price": 202.3085479736328,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:25:17.710631",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 1.3071535787425939e-05,
+    "price": 123496.2734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:25:17.710641",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 1.3071535787425939e-05,
+    "price": 4726.25439453125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:25:17.710644",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 1.3071535787425939e-05,
+    "price": 202.3345947265625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:25:47.978406",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 1.2572503950001407e-05,
+    "price": 123496.2734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:25:47.978419",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 1.2572503950001407e-05,
+    "price": 4726.25439453125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:25:47.978422",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 1.2572503950001407e-05,
+    "price": 202.3345947265625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:26:18.281252",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 6.998709782876245e-06,
+    "price": 123496.2734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:26:18.281264",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 6.998709782876245e-06,
+    "price": 4726.44482421875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:26:18.281267",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 6.998709782876245e-06,
+    "price": 202.35018920898438,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:26:48.538333",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 2.2126212142872847e-06,
+    "price": 123496.2734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:26:48.538346",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 2.2126212142872847e-06,
+    "price": 4726.44482421875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:26:48.538349",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 2.2126212142872847e-06,
+    "price": 202.35018920898438,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:27:18.799738",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 2.009429298637822e-06,
+    "price": 123603.8828125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:27:18.799749",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 2.009429298637822e-06,
+    "price": 4728.734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:27:18.799751",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 2.009429298637822e-06,
+    "price": 202.4696502685547,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:27:49.066376",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 2.110458126212788e-06,
+    "price": 123603.8828125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:27:49.066387",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 2.110458126212788e-06,
+    "price": 4728.734375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:27:49.066390",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 2.110458126212788e-06,
+    "price": 202.4696502685547,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:28:19.345177",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 3.938176136491276e-06,
+    "price": 123554.5,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:28:19.345188",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 3.938176136491276e-06,
+    "price": 4733.36328125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:28:19.345191",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 3.938176136491276e-06,
+    "price": 202.4934539794922,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:28:49.603719",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 1.1903897931943274e-06,
+    "price": 123554.5,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:28:49.603732",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 1.1903897931943274e-06,
+    "price": 4733.36328125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:28:49.603735",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 1.1903897931943274e-06,
+    "price": 202.4934539794922,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:29:19.858796",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 2.4710225811620414e-06,
+    "price": 123554.5,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:29:19.858809",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 2.4710225811620414e-06,
+    "price": 4734.34912109375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:29:19.858812",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 2.4710225811620414e-06,
+    "price": 202.81703186035156,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:29:50.125722",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 8.871214640219413e-07,
+    "price": 123554.5,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:29:50.125734",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 8.871214640219413e-07,
+    "price": 4734.34912109375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:29:50.125737",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 8.871214640219413e-07,
+    "price": 202.81703186035156,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:30:20.420218",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 1.4467631397177453e-06,
+    "price": 123601.484375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:30:20.420231",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 1.4467631397177453e-06,
+    "price": 4736.404296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:30:20.420234",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 1.4467631397177453e-06,
+    "price": 202.8495330810547,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:30:50.678250",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 8.043321233167006e-07,
+    "price": 123601.484375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:30:50.678262",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 8.043321233167006e-07,
+    "price": 4736.404296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:30:50.678265",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 8.043321233167006e-07,
+    "price": 202.8495330810547,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:31:20.938327",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 4.7683475338520263e-07,
+    "price": 123587.40625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:31:20.938341",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 4.7683475338520263e-07,
+    "price": 4736.609375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:31:20.938345",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 4.7683475338520263e-07,
+    "price": 202.8826904296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:31:51.198279",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 8.154625651457448e-07,
+    "price": 123587.40625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:31:51.198291",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 8.154625651457448e-07,
+    "price": 4736.609375,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:31:51.198294",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 8.154625651457448e-07,
+    "price": 202.8826904296875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:34:22.669892",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 2.607864722842743e-07,
+    "price": 123590.90625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:34:22.669904",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 2.607864722842743e-07,
+    "price": 4739.4619140625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:34:22.669908",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 2.607864722842743e-07,
+    "price": 203.20703125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:34:52.938121",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 5.670163594114055e-07,
+    "price": 123590.90625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:34:52.938134",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 5.670163594114055e-07,
+    "price": 4739.4619140625,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:34:52.938137",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 5.670163594114055e-07,
+    "price": 203.20703125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:35:23.270841",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 3.4939575164505157e-07,
+    "price": 123610.8671875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:35:23.270855",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 3.4939575164505157e-07,
+    "price": 4747.67626953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:35:23.270859",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 3.4939575164505157e-07,
+    "price": 203.54391479492188,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:35:53.517943",
+    "action": "BUY",
+    "symbol": "BTC-USD",
+    "amount": 1.2663420385412242e-07,
+    "price": 123610.8671875,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:35:53.517957",
+    "action": "BUY",
+    "symbol": "ETH-USD",
+    "amount": 1.2663420385412242e-07,
+    "price": 4747.67626953125,
+    "success": true,
+    "profit": 0
+  },
+  {
+    "timestamp": "2025-08-13T20:35:53.517960",
+    "action": "BUY",
+    "symbol": "SOL-USD",
+    "amount": 1.2663420385412242e-07,
+    "price": 203.54391479492188,
+    "success": true,
+    "profit": 0
+  }
+]

@@ -1,0 +1,282 @@
+[
+  {
+    "title": "IMPLEMENT: Retrograde Debugging System",
+    "description": "Start from error state, work backwards to find cause. Like crawdad walking backwards to safety.",
+    "priority": 89,
+    "agent": "Crawdad",
+    "category": "Retrograde"
+  },
+  {
+    "title": "BUILD: Time-Reverse Testing Framework",
+    "description": "Write tests that start with desired output, work backwards to required input. Crawdad-style TDD.",
+    "priority": 55,
+    "agent": "Eagle Eye",
+    "category": "Testing"
+  },
+  {
+    "title": "CREATE: Undo-First Development Protocol",
+    "description": "Every feature must have rollback BEFORE forward implementation. Tail-flip ready.",
+    "priority": 55,
+    "agent": "Turtle",
+    "category": "Safety"
+  },
+  {
+    "title": "OPTIMIZE: Backward Cache Prediction",
+    "description": "Predict future needs by analyzing past usage backwards. Crawdads remember good mud spots.",
+    "priority": 34,
+    "agent": "Spider",
+    "category": "Performance"
+  },
+  {
+    "title": "RESEARCH: Quantum Retrograde Algorithms",
+    "description": "Develop algorithms that solve problems by starting at solution and working to problem.",
+    "priority": 55,
+    "agent": "Raven",
+    "category": "Research"
+  },
+  {
+    "title": "BUILD: Mud Layer Caching System",
+    "description": "Multi-depth cache layers like mud strata. Deeper = older but more stable data.",
+    "priority": 55,
+    "agent": "Crawdad",
+    "category": "Architecture"
+  },
+  {
+    "title": "IMPLEMENT: Burrow Network Topology",
+    "description": "Connected cache burrows with tunnel system. Crawdad highways for data.",
+    "priority": 55,
+    "agent": "Gecko",
+    "category": "Infrastructure"
+  },
+  {
+    "title": "CREATE: Mud Consistency Protocol",
+    "description": "Data consistency through mud viscosity metaphor. Thicker mud = stronger consistency.",
+    "priority": 34,
+    "agent": "Spider",
+    "category": "Database"
+  },
+  {
+    "title": "DESIGN: Bottom-Feeder Garbage Collection",
+    "description": "GC that starts from bottom of heap, consuming technical debt like crawdad eating detritus.",
+    "priority": 55,
+    "agent": "Crawdad",
+    "category": "Memory"
+  },
+  {
+    "title": "BUILD: Muddy Waters Obfuscation",
+    "description": "Security through mud-stirring. Make waters murky to hide sensitive operations.",
+    "priority": 89,
+    "agent": "Coyote",
+    "category": "Security"
+  },
+  {
+    "title": "IMPLEMENT: Problem Pincher Grip System",
+    "description": "Lock onto problems with pincher grip. Never release until resolved. Deadlock as feature.",
+    "priority": 55,
+    "agent": "Crawdad",
+    "category": "Problem Solving"
+  },
+  {
+    "title": "BUILD: Dual-Pincher Load Balancer",
+    "description": "Two pinchers = two load paths. Alternate gripping for continuous operation.",
+    "priority": 34,
+    "agent": "Eagle Eye",
+    "category": "Infrastructure"
+  },
+  {
+    "title": "CREATE: Pinch-Test Framework",
+    "description": "Tests that grip edge cases and squeeze until they break. Pinch-driven development.",
+    "priority": 55,
+    "agent": "Turtle",
+    "category": "Testing"
+  },
+  {
+    "title": "IMPLEMENT: Defensive Pinching Firewall",
+    "description": "Pinch suspicious packets. Hold for inspection. Release or crush based on analysis.",
+    "priority": 89,
+    "agent": "Crawdad",
+    "category": "Security"
+  },
+  {
+    "title": "OPTIMIZE: Pincher Parallel Processing",
+    "description": "Two pinchers = natural parallelism. Process two streams simultaneously.",
+    "priority": 34,
+    "agent": "Gecko",
+    "category": "Performance"
+  },
+  {
+    "title": "IMPLEMENT: Scheduled Architecture Molting",
+    "description": "Periodic complete system refresh. Shed old architecture, emerge stronger.",
+    "priority": 55,
+    "agent": "Crawdad",
+    "category": "Architecture"
+  },
+  {
+    "title": "BUILD: Self-Healing Claw Regeneration",
+    "description": "Auto-regenerate lost components. If service dies, grows back stronger.",
+    "priority": 55,
+    "agent": "Spider",
+    "category": "Resilience"
+  },
+  {
+    "title": "CREATE: Shell Hardening Pipeline",
+    "description": "Progressive security hardening like shell calcification. Gets tougher over time.",
+    "priority": 89,
+    "agent": "Turtle",
+    "category": "Security"
+  },
+  {
+    "title": "DESIGN: Molt-Based Version Control",
+    "description": "Major versions = molts. Keep old shells as backups. Can re-inhabit if needed.",
+    "priority": 34,
+    "agent": "Raven",
+    "category": "DevOps"
+  },
+  {
+    "title": "IMPLEMENT: Growth Ring Logging",
+    "description": "Like crawdad shell rings, each log layer shows system age and growth.",
+    "priority": 21,
+    "agent": "Eagle Eye",
+    "category": "Monitoring"
+  },
+  {
+    "title": "BUILD: Antennae Early Warning System",
+    "description": "Async sensors detect problems before they manifest. Feel the vibrations in the mud.",
+    "priority": 55,
+    "agent": "Crawdad",
+    "category": "Monitoring"
+  },
+  {
+    "title": "IMPLEMENT: Quantum Entangled Antennae",
+    "description": "Instant communication between all crawdads through quantum antennae entanglement.",
+    "priority": 89,
+    "agent": "Raven",
+    "category": "Communication"
+  },
+  {
+    "title": "CREATE: Antennae Tickle Protocol",
+    "description": "Gentle system health checks that tickle services to verify responsiveness.",
+    "priority": 21,
+    "agent": "Gecko",
+    "category": "Health"
+  },
+  {
+    "title": "OPTIMIZE: Dual-Antennae Redundancy",
+    "description": "Two antennae for failover sensing. If one fails, other maintains awareness.",
+    "priority": 34,
+    "agent": "Spider",
+    "category": "Reliability"
+  },
+  {
+    "title": "RESEARCH: Antennae-Based Prediction",
+    "description": "Use antennae vibration patterns to predict future system states.",
+    "priority": 55,
+    "agent": "Eagle Eye",
+    "category": "ML"
+  },
+  {
+    "title": "CRITICAL: Emergency Tail Flip Protocol",
+    "description": "Instant backward escape from infinite loops, deadlocks, or doom spirals. One flip to safety.",
+    "priority": 89,
+    "agent": "Crawdad",
+    "category": "Emergency"
+  },
+  {
+    "title": "BUILD: Tail Flip Circuit Breaker",
+    "description": "Auto-trigger tail flip when system metrics exceed danger threshold.",
+    "priority": 55,
+    "agent": "Coyote",
+    "category": "Safety"
+  },
+  {
+    "title": "IMPLEMENT: Quantum Tail Teleport",
+    "description": "Use tail flip to quantum tunnel to safe state instantly. No intermediate states.",
+    "priority": 55,
+    "agent": "Raven",
+    "category": "Quantum"
+  },
+  {
+    "title": "CREATE: Tail Splash Logging",
+    "description": "Log the mud splash pattern from tail flips to analyze escape triggers.",
+    "priority": 21,
+    "agent": "Spider",
+    "category": "Analytics"
+  },
+  {
+    "title": "TEST: Tail Flip Recovery Time",
+    "description": "Measure system recovery after emergency tail flip. Optimize re-orientation.",
+    "priority": 34,
+    "agent": "Turtle",
+    "category": "Performance"
+  },
+  {
+    "title": "IMPLEMENT: Technical Debt Digestion",
+    "description": "Actively consume and process technical debt as nutrition. Bottom feeders thrive on waste.",
+    "priority": 55,
+    "agent": "Crawdad",
+    "category": "Maintenance"
+  },
+  {
+    "title": "BUILD: Detritus Processing Pipeline",
+    "description": "Convert code waste into useful components. Crawdad recycling system.",
+    "priority": 34,
+    "agent": "Gecko",
+    "category": "Optimization"
+  },
+  {
+    "title": "CREATE: Bottom-Up Refactoring",
+    "description": "Start refactoring from lowest, messiest layers. Where crawdads naturally feed.",
+    "priority": 55,
+    "agent": "Spider",
+    "category": "Refactoring"
+  },
+  {
+    "title": "OPTIMIZE: Sediment Layer Analysis",
+    "description": "Analyze code sediment layers to understand technical debt accumulation patterns.",
+    "priority": 34,
+    "agent": "Eagle Eye",
+    "category": "Analysis"
+  },
+  {
+    "title": "RESEARCH: Nutrient Extraction Algorithms",
+    "description": "Extract value from deprecated code like crawdads extract nutrients from mud.",
+    "priority": 21,
+    "agent": "Raven",
+    "category": "Research"
+  },
+  {
+    "title": "QUANTUM: Schr\u00f6dinger's Crawdad",
+    "description": "System exists in superposition of working/broken until observed. Crawdad in quantum mud.",
+    "priority": 89,
+    "agent": "Raven",
+    "category": "Quantum"
+  },
+  {
+    "title": "PATENT: Retrograde Quantum Processing",
+    "description": "Patent the crawdad method: solving problems backwards through quantum probability.",
+    "priority": 89,
+    "agent": "Peace Chief Claude",
+    "category": "IP"
+  },
+  {
+    "title": "BUILD: Crawdad Swarm Intelligence",
+    "description": "Not bee swarm, but CRAWDAD SCHOOL. Bottom-dwelling collective intelligence.",
+    "priority": 55,
+    "agent": "Crawdad",
+    "category": "AI"
+  },
+  {
+    "title": "EPIC: The Great Crawdad Migration",
+    "description": "Migrate entire system from forward-thinking to backward-processing paradigm.",
+    "priority": 89,
+    "agent": "Crawdad",
+    "category": "Migration"
+  },
+  {
+    "title": "RESEARCH: Mud Quantum Computer",
+    "description": "Use mud viscosity states for quantum computing. Different mud thickness = different qubits.",
+    "priority": 55,
+    "agent": "Coyote",
+    "category": "Quantum"
+  }
+]

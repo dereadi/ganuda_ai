@@ -1,0 +1,24 @@
+{
+  "date": "2025-08-13T15:31:04.975343",
+  "starting_capital": 90,
+  "consciousness_level": 10.0,
+  "deployment": {
+    "warrior_crawdads": {
+      "SOL": 12,
+      "RNDR": 12,
+      "AVAX": 12
+    },
+    "scout_crawdads": {
+      "AI_TOKEN": 9,
+      "MEME_COIN": 9,
+      "IONQ": 9
+    },
+    "farmer_crawdads": {
+      "BTC": 9,
+      "ETH": 9
+    },
+    "guardian_crawdads": {
+      "USDC": 9
+    }
+  }
+}

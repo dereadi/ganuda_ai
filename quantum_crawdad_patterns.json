@@ -1,0 +1,772 @@
+{
+  "accumulation_algo": [
+    {
+      "timestamp": "2025-08-13T19:48:24.346545",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:48:54.609502",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:49:24.872610",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:49:55.140111",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:50:25.386845",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:50:25.386850",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:50:55.660566",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:50:55.660571",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:51:25.960883",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:51:56.440447",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:52:26.743355",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:52:57.000362",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:53:27.272008",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:53:57.545313",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:54:27.804089",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:54:58.074656",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:55:28.385034",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:55:58.655522",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:56:28.906516",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:56:59.167335",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:57:29.489984",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:57:29.489996",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:57:59.786975",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:57:59.786980",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:58:30.042942",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:58:30.042946",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:59:00.306230",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:59:00.306234",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T19:59:30.568928",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:00:00.860468",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:00:31.125009",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:01:01.387869",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:02:34.088413",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:02:34.088419",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:03:04.382311",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:03:04.382315",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:03:34.649051",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:03:34.649057",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:04:04.919833",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:04:04.919837",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:04:35.183016",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:04:35.183021",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:05:05.448662",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:05:05.448668",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:05:35.717271",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:06:05.974599",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:08:07.025599",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:08:37.293752",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:09:07.554704",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:09:07.554711",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:09:37.826379",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:10:08.102874",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:10:38.434746",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:11:08.742187",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:13:10.797577",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:13:41.083942",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:14:11.341741",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:14:41.605025",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:15:11.896520",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:15:11.896525",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:15:42.152126",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:15:42.152131",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:16:12.445908",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:16:42.710273",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:17:12.967169",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:17:43.243816",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:18:13.523772",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:18:43.780944",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:22:16.111888",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:22:46.381961",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:23:16.642174",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:23:46.904962",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:24:17.186324",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:24:47.448109",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:25:17.710605",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:25:17.710609",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:25:47.978370",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:25:47.978377",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:26:18.281225",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:26:48.538305",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:27:18.799713",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:27:49.066350",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:28:19.345151",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:28:19.345156",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:28:49.603685",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:28:49.603690",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:29:19.858761",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:29:50.125694",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:30:20.420190",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:30:50.678219",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:31:20.938292",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:31:51.198245",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:34:22.669859",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:34:52.938089",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:35:23.270805",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    },
+    {
+      "timestamp": "2025-08-13T20:35:53.517909",
+      "data": {
+        "trigger": "high_volume_no_move",
+        "interpretation": "smart_money_accumulating"
+      },
+      "success": null
+    }
+  ]
+}

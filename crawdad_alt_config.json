@@ -1,0 +1,25 @@
+{
+  "mode": "aggressive",
+  "trade_size": 500,
+  "max_position": 2000,
+  "targets": [
+    "XRP",
+    "ETH",
+    "AVAX",
+    "MATIC",
+    "LINK",
+    "ADA",
+    "DOT"
+  ],
+  "allocations": {
+    "XRP": 2000,
+    "ETH": 1500,
+    "AVAX": 800,
+    "MATIC": 800,
+    "LINK": 800,
+    "ADA": 400,
+    "DOT": 351
+  },
+  "strategy": "market_buy",
+  "timestamp": "2025-09-05T09:54:39.039778"
+}

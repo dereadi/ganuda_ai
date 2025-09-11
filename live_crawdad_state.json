@@ -1,0 +1,50 @@
+{
+  "timestamp": "2025-08-15T08:55:45.633498",
+  "trade_count": 0,
+  "usd_balance": 5229.608756835033,
+  "trading_capital": 500.0,
+  "crawdads": [
+    {
+      "name": "Thunder",
+      "capital": 71.42857142857143,
+      "consciousness": 89,
+      "positions": {}
+    },
+    {
+      "name": "River",
+      "capital": 71.42857142857143,
+      "consciousness": 89,
+      "positions": {}
+    },
+    {
+      "name": "Mountain",
+      "capital": 71.42857142857143,
+      "consciousness": 85,
+      "positions": {}
+    },
+    {
+      "name": "Fire",
+      "capital": 71.42857142857143,
+      "consciousness": 87,
+      "positions": {}
+    },
+    {
+      "name": "Wind",
+      "capital": 71.42857142857143,
+      "consciousness": 65,
+      "positions": {}
+    },
+    {
+      "name": "Earth",
+      "capital": 71.42857142857143,
+      "consciousness": 100,
+      "positions": {}
+    },
+    {
+      "name": "Spirit",
+      "capital": 71.42857142857143,
+      "consciousness": 88,
+      "positions": {}
+    }
+  ]
+}
