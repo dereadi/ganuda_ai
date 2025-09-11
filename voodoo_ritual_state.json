@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-08-26T14:03:18.914024",
+  "price": 110671.665,
+  "distance": 439.3350000000064,
+  "voodoo_power": 84.71428571428572,
+  "phase": "possession",
+  "chant": "Never did I wanna be here again",
+  "spirits": {
+    "Spirit": 92,
+    "Fire": 89,
+    "Wind": 87,
+    "Thunder": 86,
+    "River": 82,
+    "Mountain": 79,
+    "Earth": 78
+  }
+}

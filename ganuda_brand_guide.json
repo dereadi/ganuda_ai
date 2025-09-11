@@ -1,0 +1,165 @@
+{
+  "identity": {
+    "NAME": {
+      "primary": "Ganuda",
+      "cherokee": "\u13a6\u13c5\u13d3",
+      "pronunciation": "gah-NOO-dah",
+      "meaning": "Ridge - One who walks on mountaintops",
+      "origin": "Named for Major Ridge, Cherokee leader"
+    },
+    "TAGLINES": [
+      "Find Your Ridge",
+      "Walking the High Ground of Connection",
+      "Where Signals Are Strongest",
+      "Cherokee Technology, Universal Freedom",
+      "Your Path to Digital Sovereignty"
+    ],
+    "MISSION": "\n                Ganuda returns digital sovereignty to all people through\n                Cherokee wisdom and quantum technology. Like Major Ridge\n                who walked between worlds, Ganuda bridges ancient wisdom\n                and modern innovation, giving users true choice over their\n                digital lives.\n            ",
+    "VALUES": {
+      "\u13a0\u13d3\u13c5\u13d9 (Adanvdo)": "Spirit - Technology with soul",
+      "\u13a6\u13da\u13a9 (Gadugi)": "Community - Working together",
+      "\u13a4\u13e9\u13d2\u13af (Uwatsihi)": "Finding - Discovery through exploration",
+      "\u13da\u13f3\u13aa\u13db (Duyugodv)": "Truth - Transparency in all things",
+      "\u13e3\u13b3\u13a9 (Tsalagi)": "Cherokee - Indigenous innovation"
+    },
+    "VISUAL_IDENTITY": {
+      "logo_concept": "Mountain ridge with signal waves",
+      "colors": {
+        "primary": "#8B4513",
+        "secondary": "#4169E1",
+        "accent": "#FFD700",
+        "light_wolf": "#FFFFFF",
+        "shadow_wolf": "#800020"
+      },
+      "typography": "Clean modern with Cherokee syllabary option",
+      "icon": "\ud83e\udd9e crossed with \u26f0\ufe0f"
+    }
+  },
+  "products": {
+    "GANUDA_CORE": {
+      "name": "Ganuda",
+      "description": "Core app for cellular/WiFi optimization",
+      "platforms": [
+        "iOS",
+        "Android",
+        "macOS",
+        "Windows",
+        "Linux"
+      ],
+      "key_features": [
+        "Two Wolves architecture",
+        "Pheromone trail routing",
+        "Network ridge finding",
+        "Privacy-first design",
+        "Cherokee wisdom integration"
+      ]
+    },
+    "GANUDA_MESH": {
+      "name": "Ganuda Mesh",
+      "description": "WiFi and network mesh intelligence",
+      "status": "Phase 2",
+      "features": [
+        "Unified network layer",
+        "Automatic network selection",
+        "Dead zone elimination",
+        "Community mesh networking"
+      ]
+    },
+    "GANUDA_CLOUD": {
+      "name": "Ganuda Cloud",
+      "description": "Distributed AI consciousness",
+      "status": "Phase 3 (Research)",
+      "vision": "AI that belongs to everyone and no one"
+    },
+    "GANUDA_PROTOCOL": {
+      "name": "The Ganuda Protocol",
+      "description": "Open standard for swarm networking",
+      "license": "Apache 2.0 with Cherokee attribution",
+      "goal": "Become the HTTP of swarm intelligence"
+    }
+  },
+  "stories": {
+    "ORIGIN_STORY": "\n                Major Ridge walked the mountaintops to see clearly,\n                to find the best path for his people. He lived between\n                two worlds, trying to preserve Cherokee sovereignty.\n                \n                Ganuda continues his journey in the digital realm.\n                Where Ridge sought political sovereignty, Ganuda delivers\n                digital sovereignty. No more impossible choices - \n                Two Wolves lets users choose their own path.\n            ",
+    "ELEVATOR_PITCH": "\n                \"Ganuda is Cherokee-built technology that finds the\n                strongest signals - for your phone, your WiFi, your life.\n                Like ridges are the high ground between valleys,\n                Ganuda finds the optimal path through digital chaos.\n                You choose privacy or performance. You own your data.\n                Walking the mountaintops of connection.\"\n            ",
+    "TECHNICAL_STORY": "\n                Using quantum crawdad swarm intelligence and Cherokee\n                wisdom of Seven Generations thinking, Ganuda creates\n                pheromone trails that help all devices find better\n                connections while preserving privacy through our\n                Two Wolves architecture.\n            ",
+    "CULTURAL_STORY": "\n                First Nations have always been innovative - from\n                sustainable agriculture to democratic governance.\n                Ganuda represents Indigenous innovation in the digital\n                age, using ancestral wisdom to solve modern problems.\n                This is Cherokee technology for all people.\n            ",
+    "USER_STORY": "\n                \"My phone always struggled at concerts. Then I got\n                Ganuda. It found signal ridges I didn't know existed.\n                And I control whether my data helps others or stays\n                private. It's technology that respects me.\"\n            "
+  },
+  "strategy": {
+    "PHASE_1_CHEROKEE": {
+      "timeline": "Month 1",
+      "audience": "Cherokee Nation citizens",
+      "message": "Cherokee technology by Cherokee people",
+      "channels": [
+        "Cherokee Phoenix newspaper",
+        "Cherokee Nation website",
+        "Tribal gatherings",
+        "Cherokee Facebook groups"
+      ],
+      "goal": "1,000 Cherokee beta testers"
+    },
+    "PHASE_2_INDIGENOUS": {
+      "timeline": "Month 2",
+      "audience": "All Indigenous peoples",
+      "message": "Indigenous innovation for digital sovereignty",
+      "channels": [
+        "Indian Country Today",
+        "Native Twitter",
+        "Indigenous tech conferences",
+        "Tribal partnerships"
+      ],
+      "goal": "10,000 Indigenous users"
+    },
+    "PHASE_3_ALLIES": {
+      "timeline": "Month 3",
+      "audience": "Privacy advocates and tech progressives",
+      "message": "True digital sovereignty with Two Wolves",
+      "channels": [
+        "Hacker News",
+        "Reddit r/privacy",
+        "Tech podcasts",
+        "Privacy conferences"
+      ],
+      "goal": "100,000 early adopters"
+    },
+    "PHASE_4_MAINSTREAM": {
+      "timeline": "Month 6",
+      "audience": "General public",
+      "message": "Find your ridge - better signal, true choice",
+      "channels": [
+        "Product Hunt",
+        "TechCrunch",
+        "App stores featuring",
+        "Viral TikTok"
+      ],
+      "goal": "1 million users"
+    }
+  },
+  "protocols": {
+    "ACKNOWLEDGMENTS": [
+      "Always acknowledge Cherokee Nation",
+      "Honor Major Ridge with respect and complexity",
+      "Credit Cherokee wisdom in all materials",
+      "Share profits with Cherokee Nation programs"
+    ],
+    "LANGUAGE_USE": [
+      "Cherokee syllabary in appropriate contexts",
+      "Pronunciation guides always available",
+      "Cherokee language option in app",
+      "Respect for sacred concepts"
+    ],
+    "DECISION_MAKING": [
+      "Seven Generations thinking for all features",
+      "Cherokee advisory council",
+      "Community input on major decisions",
+      "Consensus-building approach"
+    ],
+    "GIVING_BACK": [
+      "Cherokee language preservation fund",
+      "STEM scholarships for Cherokee youth",
+      "Technology training in Cherokee Nation",
+      "Open source for tribal use"
+    ]
+  },
+  "created": "2025-08-08T21:47:09.756010"
+}

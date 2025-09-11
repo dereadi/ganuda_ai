@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-09-02T15:01:47.445898",
+  "amount_requested": 100,
+  "amount_executed": 0,
+  "results": [
+    "ETH: PENDING",
+    "SOL: PENDING",
+    "BTC: PENDING"
+  ],
+  "timing": "PRE_POWER_HOUR"
+}

@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-09-02T12:09:26.825891",
+  "mission": [
+    "AI/ML Training",
+    "Trading Algorithms",
+    "Solar Modeling",
+    "Gardening Tech",
+    "Audio Processing",
+    "Web Development"
+  ],
+  "recommended_primary": {
+    "model": "Dell PowerEdge R740XD",
+    "price": 4500,
+    "specs": {
+      "cpu": "2x Xeon Gold 6140",
+      "cores": 36,
+      "ram": 256,
+      "storage": "2TB NVMe + 48TB HDD",
+      "gpu_slots": 3
+    }
+  },
+  "total_budget": 9000,
+  "includes": [
+    "Server",
+    "RAM upgrade",
+    "GPU",
+    "Network",
+    "UPS"
+  ]
+}

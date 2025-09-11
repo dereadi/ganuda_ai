@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-08-25T20:29:07.765613",
+  "strike": "ONE",
+  "btc_price": 109702.5,
+  "direction": "SELL",
+  "orders": [],
+  "btc_deployed": 0.009222475,
+  "target_exit": 108605.475,
+  "strike_levels": [
+    {
+      "price": 109921.905,
+      "size": 0.0027667425,
+      "type": "LIMIT"
+    },
+    {
+      "price": 110251.01249999998,
+      "size": 0.0027667425,
+      "type": "LIMIT"
+    },
+    {
+      "price": 110580.12,
+      "size": 0.0036889900000000005,
+      "type": "LIMIT"
+    }
+  ]
+}

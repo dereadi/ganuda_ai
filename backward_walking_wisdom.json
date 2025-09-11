@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-08-14T15:45:35.806308",
+  "patterns_discovered": {
+    "triple_dip_reversal": {
+      "count": 7,
+      "crawdads": [
+        "Nostradamus",
+        "Rewind",
+        "Echo",
+        "Hindsight",
+        "Temporal",
+        "Mirror",
+        "Oracle"
+      ],
+      "avg_reliability": 5.949999999999999,
+      "action": "BUY_AGGRESSIVELY"
+    }
+  },
+  "backward_walking_enabled": true,
+  "mini_trend_detection": "ACTIVE",
+  "crawdad_consensus": 1
+}

@@ -1,0 +1,62 @@
+{
+  "timestamp": "2025-08-30T10:58:38.024566",
+  "strategy": "BLOOD_BAG_LIQUIDITY",
+  "philosophy": "Use worthless pumping alts as ATMs",
+  "targets": {
+    "DOGE": {
+      "status": "PRIME_BLOOD_BAG",
+      "current_holding": 1387.2,
+      "strategy": "Build on dips, bleed on pumps",
+      "pump_threshold": 0.02,
+      "accumulate_under": 0.215,
+      "bleed_above": 0.22,
+      "allocation": 10
+    },
+    "XRP": {
+      "status": "SECONDARY_BLOOD_BAG",
+      "current_holding": 13.670958,
+      "strategy": "Rate cut pump coming",
+      "pump_threshold": 0.03,
+      "accumulate_under": 2.75,
+      "bleed_above": 2.9,
+      "allocation": 5
+    },
+    "LINK": {
+      "status": "BACKUP_BLOOD_BAG",
+      "current_holding": 0.38,
+      "strategy": "Oracle narrative pump",
+      "pump_threshold": 0.025,
+      "accumulate_under": 23.0,
+      "bleed_above": 24.0,
+      "allocation": 5
+    }
+  },
+  "execution_plan": {
+    "BUILD_PHASE": [
+      "Use ANY available USD to accumulate blood bags",
+      "Focus on DOGE (most reliable pumper)",
+      "Buy micro dips (even $2-5 amounts)",
+      "Build slowly while others FOMO"
+    ],
+    "BLEED_PHASE": [
+      "Set alerts for 2-3% pumps",
+      "Bleed 50% on first pump",
+      "Bleed remaining on second pump",
+      "Convert ALL to USD immediately",
+      "NEVER HODL blood bags"
+    ]
+  },
+  "two_wolves_alignment": {
+    "feeds_fear_wolf": "Generates cash reserves",
+    "starves_greed_wolf": "Sells into greed, doesn't chase",
+    "balance": "Turns worthless pumps into liquidity"
+  },
+  "specialist_directives": {
+    "mean-reversion": "Buy blood bags at bottom of range",
+    "trend": "Ride pump for 2-3% then BLEED",
+    "volatility": "Trade the meme volatility",
+    "breakout": "Catch meme breakouts, sell immediately"
+  },
+  "warning": "These are BLOOD BAGS not investments",
+  "sacred_fire": "BURNING_PARASITIC"
+}

@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-09-02T12:43:42.851155",
+  "total_value": 14909.480000000001,
+  "crypto_value": 14708.03,
+  "positions": {
+    "BTC": {
+      "amount": 0.05672937,
+      "value": 6290.29,
+      "price": 110882.43,
+      "on_hold": 0.04651104
+    },
+    "ETH": {
+      "amount": 0.98685514,
+      "value": 4254.46,
+      "price": 4311.13
+    },
+    "SOL": {
+      "amount": 13.78416203,
+      "value": 2822.31,
+      "price": 204.75
+    },
+    "AVAX": {
+      "amount": 43.28691157,
+      "value": 1037.15,
+      "price": 23.96
+    },
+    "XRP": {
+      "amount": 108.595005,
+      "value": 303.82,
+      "price": 2.8
+    },
+    "USD": {
+      "available": 0.65,
+      "on_hold": 200.8,
+      "total": 201.45
+    }
+  },
+  "allocation": {
+    "BTC": "42.8%",
+    "ETH": "28.9%",
+    "SOL": "19.2%",
+    "Others": "9.1%"
+  },
+  "recommendation": "Deploy $15K with 50% ETH focus"
+}

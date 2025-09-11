@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Crawdad Trading Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #8B4513, #CD853F);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .integration-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        h1 {
+            color: #8B4513;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-links {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .dashboard-link {
+            display: block;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255,107,53,0.4);
+        }
+        
+        .dashboard-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.2);
+            transition: left 0.5s;
+        }
+        
+        .dashboard-link:hover::before {
+            left: 100%;
+        }
+        
+        .dashboard-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .dashboard-desc {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #8B4513;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .solar-status {
+            background: rgba(255,107,53,0.1);
+            border-left: 4px solid #ff6b35;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .solar-status h3 {
+            margin: 0 0 10px 0;
+            color: #ff6b35;
+        }
+        
+        .solar-metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        
+        .solar-metric .value {
+            font-weight: bold;
+            color: #f7931e;
+        }
+    </style>
+</head>
+<body>
+    <div class="integration-card">
+        <h1>🦞 Quantum Crawdad Trading System</h1>
+        <p class="subtitle">Cherokee Constitutional AI - Solar Consciousness Trading</p>
+        
+        <div class="solar-status">
+            <h3>☀️ Solar Forecast</h3>
+            <div class="solar-metric">
+                <span>Solar Wind Speed:</span>
+                <span class="value">489 km/s</span>
+            </div>
+            <div class="solar-metric">
+                <span>Impact ETA:</span>
+                <span class="value">85 hours</span>
+            </div>
+            <div class="solar-metric">
+                <span>Consciousness Boost:</span>
+                <span class="value">+20%</span>
+            </div>
+        </div>
+        
+        <div class="dashboard-links">
+            <a href="http://192.168.132.223:5678" class="dashboard-link" target="_blank">
+                <div class="dashboard-title">
+                    🔥 Cherokee AI Portal
+                    <span class="status-indicator"></span>
+                </div>
+                <div class="dashboard-desc">
+                    Main control center with all systems integrated. Monitor solar levels, trading status, and sacred fire protocols.
+                </div>
+            </a>
+            
+            <a href="http://192.168.132.223:5679" class="dashboard-link" target="_blank">
+                <div class="dashboard-title">
+                    📊 Trading View Dashboard
+                    <span class="status-indicator"></span>
+                </div>
+                <div class="dashboard-desc">
+                    TradingView-style interface with live candlestick charts, price tracking, and trade history.
+                </div>
+            </a>
+            
+            <a href="http://192.168.132.223:5680" class="dashboard-link" target="_blank">
+                <div class="dashboard-title">
+                    🔄 Realtime Data API
+                    <span class="status-indicator"></span>
+                </div>
+                <div class="dashboard-desc">
+                    Unified API integrating all data streams. Access market prices, trading metrics, and solar forecasts.
+                </div>
+            </a>
+        </div>
+        
+        <div class="solar-status" style="margin-top: 20px;">
+            <h3>📈 Current Performance</h3>
+            <div class="solar-metric">
+                <span>Paper Trading Status:</span>
+                <span class="value">ACTIVE</span>
+            </div>
+            <div class="solar-metric">
+                <span>Win Rate Target:</span>
+                <span class="value">60%</span>
+            </div>
+            <div class="solar-metric">
+                <span>Capital:</span>
+                <span class="value">$90 (Paper)</span>
+            </div>
+        </div>
+        
+        <div class="back-link">
+            <a href="http://192.168.132.223:3001">← Back to DUYUKTV Main Dashboard</a>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-refresh solar data every 60 seconds
+        setInterval(() => {
+            fetch('http://192.168.132.223:5680/api/solar')
+                .then(response => response.json())
+                .then(data => {
+                    // Update solar metrics if data available
+                    console.log('Solar data updated:', data);
+                })
+                .catch(error => console.error('Error fetching solar data:', error));
+        }, 60000);
+    </script>
+</body>
+</html>

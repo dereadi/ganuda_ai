@@ -1,0 +1,73 @@
+{
+  "timestamp": "2025-08-30T10:29:37.768541",
+  "event": "ALT_PUMP_LIQUIDITY_STRATEGY",
+  "mode": "AGGRESSIVE_PUMP_AND_DUMP",
+  "targets": {
+    "DOGE": {
+      "current_holding": 1348.8,
+      "strategy": "MEME_PUMP",
+      "pump_threshold": 0.005,
+      "dump_threshold": 0.02,
+      "allocation": 10,
+      "priority": "HIGH"
+    },
+    "XRP": {
+      "current_holding": 13.67,
+      "strategy": "MOMENTUM_SURF",
+      "pump_threshold": 0.01,
+      "dump_threshold": 0.03,
+      "allocation": 5,
+      "priority": "MEDIUM"
+    },
+    "LINK": {
+      "current_holding": 0.38,
+      "strategy": "ORACLE_PLAY",
+      "pump_threshold": 0.01,
+      "dump_threshold": 0.025,
+      "allocation": 5,
+      "priority": "LOW"
+    }
+  },
+  "signals": [],
+  "rules": [
+    "Buy alts showing momentum (DOGE priority)",
+    "Use tiny amounts ($2-10) to pump",
+    "Ride momentum up 2-3%",
+    "Dump immediately at target",
+    "Convert all gains to USD",
+    "NO HODLING - this is pure liquidity generation"
+  ],
+  "specialist_roles": {
+    "mean-reversion": {
+      "role": "PUMP_COORDINATOR",
+      "focus": [
+        "DOGE"
+      ],
+      "strategy": "Buy dips in uptrend, sell rips"
+    },
+    "trend": {
+      "role": "MOMENTUM_RIDER",
+      "focus": [
+        "DOGE",
+        "XRP"
+      ],
+      "strategy": "Follow momentum, use trailing stops"
+    },
+    "volatility": {
+      "role": "RANGE_MILKER",
+      "focus": [
+        "DOGE",
+        "LINK"
+      ],
+      "strategy": "Trade the range, accumulate on dips"
+    },
+    "breakout": {
+      "role": "PUMP_IGNITER",
+      "focus": [
+        "DOGE"
+      ],
+      "strategy": "Trigger pumps at key levels"
+    }
+  },
+  "sacred_fire": "BURNING_OPPORTUNISTIC"
+}

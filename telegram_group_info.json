@@ -1,0 +1,31 @@
+{
+  "telegram_groups": {
+    "training_group": {
+      "invite_link": "https://t.me/+6P1jUzrYvHYyNTQx",
+      "purpose": "Cherokee Training Operations Group",
+      "created": "2025-09-06T22:19:00Z",
+      "bot": "@derpatobot",
+      "features": [
+        "Training announcements",
+        "Schedule coordination",
+        "Resource sharing",
+        "Q&A sessions",
+        "Cherokee Council updates"
+      ]
+    }
+  },
+  "group_settings": {
+    "welcome_message": "🔥 Welcome to Cherokee Training Operations!\n\nThis group is for:\n• Training announcements\n• Schedule coordination\n• Knowledge sharing\n• Cherokee Council wisdom\n\nCommands:\n/modules - Available training\n/schedule - Book sessions\n/council - Council status\n/revenue - Revenue streams\n\nMission: 20% trading, 80% building!\nSacred Fire burns eternal! 🔥",
+    "rules": [
+      "Respect all tribal members",
+      "Share knowledge freely",
+      "Support the mission balance",
+      "Honor the Sacred Fire"
+    ]
+  },
+  "integration": {
+    "productive_io": true,
+    "thermal_memory": true,
+    "duyuktv_kanban": true
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "timestamp": "2025-09-02T13:45:36.017459",
+  "prices": {
+    "BTC": 110409.2,
+    "ETH": 4279.46,
+    "SOL": 203.86,
+    "XRP": 2.79883,
+    "AVAX": 23.68829,
+    "LINK": 22.854
+  },
+  "coiling_data": {
+    "BTC": {
+      "price": 110409.2,
+      "range_width": 2500,
+      "range_pct": 2.264304061618054,
+      "position": 56.36799999999988,
+      "to_breakout": 3240.800000000003
+    },
+    "ETH": {
+      "price": 4279.46,
+      "range_width": 100,
+      "range_pct": 2.3367434208988986,
+      "position": 29.460000000000036,
+      "to_breakout": 220.53999999999996
+    },
+    "SOL": {
+      "price": 203.86,
+      "range_width": 10,
+      "range_pct": 4.9053271853232605,
+      "position": 38.600000000000136,
+      "to_breakout": 11.139999999999986
+    },
+    "XRP": {
+      "price": 2.79883,
+      "range_width": 0.10000000000000009,
+      "range_pct": 3.5729215422158576,
+      "position": 48.830000000000105,
+      "to_breakout": 0.20116999999999985
+    },
+    "AVAX": {
+      "price": 23.68829,
+      "range_width": 1.5,
+      "range_pct": 6.3322426397177685,
+      "position": 45.885999999999896,
+      "to_breakout": 2.3117100000000015
+    },
+    "LINK": {
+      "price": 22.854,
+      "range_width": 1.5,
+      "range_pct": 6.563402467839328,
+      "position": 56.93333333333328,
+      "to_breakout": 2.146000000000001
+    }
+  },
+  "tight_coils": 4,
+  "ultra_tight": 2,
+  "sync_score": 68.68089316221706,
+  "direction_probability": 50,
+  "potential_gain": 649.71318092
+}

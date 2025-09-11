@@ -1,0 +1,50 @@
+{
+  "timestamp": "2025-09-05T09:52:35.663416",
+  "capital": 300.0,
+  "total_trades": 10,
+  "crawdads": [
+    {
+      "name": "Thunder",
+      "capital": 42.857142857142854,
+      "trades": 0,
+      "last_consciousness": 93
+    },
+    {
+      "name": "River",
+      "capital": 42.857142857142854,
+      "trades": 0,
+      "last_consciousness": 79
+    },
+    {
+      "name": "Mountain",
+      "capital": 42.857142857142854,
+      "trades": 0,
+      "last_consciousness": 91
+    },
+    {
+      "name": "Fire",
+      "capital": 42.857142857142854,
+      "trades": 0,
+      "last_consciousness": 86
+    },
+    {
+      "name": "Wind",
+      "capital": 42.857142857142854,
+      "trades": 0,
+      "last_consciousness": 93
+    },
+    {
+      "name": "Earth",
+      "capital": 42.857142857142854,
+      "trades": 0,
+      "last_consciousness": 90
+    },
+    {
+      "name": "Spirit",
+      "capital": 42.857142857142854,
+      "trades": 0,
+      "last_consciousness": 84
+    }
+  ],
+  "mode": "live"
+}

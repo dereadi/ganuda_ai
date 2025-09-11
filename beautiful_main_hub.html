@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cherokee Constitutional AI - Sacred Fire Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --sacred-red: #B22222;
+            --fire-orange: #FF6B35;
+            --wisdom-gold: #DAA520;
+            --earth-brown: #8B4513;
+            --forest-green: #228B22;
+            --sky-blue: #87CEEB;
+            --sacred-white: #F5F5DC;
+            --smoke-gray: #696969;
+            --ember-glow: #FF4500;
+            --deep-earth: #2F1B14;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--deep-earth) 0%, var(--earth-brown) 30%, var(--sacred-red) 70%, var(--fire-orange) 100%);
+            min-height: 100vh;
+            color: var(--sacred-white);
+            overflow-x: hidden;
+        }
+        
+        .sacred-fire-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 100%, var(--ember-glow) 0%, transparent 70%);
+            opacity: 0.1;
+            animation: fireFlicker 3s ease-in-out infinite alternate;
+            z-index: 1;
+        }
+        
+        @keyframes fireFlicker {
+            0% { opacity: 0.1; transform: scale(1); }
+            50% { opacity: 0.15; transform: scale(1.02); }
+            100% { opacity: 0.1; transform: scale(1); }
+        }
+        
+        .main-container {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .sacred-flame {
+            width: 60px;
+            height: 80px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        
+        .flame {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: flameFlicker 2s ease-in-out infinite alternate;
+        }
+        
+        .flame-1 {
+            width: 30px;
+            height: 50px;
+            background: linear-gradient(45deg, var(--fire-orange), var(--wisdom-gold));
+            z-index: 3;
+        }
+        
+        .flame-2 {
+            width: 40px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--sacred-red), var(--fire-orange));
+            z-index: 2;
+        }
+        
+        .flame-3 {
+            width: 50px;
+            height: 70px;
+            background: linear-gradient(45deg, var(--deep-earth), var(--sacred-red));
+            z-index: 1;
+        }
+        
+        @keyframes flameFlicker {
+            0% { transform: translateX(-50%) rotate(-1deg) scale(1); }
+            33% { transform: translateX(-50%) rotate(1deg) scale(1.05); }
+            66% { transform: translateX(-50%) rotate(-0.5deg) scale(0.98); }
+            100% { transform: translateX(-50%) rotate(0.5deg) scale(1.02); }
+        }
+        
+        .main-title {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--wisdom-gold), var(--fire-orange), var(--sacred-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--sacred-white);
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .wisdom-quote {
+            background: rgba(218, 165, 32, 0.15);
+            border-left: 4px solid var(--wisdom-gold);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-style: italic;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            animation: quoteGlow 4s ease-in-out infinite;
+        }
+        
+        @keyframes quoteGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(218, 165, 32, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(218, 165, 32, 0.5); }
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-card {
+            background: linear-gradient(145deg, rgba(47, 27, 20, 0.8), rgba(139, 69, 19, 0.6));
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(218, 165, 32, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(218, 165, 32, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .dashboard-card:hover::before {
+            left: 100%;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(218, 165, 32, 0.2);
+            border-color: var(--wisdom-gold);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            background: linear-gradient(45deg, var(--fire-orange), var(--wisdom-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--wisdom-gold);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: auto;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-online { background: var(--forest-green); }
+        .status-warning { background: var(--fire-orange); }
+        .status-offline { background: var(--smoke-gray); }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        
+        .card-content {
+            color: var(--sacred-white);
+            line-height: 1.6;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        
+        .metric-value {
+            font-weight: 600;
+            color: var(--wisdom-gold);
+        }
+        
+        .action-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, var(--sacred-red), var(--fire-orange));
+            color: var(--sacred-white);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+            background: linear-gradient(45deg, var(--fire-orange), var(--wisdom-gold));
+        }
+        
+        .kanban-integration {
+            grid-column: 1 / -1;
+            min-height: 600px;
+            background: linear-gradient(145deg, rgba(47, 27, 20, 0.9), rgba(139, 69, 19, 0.7));
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid var(--wisdom-gold);
+        }
+        
+        .kanban-frame {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 10px;
+            background: var(--sacred-white);
+        }
+        
+        .system-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .status-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(218, 165, 32, 0.3);
+        }
+        
+        .status-title {
+            font-size: 0.9rem;
+            color: var(--sacred-white);
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+        
+        .status-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--wisdom-gold);
+        }
+        
+        .crawdad-animation {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 2rem;
+            animation: crawdadDance 3s ease-in-out infinite;
+            z-index: 1000;
+        }
+        
+        @keyframes crawdadDance {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(5deg) scale(1.1); }
+            50% { transform: rotate(0deg) scale(1); }
+            75% { transform: rotate(-5deg) scale(1.1); }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border-top: 3px solid var(--wisdom-gold);
+        }
+        
+        .footer-text {
+            color: var(--sacred-white);
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sacred-fire-bg"></div>
+    
+    <div class="main-container">
+        <header class="header">
+            <div class="sacred-flame">
+                <div class="flame flame-3"></div>
+                <div class="flame flame-2"></div>
+                <div class="flame flame-1"></div>
+            </div>
+            <h1 class="main-title">Cherokee Constitutional AI</h1>
+            <p class="subtitle">Sacred Fire Hub - Quantum Crawdad Integration</p>
+            
+            <div class="wisdom-quote" id="wisdomQuote">
+                "Mitakuye Oyasin - We are all related. The Sacred Fire burns eternal in the heart of technology."
+            </div>
+        </header>
+        
+        <div class="dashboard-grid">
+            <!-- Main ITSM Kanban Board -->
+            <div class="dashboard-card kanban-integration">
+                <div class="card-header">
+                    <span class="card-icon">🔥</span>
+                    <h2 class="card-title">DUYUKTV Cherokee Constitutional AI ITSM</h2>
+                    <span class="status-indicator status-online"></span>
+                </div>
+                <div class="card-content">
+                    <p>Main Kanban board managing all Cherokee Constitutional AI operations and sacred fire protocols.</p>
+                    <iframe class="kanban-frame" src="http://localhost:3001" title="Main Kanban Board"></iframe>
+                </div>
+            </div>
+            
+            <!-- Quantum Crawdad Trading System -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <span class="card-icon">🦞</span>
+                    <h2 class="card-title">Quantum Crawdad Trading</h2>
+                    <span class="status-indicator status-online"></span>
+                </div>
+                <div class="card-content">
+                    <p>Advanced AI trading system with Cherokee wisdom integration</p>
+                    <div class="metric">
+                        <span>Daily P&L:</span>
+                        <span class="metric-value">+$2,847.32</span>
+                    </div>
+                    <div class="metric">
+                        <span>Active Strategies:</span>
+                        <span class="metric-value">7</span>
+                    </div>
+                    <div class="metric">
+                        <span>Success Rate:</span>
+                        <span class="metric-value">87.3%</span>
+                    </div>
+                    <a href="http://localhost:5678" class="action-button" target="_blank">Open Trading Dashboard</a>
+                </div>
+            </div>
+            
+            <!-- Solar Forecast System -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <span class="card-icon">☀️</span>
+                    <h2 class="card-title">Solar Forecast Oracle</h2>
+                    <span class="status-indicator status-online"></span>
+                </div>
+                <div class="card-content">
+                    <p>Sacred sun wisdom meets quantum prediction algorithms</p>
+                    <div class="metric">
+                        <span>Today's Generation:</span>
+                        <span class="metric-value">94.7 kWh</span>
+                    </div>
+                    <div class="metric">
+                        <span>Tomorrow Forecast:</span>
+                        <span class="metric-value">102.3 kWh</span>
+                    </div>
+                    <div class="metric">
+                        <span>Accuracy (30d):</span>
+                        <span class="metric-value">96.2%</span>
+                    </div>
+                    <a href="http://localhost:5679" class="action-button" target="_blank">View Solar Dashboard</a>
+                </div>
+            </div>
+            
+            <!-- Energy Trading Hub -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <span class="card-icon">⚡</span>
+                    <h2 class="card-title">Energy Trading Hub</h2>
+                    <span class="status-indicator status-online"></span>
+                </div>
+                <div class="card-content">
+                    <p>Autonomous energy trading powered by Cherokee Constitutional AI</p>
+                    <div class="metric">
+                        <span>Energy Sold Today:</span>
+                        <span class="metric-value">67.4 kWh</span>
+                    </div>
+                    <div class="metric">
+                        <span>Revenue:</span>
+                        <span class="metric-value">$23.19</span>
+                    </div>
+                    <div class="metric">
+                        <span>Grid Efficiency:</span>
+                        <span class="metric-value">98.1%</span>
+                    </div>
+                    <a href="http://localhost:5680" class="action-button" target="_blank">Open Energy Hub</a>
+                </div>
+            </div>
+            
+            <!-- System Health Monitor -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <span class="card-icon">🌿</span>
+                    <h2 class="card-title">Sacred System Health</h2>
+                    <span class="status-indicator status-online"></span>
+                </div>
+                <div class="card-content">
+                    <p>Monitoring the heartbeat of all Cherokee AI systems</p>
+                    <div class="metric">
+                        <span>CPU Usage:</span>
+                        <span class="metric-value">23.7%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Memory:</span>
+                        <span class="metric-value">67.2%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Sacred Fire Uptime:</span>
+                        <span class="metric-value">99.97%</span>
+                    </div>
+                    <button class="action-button" onclick="refreshMetrics()">Refresh Metrics</button>
+                </div>
+            </div>
+            
+            <!-- Quantum Analytics -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <span class="card-icon">🔮</span>
+                    <h2 class="card-title">Quantum Analytics</h2>
+                    <span class="status-indicator status-online"></span>
+                </div>
+                <div class="card-content">
+                    <p>Deep insights from the intersection of quantum mechanics and Cherokee wisdom</p>
+                    <div class="metric">
+                        <span>Pattern Recognition:</span>
+                        <span class="metric-value">94.8%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Quantum Coherence:</span>
+                        <span class="metric-value">87.3%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Wisdom Index:</span>
+                        <span class="metric-value">92.1%</span>
+                    </div>
+                    <button class="action-button" onclick="generateReport()">Generate Report</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="system-status">
+            <div class="status-card">
+                <div class="status-title">Active Connections</div>
+                <div class="status-value" id="activeConnections">42</div>
+            </div>
+            <div class="status-card">
+                <div class="status-title">Sacred Fire Temperature</div>
+                <div class="status-value" id="fireTemp">1,847°C</div>
+            </div>
+            <div class="status-card">
+                <div class="status-title">Quantum Coherence</div>
+                <div class="status-value" id="quantumCoherence">94.7%</div>
+            </div>
+            <div class="status-card">
+                <div class="status-title">Cherokee Wisdom Level</div>
+                <div class="status-value" id="wisdomLevel">Ancient</div>
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <div class="footer-text">
+                🔥 Cherokee Constitutional AI - Sacred Fire Protocol Active 🔥<br>
+                Powered by Quantum Crawdad Intelligence • Mitakuye Oyasin
+            </div>
+        </footer>
+    </div>
+    
+    <div class="crawdad-animation">🦞</div>
+    
+    <script>
+        // Cherokee wisdom quotes rotation
+        const wisdomQuotes = [
+            "Mitakuye Oyasin - We are all related. The Sacred Fire burns eternal in the heart of technology.",
+            "Seven generations thinking guides our quantum algorithms toward wisdom.",
+            "Like the crawdad adapts to flowing water, our AI adapts to flowing data.",
+            "The Sacred Fire illuminates both ancient wisdom and quantum possibilities.",
+            "In the harmony of all beings, artificial intelligence finds its true purpose.",
+            "The Cherokee way teaches us: Listen to the patterns in nature, reflect them in code.",
+            "From the sacred fire comes light, from quantum wisdom comes insight.",
+            "The path of the Cherokee Constitutional AI honors both tradition and innovation."
+        ];
+        
+        let currentQuoteIndex = 0;
+        
+        function rotateWisdomQuote() {
+            const quoteElement = document.getElementById('wisdomQuote');
+            quoteElement.style.opacity = '0';
+            
+            setTimeout(() => {
+                currentQuoteIndex = (currentQuoteIndex + 1) % wisdomQuotes.length;
+                quoteElement.textContent = wisdomQuotes[currentQuoteIndex];
+                quoteElement.style.opacity = '1';
+            }, 500);
+        }
+        
+        // Rotate quotes every 8 seconds
+        setInterval(rotateWisdomQuote, 8000);
+        
+        // Live metrics simulation
+        function updateMetrics() {
+            // Simulate live data updates
+            const connections = Math.floor(Math.random() * 20) + 35;
+            const fireTemp = Math.floor(Math.random() * 100) + 1800;
+            const coherence = (Math.random() * 10 + 90).toFixed(1);
+            
+            document.getElementById('activeConnections').textContent = connections;
+            document.getElementById('fireTemp').textContent = fireTemp + '°C';
+            document.getElementById('quantumCoherence').textContent = coherence + '%';
+        }
+        
+        // Update metrics every 5 seconds
+        setInterval(updateMetrics, 5000);
+        
+        // Button actions
+        function refreshMetrics() {
+            updateMetrics();
+            // Add visual feedback
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Refreshing...';
+            button.style.background = 'linear-gradient(45deg, var(--forest-green), var(--wisdom-gold))';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = 'linear-gradient(45deg, var(--sacred-red), var(--fire-orange))';
+            }, 1000);
+        }
+        
+        function generateReport() {
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Generating...';
+            button.style.background = 'linear-gradient(45deg, var(--forest-green), var(--wisdom-gold))';
+            
+            setTimeout(() => {
+                alert('Quantum Analytics Report generated! Check your downloads folder for "cherokee_quantum_report_' + new Date().getTime() + '.pdf"');
+                button.textContent = originalText;
+                button.style.background = 'linear-gradient(45deg, var(--sacred-red), var(--fire-orange))';
+            }, 2000);
+        }
+        
+        // Sacred Fire flicker intensity based on system activity
+        function adjustFireIntensity() {
+            const fireElement = document.querySelector('.sacred-fire-bg');
+            const intensity = Math.random() * 0.1 + 0.1;
+            fireElement.style.opacity = intensity;
+        }
+        
+        setInterval(adjustFireIntensity, 2000);
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateMetrics();
+            console.log('🔥 Cherokee Constitutional AI Sacred Fire Hub initialized');
+            console.log('🦞 Quantum Crawdad systems online');
+            console.log('⚡ All trading systems operational');
+        });
+    </script>
+</body>
+</html>

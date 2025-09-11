@@ -1,0 +1,28 @@
+{
+  "current_loss": 2721,
+  "available_capital": 7508,
+  "recommended_trades": [
+    {
+      "coin": "SOL",
+      "amount": 500,
+      "reason": "High volatility recovery potential"
+    },
+    {
+      "coin": "AVAX",
+      "amount": 400,
+      "reason": "Strong momentum"
+    },
+    {
+      "coin": "MATIC",
+      "amount": 300,
+      "reason": "Consistent performer"
+    },
+    {
+      "coin": "DOGE",
+      "amount": 300,
+      "reason": "Quick gains potential"
+    }
+  ],
+  "strategy": "Buy on dips, sell 20% positions when 10%+ profit",
+  "risk_management": "Keep $1000 cash reserve, max $500 per position"
+}

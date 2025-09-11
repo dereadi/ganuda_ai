@@ -1,0 +1,44 @@
+{
+  "timestamp": "2025-09-02T15:42:33.579909",
+  "bleed_analysis": {
+    "BTC": {
+      "current": 111295.55,
+      "bleed_1": 113650,
+      "distance_to_bleed": 2354.449999999997,
+      "pct_to_bleed": 2.1154933867526573
+    },
+    "ETH": {
+      "current": 4325.2,
+      "bleed_1": 4500,
+      "distance_to_bleed": 174.80000000000018,
+      "pct_to_bleed": 4.041431610098959
+    },
+    "SOL": {
+      "current": 207.78,
+      "bleed_1": 210,
+      "distance_to_bleed": 2.219999999999999,
+      "pct_to_bleed": 1.0684377707190293
+    },
+    "XRP": {
+      "current": 2.8506,
+      "bleed_1": 2.9,
+      "distance_to_bleed": 0.04939999999999989,
+      "pct_to_bleed": 1.7329684978600959
+    },
+    "AVAX": {
+      "current": 24.16,
+      "bleed_1": 25,
+      "distance_to_bleed": 0.8399999999999999,
+      "pct_to_bleed": 3.47682119205298
+    },
+    "LINK": {
+      "current": 23.38,
+      "bleed_1": 24,
+      "distance_to_bleed": 0.620000000000001,
+      "pct_to_bleed": 2.651839178785291
+    }
+  },
+  "total_bleedable_now": 0,
+  "total_potential_today": 706.54083,
+  "liquidity_status": "LOW"
+}

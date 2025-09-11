@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-09-08T08:04:06.177536",
+  "monday_date": "2025-09-09",
+  "current_kp": 2.0,
+  "monday_forecast": {
+    "00-03 ET": 2.67,
+    "03-06 ET": 2.67,
+    "06-09 ET": 2.0,
+    "09-12 ET": 1.67,
+    "12-15 ET": 1.67,
+    "15-18 ET": 1.0,
+    "18-21 ET": 1.0,
+    "21-00 ET": 2.33
+  },
+  "max_kp": 2.67,
+  "min_kp": 1.0,
+  "storm_level": "NONE",
+  "trading_bias": "BULLISH",
+  "expected_gain_percent": 2.3,
+  "portfolio_target": 33705.16974
+}

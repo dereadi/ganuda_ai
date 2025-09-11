@@ -1,0 +1,59 @@
+{
+  "timestamp": "2025-09-05T16:40:00",
+  "total_value": 30609.76,
+  "cash": {
+    "USD": 201.42,
+    "USDC": 215.02,
+    "total": 416.45
+  },
+  "crypto_positions": {
+    "ETH": {
+      "amount": 2.94784322,
+      "value": 12691.06,
+      "price": 4306.22,
+      "unrealized": -295.38,
+      "return_pct": -2.27
+    },
+    "SOL": {
+      "amount": 37.24537566,
+      "value": 7592.84,
+      "price": 203.86,
+      "unrealized": -7.24,
+      "return_pct": -0.10
+    },
+    "BTC": {
+      "amount": 0.06347764,
+      "value": 7032.38,
+      "price": 110785.18,
+      "unrealized": 101.72,
+      "return_pct": 1.47
+    },
+    "XRP": {
+      "amount": 1021.58029,
+      "value": 2892.34,
+      "price": 2.83,
+      "unrealized": -36.77,
+      "return_pct": -1.25
+    },
+    "LINK": {
+      "amount": 0.38,
+      "value": 8.49,
+      "price": 22.35,
+      "unrealized": 0.14,
+      "return_pct": 1.68
+    },
+    "AVAX": {
+      "amount": 0.28691157,
+      "value": 6.99,
+      "price": 24.38,
+      "unrealized": 0.24,
+      "return_pct": 3.53
+    }
+  },
+  "crypto_total": 30224.21,
+  "summary": {
+    "total_unrealized": -237.29,
+    "percent_in_crypto": 98.64,
+    "percent_in_cash": 1.36
+  }
+}

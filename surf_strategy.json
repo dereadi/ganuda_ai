@@ -1,0 +1,90 @@
+{
+  "timestamp": "2025-08-15T11:06:47.272009",
+  "portfolio_value": 9948.5,
+  "positions": {
+    "MATIC": {
+      "amount": 9042.1,
+      "value": 3616.84,
+      "strategy": "HOLD_STRONG"
+    },
+    "SOL": {
+      "amount": 16.55,
+      "value": 2483.02,
+      "strategy": "ACCUMULATE"
+    },
+    "AVAX": {
+      "amount": 87.12,
+      "value": 2178.12,
+      "strategy": "MOMENTUM_RIDE"
+    },
+    "BTC": {
+      "amount": 0.0135,
+      "value": 796.34,
+      "strategy": "STABLE_ANCHOR"
+    },
+    "ETH": {
+      "amount": 0.287,
+      "value": 747.17,
+      "strategy": "LAYER2_PLAY"
+    },
+    "LINK": {
+      "amount": 11.38,
+      "value": 125.18,
+      "strategy": "ORACLE_HEDGE"
+    },
+    "USD": {
+      "amount": 1.83,
+      "value": 1.83,
+      "strategy": "NEED_LIQUIDITY"
+    }
+  },
+  "immediate_actions": [
+    "1. CREATE LIQUIDITY: Sell 10% of MATIC (904 tokens) = ~$361 cash",
+    "2. SET ALERTS: MATIC < $0.38 (stop), > $0.45 (profit)",
+    "3. ACCUMULATE: Buy $100 more SOL if it dips below $145",
+    "4. SWING TRADE: Use $200 for AVAX scalping ($24-27 range)",
+    "5. HOLD STRONG: Keep 80% positions, only trade with 20%"
+  ],
+  "crawdad_assignments": [
+    {
+      "name": "Thunder",
+      "role": "MATIC Guardian",
+      "action": "Monitor MATIC 24/7, alert at \u00b13% moves"
+    },
+    {
+      "name": "River",
+      "role": "Liquidity Maker",
+      "action": "Sell 5% of each position for trading cash"
+    },
+    {
+      "name": "Fire",
+      "role": "SOL Surfer",
+      "action": "Accumulate SOL on any dip below $145"
+    },
+    {
+      "name": "Mountain",
+      "role": "AVAX Climber",
+      "action": "Swing trade AVAX $24-27 range"
+    },
+    {
+      "name": "Wind",
+      "role": "Profit Taker",
+      "action": "Sell 10% on any +5% daily gain"
+    },
+    {
+      "name": "Stone",
+      "role": "BTC Holder",
+      "action": "Never sell BTC, only accumulate"
+    },
+    {
+      "name": "Sky",
+      "role": "Scout",
+      "action": "Watch for new opportunities < $0.50"
+    }
+  ],
+  "targets": {
+    "portfolio_target": 12500,
+    "stop_loss": 9000,
+    "timeline_days": 14
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "total_trades": 5,
+  "successful_patterns": [
+    {
+      "timestamp": "2025-08-14T15:42:29.138227",
+      "action": "BUY",
+      "price": 117500,
+      "result": "success",
+      "market_conditions": {}
+    },
+    {
+      "timestamp": "2025-08-14T15:42:29.138303",
+      "action": "BUY",
+      "price": 4480,
+      "result": "success",
+      "market_conditions": {}
+    },
+    {
+      "timestamp": "2025-08-14T15:42:29.138369",
+      "action": "BUY",
+      "price": 195,
+      "result": "success",
+      "market_conditions": {}
+    },
+    {
+      "timestamp": "2025-08-14T15:42:29.138750",
+      "action": "OBSERVE",
+      "price": 192,
+      "result": "success",
+      "market_conditions": {}
+    }
+  ],
+  "failed_patterns": [
+    {
+      "timestamp": "2025-08-14T15:42:29.138703",
+      "action": "HOLD",
+      "price": 118000,
+      "result": "neutral",
+      "market_conditions": {}
+    }
+  ],
+  "market_wisdom": [],
+  "evolution_stage": 1
+}

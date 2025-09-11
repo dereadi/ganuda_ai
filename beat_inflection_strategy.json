@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-09-02T11:57:14.138614",
+  "inflection_warning": "November-February crash expected",
+  "capital_plan": {
+    "current": 14833,
+    "friday": 15000,
+    "second_wave": 20000,
+    "total": 49833
+  },
+  "exit_timeline": {
+    "days_to_november": 59,
+    "optimal_exit": "October 15",
+    "crash_start": "November 1"
+  },
+  "profit_targets": {
+    "conservative": {
+      "gain_pct": 50,
+      "final": 74749.5
+    },
+    "aggressive": {
+      "gain_pct": 100,
+      "final": 99666.0
+    },
+    "moon": {
+      "gain_pct": 150,
+      "final": 124582.5
+    }
+  },
+  "post_crash_targets": {
+    "btc_buy": 60000,
+    "eth_buy": 2000,
+    "sol_buy": 80,
+    "potential_2026_value": 725000
+  }
+}

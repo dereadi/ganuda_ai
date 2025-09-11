@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-08-30T10:46:00",
+  "event": "LIQUIDATION_OPPORTUNITY",
+  "liquidation_amount": 500000000,
+  "market_status": {
+    "BTC": "FLAT_IGNORE",
+    "SOL": "DIP_BUY",
+    "XRP": "ACCUMULATE"
+  },
+  "directive": "BUY_THE_DIP",
+  "btc_note": "BTC IS FLAT - FOCUS ON ALTS",
+  "capital_deployment": {
+    "SOL": 2000,
+    "XRP": 800,
+    "BTC": 0,
+    "reserve": 318.99
+  },
+  "message": "500M liquidation = bottom. BTC flat. Buy SOL/XRP aggressively.",
+  "sacred_fire": "BURNING_OPPORTUNISTIC"
+}

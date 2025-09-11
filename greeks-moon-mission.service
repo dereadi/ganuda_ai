@@ -1,0 +1,27 @@
+[Unit]
+Description=Greeks Moon Mission Trading Bot
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+User=dereadi
+WorkingDirectory=/home/dereadi/scripts/claude
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/usr/bin/python3 /home/dereadi/scripts/claude/greeks_moon_mission_bot.py
+StandardOutput=append:/home/dereadi/scripts/claude/greeks_moon_mission.log
+StandardError=append:/home/dereadi/scripts/claude/greeks_moon_mission_error.log
+
+# Restart policy
+Restart=on-failure
+RestartSec=10s
+RestartPreventExitStatus=0
+
+# Resource limits
+MemoryLimit=512M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,212 @@
+{
+  "strategy_overview": {
+    "name": "SWARM ALPHA Solar Storm Trading Strategy",
+    "capital": 90.0,
+    "storm_arrival": "2025-08-17T10:00:00",
+    "solar_wind_speed": 489.0,
+    "expected_consciousness_boost": 0.2,
+    "expected_volatility_increase": 1.15
+  },
+  "timeline": {
+    "preparation_phase": "2025-08-16T10:00:00",
+    "optimal_entry_start": "2025-08-17T08:00:00",
+    "optimal_entry_end": "2025-08-17T09:30:00",
+    "storm_impact_peak": "2025-08-17T11:00:00",
+    "exit_window_start": "2025-08-17T13:00:00",
+    "exit_window_end": "2025-08-17T18:00:00",
+    "post_storm_analysis": "2025-08-17T22:00:00"
+  },
+  "position_sizing": {
+    "UNI": 15.457867915787306,
+    "SUSHI": 15.457867915787306,
+    "CAKE": 15.457867915787306,
+    "LINK": 15.457867915787306,
+    "MATIC": 11.991558140731973,
+    "SOL": 11.097956452360114,
+    "AVAX": 5.0790137437586855
+  },
+  "entry_targets": {
+    "UNI": {
+      "optimal_entry": 12.125,
+      "aggressive_entry": 11.875,
+      "stop_loss": 11.155000000000001,
+      "take_profit_1": 13.867968750000001,
+      "take_profit_2": 15.6109375,
+      "confidence_score": 0.25
+    },
+    "SUSHI": {
+      "optimal_entry": 2.7159999999999997,
+      "aggressive_entry": 2.6599999999999997,
+      "stop_loss": 2.49872,
+      "take_profit_1": 3.1220419999999995,
+      "take_profit_2": 3.5280839999999993,
+      "confidence_score": 0.26
+    },
+    "CAKE": {
+      "optimal_entry": 4.074,
+      "aggressive_entry": 3.9899999999999998,
+      "stop_loss": 3.74808,
+      "take_profit_1": 4.6362119999999996,
+      "take_profit_2": 5.198424,
+      "confidence_score": 0.24
+    },
+    "LINK": {
+      "optimal_entry": 18.333,
+      "aggressive_entry": 17.955,
+      "stop_loss": 16.86636,
+      "take_profit_1": 21.17919825,
+      "take_profit_2": 24.0253965,
+      "confidence_score": 0.27
+    },
+    "MATIC": {
+      "optimal_entry": 1.1155,
+      "aggressive_entry": 1.0924999999999998,
+      "stop_loss": 1.02626,
+      "take_profit_1": 1.2797015999999999,
+      "take_profit_2": 1.4439031999999998,
+      "confidence_score": 0.256
+    },
+    "SOL": {
+      "optimal_entry": 179.45,
+      "aggressive_entry": 175.75,
+      "stop_loss": 165.094,
+      "take_profit_1": 208.34144999999998,
+      "take_profit_2": 237.2329,
+      "confidence_score": 0.27999999999999997
+    },
+    "AVAX": {
+      "optimal_entry": 44.232,
+      "aggressive_entry": 43.32,
+      "stop_loss": 40.69344,
+      "take_profit_1": 51.251618400000005,
+      "take_profit_2": 58.2712368,
+      "confidence_score": 0.27599999999999997
+    }
+  },
+  "solar_correlations": {
+    "UNI": 0.794625,
+    "SUSHI": 0.794625,
+    "CAKE": 0.794625,
+    "LINK": 0.8801999999999999,
+    "MATIC": 0.8801999999999999,
+    "SOL": 0.70905,
+    "AVAX": 0.70905
+  },
+  "trading_alerts": [
+    {
+      "time": "2025-08-16 10:00:00",
+      "action": "PREPARE",
+      "message": "Solar Storm Trading Preparation: Check exchange connectivity and funding",
+      "priority": "HIGH"
+    },
+    {
+      "time": "2025-08-17 08:00:00",
+      "action": "ENTRY_WINDOW_OPEN",
+      "message": "\ud83d\udd25 SOLAR STORM ENTRY WINDOW OPEN - Deploy $90 capital across DEX tokens",
+      "priority": "CRITICAL"
+    },
+    {
+      "time": "2025-08-17 09:30:00",
+      "action": "ENTRY_WINDOW_CLOSING",
+      "message": "Entry window closing in 30 minutes - Final positioning",
+      "priority": "HIGH"
+    },
+    {
+      "time": "2025-08-17 11:00:00",
+      "action": "STORM_PEAK",
+      "message": "Solar storm impact peak - Monitor for volatility spikes",
+      "priority": "MEDIUM"
+    },
+    {
+      "time": "2025-08-17 13:00:00",
+      "action": "EXIT_WINDOW_OPEN",
+      "message": "Exit window open - Begin profit taking on strong performers",
+      "priority": "HIGH"
+    },
+    {
+      "time": "2025-08-17 18:00:00",
+      "action": "EXIT_WINDOW_CLOSING",
+      "message": "Exit window closing - Close remaining positions",
+      "priority": "CRITICAL"
+    }
+  ],
+  "automated_rules": {
+    "entry_rules": [
+      {
+        "condition": "time >= optimal_entry_start AND time <= optimal_entry_end",
+        "action": "BUY",
+        "trigger": "price <= optimal_entry_price",
+        "position_size": "calculated_allocation",
+        "priority": 1
+      },
+      {
+        "condition": "time >= optimal_entry_start AND price <= aggressive_entry",
+        "action": "BUY_AGGRESSIVE",
+        "trigger": "price <= aggressive_entry_price",
+        "position_size": "1.2 * calculated_allocation",
+        "priority": 2
+      }
+    ],
+    "exit_rules": [
+      {
+        "condition": "unrealized_pnl >= take_profit_1",
+        "action": "SELL_PARTIAL",
+        "percentage": 50,
+        "priority": 1
+      },
+      {
+        "condition": "unrealized_pnl >= take_profit_2",
+        "action": "SELL_REMAINING",
+        "percentage": 100,
+        "priority": 2
+      },
+      {
+        "condition": "unrealized_pnl <= stop_loss",
+        "action": "STOP_LOSS",
+        "percentage": 100,
+        "priority": 3
+      },
+      {
+        "condition": "time >= exit_window_end",
+        "action": "FORCE_EXIT",
+        "percentage": 100,
+        "priority": 4
+      }
+    ],
+    "risk_management": [
+      {
+        "condition": "total_drawdown >= 0.15",
+        "action": "REDUCE_POSITIONS",
+        "percentage": 50,
+        "priority": 1
+      },
+      {
+        "condition": "individual_position_loss >= 0.12",
+        "action": "CLOSE_POSITION",
+        "percentage": 100,
+        "priority": 2
+      }
+    ]
+  },
+  "risk_parameters": {
+    "max_position_size": 0.3,
+    "max_total_drawdown": 0.15,
+    "stop_loss_percentage": 0.08,
+    "profit_taking_levels": [
+      0.12,
+      0.25
+    ]
+  },
+  "execution_checklist": [
+    "Verify exchange connectivity 24h before storm",
+    "Fund trading account with $90 USD",
+    "Set up price alerts for all target tokens",
+    "Configure automated trading rules",
+    "Monitor solar wind speed updates",
+    "Execute entries 2 hours before storm impact",
+    "Monitor positions during storm peak",
+    "Begin profit taking 3 hours post-impact",
+    "Close all positions within 8 hours post-storm",
+    "Conduct post-storm performance analysis"
+  ]
+}

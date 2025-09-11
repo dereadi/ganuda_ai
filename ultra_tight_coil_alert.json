@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-09-02T14:45:41.320511",
+  "prices": {
+    "BTC": 110659.74,
+    "ETH": 4273.34,
+    "SOL": 205.23,
+    "XRP": 2.8152,
+    "AVAX": 23.76539,
+    "LINK": 22.975
+  },
+  "compression_score": 60.17788827492275,
+  "ultra_tight_count": 5,
+  "avg_range_pct": 0.3982211172507725,
+  "status": "EXTREME_COMPRESSION",
+  "breakout_imminent": true
+}

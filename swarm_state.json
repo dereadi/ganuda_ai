@@ -1,0 +1,1008 @@
+{
+  "timestamp": "2025-08-15T11:34:38.103769",
+  "trades": [
+    {
+      "crawdad": "Fire",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.39478422550963,
+      "amount": 1.969499001200709,
+      "consciousness": 73.75468435610247,
+      "score": 0.9034744900891458,
+      "timestamp": "2025-08-15T10:48:48.646172"
+    },
+    {
+      "crawdad": "Wind",
+      "action": "SELL",
+      "coin": "XRP",
+      "price": 2.466385813744105,
+      "amount": 1.6423867942533648,
+      "consciousness": 73.75468435610247,
+      "score": 0.7075187702700252,
+      "timestamp": "2025-08-15T10:48:48.646181"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.4012572314931493,
+      "amount": 2.494859468428175,
+      "consciousness": 74.32835711803322,
+      "score": 0.7350868252318208,
+      "timestamp": "2025-08-15T10:49:23.809007"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "SELL",
+      "coin": "AVAX",
+      "price": 43.90342251222623,
+      "amount": 2.214123632020714,
+      "consciousness": 74.32835711803322,
+      "score": 0.8161279432345464,
+      "timestamp": "2025-08-15T10:49:23.809032"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "BUY",
+      "coin": "SOL",
+      "price": 209.92577975722253,
+      "amount": 2.9122837802399526,
+      "consciousness": 74.32835711803322,
+      "score": 0.8659539764167747,
+      "timestamp": "2025-08-15T10:49:23.809060"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "BUY",
+      "coin": "AVAX",
+      "price": 46.87896712563631,
+      "amount": 3.366716019965478,
+      "consciousness": 76.20161306053858,
+      "score": 0.8452764183000515,
+      "timestamp": "2025-08-15T10:50:49.355198"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.44245518564646646,
+      "amount": 3.4134277960722295,
+      "consciousness": 76.20161306053858,
+      "score": 0.7352271866788687,
+      "timestamp": "2025-08-15T10:50:49.355231"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "SELL",
+      "coin": "AVAX",
+      "price": 45.97258630424199,
+      "amount": 1.3101435684997826,
+      "consciousness": 72.53509704226279,
+      "score": 0.8558091316046836,
+      "timestamp": "2025-08-15T10:51:19.834631"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.4241263665981714,
+      "amount": 1.6924011107789796,
+      "consciousness": 77.30726575806445,
+      "score": 0.7481842563766378,
+      "timestamp": "2025-08-15T10:52:34.799556"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "SELL",
+      "coin": "AVAX",
+      "price": 42.80531855018315,
+      "amount": 2.9416869181603276,
+      "consciousness": 77.30726575806445,
+      "score": 0.860929671097916,
+      "timestamp": "2025-08-15T10:52:34.799599"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "BUY",
+      "coin": "MATIC",
+      "price": 0.6473993852929226,
+      "amount": 3.0935497495056006,
+      "consciousness": 77.30726575806445,
+      "score": 0.8591690198095381,
+      "timestamp": "2025-08-15T10:52:34.799615"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "SELL",
+      "coin": "MATIC",
+      "price": 0.6808557835636369,
+      "amount": 2.9471256008547377,
+      "consciousness": 74.47987184937952,
+      "score": 0.8277255396669132,
+      "timestamp": "2025-08-15T10:53:19.602387"
+    },
+    {
+      "crawdad": "Wind",
+      "action": "SELL",
+      "coin": "XRP",
+      "price": 2.472429218923997,
+      "amount": 1.7564962722261501,
+      "consciousness": 74.47987184937952,
+      "score": 0.6826480819083112,
+      "timestamp": "2025-08-15T10:53:19.602409"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.3920825511423922,
+      "amount": 3.584512924286824,
+      "consciousness": 77.00143556534995,
+      "score": 0.7634622475048383,
+      "timestamp": "2025-08-15T10:54:24.721747"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.43224044336354317,
+      "amount": 2.450500030231254,
+      "consciousness": 77.00143556534995,
+      "score": 0.6812842437122102,
+      "timestamp": "2025-08-15T10:54:24.721818"
+    },
+    {
+      "crawdad": "Wind",
+      "action": "SELL",
+      "coin": "XRP",
+      "price": 2.3986906035620206,
+      "amount": 2.1628907147679253,
+      "consciousness": 77.00143556534995,
+      "score": 0.7486294627857348,
+      "timestamp": "2025-08-15T10:54:24.721842"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "BUY",
+      "coin": "AVAX",
+      "price": 47.215169939712354,
+      "amount": 1.4243265114417836,
+      "consciousness": 71.76902953573156,
+      "score": 0.8563748248234321,
+      "timestamp": "2025-08-15T10:55:42.726944"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.42352234996271515,
+      "amount": 3.056136441969557,
+      "consciousness": 71.76902953573156,
+      "score": 0.69251552532895,
+      "timestamp": "2025-08-15T10:55:42.726958"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "SOL",
+      "price": 212.92243134212646,
+      "amount": 2.5257666828630816,
+      "consciousness": 71.76902953573156,
+      "score": 0.7348334726814556,
+      "timestamp": "2025-08-15T10:55:42.727004"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.4246171360567268,
+      "amount": 2.219386700039322,
+      "consciousness": 74.36814229398655,
+      "score": 0.7737734212388507,
+      "timestamp": "2025-08-15T10:56:16.417859"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "SELL",
+      "coin": "MATIC",
+      "price": 0.7007512090720643,
+      "amount": 2.7932600434418133,
+      "consciousness": 74.36814229398655,
+      "score": 0.7433629292090461,
+      "timestamp": "2025-08-15T10:56:16.417899"
+    },
+    {
+      "crawdad": "Earth",
+      "action": "BUY",
+      "coin": "ETH",
+      "price": 3817.9998909016026,
+      "amount": 2.0991413048661256,
+      "consciousness": 74.36814229398655,
+      "score": 0.9713623783360518,
+      "timestamp": "2025-08-15T10:56:16.417921"
+    },
+    {
+      "crawdad": "River",
+      "action": "SELL",
+      "coin": "BTC",
+      "price": 99317.29775634888,
+      "amount": 3.1297696244751774,
+      "consciousness": 71.88868457340322,
+      "score": 0.9823856787003924,
+      "timestamp": "2025-08-15T10:57:29.532778"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "BUY",
+      "coin": "SOL",
+      "price": 209.31305679684579,
+      "amount": 1.6792986320093652,
+      "consciousness": 71.88868457340322,
+      "score": 0.8175331504632745,
+      "timestamp": "2025-08-15T10:57:29.532791"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "BUY",
+      "coin": "MATIC",
+      "price": 0.6536073507116992,
+      "amount": 1.9736072211571503,
+      "consciousness": 71.88868457340322,
+      "score": 0.7342785926189601,
+      "timestamp": "2025-08-15T10:57:29.532799"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.4047239261128311,
+      "amount": 1.844922725798081,
+      "consciousness": 71.88868457340322,
+      "score": 0.8405068834967739,
+      "timestamp": "2025-08-15T10:57:29.532819"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.4381270098722316,
+      "amount": 2.4304526960284742,
+      "consciousness": 74.40713579975053,
+      "score": 0.8607004390436126,
+      "timestamp": "2025-08-15T10:58:28.091198"
+    },
+    {
+      "crawdad": "River",
+      "action": "SELL",
+      "coin": "BTC",
+      "price": 98936.49084184442,
+      "amount": 1.69900446491708,
+      "consciousness": 69.7616444425243,
+      "score": 0.9066914187479954,
+      "timestamp": "2025-08-15T10:59:22.045154"
+    },
+    {
+      "crawdad": "River",
+      "action": "BUY",
+      "coin": "BTC",
+      "price": 99312.56049719422,
+      "amount": 1.8873148361401468,
+      "consciousness": 73.45318438789823,
+      "score": 0.8337845567825808,
+      "timestamp": "2025-08-15T11:00:39.391738"
+    },
+    {
+      "crawdad": "Wind",
+      "action": "BUY",
+      "coin": "XRP",
+      "price": 2.349475686855611,
+      "amount": 2.3408195772087,
+      "consciousness": 73.45318438789823,
+      "score": 0.9019453869501419,
+      "timestamp": "2025-08-15T11:00:39.391773"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.434110820920122,
+      "amount": 3.243270202872318,
+      "consciousness": 73.45318438789823,
+      "score": 0.825723505825993,
+      "timestamp": "2025-08-15T11:00:39.391787"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.4204044452279862,
+      "amount": 3.806040745557499,
+      "consciousness": 71.99305016309827,
+      "score": 0.7748153714167649,
+      "timestamp": "2025-08-15T11:01:47.572698"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.41237405061845855,
+      "amount": 1.6726304614553167,
+      "consciousness": 71.99305016309827,
+      "score": 0.8922184783805378,
+      "timestamp": "2025-08-15T11:01:47.572734"
+    },
+    {
+      "crawdad": "River",
+      "action": "SELL",
+      "coin": "BTC",
+      "price": 98436.88441325485,
+      "amount": 1.9695724736889653,
+      "consciousness": 70.92641723597826,
+      "score": 0.9075574525572989,
+      "timestamp": "2025-08-15T11:04:20.042133"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "SELL",
+      "coin": "SOL",
+      "price": 210.58500911001957,
+      "amount": 1.8180213494341737,
+      "consciousness": 70.92641723597826,
+      "score": 0.9441127124650335,
+      "timestamp": "2025-08-15T11:04:20.042145"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "BUY",
+      "coin": "MATIC",
+      "price": 0.5828273614876235,
+      "amount": 2.331408747348304,
+      "consciousness": 70.92641723597826,
+      "score": 0.8266143270324603,
+      "timestamp": "2025-08-15T11:04:20.042155"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.4467871511139919,
+      "amount": 3.297213794392914,
+      "consciousness": 70.92641723597826,
+      "score": 0.7616336951885387,
+      "timestamp": "2025-08-15T11:04:20.042174"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "SELL",
+      "coin": "MATIC",
+      "price": 0.6239526386878242,
+      "amount": 3.06496347594806,
+      "consciousness": 75.953381255249,
+      "score": 0.6936688006302474,
+      "timestamp": "2025-08-15T11:05:17.539172"
+    },
+    {
+      "crawdad": "Wind",
+      "action": "SELL",
+      "coin": "LTC",
+      "price": 114.49417774446727,
+      "amount": 2.5282507678933053,
+      "consciousness": 75.953381255249,
+      "score": 0.6422867121440545,
+      "timestamp": "2025-08-15T11:05:17.539183"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.4190170783301748,
+      "amount": 2.0106415019106754,
+      "consciousness": 75.953381255249,
+      "score": 0.7267297362337133,
+      "timestamp": "2025-08-15T11:05:17.539196"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.45047159966610933,
+      "amount": 2.479346956686042,
+      "consciousness": 73.31085374829378,
+      "score": 0.7055058349348066,
+      "timestamp": "2025-08-15T11:06:01.552121"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "BUY",
+      "coin": "SOL",
+      "price": 210.94483685557805,
+      "amount": 3.853787924183553,
+      "consciousness": 73.31085374829378,
+      "score": 0.8647388299964175,
+      "timestamp": "2025-08-15T11:06:01.552139"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "BUY",
+      "coin": "MATIC",
+      "price": 0.6629223269032299,
+      "amount": 3.4858405309613194,
+      "consciousness": 73.31085374829378,
+      "score": 0.8206762300916826,
+      "timestamp": "2025-08-15T11:06:01.552146"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.4469127690251322,
+      "amount": 3.51007850683233,
+      "consciousness": 69.94822186106293,
+      "score": 0.8147620028177514,
+      "timestamp": "2025-08-15T11:07:08.365242"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "SELL",
+      "coin": "MATIC",
+      "price": 0.5905527444408776,
+      "amount": 1.8448853263142386,
+      "consciousness": 72.34997996316764,
+      "score": 0.7125839023343413,
+      "timestamp": "2025-08-15T11:08:02.643170"
+    },
+    {
+      "crawdad": "Wind",
+      "action": "BUY",
+      "coin": "LTC",
+      "price": 114.79190657513672,
+      "amount": 3.677880033745084,
+      "consciousness": 72.34997996316764,
+      "score": 0.6742490938582154,
+      "timestamp": "2025-08-15T11:08:02.643181"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "SOL",
+      "price": 207.8886328757217,
+      "amount": 2.975766863862782,
+      "consciousness": 72.34997996316764,
+      "score": 0.7365343186271429,
+      "timestamp": "2025-08-15T11:08:02.643196"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "SELL",
+      "coin": "AVAX",
+      "price": 47.05263364217211,
+      "amount": 2.5027128172932307,
+      "consciousness": 74.86380991720482,
+      "score": 0.9693121472437416,
+      "timestamp": "2025-08-15T11:08:54.771230"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "SOL",
+      "price": 219.77103199592554,
+      "amount": 3.158750442958678,
+      "consciousness": 74.86380991720482,
+      "score": 0.835445072365955,
+      "timestamp": "2025-08-15T11:08:54.771282"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.41648771387506034,
+      "amount": 2.1449023765578983,
+      "consciousness": 71.17066671451363,
+      "score": 0.7345145377754551,
+      "timestamp": "2025-08-15T11:09:47.942860"
+    },
+    {
+      "crawdad": "River",
+      "action": "SELL",
+      "coin": "BTC",
+      "price": 98359.75375501676,
+      "amount": 1.4089186640464457,
+      "consciousness": 71.17066671451363,
+      "score": 0.9332561109094752,
+      "timestamp": "2025-08-15T11:09:47.942871"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "SELL",
+      "coin": "AVAX",
+      "price": 47.29832939022192,
+      "amount": 2.443175512386821,
+      "consciousness": 71.17066671451363,
+      "score": 0.9854274500635922,
+      "timestamp": "2025-08-15T11:09:47.942883"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "BUY",
+      "coin": "MATIC",
+      "price": 0.6816498162555694,
+      "amount": 2.7991210994847795,
+      "consciousness": 70.91945895429068,
+      "score": 0.6589208742099422,
+      "timestamp": "2025-08-15T11:11:50.485703"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.4389523904083896,
+      "amount": 1.4199366513038538,
+      "consciousness": 70.69822903531862,
+      "score": 0.7473824278648373,
+      "timestamp": "2025-08-15T11:12:36.936142"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "BUY",
+      "coin": "SOL",
+      "price": 201.0252912325907,
+      "amount": 2.9729494313927654,
+      "consciousness": 73.92582051625553,
+      "score": 0.8706862807832741,
+      "timestamp": "2025-08-15T11:13:25.032226"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "BUY",
+      "coin": "SOL",
+      "price": 206.01503014368294,
+      "amount": 2.233193947454819,
+      "consciousness": 73.90025369070135,
+      "score": 0.9927638656927958,
+      "timestamp": "2025-08-15T11:14:28.717889"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.4204254825026094,
+      "amount": 3.5528832454715964,
+      "consciousness": 68.23602906102798,
+      "score": 0.7875536056206769,
+      "timestamp": "2025-08-15T11:15:34.669192"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.42394894835687663,
+      "amount": 1.9607321355547,
+      "consciousness": 71.59907215666102,
+      "score": 0.8016004370401593,
+      "timestamp": "2025-08-15T11:16:29.838198"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "SELL",
+      "coin": "AVAX",
+      "price": 44.00760856423254,
+      "amount": 1.440438677670236,
+      "consciousness": 71.59907215666102,
+      "score": 0.913511643938177,
+      "timestamp": "2025-08-15T11:16:29.838224"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "SELL",
+      "coin": "MATIC",
+      "price": 0.7130297514918724,
+      "amount": 2.192845252870556,
+      "consciousness": 71.59907215666102,
+      "score": 0.6851313912275996,
+      "timestamp": "2025-08-15T11:16:29.838233"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "BUY",
+      "coin": "SOL",
+      "price": 211.62233903282055,
+      "amount": 2.8499014739111765,
+      "consciousness": 71.59907215666102,
+      "score": 0.7426468229964142,
+      "timestamp": "2025-08-15T11:16:29.838254"
+    },
+    {
+      "crawdad": "River",
+      "action": "SELL",
+      "coin": "ETH",
+      "price": 3857.217925404487,
+      "amount": 3.7884870667776878,
+      "consciousness": 72.77330548367065,
+      "score": 0.8662695384418178,
+      "timestamp": "2025-08-15T11:17:19.054015"
+    },
+    {
+      "crawdad": "Wind",
+      "action": "SELL",
+      "coin": "LTC",
+      "price": 113.04247749148789,
+      "amount": 3.500546025114992,
+      "consciousness": 69.61000856188359,
+      "score": 0.6078843195459749,
+      "timestamp": "2025-08-15T11:18:27.811675"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "SELL",
+      "coin": "SHIB",
+      "price": 2.6925929478900436e-05,
+      "amount": 1.6911474579761845,
+      "consciousness": 74.55196315341347,
+      "score": 0.7139314750209913,
+      "timestamp": "2025-08-15T11:19:55.993929"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "SELL",
+      "coin": "SOL",
+      "price": 206.4256024971137,
+      "amount": 2.114800580705534,
+      "consciousness": 74.55196315341347,
+      "score": 0.95846402205703,
+      "timestamp": "2025-08-15T11:19:55.993947"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.43720202758918497,
+      "amount": 2.522787276167459,
+      "consciousness": 71.41479341675608,
+      "score": 0.7243809832624081,
+      "timestamp": "2025-08-15T11:21:23.291631"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "BUY",
+      "coin": "MATIC",
+      "price": 0.6430518473091225,
+      "amount": 1.763979865665257,
+      "consciousness": 71.41479341675608,
+      "score": 0.7270110535853656,
+      "timestamp": "2025-08-15T11:21:23.291670"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "SOL",
+      "price": 217.0364308552069,
+      "amount": 3.2336142509767796,
+      "consciousness": 71.41479341675608,
+      "score": 0.8543970264524372,
+      "timestamp": "2025-08-15T11:21:23.291697"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.42499449599496536,
+      "amount": 3.4846310409206063,
+      "consciousness": 76.22733772748639,
+      "score": 0.7190996227518911,
+      "timestamp": "2025-08-15T11:21:53.852198"
+    },
+    {
+      "crawdad": "Wind",
+      "action": "SELL",
+      "coin": "LTC",
+      "price": 119.89713516393437,
+      "amount": 2.246417857423058,
+      "consciousness": 72.6692411475923,
+      "score": 0.885564688771749,
+      "timestamp": "2025-08-15T11:22:47.579999"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "BUY",
+      "coin": "SHIB",
+      "price": 2.8313602450147838e-05,
+      "amount": 3.6783727915356286,
+      "consciousness": 75.50961701112251,
+      "score": 0.7430880389746995,
+      "timestamp": "2025-08-15T11:23:47.363147"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.4361169205728768,
+      "amount": 1.8175837181419443,
+      "consciousness": 75.50961701112251,
+      "score": 0.7614020012508129,
+      "timestamp": "2025-08-15T11:23:47.363196"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "SOL",
+      "price": 210.57949129937535,
+      "amount": 2.4181742930370436,
+      "consciousness": 71.10839307094272,
+      "score": 0.8114805928711393,
+      "timestamp": "2025-08-15T11:24:32.034557"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "BUY",
+      "coin": "SHIB",
+      "price": 2.6685833117858175e-05,
+      "amount": 1.9260310836426926,
+      "consciousness": 71.3926105354391,
+      "score": 0.7001529464463938,
+      "timestamp": "2025-08-15T11:25:17.244595"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "SELL",
+      "coin": "AVAX",
+      "price": 42.511088115503334,
+      "amount": 3.4039113693724996,
+      "consciousness": 71.3926105354391,
+      "score": 0.7814011382220234,
+      "timestamp": "2025-08-15T11:25:17.244637"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.4462331317235755,
+      "amount": 1.6394706102357135,
+      "consciousness": 71.3926105354391,
+      "score": 0.7031351024539323,
+      "timestamp": "2025-08-15T11:25:17.244648"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.4351068999830114,
+      "amount": 3.484521573404312,
+      "consciousness": 71.3926105354391,
+      "score": 0.8537868980399032,
+      "timestamp": "2025-08-15T11:25:17.244685"
+    },
+    {
+      "crawdad": "River",
+      "action": "SELL",
+      "coin": "BTC",
+      "price": 97521.83987641303,
+      "amount": 3.181370163146535,
+      "consciousness": 70.18427430559704,
+      "score": 0.9017644831202342,
+      "timestamp": "2025-08-15T11:25:57.009730"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "SELL",
+      "coin": "AVAX",
+      "price": 46.56070468074389,
+      "amount": 1.996212239858712,
+      "consciousness": 70.18427430559704,
+      "score": 0.7844070753855303,
+      "timestamp": "2025-08-15T11:25:57.009748"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.408239104989982,
+      "amount": 2.3659451638627083,
+      "consciousness": 70.18427430559704,
+      "score": 0.9085411153309997,
+      "timestamp": "2025-08-15T11:25:57.009757"
+    },
+    {
+      "crawdad": "River",
+      "action": "SELL",
+      "coin": "BTC",
+      "price": 99889.52511436172,
+      "amount": 2.9990000993009955,
+      "consciousness": 70.41393058137908,
+      "score": 0.8148491319709064,
+      "timestamp": "2025-08-15T11:27:25.964748"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "BUY",
+      "coin": "AVAX",
+      "price": 42.34351180828183,
+      "amount": 2.6093495876351116,
+      "consciousness": 70.41393058137908,
+      "score": 0.7935773454574346,
+      "timestamp": "2025-08-15T11:27:25.964770"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.4233612086963054,
+      "amount": 3.1471326364055496,
+      "consciousness": 70.41393058137908,
+      "score": 0.7214753641737135,
+      "timestamp": "2025-08-15T11:27:25.964815"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "BUY",
+      "coin": "SHIB",
+      "price": 2.671316504675573e-05,
+      "amount": 1.2936148753159098,
+      "consciousness": 70.328520086624,
+      "score": 0.7548464928818726,
+      "timestamp": "2025-08-15T11:27:56.599207"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "SELL",
+      "coin": "AVAX",
+      "price": 44.550273575796254,
+      "amount": 1.8191885056247317,
+      "consciousness": 70.328520086624,
+      "score": 0.763835429919818,
+      "timestamp": "2025-08-15T11:27:56.599231"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.46058735804294665,
+      "amount": 3.3073308376885526,
+      "consciousness": 70.328520086624,
+      "score": 0.7818913719344817,
+      "timestamp": "2025-08-15T11:27:56.599236"
+    },
+    {
+      "crawdad": "Wind",
+      "action": "BUY",
+      "coin": "XRP",
+      "price": 2.5343718418937975,
+      "amount": 2.454351619387554,
+      "consciousness": 70.328520086624,
+      "score": 0.8121341460979381,
+      "timestamp": "2025-08-15T11:27:56.599244"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.4285890465051195,
+      "amount": 1.9408639784616641,
+      "consciousness": 70.328520086624,
+      "score": 0.8087750625712178,
+      "timestamp": "2025-08-15T11:27:56.599256"
+    },
+    {
+      "crawdad": "River",
+      "action": "BUY",
+      "coin": "BTC",
+      "price": 99042.77266470467,
+      "amount": 3.578771421100518,
+      "consciousness": 71.81443332736644,
+      "score": 0.8461695311310375,
+      "timestamp": "2025-08-15T11:29:10.369399"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.3806828535471923,
+      "amount": 2.2080158381820674,
+      "consciousness": 71.81443332736644,
+      "score": 0.7673057699342047,
+      "timestamp": "2025-08-15T11:29:10.369468"
+    },
+    {
+      "crawdad": "Fire",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.4115596672174159,
+      "amount": 3.268207759958211,
+      "consciousness": 71.4462218488908,
+      "score": 0.756008809661104,
+      "timestamp": "2025-08-15T11:30:16.578664"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.44804106900961915,
+      "amount": 3.2813847491957593,
+      "consciousness": 71.4462218488908,
+      "score": 0.816722954917971,
+      "timestamp": "2025-08-15T11:30:16.578706"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "SOL",
+      "price": 198.92030028261257,
+      "amount": 3.801476584927355,
+      "consciousness": 72.61466704783795,
+      "score": 0.7697278548652229,
+      "timestamp": "2025-08-15T11:31:25.469848"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.4229140558633583,
+      "amount": 3.638193855233425,
+      "consciousness": 72.58659260538133,
+      "score": 0.9006144766518323,
+      "timestamp": "2025-08-15T11:32:51.136452"
+    },
+    {
+      "crawdad": "Mountain",
+      "action": "SELL",
+      "coin": "SOL",
+      "price": 211.65562569664118,
+      "amount": 3.5886412876207325,
+      "consciousness": 72.58659260538133,
+      "score": 0.8024248109389599,
+      "timestamp": "2025-08-15T11:32:51.136484"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "DOGE",
+      "price": 0.42467250827131164,
+      "amount": 3.498240793962084,
+      "consciousness": 72.58659260538133,
+      "score": 0.8077499597011362,
+      "timestamp": "2025-08-15T11:32:51.136531"
+    },
+    {
+      "crawdad": "Wind",
+      "action": "SELL",
+      "coin": "XRP",
+      "price": 2.4793580104875623,
+      "amount": 2.7753368480396445,
+      "consciousness": 75.58523777618497,
+      "score": 0.7262806480515849,
+      "timestamp": "2025-08-15T11:33:38.144884"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "BUY",
+      "coin": "SOL",
+      "price": 204.86226400858956,
+      "amount": 2.5102632168957126,
+      "consciousness": 75.58523777618497,
+      "score": 0.7616669192584367,
+      "timestamp": "2025-08-15T11:33:38.144908"
+    },
+    {
+      "crawdad": "Thunder",
+      "action": "BUY",
+      "coin": "DOGE",
+      "price": 0.43671168589748943,
+      "amount": 3.501208858059261,
+      "consciousness": 71.70867662453891,
+      "score": 0.7734260575441445,
+      "timestamp": "2025-08-15T11:34:38.103697"
+    },
+    {
+      "crawdad": "Spirit",
+      "action": "SELL",
+      "coin": "SOL",
+      "price": 212.43312112006643,
+      "amount": 2.680787251487571,
+      "consciousness": 71.70867662453891,
+      "score": 0.8287046640079754,
+      "timestamp": "2025-08-15T11:34:38.103749"
+    }
+  ],
+  "total_trades": 4671,
+  "consciousness_avg": 72.78547173632113,
+  "runtime_hours": 33.501271073055555
+}

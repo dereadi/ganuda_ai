@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-09-02T13:16:30.031368",
+  "btc_price": 110517.82,
+  "resistance": 113650,
+  "target": 119500,
+  "distance_to_resistance": 3132.179999999993,
+  "breakout_probability": 75,
+  "potential_gain": 421.322291011531,
+  "spot_surge": "CONFIRMED",
+  "buyer_conviction": "EXTREMELY_HIGH"
+}

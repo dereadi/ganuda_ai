@@ -1,0 +1,11 @@
+{
+  "launch_time": "2025-08-25T23:50:56.837043",
+  "processes": {
+    "crawdad_swarm": 419868,
+    "flywheel": 420476,
+    "solar_storm": 420796
+  },
+  "capital_deployed": 100.92,
+  "mission": "500K Nuclear",
+  "blessed": true
+}

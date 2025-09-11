@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-09-02T15:15:40.166397",
+  "prices": {
+    "BTC": 111232.0,
+    "ETH": 4298.62,
+    "SOL": 206.39,
+    "XRP": 2.8348,
+    "AVAX": 23.99,
+    "LINK": 23.201
+  },
+  "climbing_count": 6,
+  "portfolio_gain": 83.51591399999961,
+  "momentum": 100.0,
+  "status": "CLIMBING_EXPLOSION"
+}

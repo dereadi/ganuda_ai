@@ -1,0 +1,52 @@
+{
+  "timestamp": "2025-08-15T12:38:21.384640",
+  "patterns_discovered": 5,
+  "algorithms_analyzed": 5,
+  "top_patterns": [
+    {
+      "pattern": "Moving Average Crossover",
+      "description": "Buy when fast MA crosses above slow MA",
+      "complexity": "SIMPLE",
+      "success_rate": "65%",
+      "code_snippet": "if ma_fast[-1] > ma_slow[-1] and ma_fast[-2] <= ma_slow[-2]: buy()"
+    },
+    {
+      "pattern": "RSI Divergence",
+      "description": "Trade when price and RSI diverge",
+      "complexity": "MEDIUM",
+      "success_rate": "70%",
+      "code_snippet": "if price_trend == 'up' and rsi_trend == 'down': prepare_reversal()"
+    },
+    {
+      "pattern": "Bollinger Band Squeeze",
+      "description": "Trade breakouts from low volatility",
+      "complexity": "MEDIUM",
+      "success_rate": "68%",
+      "code_snippet": "if bb_width < bb_width_avg * 0.5: await_breakout()"
+    }
+  ],
+  "top_algorithms": [
+    {
+      "algorithm": "Grid Trading",
+      "principle": "Place buy/sell orders at regular intervals",
+      "best_for": "Ranging markets",
+      "risk": "Trending markets can deplete one side",
+      "enhancement": "Add dynamic grid spacing based on volatility"
+    },
+    {
+      "algorithm": "Martingale Modified",
+      "principle": "Double position on losses with max limit",
+      "best_for": "High win-rate strategies",
+      "risk": "Account blow-up on extended losses",
+      "enhancement": "Use partial martingale (1.5x instead of 2x)"
+    },
+    {
+      "algorithm": "Pairs Trading",
+      "principle": "Trade correlated asset divergences",
+      "best_for": "Market neutral profits",
+      "risk": "Correlation breakdown",
+      "enhancement": "Dynamic correlation windows"
+    }
+  ],
+  "integration_ready": true
+}

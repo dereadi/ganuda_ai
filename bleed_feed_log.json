@@ -1,0 +1,49 @@
+{
+  "timestamp": "2025-09-07T13:26:07.968868",
+  "attempted": [
+    {
+      "coin": "XRP",
+      "amount": 58,
+      "expected_usd": 166
+    },
+    {
+      "coin": "SOL",
+      "amount": 2.1,
+      "expected_usd": 424
+    },
+    {
+      "coin": "ETH",
+      "amount": 0.14,
+      "expected_usd": 599
+    },
+    {
+      "coin": "BTC",
+      "amount": 0.0014,
+      "expected_usd": 155
+    }
+  ],
+  "executed": [],
+  "failed": [
+    {
+      "coin": "XRP",
+      "amount": 58,
+      "expected_usd": 166
+    },
+    {
+      "coin": "SOL",
+      "amount": 2.1,
+      "expected_usd": 424
+    },
+    {
+      "coin": "ETH",
+      "amount": 0.14,
+      "expected_usd": 599
+    },
+    {
+      "coin": "BTC",
+      "amount": 0.0014,
+      "expected_usd": 155
+    }
+  ],
+  "expected_total": 1344
+}

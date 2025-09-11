@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-08-19T06:55:35.581952",
+  "total_portfolio": 22879,
+  "divest_target": 20000,
+  "keep_momentum": 2879,
+  "sell_orders": {
+    "MATIC": "Sell all 11,159 @ $0.95+",
+    "SOL": "Sell 20 @ $241+",
+    "DOGE": "Sell all 5,811 @ $0.42+",
+    "AVAX": "Sell 44 @ $45+"
+  },
+  "timeline": "Execute by midnight tonight",
+  "urgency": "HIGH - Market picking up now"
+}

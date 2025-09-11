@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-08-29T14:22:12.664544",
+  "policy": {
+    "minimum_cash": 250,
+    "ideal_cash": 500,
+    "maximum_cash": 1000,
+    "current_cash": 500
+  },
+  "rules": [
+    "Always maintain $250 minimum",
+    "Target $500 for optimal flexibility",
+    "Above $1000 should be deployed to positions",
+    "Check liquidity before each trading session"
+  ],
+  "triggers": {
+    "sell_trigger": "When cash < $250",
+    "buy_trigger": "When cash > $1000",
+    "rebalance": "Daily at market open"
+  },
+  "execution": {
+    "action_taken": "Sold 0.6468 SOL",
+    "amount_raised": 131.36,
+    "new_cash_balance": 500
+  }
+}

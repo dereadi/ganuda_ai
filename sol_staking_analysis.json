@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-09-02T14:02:22.357422",
+  "sol_price": 205.88,
+  "regulatory_development": "SEC_liquid_staking_framework",
+  "jito_impact": "institutional_adoption_catalyst",
+  "price_targets": {
+    "conservative": 257.35,
+    "moderate": 308.82,
+    "aggressive": 411.76
+  },
+  "your_sol_value": {
+    "current": 2254.18012,
+    "conservative": 2817.72515,
+    "moderate": 3381.27018,
+    "aggressive": 4508.36024
+  }
+}

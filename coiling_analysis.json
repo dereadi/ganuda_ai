@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-09-02T13:00:19.449773",
+  "prices": {
+    "BTC": 110933.54,
+    "ETH": 4321.13,
+    "SOL": 204.96
+  },
+  "btc_coiling": {
+    "range": [
+      108000,
+      111000
+    ],
+    "position_pct": 97.78466666666645,
+    "width_pct": 2.727272727272727
+  },
+  "eth_coiling": {
+    "range": [
+      4250,
+      4350
+    ],
+    "position_pct": 71.13000000000011,
+    "width_pct": 2.3255813953488373
+  },
+  "breakout_probability_up": 75
+}

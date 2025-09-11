@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Browser Test</title>
+    <style>
+        body { font-family: monospace; background: #0f0f1e; color: #00ff88; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px; }
+        .success { border-left: 3px solid #00ff88; }
+        .error { border-left: 3px solid #ff4444; color: #ff4444; }
+        .info { border-left: 3px solid #ffaa00; color: #ffaa00; }
+    </style>
+</head>
+<body>
+    <h1>🦞 Quantum Crawdad Dashboard Browser Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testDashboardAPIs() {
+            const results = document.getElementById('results');
+            
+            function addResult(message, type = 'info') {
+                const div = document.createElement('div');
+                div.className = `result ${type}`;
+                div.textContent = message;
+                results.appendChild(div);
+            }
+            
+            addResult('🔍 Starting browser-side API tests...', 'info');
+            
+            // Test market prices
+            try {
+                addResult('Testing market prices API...', 'info');
+                const response = await fetch('/api/market_prices');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                
+                if (data.error) throw new Error(data.error);
+                
+                const count = Object.keys(data).length;
+                addResult(`✅ Market prices loaded: ${count} cryptocurrencies`, 'success');
+                
+                // Show sample data
+                const firstSymbol = Object.keys(data)[0];
+                const firstData = data[firstSymbol];
+                addResult(`   Sample: ${firstSymbol} = $${firstData.price.toFixed(2)} (${firstData.change > 0 ? '+' : ''}${firstData.change.toFixed(2)}%)`, 'success');
+                
+            } catch (error) {
+                addResult(`❌ Market prices failed: ${error.message}`, 'error');
+            }
+            
+            // Test paper trading
+            try {
+                addResult('Testing paper trading API...', 'info');
+                const response = await fetch('/api/paper_trading');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                
+                if (data.error) throw new Error(data.error);
+                
+                addResult('✅ Paper trading data loaded', 'success');
+                if (data.metrics) {
+                    addResult(`   Win Rate: ${data.metrics.win_rate || 0}%`, 'success');
+                    addResult(`   Total Trades: ${data.metrics.total_trades || 0}`, 'success');
+                    addResult(`   P&L: $${(data.metrics.total_pnl || 0).toFixed(2)}`, 'success');
+                }
+                
+            } catch (error) {
+                addResult(`❌ Paper trading failed: ${error.message}`, 'error');
+            }
+            
+            // Test CORS
+            try {
+                addResult('Testing cross-origin request to original API...', 'info');
+                const response = await fetch('http://192.168.132.223:5680/api/market_prices');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                addResult('✅ CORS working - can access original API directly', 'success');
+            } catch (error) {
+                addResult(`⚠️  CORS blocked (expected): ${error.message}`, 'info');
+                addResult('✅ This is why we needed proxy endpoints!', 'success');
+            }
+            
+            addResult('🎉 Browser-side tests complete!', 'success');
+            addResult('🔗 Visit the main dashboard: http://192.168.132.223:5679', 'info');
+        }
+        
+        // Run tests when page loads
+        window.onload = testDashboardAPIs;
+    </script>
+</body>
+</html>

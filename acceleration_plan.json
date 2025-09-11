@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-08-26T15:24:45.638856",
+  "current_capital": 4500,
+  "phase1_weeks": 12,
+  "phase1_target_return": 2.0,
+  "phase1_final_capital": 14764.63854764436,
+  "target_achievement_week": 24,
+  "ultra_path_week": 8,
+  "weekly_target": 20000,
+  "earth_impact": {
+    "Solar Panels": "100 homes/month",
+    "Community Gardens": "5 new gardens/month",
+    "Water Systems": "2 villages/month",
+    "Education": "50 students full ride/year",
+    "Sacred Land": "10 acres protected/month",
+    "Total Annual Impact": "$1,040,000 deployed"
+  }
+}

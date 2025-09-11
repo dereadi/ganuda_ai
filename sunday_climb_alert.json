@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-09-08T08:07:48.888769",
+  "alert_type": "SUNDAY_CLIMB",
+  "assets_climbing": [
+    "ETH",
+    "BTC",
+    "DOGE"
+  ],
+  "synchronization": "HIGH",
+  "monday_bias": "EXTREMELY_BULLISH",
+  "expected_gap": "1-2%",
+  "portfolio_exposure": "67.6%",
+  "action": "HOLD_AND_PREPARE"
+}

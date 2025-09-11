@@ -1,0 +1,98 @@
+{
+  "penny_cryptos": {
+    "SHIB-USD": {
+      "name": "Shiba Inu",
+      "current_price": "$0.00001386",
+      "daily_volatility": "0.16%",
+      "avg_daily_swing": "6.04%",
+      "momentum_ops": 0,
+      "reversal_ops": 0,
+      "predicted_win_rate": 55.0,
+      "recommendation": "NEUTRAL - Trade with caution"
+    },
+    "FLOKI-USD": {
+      "name": "Floki",
+      "current_price": "$0.00011866",
+      "daily_volatility": "0.27%",
+      "avg_daily_swing": "7.49%",
+      "momentum_ops": 0,
+      "reversal_ops": 0,
+      "predicted_win_rate": 54.5,
+      "recommendation": "AVOID - Better opportunities elsewhere"
+    },
+    "BONK-USD": {
+      "name": "Bonk",
+      "current_price": "$0.00002717",
+      "daily_volatility": "0.36%",
+      "avg_daily_swing": "9.27%",
+      "momentum_ops": 0,
+      "reversal_ops": 0,
+      "predicted_win_rate": 54.0,
+      "recommendation": "AVOID - Better opportunities elsewhere"
+    },
+    "LUNC-USD": {
+      "name": "Terra Luna Classic",
+      "current_price": "$0.00006204",
+      "daily_volatility": "0.15%",
+      "avg_daily_swing": "4.18%",
+      "momentum_ops": 0,
+      "reversal_ops": 0,
+      "predicted_win_rate": 53.0,
+      "recommendation": "AVOID - Better opportunities elsewhere"
+    }
+  },
+  "mid_cap_cryptos": {
+    "DOGE-USD": {
+      "name": "Dogecoin",
+      "current_price": "$0.2442",
+      "daily_volatility": "0.22%",
+      "avg_daily_swing": "7.14%",
+      "momentum_ops": 0,
+      "reversal_ops": 0,
+      "predicted_win_rate": 55.0,
+      "recommendation": "NEUTRAL - Trade with caution"
+    },
+    "XRP-USD": {
+      "name": "Ripple",
+      "current_price": "$3.2927",
+      "daily_volatility": "0.16%",
+      "avg_daily_swing": "4.79%",
+      "momentum_ops": 0,
+      "reversal_ops": 0,
+      "predicted_win_rate": 52.0,
+      "recommendation": "AVOID - Better opportunities elsewhere"
+    }
+  },
+  "recommendations": [
+    {
+      "rank": 1,
+      "symbol": "SHIB-USD",
+      "name": "Shiba Inu",
+      "win_rate": 55.0
+    },
+    {
+      "rank": 2,
+      "symbol": "DOGE-USD",
+      "name": "Dogecoin",
+      "win_rate": 55.0
+    },
+    {
+      "rank": 3,
+      "symbol": "FLOKI-USD",
+      "name": "Floki",
+      "win_rate": 54.5
+    },
+    {
+      "rank": 4,
+      "symbol": "BONK-USD",
+      "name": "Bonk",
+      "win_rate": 54.0
+    },
+    {
+      "rank": 5,
+      "symbol": "LUNC-USD",
+      "name": "Terra Luna Classic",
+      "win_rate": 53.0
+    }
+  ]
+}

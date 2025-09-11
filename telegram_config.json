@@ -1,0 +1,41 @@
+{
+  "telegram": {
+    "bot_token": "YOUR_BOT_TOKEN_HERE",
+    "bot_username": "@derpatobot",
+    "api_id": "YOUR_API_ID_HERE",
+    "api_hash": "YOUR_API_HASH_HERE",
+    "channel_ids": {
+      "training": "@CherokeeeTraining",
+      "trading_alerts": "@CherokeeTradingAlerts",
+      "council_decisions": "@CherokeeeCouncil"
+    }
+  },
+  "productive": {
+    "api_key": "cab4ebf1-7af4-43f6-b51f-44baabf61231",
+    "base_url": "https://api.productive.io/api/v2",
+    "organization_id": "49628",
+    "access_token_name": "n8n Prototyping (RO)"
+  },
+  "training_settings": {
+    "auto_schedule": true,
+    "min_participants": 1,
+    "max_participants": 20,
+    "buffer_time_minutes": 15,
+    "timezone": "America/Chicago"
+  },
+  "revenue_tracking": {
+    "training_percentage": 0.15,
+    "target_monthly": 5000,
+    "currency": "USD"
+  },
+  "integration_endpoints": {
+    "duyuktv": "http://192.168.132.223:3001/",
+    "audio_service": "http://192.168.132.223:3004/",
+    "thermal_memory": "postgresql://claude:jawaseatlasers2@192.168.132.222:5432/zammad_production"
+  },
+  "council_settings": {
+    "consensus_required": true,
+    "min_council_members": 5,
+    "voting_timeout_minutes": 30
+  }
+}

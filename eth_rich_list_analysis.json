@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-09-02T13:18:02.882905",
+  "eth_price": 4286.45,
+  "total_supply": 120710000,
+  "staked": 68000000,
+  "tradeable": 52710000,
+  "top_holders": {
+    "beacon_contract": 68000000,
+    "coinbase": 4930000,
+    "binance": 4230000,
+    "blackrock": 3000000
+  },
+  "concentration": {
+    "top_10_control_pct": 61,
+    "top_200_control_pct": 52
+  },
+  "your_position": {
+    "eth_amount": 1.64,
+    "supply_percentage": 1.358628116974567e-06,
+    "current_value": 7029.777999999999
+  }
+}

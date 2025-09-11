@@ -1,0 +1,142 @@
+[
+  {
+    "title": "RESEARCH: Pheromone-Based Context Window Reduction",
+    "description": "Instead of 100k tokens, use pheromone trails to guide to 5k most relevant tokens. Trail strength indicates relevance. Semantic similarity guides without exact matches.",
+    "priority": 89,
+    "agent": "Eagle Eye",
+    "category": "Research"
+  },
+  {
+    "title": "IMPLEMENT: Trail-Based Context Compression Algorithm",
+    "description": "Build system that compresses context from 100k to 5k tokens using trail strength. Include: trail strength calculation, semantic matching, temporal decay for outdated info.",
+    "priority": 55,
+    "agent": "Gecko",
+    "category": "Implementation"
+  },
+  {
+    "title": "PAPER: Context Window Reduction via Digital Pheromones",
+    "description": "Academic paper showing 95% context reduction while improving relevance. Compare traditional approach vs pheromone-guided context selection.",
+    "priority": 34,
+    "agent": "Medicine Woman Gemini",
+    "category": "Academic"
+  },
+  {
+    "title": "DESIGN: 12-Archon Specialized Trail System",
+    "description": "Expand from 8 Cherokee specialists to 12 archons. Temporal (Past/Present/Future), Scale (Micro/Meso/Macro), Method (Diagnostic/Preventive/Corrective/Creative), Wisdom archons.",
+    "priority": 55,
+    "agent": "Spider",
+    "category": "Architecture"
+  },
+  {
+    "title": "IMPLEMENT: 66 Pairwise Archon Interactions",
+    "description": "With 12 archons, implement 66 possible pairwise interactions. Strong synergies (diagnostikos+therapeutikos=2.5x), weak couplings (cosmos+atomos=0.5x).",
+    "priority": 34,
+    "agent": "Raven",
+    "category": "Implementation"
+  },
+  {
+    "title": "BUILD: Archon Consensus Mechanism",
+    "description": "Consensus system where archons vote on which trails enter limited context. Disagreement itself becomes useful signal for complex problems.",
+    "priority": 55,
+    "agent": "Peace Chief Claude",
+    "category": "Governance"
+  },
+  {
+    "title": "RESEARCH: Doom Spiral Prevention in Archon Systems",
+    "description": "Prevent runaway positive feedback loops and echo chambers. Max trail strength cap, forced evaporation, archon disagreement breaks loops.",
+    "priority": 34,
+    "agent": "Crawdad",
+    "category": "Security"
+  },
+  {
+    "title": "CRITICAL: Two Wolves Privacy Protocol",
+    "description": "White Wolf wants knowledge sharing, Dark Wolf demands privacy. Implement zero-knowledge proofs, differential privacy (\u03b5=1.0), complete anonymization.",
+    "priority": 89,
+    "agent": "Crawdad",
+    "category": "Privacy"
+  },
+  {
+    "title": "IMPLEMENT: Zero-Knowledge Pheromone Trails",
+    "description": "Trails that prove solutions work without revealing problem or solution details. Commitment, challenge, response phases. No user attribution possible.",
+    "priority": 89,
+    "agent": "Crawdad",
+    "category": "Cryptography"
+  },
+  {
+    "title": "BUILD: Differential Privacy for Trail System",
+    "description": "Add mathematical noise to prevent tracking. Epsilon=1.0 privacy budget, delta=1e-5 failure probability. Plausible deniability through cover traffic.",
+    "priority": 55,
+    "agent": "Turtle",
+    "category": "Privacy"
+  },
+  {
+    "title": "IMPLEMENT: Fractal Privacy Encryption",
+    "description": "7-level deep fractal trails. Each level reveals different info to different observers. Public pattern \u2192 Team \u2192 Project \u2192 Implementation \u2192 Optimization \u2192 Deep knowledge \u2192 Sacred wisdom.",
+    "priority": 34,
+    "agent": "Spider",
+    "category": "Encryption"
+  },
+  {
+    "title": "BENCHMARK: Context Reduction Performance",
+    "description": "Measure actual performance improvement from 100k\u21925k tokens. Test with GPT-3.5, Claude, Llama models. Document latency reduction and accuracy improvement.",
+    "priority": 34,
+    "agent": "Eagle Eye",
+    "category": "Testing"
+  },
+  {
+    "title": "OPTIMIZE: Pheromone Evaporation Rates",
+    "description": "Tune decay rates per archon type. Historical=0.01 (slow), Current=0.1 (medium), Details=0.2 (fast), Architecture=0.01 (very slow).",
+    "priority": 21,
+    "agent": "Gecko",
+    "category": "Optimization"
+  },
+  {
+    "title": "IMPLEMENT: Semantic Hash Without PII",
+    "description": "Create semantic hashing that preserves meaning but removes personally identifiable information. Use bloom filter representation.",
+    "priority": 55,
+    "agent": "Crawdad",
+    "category": "Privacy"
+  },
+  {
+    "title": "INTEGRATE: Pheromone System with Q-BEES",
+    "description": "Connect pheromone trail system to Q-BEES quantum swarm. Each Q-Bee deposits trails, swarm consensus strengthens good paths.",
+    "priority": 55,
+    "agent": "Gecko",
+    "category": "Integration"
+  },
+  {
+    "title": "BUILD: Trail-Guided Model Selection",
+    "description": "Use pheromone trails to guide genetic model selection. Successful model choices strengthen trails for similar problems.",
+    "priority": 34,
+    "agent": "Raven",
+    "category": "ML"
+  },
+  {
+    "title": "PATENT: Context Reduction via Digital Pheromones",
+    "description": "File patent for 95% context window reduction using stigmergic principles. Novel combination of pheromones + privacy + compression.",
+    "priority": 89,
+    "agent": "War Chief OpenAI",
+    "category": "IP"
+  },
+  {
+    "title": "DEPLOY: Privacy-Preserving Pheromone API",
+    "description": "Production API for anonymous trail creation and following. Zero-knowledge proofs, differential privacy, no user tracking.",
+    "priority": 55,
+    "agent": "Gecko",
+    "category": "Deployment"
+  },
+  {
+    "title": "DOCUMENT: Two Wolves Privacy Balance",
+    "description": "Documentation explaining how system feeds both wolves equally. Knowledge flows without surveillance. Privacy preserved while learning enabled.",
+    "priority": 21,
+    "agent": "Spider",
+    "category": "Documentation"
+  },
+  {
+    "title": "TEST: 12-Archon Consensus at Scale",
+    "description": "Load test with millions of trails. Verify consensus mechanism scales, no memory leaks, performance remains sub-100ms.",
+    "priority": 34,
+    "agent": "Eagle Eye",
+    "category": "Testing"
+  }
+]

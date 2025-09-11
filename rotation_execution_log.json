@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-09-02T12:48:46.923315",
+  "trades": [
+    {
+      "asset": "BTC",
+      "action": "SELL",
+      "amount": 0.0102
+    },
+    {
+      "asset": "SOL",
+      "action": "SELL",
+      "amount": 3.03
+    },
+    {
+      "asset": "AVAX",
+      "action": "SELL",
+      "amount": 43.0
+    },
+    {
+      "asset": "XRP",
+      "action": "SELL",
+      "amount": 50.0
+    },
+    {
+      "asset": "ETH",
+      "action": "BUY",
+      "usd_amount": 2863.2355219999995
+    }
+  ],
+  "total_proceeds": 2921.6688999999997,
+  "eth_deployed": 2863.2355219999995,
+  "status": "ROTATION_COMPLETE"
+}

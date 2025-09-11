@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-08-26T15:55:15.955615",
+  "btc_price": 111196,
+  "eth_price": 4576,
+  "ratio": 24.3,
+  "correlation_status": "LINKED",
+  "portfolio_positioning": "OPTIMAL",
+  "your_positions": {
+    "BTC": 2419,
+    "ETH": 605,
+    "SOL": 4289,
+    "AVAX": 2966
+  },
+  "mountain_consciousness": 84,
+  "recommendation": "Hold positions, watch for decoupling"
+}

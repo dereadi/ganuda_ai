@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-09-02T11:44:27.082331",
+  "current_portfolio": 14833,
+  "friday_injection_options": {
+    "conservative": 10000,
+    "aggressive": 15000
+  },
+  "to_achieve_20k_weekly": {
+    "required_portfolio": 200000,
+    "at_10_percent_weekly": "sustainable",
+    "timeline_months": 6
+  },
+  "immediate_targets": {
+    "with_10k": {
+      "total": 24833,
+      "weekly_10pct": 2483.3,
+      "weeks_to_200k": 22
+    },
+    "with_15k": {
+      "total": 29833,
+      "weekly_10pct": 2983.3,
+      "weeks_to_200k": 20
+    }
+  }
+}

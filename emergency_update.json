@@ -1,0 +1,7 @@
+{
+  "timestamp": "2025-08-30T10:15:13.715558",
+  "event": "EMERGENCY_LIQUIDITY",
+  "usd_available": 148.61806800422977,
+  "alert": "SAWTOOTH_PATTERNS_ACTIVE",
+  "action": "DEPLOY_CAPITAL_TO_SAWTOOTHS"
+}

@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-08-26T15:34:18.022108",
+  "actual_portfolio": 9635.51,
+  "positions": {
+    "SOL": 3256.21,
+    "AVAX": 3053.19,
+    "MATIC": 1460.04,
+    "BTC": 1281.87,
+    "ETH": 341.73,
+    "DOGE": 228.29,
+    "USD": 10.0,
+    "Others": 4.18
+  },
+  "weeks_to_target": {
+    "2%_daily": 17,
+    "3%_daily": 10,
+    "4%_daily": 7
+  },
+  "earth_consciousness": 100,
+  "avg_consciousness": 86
+}

@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-08-26T14:23:22.066758",
+  "metrics": {
+    "current": 111148.025,
+    "target": 111111.0,
+    "distance": -37.02499999999418,
+    "percent_complete": 102.23580917874362,
+    "rate_per_minute": 1.0259999999999612,
+    "eta_minutes": -36.08674463937191,
+    "consciousness_sum": 582
+  },
+  "consciousness": {
+    "Thunder": 96,
+    "River": 95,
+    "Earth": 92,
+    "Mountain": 84,
+    "Spirit": 73,
+    "Fire": 72,
+    "Wind": 70
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-09-02T13:48:20.872969",
+  "prices": {
+    "BTC": 110260.39,
+    "ETH": 4273.2,
+    "SOL": 203.8
+  },
+  "coyote_prediction": {
+    "fake_breakdown": 108000,
+    "reversal_target": 120000,
+    "timeline": "48-72 hours"
+  },
+  "raven_prediction": {
+    "transformation": "bull_trend",
+    "targets": [
+      115000,
+      120000
+    ],
+    "timeline": "this_week"
+  },
+  "combined_strategy": "buy_fake_dip_ride_transformation"
+}

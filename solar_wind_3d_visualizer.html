@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Wind 3D Visualizer - Quantum Crawdads SWARM BETA</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            color: #00ff88;
+        }
+        
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        #countdown {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 0, 0, 0.8);
+            padding: 15px 25px;
+            border: 2px solid #ff0044;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            min-width: 200px;
+        }
+        
+        #market-zones {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border: 2px solid #ffaa00;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        .calm { background: #00ff00; }
+        .active { background: #ffff00; }
+        .storm { background: #ff0000; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 5px currentColor; }
+            50% { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+        }
+        
+        .glow { animation: glow 2s infinite; }
+        
+        #crawdad-counter {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(0, 255, 136, 0.8);
+            padding: 15px;
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            color: #000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="ui">
+            <h2 class="glow">🔥 SOLAR WIND MONITOR</h2>
+            <div>Solar Wind Speed: <span id="wind-speed">450 km/s</span></div>
+            <div>Magnetic Field: <span id="mag-field">-5.2 nT</span></div>
+            <div>Particle Density: <span id="density">8.5 /cm³</span></div>
+            <div>KP Index: <span id="kp-index">3.2</span></div>
+            <div>Status: <span id="status" class="status-indicator calm"></span><span id="status-text">CALM</span></div>
+        </div>
+        
+        <div id="countdown">
+            <div>NEXT SOLAR IMPACT</div>
+            <div id="timer" class="glow">03:42:15</div>
+        </div>
+        
+        <div id="market-zones">
+            <h3>🌍 GLOBAL IMPACT ZONES</h3>
+            <div>North America: <span class="status-indicator calm"></span>STABLE</div>
+            <div>Europe: <span class="status-indicator active"></span>ACTIVE</div>
+            <div>Asia-Pacific: <span class="status-indicator calm"></span>STABLE</div>
+            <div>Satellites: <span class="status-indicator storm"></span>ALERT</div>
+        </div>
+        
+        <div id="crawdad-counter">
+            <div>🦀 QUANTUM CRAWDADS</div>
+            <div>Swimming: <span id="crawdad-count">0</span></div>
+            <div>Energy Level: <span id="crawdad-energy">HIGH</span></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        class SolarWindVisualizer {
+            constructor() {
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+                this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setClearColor(0x000011);
+                document.getElementById('container').appendChild(this.renderer.domElement);
+                
+                // Audio context for sound effects
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Initialize components
+                this.initLighting();
+                this.createSun();
+                this.createEarth();
+                this.createSolarWind();
+                this.createMagnetosphere();
+                this.createQuantumCrawdads();
+                this.createStarField();
+                
+                // Data simulation
+                this.solarData = {
+                    windSpeed: 450,
+                    magneticField: -5.2,
+                    density: 8.5,
+                    kpIndex: 3.2,
+                    status: 'calm'
+                };
+                
+                this.countdownTime = 13335; // seconds
+                this.crawdadCount = 0;
+                
+                // Animation loop
+                this.animate();
+                this.updateData();
+                this.updateCountdown();
+                
+                // Event listeners
+                this.setupControls();
+                window.addEventListener('resize', () => this.onWindowResize());
+            }
+            
+            initLighting() {
+                // Ambient light
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+                this.scene.add(ambientLight);
+                
+                // Sun light
+                this.sunLight = new THREE.PointLight(0xffaa00, 2, 5000);
+                this.sunLight.position.set(-2000, 0, 0);
+                this.scene.add(this.sunLight);
+            }
+            
+            createSun() {
+                const sunGeometry = new THREE.SphereGeometry(150, 32, 32);
+                const sunMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xffaa00,
+                    emissive: 0xff4400,
+                    emissiveIntensity: 0.8
+                });
+                
+                this.sun = new THREE.Mesh(sunGeometry, sunMaterial);
+                this.sun.position.set(-2000, 0, 0);
+                this.scene.add(this.sun);
+                
+                // Solar flares
+                this.solarFlares = [];
+                this.createSolarFlares();
+            }
+            
+            createSolarFlares() {
+                for (let i = 0; i < 20; i++) {
+                    const flareGeometry = new THREE.ConeGeometry(5, 50, 8);
+                    const flareMaterial = new THREE.MeshBasicMaterial({
+                        color: 0xff2200,
+                        transparent: true,
+                        opacity: 0.7
+                    });
+                    
+                    const flare = new THREE.Mesh(flareGeometry, flareMaterial);
+                    flare.position.set(
+                        -2000 + Math.random() * 300 - 150,
+                        Math.random() * 300 - 150,
+                        Math.random() * 300 - 150
+                    );
+                    flare.rotation.set(
+                        Math.random() * Math.PI,
+                        Math.random() * Math.PI,
+                        Math.random() * Math.PI
+                    );
+                    
+                    this.solarFlares.push(flare);
+                    this.scene.add(flare);
+                }
+            }
+            
+            createEarth() {
+                const earthGeometry = new THREE.SphereGeometry(50, 32, 32);
+                const earthMaterial = new THREE.MeshPhongMaterial({
+                    color: 0x0088ff,
+                    emissive: 0x002244,
+                    shininess: 100
+                });
+                
+                this.earth = new THREE.Mesh(earthGeometry, earthMaterial);
+                this.earth.position.set(1500, 0, 0);
+                this.scene.add(this.earth);
+                
+                // Earth's atmosphere
+                const atmosphereGeometry = new THREE.SphereGeometry(55, 32, 32);
+                const atmosphereMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x0088ff,
+                    transparent: true,
+                    opacity: 0.2
+                });
+                
+                this.atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+                this.atmosphere.position.copy(this.earth.position);
+                this.scene.add(this.atmosphere);
+            }
+            
+            createSolarWind() {
+                this.solarWindParticles = new THREE.Group();
+                this.scene.add(this.solarWindParticles);
+                
+                // Create particle system
+                const particleCount = 2000;
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(particleCount * 3);
+                const velocities = [];
+                
+                for (let i = 0; i < particleCount; i++) {
+                    positions[i * 3] = (Math.random() - 0.5) * 4000;
+                    positions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+                    positions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+                    
+                    velocities.push({
+                        x: Math.random() * 10 + 5,
+                        y: (Math.random() - 0.5) * 2,
+                        z: (Math.random() - 0.5) * 2
+                    });
+                }
+                
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                
+                const material = new THREE.PointsMaterial({
+                    color: 0x00ffaa,
+                    size: 3,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                
+                this.windParticles = new THREE.Points(geometry, material);
+                this.windVelocities = velocities;
+                this.scene.add(this.windParticles);
+            }
+            
+            createMagnetosphere() {
+                // Create magnetosphere visualization
+                const magnetosphereGeometry = new THREE.TorusGeometry(100, 10, 16, 100);
+                const magnetosphereMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x00ff88,
+                    transparent: true,
+                    opacity: 0.3,
+                    wireframe: true
+                });
+                
+                this.magnetosphere = new THREE.Mesh(magnetosphereGeometry, magnetosphereMaterial);
+                this.magnetosphere.position.copy(this.earth.position);
+                this.magnetosphere.rotation.x = Math.PI / 2;
+                this.scene.add(this.magnetosphere);
+                
+                // Magnetic field lines
+                this.createMagneticFieldLines();
+            }
+            
+            createMagneticFieldLines() {
+                this.magneticLines = new THREE.Group();
+                
+                for (let i = 0; i < 20; i++) {
+                    const curve = new THREE.EllipseCurve(
+                        0, 0,
+                        100 + i * 5, 50 + i * 3,
+                        0, 2 * Math.PI,
+                        false,
+                        0
+                    );
+                    
+                    const points = curve.getPoints(100);
+                    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                    const material = new THREE.LineBasicMaterial({
+                        color: 0x00ff88,
+                        transparent: true,
+                        opacity: 0.4
+                    });
+                    
+                    const line = new THREE.Line(geometry, material);
+                    line.rotation.x = Math.random() * Math.PI;
+                    line.rotation.y = Math.random() * Math.PI;
+                    this.magneticLines.add(line);
+                }
+                
+                this.magneticLines.position.copy(this.earth.position);
+                this.scene.add(this.magneticLines);
+            }
+            
+            createQuantumCrawdads() {
+                this.crawdads = [];
+                
+                for (let i = 0; i < 50; i++) {
+                    const crawdad = this.createSingleCrawdad();
+                    this.crawdads.push(crawdad);
+                    this.scene.add(crawdad);
+                }
+            }
+            
+            createSingleCrawdad() {
+                const group = new THREE.Group();
+                
+                // Crawdad body
+                const bodyGeometry = new THREE.SphereGeometry(3, 8, 8);
+                const bodyMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xff6600,
+                    emissive: 0x442200
+                });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                group.add(body);
+                
+                // Claws
+                for (let i = 0; i < 2; i++) {
+                    const clawGeometry = new THREE.SphereGeometry(1.5, 6, 6);
+                    const clawMaterial = new THREE.MeshBasicMaterial({ color: 0xff4400 });
+                    const claw = new THREE.Mesh(clawGeometry, clawMaterial);
+                    claw.position.set(i === 0 ? -4 : 4, 2, 2);
+                    group.add(claw);
+                }
+                
+                // Position randomly in solar wind
+                group.position.set(
+                    Math.random() * 3000 - 1500,
+                    Math.random() * 1000 - 500,
+                    Math.random() * 1000 - 500
+                );
+                
+                // Swimming properties
+                group.userData = {
+                    swimSpeed: Math.random() * 2 + 1,
+                    direction: new THREE.Vector3(
+                        Math.random() - 0.5,
+                        Math.random() - 0.5,
+                        Math.random() - 0.5
+                    ).normalize(),
+                    phase: Math.random() * Math.PI * 2
+                };
+                
+                this.crawdadCount++;
+                
+                return group;
+            }
+            
+            createStarField() {
+                const starGeometry = new THREE.BufferGeometry();
+                const starCount = 5000;
+                const positions = new Float32Array(starCount * 3);
+                
+                for (let i = 0; i < starCount; i++) {
+                    positions[i * 3] = (Math.random() - 0.5) * 20000;
+                    positions[i * 3 + 1] = (Math.random() - 0.5) * 20000;
+                    positions[i * 3 + 2] = (Math.random() - 0.5) * 20000;
+                }
+                
+                starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                
+                const starMaterial = new THREE.PointsMaterial({
+                    color: 0xffffff,
+                    size: 1
+                });
+                
+                const stars = new THREE.Points(starGeometry, starMaterial);
+                this.scene.add(stars);
+            }
+            
+            setupControls() {
+                // Camera position
+                this.camera.position.set(0, 500, 1000);
+                this.camera.lookAt(0, 0, 0);
+                
+                // Mouse controls for camera
+                let mouseDown = false;
+                let mouseX = 0;
+                let mouseY = 0;
+                
+                window.addEventListener('mousedown', () => mouseDown = true);
+                window.addEventListener('mouseup', () => mouseDown = false);
+                window.addEventListener('mousemove', (event) => {
+                    if (mouseDown) {
+                        const deltaX = event.clientX - mouseX;
+                        const deltaY = event.clientY - mouseY;
+                        
+                        this.camera.position.x += deltaX * 2;
+                        this.camera.position.y -= deltaY * 2;
+                    }
+                    mouseX = event.clientX;
+                    mouseY = event.clientY;
+                });
+                
+                // Zoom controls
+                window.addEventListener('wheel', (event) => {
+                    this.camera.position.z += event.deltaY * 0.5;
+                    this.camera.position.z = Math.max(100, Math.min(3000, this.camera.position.z));
+                });
+            }
+            
+            updateSolarWind() {
+                const positions = this.windParticles.geometry.attributes.position.array;
+                
+                for (let i = 0; i < positions.length / 3; i++) {
+                    const velocity = this.windVelocities[i];
+                    
+                    positions[i * 3] += velocity.x;
+                    positions[i * 3 + 1] += velocity.y;
+                    positions[i * 3 + 2] += velocity.z;
+                    
+                    // Reset particles that go too far
+                    if (positions[i * 3] > 2000) {
+                        positions[i * 3] = -2000;
+                        positions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+                        positions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+                    }
+                }
+                
+                this.windParticles.geometry.attributes.position.needsUpdate = true;
+            }
+            
+            updateCrawdads() {
+                this.crawdads.forEach((crawdad, index) => {
+                    const userData = crawdad.userData;
+                    const time = Date.now() * 0.001;
+                    
+                    // Swimming motion
+                    crawdad.position.add(userData.direction.clone().multiplyScalar(userData.swimSpeed));
+                    
+                    // Bobbing motion
+                    crawdad.position.y += Math.sin(time * 2 + userData.phase) * 0.5;
+                    
+                    // Rotation
+                    crawdad.rotation.y += 0.02;
+                    crawdad.rotation.z = Math.sin(time + userData.phase) * 0.2;
+                    
+                    // Keep in bounds
+                    if (crawdad.position.length() > 3000) {
+                        crawdad.position.normalize().multiplyScalar(100);
+                    }
+                });
+            }
+            
+            updateData() {
+                setInterval(() => {
+                    // Simulate real-time data changes
+                    this.solarData.windSpeed = 400 + Math.random() * 200;
+                    this.solarData.magneticField = -10 + Math.random() * 15;
+                    this.solarData.density = 5 + Math.random() * 10;
+                    this.solarData.kpIndex = Math.random() * 9;
+                    
+                    // Determine status
+                    if (this.solarData.kpIndex < 3) {
+                        this.solarData.status = 'calm';
+                    } else if (this.solarData.kpIndex < 6) {
+                        this.solarData.status = 'active';
+                    } else {
+                        this.solarData.status = 'storm';
+                    }
+                    
+                    this.updateUI();
+                    
+                    // Play sound effects for solar flares
+                    if (this.solarData.status === 'storm' && Math.random() > 0.7) {
+                        this.playSolarFlareSound();
+                    }
+                }, 2000);
+            }
+            
+            updateUI() {
+                document.getElementById('wind-speed').textContent = `${this.solarData.windSpeed.toFixed(0)} km/s`;
+                document.getElementById('mag-field').textContent = `${this.solarData.magneticField.toFixed(1)} nT`;
+                document.getElementById('density').textContent = `${this.solarData.density.toFixed(1)} /cm³`;
+                document.getElementById('kp-index').textContent = this.solarData.kpIndex.toFixed(1);
+                
+                const statusElement = document.getElementById('status');
+                const statusText = document.getElementById('status-text');
+                
+                statusElement.className = `status-indicator ${this.solarData.status}`;
+                statusText.textContent = this.solarData.status.toUpperCase();
+                
+                document.getElementById('crawdad-count').textContent = this.crawdadCount;
+                document.getElementById('crawdad-energy').textContent = 
+                    this.solarData.status === 'storm' ? 'EXTREME' : 
+                    this.solarData.status === 'active' ? 'HIGH' : 'NORMAL';
+            }
+            
+            updateCountdown() {
+                setInterval(() => {
+                    this.countdownTime--;
+                    if (this.countdownTime <= 0) {
+                        this.countdownTime = Math.random() * 7200 + 1800; // 30min - 2hr
+                        this.triggerSolarEvent();
+                    }
+                    
+                    const hours = Math.floor(this.countdownTime / 3600);
+                    const minutes = Math.floor((this.countdownTime % 3600) / 60);
+                    const seconds = this.countdownTime % 60;
+                    
+                    document.getElementById('timer').textContent = 
+                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
+            }
+            
+            triggerSolarEvent() {
+                // Massive solar flare event
+                this.solarData.kpIndex = 7 + Math.random() * 2;
+                this.solarData.windSpeed = 600 + Math.random() * 200;
+                this.playSolarStormSound();
+                
+                // Visual effects
+                this.sunLight.intensity = 5;
+                setTimeout(() => {
+                    this.sunLight.intensity = 2;
+                }, 3000);
+                
+                // Add more crawdads during storm
+                for (let i = 0; i < 10; i++) {
+                    const newCrawdad = this.createSingleCrawdad();
+                    this.crawdads.push(newCrawdad);
+                    this.scene.add(newCrawdad);
+                }
+            }
+            
+            playSolarFlareSound() {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(50, this.audioContext.currentTime + 0.5);
+                
+                gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
+                
+                oscillator.start();
+                oscillator.stop(this.audioContext.currentTime + 0.5);
+            }
+            
+            playSolarStormSound() {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(100, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(20, this.audioContext.currentTime + 2);
+                
+                gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 2);
+                
+                oscillator.start();
+                oscillator.stop(this.audioContext.currentTime + 2);
+            }
+            
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                const time = Date.now() * 0.001;
+                
+                // Rotate sun
+                this.sun.rotation.y += 0.005;
+                
+                // Animate solar flares
+                this.solarFlares.forEach((flare, index) => {
+                    flare.scale.setScalar(1 + Math.sin(time * 2 + index) * 0.3);
+                    flare.material.opacity = 0.5 + Math.sin(time * 3 + index) * 0.3;
+                });
+                
+                // Rotate Earth
+                this.earth.rotation.y += 0.01;
+                this.atmosphere.rotation.y += 0.008;
+                
+                // Animate magnetosphere
+                this.magnetosphere.rotation.z += 0.005;
+                this.magneticLines.rotation.y += 0.003;
+                
+                // Update particles and crawdads
+                this.updateSolarWind();
+                this.updateCrawdads();
+                
+                // Color changes based on solar activity
+                const intensity = this.solarData.kpIndex / 9;
+                this.windParticles.material.color.setRGB(
+                    intensity,
+                    1 - intensity * 0.5,
+                    1 - intensity
+                );
+                
+                this.renderer.render(this.scene, this.camera);
+            }
+            
+            onWindowResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        }
+        
+        // Initialize the visualizer
+        window.addEventListener('load', () => {
+            new SolarWindVisualizer();
+        });
+    </script>
+</body>
+</html>

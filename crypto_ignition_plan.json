@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-08-25T20:24:59.767781",
+  "holdings": {
+    "USD": 1.5034823372870911,
+    "ETH": 0.06977323,
+    "BTC": 0.02169994
+  },
+  "btc_price": 109800.0,
+  "eth_price": 4378.4,
+  "total_firepower": 2688.1485222320002,
+  "strategy": "TREND_FOLLOW",
+  "ignition_trades": [
+    {
+      "action": "SELL",
+      "product": "BTC-USD",
+      "size": 0.0027124925,
+      "type": "LIMIT",
+      "price": 110019.6,
+      "purpose": "Take profit on half"
+    },
+    {
+      "action": "BUY",
+      "product": "BTC-USD",
+      "size": 0.0027124925,
+      "type": "LIMIT",
+      "price": 109580.4,
+      "purpose": "Buy the dip"
+    }
+  ],
+  "profit_projection": -60.483341750220006
+}

@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-08-14T13:41:52.558458",
+  "kp_index": 1.67,
+  "signal": "\ud83d\udfe2 LOW - Minimal put exposure",
+  "recommendations": {
+    "BTC": {
+      "asset": "BTC",
+      "spot": 117823,
+      "strikes": [
+        111931.84999999999
+      ],
+      "allocation_pct": 5.0,
+      "kp_index": 1.67,
+      "signal": "\ud83d\udfe2 LOW - Minimal put exposure"
+    },
+    "ETH": {
+      "asset": "ETH",
+      "spot": 4567,
+      "strikes": [
+        4338.65
+      ],
+      "allocation_pct": 5.0,
+      "kp_index": 1.67,
+      "signal": "\ud83d\udfe2 LOW - Minimal put exposure"
+    },
+    "SOL": {
+      "asset": "SOL",
+      "spot": 192,
+      "strikes": [
+        182.39999999999998
+      ],
+      "allocation_pct": 5.0,
+      "kp_index": 1.67,
+      "signal": "\ud83d\udfe2 LOW - Minimal put exposure"
+    }
+  }
+}

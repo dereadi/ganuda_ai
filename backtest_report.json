@@ -1,0 +1,153 @@
+{
+  "timestamp": "2025-08-15T12:58:00.174521",
+  "strategies_tested": 4,
+  "coins_tested": 3,
+  "total_tests": 12,
+  "test_results": [
+    {
+      "strategy": "RSI Divergence",
+      "coin": "BTC",
+      "initial_capital": 10000,
+      "final_value": 10000.0,
+      "total_return": 0.0,
+      "total_trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "win_rate": 0.0,
+      "max_drawdown": 0
+    },
+    {
+      "strategy": "Bollinger Squeeze",
+      "coin": "BTC",
+      "initial_capital": 10000,
+      "final_value": 10000.0,
+      "total_return": 0.0,
+      "total_trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "win_rate": 0.0,
+      "max_drawdown": 0
+    },
+    {
+      "strategy": "Solar Correlation",
+      "coin": "BTC",
+      "initial_capital": 10000,
+      "final_value": 10084.111537276838,
+      "total_return": 0.8411153727683813,
+      "total_trades": 11,
+      "wins": 6,
+      "losses": 0,
+      "win_rate": 100.0,
+      "max_drawdown": 28.805398510912884
+    },
+    {
+      "strategy": "Cherokee Council",
+      "coin": "BTC",
+      "initial_capital": 10000,
+      "final_value": 10069.448832890977,
+      "total_return": 0.6944883289097743,
+      "total_trades": 11,
+      "wins": 2,
+      "losses": 2,
+      "win_rate": 50.0,
+      "max_drawdown": 36.9052850344895
+    },
+    {
+      "strategy": "RSI Divergence",
+      "coin": "ETH",
+      "initial_capital": 10000,
+      "final_value": 10000.0,
+      "total_return": 0.0,
+      "total_trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "win_rate": 0.0,
+      "max_drawdown": 0
+    },
+    {
+      "strategy": "Bollinger Squeeze",
+      "coin": "ETH",
+      "initial_capital": 10000,
+      "final_value": 10000.0,
+      "total_return": 0.0,
+      "total_trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "win_rate": 0.0,
+      "max_drawdown": 0
+    },
+    {
+      "strategy": "Solar Correlation",
+      "coin": "ETH",
+      "initial_capital": 10000,
+      "final_value": 10319.509379513725,
+      "total_return": 3.1950937951372542,
+      "total_trades": 12,
+      "wins": 7,
+      "losses": 0,
+      "win_rate": 100.0,
+      "max_drawdown": 28.720579144813858
+    },
+    {
+      "strategy": "Cherokee Council",
+      "coin": "ETH",
+      "initial_capital": 10000,
+      "final_value": 10235.70646009193,
+      "total_return": 2.3570646009192933,
+      "total_trades": 14,
+      "wins": 10,
+      "losses": 1,
+      "win_rate": 90.9090909090909,
+      "max_drawdown": 14.435660217151144
+    },
+    {
+      "strategy": "RSI Divergence",
+      "coin": "SOL",
+      "initial_capital": 10000,
+      "final_value": 10000.0,
+      "total_return": 0.0,
+      "total_trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "win_rate": 0.0,
+      "max_drawdown": 0
+    },
+    {
+      "strategy": "Bollinger Squeeze",
+      "coin": "SOL",
+      "initial_capital": 10000,
+      "final_value": 10000.0,
+      "total_return": 0.0,
+      "total_trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "win_rate": 0.0,
+      "max_drawdown": 0
+    },
+    {
+      "strategy": "Solar Correlation",
+      "coin": "SOL",
+      "initial_capital": 10000,
+      "final_value": 10011.3714692514,
+      "total_return": 0.11371469251400412,
+      "total_trades": 14,
+      "wins": 3,
+      "losses": 2,
+      "win_rate": 60.0,
+      "max_drawdown": 56.953279
+    },
+    {
+      "strategy": "Cherokee Council",
+      "coin": "SOL",
+      "initial_capital": 10000,
+      "final_value": 10064.152205592192,
+      "total_return": 0.6415220559219232,
+      "total_trades": 19,
+      "wins": 6,
+      "losses": 7,
+      "win_rate": 46.15384615384615,
+      "max_drawdown": 20.400225161840215
+    }
+  ],
+  "recommendations": []
+}

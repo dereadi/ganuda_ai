@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-08-15T13:14:47.931036",
+  "greeks": [
+    {
+      "name": "Delta",
+      "symbol": "\u0394",
+      "path": "/home/dereadi/scripts/claude/delta_greek.py",
+      "pid": "968810",
+      "log": "/home/dereadi/scripts/claude/delta_greek.log"
+    },
+    {
+      "name": "Gamma",
+      "symbol": "\u0393",
+      "path": "/home/dereadi/scripts/claude/gamma_greek.py",
+      "pid": "968812",
+      "log": "/home/dereadi/scripts/claude/gamma_greek.log"
+    },
+    {
+      "name": "Theta",
+      "symbol": "\u0398",
+      "path": "/home/dereadi/scripts/claude/theta_greek.py",
+      "pid": "968814",
+      "log": "/home/dereadi/scripts/claude/theta_greek.log"
+    },
+    {
+      "name": "Vega",
+      "symbol": "\u03bd",
+      "path": "/home/dereadi/scripts/claude/vega_greek.py",
+      "pid": "968816",
+      "log": "/home/dereadi/scripts/claude/vega_greek.log"
+    },
+    {
+      "name": "Rho",
+      "symbol": "\u03c1",
+      "path": "/home/dereadi/scripts/claude/rho_greek.py",
+      "pid": "968818",
+      "log": "/home/dereadi/scripts/claude/rho_greek.log"
+    }
+  ]
+}

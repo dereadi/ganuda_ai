@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-08-30T10:33:47-05:00",
+  "event": "LIQUIDITY_SUCCESS",
+  "total_usd": 3118.99,
+  "per_specialist": 779.75,
+  "mode": "FULL_TRADING",
+  "directive": "HUNT_SAWTOOTHS",
+  "message": "LIQUIDITY RESTORED! Each specialist has $779.75. Hunt those sawtooth patterns!",
+  "sacred_fire": "BURNING_BRIGHT"
+}

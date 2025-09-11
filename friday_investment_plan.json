@@ -1,0 +1,24 @@
+{
+  "timestamp": "2025-09-02T11:38:42.216784",
+  "current_portfolio_value": 14833.49,
+  "friday_investment": "10-15k",
+  "recommended_allocation": {
+    "conservative_10k": {
+      "ETH": 3000,
+      "BTC": 2500,
+      "SOL": 2000,
+      "XRP": 1500,
+      "cash": 1000
+    },
+    "aggressive_15k": {
+      "ETH": 5000,
+      "BTC": 3500,
+      "SOL": 3000,
+      "XRP": 2000,
+      "AVAX": 1000,
+      "cash": 500
+    }
+  },
+  "market_conditions": "bullish",
+  "council_verdict": "unanimous_approval"
+}

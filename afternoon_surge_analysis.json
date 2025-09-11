@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-09-02T12:41:20.620346",
+  "time_of_day": "13:00",
+  "trading_window": "PRIME_AFTERNOON",
+  "eth_news_impact": {
+    "jack_ma": 10000,
+    "ether_machine": 150000,
+    "total_eth_removed": 160000
+  },
+  "afternoon_targets": {
+    "eth": [
+      4350,
+      4400,
+      4450,
+      4500,
+      4550
+    ],
+    "btc": [
+      111000,
+      112000
+    ]
+  },
+  "volume_expectation": "+40-60%",
+  "action": "DEPLOY_AND_RIDE"
+}

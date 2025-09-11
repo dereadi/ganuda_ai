@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-09-08T08:34:56.368003",
+  "executor": "VM_TRIBE_SPECIALIST",
+  "council_decision": "DOGE_REALLOCATION",
+  "vote": "UNANIMOUS",
+  "balances_before": {},
+  "prices": {
+    "SOL": 214.7,
+    "XRP": 2.9868,
+    "DOGE": 0.23838
+  }
+}

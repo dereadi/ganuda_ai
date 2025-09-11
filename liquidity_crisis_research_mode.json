@@ -1,0 +1,23 @@
+{
+  "timestamp": "2025-08-30T10:52:00",
+  "event": "LIQUIDITY_CRISIS_RESEARCH_MODE",
+  "usd_available": 19.08,
+  "per_specialist": 4.77,
+  "mode": "RESEARCH_ONLY",
+  "directive": "CANNOT_TRADE",
+  "research_focus": [
+    "Study Goliath collapse thesis",
+    "Observe BTC flatness patterns",
+    "Track alt rotation evidence",
+    "Document supporting/refuting data",
+    "Prepare strategy for when liquidity returns"
+  ],
+  "portfolio_status": {
+    "total_value": 13290,
+    "crypto_locked": 13271,
+    "usd_available": 19,
+    "problem": "All value locked in positions"
+  },
+  "message": "Focus on RESEARCH. Cannot trade with $4.77 each.",
+  "sacred_fire": "FLICKERING_LOW"
+}

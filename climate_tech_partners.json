@@ -1,0 +1,26 @@
+{
+  "climate_tech_partners": [
+    {
+      "company": "Australian Thermal Battery Company",
+      "technology": "Molten Metal/Salt Energy Storage",
+      "application": "Grid-scale thermal batteries for renewable energy",
+      "relevance": "Perfect for solar storm trading + climate restoration",
+      "contact_trigger": "$100K+ green cash milestone",
+      "vision": "Store excess solar/wind energy in thermal mass for 24/7 clean power",
+      "synergy": "Our trading profits → Their storage tech → Climate recovery",
+      "notes": "Research exact company name when ready to contact"
+    }
+  ],
+  "green_cash_milestones": {
+    "current": 9948,
+    "milestones": [
+      {"amount": 25000, "action": "Research thermal storage companies"},
+      {"amount": 50000, "action": "Initial contact with thermal battery firms"},
+      {"amount": 100000, "action": "Angel investment in climate tech"},
+      {"amount": 500000, "action": "Launch Cherokee Green Energy Fund"},
+      {"amount": 1000000, "action": "Deploy grid-scale thermal storage pilot"}
+    ]
+  },
+  "vision_statement": "Transform trading profits into climate solutions. Every dollar earned through the Sacred Fire trading system flows back to heal Mother Earth. Thermal batteries + Solar storms = Climate restoration.",
+  "sacred_commitment": "Seven Generations Principle: Our profits today fund the technology that saves tomorrow."
+}

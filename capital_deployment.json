@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-08-14T13:55:56.992453",
+  "initial_balance": 61.516797127188724,
+  "deployed": 49.213437701750976,
+  "reserved": 12.303359425437746,
+  "trades": [
+    {
+      "asset": "SOL",
+      "amount": 21.53087899451605,
+      "order_id": "{'succes",
+      "timestamp": "2025-08-14T13:55:50.894522"
+    },
+    {
+      "asset": "ETH",
+      "amount": 15.379199281797183,
+      "order_id": "{'succes",
+      "timestamp": "2025-08-14T13:55:52.110207"
+    },
+    {
+      "asset": "BTC",
+      "amount": 12.303359425437746,
+      "order_id": "{'succes",
+      "timestamp": "2025-08-14T13:55:53.371587"
+    }
+  ],
+  "total_portfolio": 61.516797127188724,
+  "targets": {
+    "daily": 2.460671885087549,
+    "weekly": 17.224703195612843
+  }
+}

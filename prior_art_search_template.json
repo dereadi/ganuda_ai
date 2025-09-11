@@ -1,0 +1,29 @@
+{
+  "search_record": {
+    "date": "2025-08-08T15:31:33.480721",
+    "searcher": "Quantum Crawdad Collective",
+    "databases_searched": [],
+    "queries_used": [],
+    "results_per_innovation": {}
+  },
+  "per_innovation_template": {
+    "innovation_name": "",
+    "search_queries": [],
+    "relevant_patents_found": [],
+    "risk_level": "GREEN/YELLOW/RED",
+    "closest_prior_art": {
+      "patent_number": "",
+      "title": "",
+      "why_different": "",
+      "filing_date": ""
+    },
+    "recommendation": "",
+    "novel_aspects_to_emphasize": []
+  },
+  "final_assessment": {
+    "proceed_with_filing": [],
+    "modify_before_filing": [],
+    "do_not_file": [],
+    "trade_secret_instead": []
+  }
+}

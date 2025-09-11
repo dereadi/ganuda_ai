@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-08-25T23:50:52.836034",
+  "blessed_by_council": true,
+  "capital": 100.92,
+  "target": 500000,
+  "stop_loss": 50,
+  "min_consciousness": 65,
+  "pairs": [
+    "BTC-USD",
+    "ETH-USD",
+    "SOL-USD"
+  ],
+  "mode": "NUCLEAR",
+  "sacred_fire_temperature": 100,
+  "trades_per_hour_target": 1400
+}

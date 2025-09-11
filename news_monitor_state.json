@@ -1,0 +1,28 @@
+{
+  "timestamp": "2025-08-31T10:00:02.653343",
+  "news_analysis": {
+    "DOGE": "bullish",
+    "SOL": "neutral",
+    "AVAX": "neutral",
+    "ETH": "neutral",
+    "XRP": "neutral",
+    "LINK": "neutral",
+    "MATIC": "neutral",
+    "ADA": "neutral"
+  },
+  "price_alerts": [
+    "\ud83e\ude78 DOGE approaching bleed point $0.22 (current: $0.2171)"
+  ],
+  "council_deliberations": [
+    "Spider: DOGE whale news confirms blood bag strategy",
+    "Eagle Eye: Monitoring for pump to $0.22+ bleed zone",
+    "Council Consensus: Mixed signals - maintain current strategy"
+  ],
+  "trading_signals": [
+    {
+      "coin": "DOGE",
+      "action": "PREPARE_BLEED",
+      "reason": "Bullish news + approaching bleed threshold"
+    }
+  ]
+}

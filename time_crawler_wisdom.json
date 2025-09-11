@@ -1,0 +1,115 @@
+{
+  "timestamp": "2025-08-15T12:38:16.442720",
+  "files_analyzed": 50,
+  "patterns": {
+    "buy_orders": 25,
+    "sell_orders": 20,
+    "try_except": 93
+  },
+  "lessons": [
+    {
+      "lesson": "Integrate cultural wisdom with technology",
+      "file": "sourceforge_education_crawdad.py",
+      "importance": "SPIRITUAL"
+    },
+    {
+      "lesson": "Solar activity correlates with market volatility",
+      "file": "sourceforge_education_crawdad.py",
+      "importance": "STRATEGIC"
+    },
+    {
+      "lesson": "Use subprocess with timeout to avoid API hangs",
+      "file": "time_crawler_crawdad.py",
+      "importance": "CRITICAL"
+    },
+    {
+      "lesson": "Always check USD balance before trading",
+      "file": "time_crawler_crawdad.py",
+      "importance": "HIGH"
+    },
+    {
+      "lesson": "Integrate cultural wisdom with technology",
+      "file": "time_crawler_crawdad.py",
+      "importance": "SPIRITUAL"
+    },
+    {
+      "lesson": "Solar activity correlates with market volatility",
+      "file": "time_crawler_crawdad.py",
+      "importance": "STRATEGIC"
+    },
+    {
+      "lesson": "Respect API rate limits to avoid bans",
+      "file": "time_crawler_crawdad.py",
+      "importance": "OPERATIONAL"
+    },
+    {
+      "lesson": "Use subprocess with timeout to avoid API hangs",
+      "file": "peace_eagle_solar_dna.py",
+      "importance": "CRITICAL"
+    },
+    {
+      "lesson": "Always check USD balance before trading",
+      "file": "peace_eagle_solar_dna.py",
+      "importance": "HIGH"
+    },
+    {
+      "lesson": "Integrate cultural wisdom with technology",
+      "file": "peace_eagle_solar_dna.py",
+      "importance": "SPIRITUAL"
+    }
+  ],
+  "successful_patterns": [
+    {
+      "pattern": "subprocess",
+      "file": "time_crawler_crawdad.py",
+      "reason": "Avoids Coinbase API timeouts"
+    },
+    {
+      "pattern": "subprocess",
+      "file": "peace_eagle_solar_dna.py",
+      "reason": "Avoids Coinbase API timeouts"
+    },
+    {
+      "pattern": "subprocess",
+      "file": "solar_market_sync.py",
+      "reason": "Avoids Coinbase API timeouts"
+    },
+    {
+      "pattern": "subprocess",
+      "file": "solar_force_async_trader.py",
+      "reason": "Avoids Coinbase API timeouts"
+    },
+    {
+      "pattern": "subprocess",
+      "file": "network_friendly_trader.py",
+      "reason": "Avoids Coinbase API timeouts"
+    }
+  ],
+  "timeout_solutions": [
+    {
+      "file": "peace_eagle_solar_dna.py",
+      "timeout_value": "3",
+      "context": "timeout handling"
+    },
+    {
+      "file": "solar_market_sync.py",
+      "timeout_value": "3",
+      "context": "timeout handling"
+    },
+    {
+      "file": "solar_force_async_trader.py",
+      "timeout_value": "3",
+      "context": "timeout handling"
+    },
+    {
+      "file": "network_friendly_trader.py",
+      "timeout_value": "5",
+      "context": "timeout handling"
+    },
+    {
+      "file": "network_friendly_trader.py",
+      "timeout_value": "5",
+      "context": "timeout handling"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-09-02T13:04:07.826101",
+  "trump_wealth": {
+    "wlfi_tokens": 22500000000,
+    "value_usd": 5600000000,
+    "ownership_pct": 22.5
+  },
+  "microstrategy": {
+    "new_purchase_btc": 4048,
+    "total_btc": 636505,
+    "value_usd": 70000000000,
+    "btc_supply_pct": 3
+  },
+  "market_impact": {
+    "btc_target": 120000,
+    "eth_target": 5000,
+    "sol_target": 250
+  },
+  "significance": "GAME_CHANGING"
+}

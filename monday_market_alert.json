@@ -1,0 +1,40 @@
+{
+  "date": "2025-09-09",
+  "timestamp": "2025-09-08T08:08:58.331473",
+  "catalysts": {
+    "treasury_news": true,
+    "stablecoin_inflow": true,
+    "solar_calm": true,
+    "sunday_momentum": true
+  },
+  "targets": {
+    "ETH": {
+      "current": 4310,
+      "resistance": 4320,
+      "target_1": 4400,
+      "target_2": 4500,
+      "moon": 5000
+    },
+    "BTC": {
+      "current": 111970,
+      "resistance": 112500,
+      "target_1": 113000,
+      "target_2": 115000,
+      "moon": 120000
+    },
+    "DOGE": {
+      "current": 0.234,
+      "sell_1": 0.245,
+      "sell_2": 0.26,
+      "sell_3": 0.28,
+      "etf_target": 0.3
+    }
+  },
+  "portfolio_targets": {
+    "conservative": 33705.16974,
+    "moderate": 34100.53829999999,
+    "aggressive": 34594.748999999996
+  },
+  "action_plan": "HOLD_AND_ADD",
+  "power_hour_kp": 1.0
+}

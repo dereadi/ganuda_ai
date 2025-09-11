@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Robinhood TOTP Setup</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #00ff88;
+            min-height: 100vh;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #00ff88;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #ff6b35;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #ff6b35;
+        }
+        
+        .step {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid #ff6b35;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .step h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+        
+        .step ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .input-group {
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #ff6b35;
+        }
+        
+        .input-group input {
+            width: 400px;
+            padding: 15px;
+            font-size: 24px;
+            background: #1a1a2e;
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            border-radius: 8px;
+            text-align: center;
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .button {
+            background: #00ff88;
+            color: #000000;
+            border: none;
+            padding: 20px 40px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        
+        .button:hover {
+            background: #00dd77;
+            transform: scale(1.05);
+        }
+        
+        .button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .code-display {
+            font-size: 36px;
+            color: #ff6b35;
+            letter-spacing: 4px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .warning {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #ff4444;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .success {
+            background: rgba(0, 255, 136, 0.2);
+            border: 2px solid #00ff88;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 ROBINHOOD TOTP AUTHENTICATION SETUP</h1>
+        
+        <div class="step">
+            <h3>Step 1: Enable Authentication App in Robinhood</h3>
+            <ol>
+                <li>Open Robinhood app or website</li>
+                <li>Go to: Account → Settings → Security & Privacy</li>
+                <li>Click on "Two-Factor Authentication"</li>
+                <li>Choose "Authentication App" (NOT SMS!)</li>
+                <li>When QR code appears, click "Can't scan it?"</li>
+                <li>Copy the 16-character secret code shown</li>
+            </ol>
+        </div>
+        
+        <div class="warning">
+            ⚠️ <strong>IMPORTANT:</strong> Do NOT use SMS authentication. You MUST use the Authentication App option to get a TOTP secret.
+        </div>
+        
+        <div class="step">
+            <h3>Step 2: Enter Your TOTP Secret</h3>
+            <div class="input-group">
+                <label for="totpSecret">Enter the 16-character secret from Robinhood:</label>
+                <input type="text" id="totpSecret" placeholder="ABCD1234EFGH5678" maxlength="20" />
+            </div>
+            <center>
+                <button class="button" onclick="saveTOTP()">💾 Save TOTP Secret</button>
+                <button class="button" onclick="testTOTP()">🔐 Generate Test Code</button>
+            </center>
+        </div>
+        
+        <div id="result" class="result">
+            <h3>Your Current TOTP Code:</h3>
+            <div class="code-display" id="currentCode">------</div>
+            <div>This code refreshes every 30 seconds</div>
+            <div style="margin-top: 20px;">
+                <strong>Next Steps:</strong>
+                <ol style="text-align: left; display: inline-block;">
+                    <li>Enter this code in Robinhood to verify</li>
+                    <li>Save this secret in a password manager</li>
+                    <li>You can now use automated trading!</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div id="saveResult" class="success" style="display: none;">
+            ✅ TOTP secret saved successfully! Your automated trading system can now authenticate.
+        </div>
+    </div>
+    
+    <script>
+        let totpInterval = null;
+        
+        function saveTOTP() {
+            const secret = document.getElementById('totpSecret').value.trim().toUpperCase();
+            
+            if (secret.length < 16) {
+                alert('❌ Secret must be at least 16 characters');
+                return;
+            }
+            
+            // Send to backend to save
+            fetch('/api/save-totp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ secret: secret })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('saveResult').style.display = 'block';
+                    testTOTP();
+                } else {
+                    alert('❌ Failed to save: ' + data.error);
+                }
+            })
+            .catch(err => {
+                alert('❌ Error: ' + err.message);
+            });
+        }
+        
+        function testTOTP() {
+            const secret = document.getElementById('totpSecret').value.trim().toUpperCase();
+            
+            if (secret.length < 16) {
+                alert('❌ Enter a valid TOTP secret first');
+                return;
+            }
+            
+            // Show result area
+            document.getElementById('result').classList.add('show');
+            
+            // Update code immediately
+            updateCode(secret);
+            
+            // Update every second
+            if (totpInterval) clearInterval(totpInterval);
+            totpInterval = setInterval(() => updateCode(secret), 1000);
+        }
+        
+        function updateCode(secret) {
+            // Generate TOTP code client-side (for display only)
+            // In production, this would be done server-side
+            fetch('/api/generate-totp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ secret: secret })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code) {
+                    document.getElementById('currentCode').textContent = data.code;
+                }
+            })
+            .catch(err => {
+                console.error('Error generating code:', err);
+            });
+        }
+        
+        // Auto-format input
+        document.getElementById('totpSecret').addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+    </script>
+</body>
+</html>

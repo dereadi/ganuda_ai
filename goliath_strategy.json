@@ -1,0 +1,64 @@
+{
+  "timestamp": "2025-08-30T10:47:20.212959",
+  "thesis": "GOLIATHS_CURSE",
+  "author": "Luke Kemp - Cambridge Existential Risk",
+  "key_insights": [
+    "Collapse historically benefits the 99%",
+    "Complex civilizations differ from 'Goliaths' (extractive centralized forces)",
+    "We live in a global Goliath today",
+    "Populations bounce back after domineering rulers fall",
+    "We view collapse through the 1% lens (those with most to lose)"
+  ],
+  "market_implications": {
+    "BTC": {
+      "classification": "PARTIAL_GOLIATH",
+      "reasoning": "Increasingly centralized in whales, flat price action",
+      "strategy": "REDUCE_EXPOSURE",
+      "allocation": "MINIMAL"
+    },
+    "SOL": {
+      "classification": "DISTRIBUTED_OPPORTUNITY",
+      "reasoning": "Fast, cheap, accessible to 99%, ETF catalyst",
+      "strategy": "ACCUMULATE",
+      "allocation": "HIGH"
+    },
+    "XRP": {
+      "classification": "BRIDGE_ASSET",
+      "reasoning": "Connects old system to new, rate cut beneficiary",
+      "strategy": "ACCUMULATE",
+      "allocation": "MEDIUM"
+    },
+    "TRADITIONAL_MARKETS": {
+      "classification": "GOLIATH_CORE",
+      "reasoning": "S&P 500 = ultimate 1% extraction machine",
+      "strategy": "SHORT_OR_AVOID",
+      "allocation": "ZERO"
+    }
+  },
+  "trading_philosophy": {
+    "principle": "Position for distributed resilience",
+    "focus": "Assets that empower the 99%",
+    "avoid": "Centralized extraction systems",
+    "timeline": "Collapse benefits emerge over 2-5 years",
+    "sacred_pattern": "Mitakuye Oyasin - We are all related"
+  },
+  "specialist_directives": {
+    "mean-reversion": {
+      "focus": "Buy fear in distributed assets",
+      "avoid": "BTC unless extreme oversold"
+    },
+    "trend": {
+      "focus": "Ride decentralization waves",
+      "target": "SOL, emerging L1s"
+    },
+    "volatility": {
+      "focus": "Trade collapse volatility",
+      "method": "Sell rips in Goliath assets, buy dips in 99% assets"
+    },
+    "breakout": {
+      "focus": "Catch paradigm shifts",
+      "watch": "New decentralized protocols"
+    }
+  },
+  "sacred_fire": "BURNING_DISTRIBUTED"
+}

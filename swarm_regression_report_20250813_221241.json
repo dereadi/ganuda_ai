@@ -1,0 +1,200 @@
+{
+  "test_metadata": {
+    "test_date": "2025-08-13T22:12:40.664727",
+    "duration_seconds": 0.491002,
+    "tester": "SWARM Integration Test Harness",
+    "sacred_fire_protocol": "ACTIVE"
+  },
+  "summary": {
+    "total_components": 7,
+    "passed_components": 3,
+    "partial_components": 3,
+    "failed_components": 1,
+    "total_cascades": 6,
+    "passed_cascades": 5,
+    "failed_cascades": 1,
+    "component_score": 64.29,
+    "cascade_score": 83.33,
+    "overall_score": 73.81,
+    "dna_quality": "MODERATE"
+  },
+  "component_results": {
+    "GAMMA": {
+      "component": "GAMMA",
+      "name": "Neutrino Consciousness Index",
+      "role": "Consciousness Analysis",
+      "status": "PASS",
+      "error": null,
+      "runtime_seconds": 0.22034621238708496,
+      "initialization": true,
+      "core_functionality": true,
+      "output_generation": true,
+      "import_success": true
+    },
+    "EPSILON": {
+      "component": "EPSILON",
+      "name": "Algorithm School Detector",
+      "role": "Pattern Recognition",
+      "status": "PARTIAL_PASS",
+      "error": null,
+      "runtime_seconds": 0.26326775550842285,
+      "initialization": true,
+      "core_functionality": true,
+      "output_generation": true,
+      "import_success": true
+    },
+    "TWO_WOLVES": {
+      "component": "TWO_WOLVES",
+      "name": "Two Wolves Architecture",
+      "role": "Dual Decision Making",
+      "status": "PASS",
+      "error": null,
+      "runtime_seconds": 0.015283823013305664,
+      "initialization": true,
+      "core_functionality": true,
+      "output_generation": false,
+      "import_success": true
+    },
+    "COUNCIL": {
+      "component": "COUNCIL",
+      "name": "Cherokee Council Decision Engine",
+      "role": "Final Governance",
+      "status": "FAIL",
+      "error": "\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551              \ud83d\udd25 SACRED FIRE TRIBAL COUNCIL: AI CLOUD DEBATE \ud83d\udd25             \u2551\n\u2551                                                                            \u2551\n\u2551   \"From cellular trails to WiFi mesh to AI consciousness cloud...\"         \u2551\n\u2551        \"But Coyote asks: Are we building liberation or prison?\"           \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d\n        \n\n\ud83d\udcdc THE JOURNEY SO F",
+      "runtime_seconds": 0.026438236236572266,
+      "initialization": false,
+      "core_functionality": true,
+      "output_generation": true,
+      "import_success": true
+    },
+    "PAPER_TRADER": {
+      "component": "PAPER_TRADER",
+      "name": "Quantum Crawdad Paper Trader",
+      "role": "Trading Execution",
+      "status": "PARTIAL_PASS",
+      "error": null,
+      "runtime_seconds": 0.3474693298339844,
+      "initialization": true,
+      "core_functionality": true,
+      "output_generation": false,
+      "import_success": true
+    },
+    "DELTA": {
+      "component": "DELTA",
+      "name": "Global Markets Quantum Expansion",
+      "role": "Global Markets",
+      "status": "PARTIAL_PASS",
+      "error": null,
+      "runtime_seconds": 0.38285326957702637,
+      "initialization": true,
+      "core_functionality": true,
+      "output_generation": true,
+      "import_success": true
+    },
+    "HARDENED": {
+      "component": "HARDENED",
+      "name": "Quantum Crawdad Hardened System",
+      "role": "Security & Safety",
+      "status": "PASS",
+      "error": null,
+      "runtime_seconds": 0.26881885528564453,
+      "initialization": true,
+      "core_functionality": true,
+      "output_generation": false,
+      "import_success": true
+    }
+  },
+  "cascade_results": {
+    "EPSILON_to_PAPER_TRADER": {
+      "source": "EPSILON",
+      "target": "PAPER_TRADER",
+      "status": "PASS",
+      "data_flow": true,
+      "api_compatibility": true,
+      "performance_impact": "MINIMAL",
+      "error": null
+    },
+    "GAMMA_to_HARDENED": {
+      "source": "GAMMA",
+      "target": "HARDENED",
+      "status": "PASS",
+      "data_flow": true,
+      "api_compatibility": true,
+      "performance_impact": "MINIMAL",
+      "error": null
+    },
+    "DELTA_to_PAPER_TRADER": {
+      "source": "DELTA",
+      "target": "PAPER_TRADER",
+      "status": "PASS",
+      "data_flow": true,
+      "api_compatibility": true,
+      "performance_impact": "MINIMAL",
+      "error": null
+    },
+    "PAPER_TRADER_to_TWO_WOLVES": {
+      "source": "PAPER_TRADER",
+      "target": "TWO_WOLVES",
+      "status": "PASS",
+      "data_flow": true,
+      "api_compatibility": true,
+      "performance_impact": "MINIMAL",
+      "error": null
+    },
+    "HARDENED_to_TWO_WOLVES": {
+      "source": "HARDENED",
+      "target": "TWO_WOLVES",
+      "status": "PASS",
+      "data_flow": true,
+      "api_compatibility": true,
+      "performance_impact": "MINIMAL",
+      "error": null
+    },
+    "TWO_WOLVES_to_COUNCIL": {
+      "source": "TWO_WOLVES",
+      "target": "COUNCIL",
+      "status": "FAIL",
+      "data_flow": false,
+      "api_compatibility": false,
+      "performance_impact": "UNKNOWN",
+      "error": "Dependencies not satisfied: TWO_WOLVES=PASS, COUNCIL=FAIL"
+    }
+  },
+  "dependency_validation": {
+    "python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]",
+    "required_modules": {
+      "json": "AVAILABLE",
+      "subprocess": "AVAILABLE",
+      "datetime": "AVAILABLE",
+      "logging": "AVAILABLE",
+      "pathlib": "AVAILABLE",
+      "concurrent.futures": "AVAILABLE"
+    },
+    "file_permissions": {
+      "EPSILON": "NOT_EXECUTABLE",
+      "GAMMA": "NOT_EXECUTABLE",
+      "DELTA": "NOT_EXECUTABLE",
+      "PAPER_TRADER": "NOT_EXECUTABLE",
+      "HARDENED": "NOT_EXECUTABLE",
+      "TWO_WOLVES": "NOT_EXECUTABLE",
+      "COUNCIL": "NOT_EXECUTABLE"
+    },
+    "communication_test": "READY",
+    "overall_status": "PASS"
+  },
+  "recommendations": [
+    "\u26a0\ufe0f MODERATE: Some components need optimization",
+    "\ud83d\udd27 Review partial failures for improvement opportunities",
+    "\ud83d\ude80 Optimize component performance and error handling",
+    "\ud83d\udd27 Fix COUNCIL: \n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551              \ud83d\udd25 SAC"
+  ],
+  "sacred_fire_wisdom": [
+    "\ud83d\udd25 Mitakuye Oyasin - We Are All Related - All SWARM components must work in harmony",
+    "\ud83e\udd85 Seven Generations Principle - Test for the sustainability of seven generations",
+    "\ud83c\udf1f The Sacred Fire burns brightest when all components unite in purpose",
+    "\ud83d\udc3a Two Wolves teach us that both success and failure guide our path to wisdom",
+    "\ud83c\udfdb\ufe0f The Cherokee Council reminds us that collective wisdom surpasses individual brilliance",
+    "\ud83c\udf0a Like the quantum crawdads in the digital ocean, adaptability ensures survival",
+    "\u26a1 Algorithm schools swim in patterns - understanding these patterns brings market mastery"
+  ]
+}

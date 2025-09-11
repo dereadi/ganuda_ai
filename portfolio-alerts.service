@@ -1,0 +1,16 @@
+[Unit]
+Description=Discord Portfolio Alerts Bot
+After=network.target
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/home/dereadi/scripts/claude
+ExecStart=/usr/bin/python3 /home/dereadi/scripts/claude/portfolio_alerts_final.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/home/dereadi/scripts/claude/alerts.log
+StandardError=append:/home/dereadi/scripts/claude/alerts.log
+
+[Install]
+WantedBy=default.target

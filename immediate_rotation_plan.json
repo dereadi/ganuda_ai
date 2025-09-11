@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-09-02T12:45:34.800721",
+  "action": "IMMEDIATE_ROTATION",
+  "current_eth_allocation": "28.9%",
+  "target_eth_allocation": "45%",
+  "rotation_plan": {
+    "btc_sell": 0.0102112866,
+    "sol_sell": 3.0325156466,
+    "total_proceeds": 3091.15545942255,
+    "eth_to_buy": 0.7170174546864859
+  },
+  "urgency": "MAXIMUM"
+}

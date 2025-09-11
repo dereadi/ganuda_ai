@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-09-02T14:50:20.910861",
+  "amount": 100,
+  "allocation": {
+    "ETH": 50,
+    "SOL": 30,
+    "BTC": 20
+  },
+  "prices": {
+    "BTC": 110770.2,
+    "ETH": 4284.28,
+    "SOL": 206.05
+  },
+  "projected_gain": 4.223256913364054,
+  "timing": "PERFECT_COMPRESSION"
+}

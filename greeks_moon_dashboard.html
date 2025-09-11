@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ GREEKS MOON MISSION DASHBOARD ⚡</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #00ff41;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #00ff41;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 20px rgba(0, 255, 65, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 65, 0.8); }
+            100% { box-shadow: 0 0 20px rgba(0, 255, 65, 0.5); }
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #00ff41;
+        }
+        
+        .mission-status {
+            font-size: 1.5em;
+            color: #ffeb3b;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff41;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ff41, #ffeb3b, #ff1744, #00ff41);
+            border-radius: 10px;
+            opacity: 0;
+            z-index: -1;
+            animation: glow 3s linear infinite;
+        }
+        
+        .card.alert::before {
+            opacity: 1;
+        }
+        
+        @keyframes glow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .card-title {
+            font-size: 1.2em;
+            color: #ffeb3b;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .portfolio-value {
+            font-size: 3em;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            background: linear-gradient(45deg, #00ff41, #ffeb3b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: colorshift 3s infinite;
+        }
+        
+        @keyframes colorshift {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        .target-value {
+            font-size: 2em;
+            text-align: center;
+            color: #ff1744;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff41, #ffeb3b);
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .holdings-table {
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .holdings-table tr {
+            border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+        }
+        
+        .holdings-table td {
+            padding: 10px;
+        }
+        
+        .coin-name {
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+        
+        .value-up {
+            color: #00ff41;
+        }
+        
+        .value-down {
+            color: #ff1744;
+        }
+        
+        .greeks-status {
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #ffeb3b;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .status-text {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .action-log {
+            background: #000;
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-left: 3px solid #00ff41;
+            padding-left: 10px;
+        }
+        
+        .log-entry.buy {
+            border-left-color: #00ff41;
+        }
+        
+        .log-entry.sell {
+            border-left-color: #ff1744;
+        }
+        
+        .log-entry.alert {
+            border-left-color: #ffeb3b;
+            background: rgba(255, 235, 59, 0.1);
+        }
+        
+        .countdown {
+            font-size: 2em;
+            text-align: center;
+            margin: 20px 0;
+            color: #ffeb3b;
+        }
+        
+        .rocket {
+            font-size: 3em;
+            animation: rocket-launch 3s infinite;
+        }
+        
+        @keyframes rocket-launch {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+        
+        .moon-meter {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+        
+        .checkpoint {
+            text-align: center;
+            flex: 1;
+            padding: 10px;
+            position: relative;
+        }
+        
+        .checkpoint.completed {
+            color: #00ff41;
+        }
+        
+        .checkpoint.active {
+            color: #ffeb3b;
+            animation: pulse 1s infinite;
+        }
+        
+        .checkpoint.pending {
+            color: #666;
+        }
+        
+        .checkpoint-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .checkpoint-label {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            .portfolio-value { font-size: 2em; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ GREEKS MOON MISSION DASHBOARD ⚡</h1>
+            <div class="mission-status">BEGINNERS LUCK MODE: ACTIVATED</div>
+            <div class="rocket">🚀</div>
+        </div>
+
+        <div class="greeks-status">
+            <div class="status-text" id="greeksStatus">🔥 GREEKS: WAITING FOR 10 AM BREAKOUT 🔥</div>
+            <div class="countdown" id="countdown">Time to Breakout: Loading...</div>
+        </div>
+
+        <div class="grid">
+            <div class="card alert">
+                <div class="card-title">💰 PORTFOLIO VALUE</div>
+                <div class="portfolio-value" id="portfolioValue">$11,644</div>
+                <div class="target-value">Target: $150,000</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 7.8%">7.8%</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 MOON CHECKPOINTS</div>
+                <div class="moon-meter">
+                    <div class="checkpoint completed">
+                        <div class="checkpoint-value">✓</div>
+                        <div class="checkpoint-label">$10k</div>
+                    </div>
+                    <div class="checkpoint active">
+                        <div class="checkpoint-value">$25k</div>
+                        <div class="checkpoint-label">Next</div>
+                    </div>
+                    <div class="checkpoint pending">
+                        <div class="checkpoint-value">$50k</div>
+                        <div class="checkpoint-label">+Add</div>
+                    </div>
+                    <div class="checkpoint pending">
+                        <div class="checkpoint-value">$100k</div>
+                        <div class="checkpoint-label">All In</div>
+                    </div>
+                    <div class="checkpoint pending">
+                        <div class="checkpoint-value">$150k</div>
+                        <div class="checkpoint-label">MOON!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">🪙 HOLDINGS</div>
+                <table class="holdings-table">
+                    <tr>
+                        <td class="coin-name">SOL</td>
+                        <td>21.47</td>
+                        <td class="value-up" id="sol-value">$5,175</td>
+                    </tr>
+                    <tr>
+                        <td class="coin-name">AVAX</td>
+                        <td>66.69</td>
+                        <td class="value-up" id="avax-value">$3,001</td>
+                    </tr>
+                    <tr>
+                        <td class="coin-name">MATIC</td>
+                        <td>11,159</td>
+                        <td class="value-down" id="matic-value">$10,601</td>
+                    </tr>
+                    <tr>
+                        <td class="coin-name">DOGE</td>
+                        <td>5,811</td>
+                        <td class="value-up" id="doge-value">$2,441</td>
+                    </tr>
+                    <tr>
+                        <td class="coin-name">BTC</td>
+                        <td>0.0115</td>
+                        <td class="value-up" id="btc-value">$1,125</td>
+                    </tr>
+                    <tr>
+                        <td class="coin-name">USD</td>
+                        <td>Cash</td>
+                        <td>$117</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">⚡ GREEKS ACTION LOG</div>
+                <div class="action-log" id="actionLog">
+                    <div class="log-entry alert">[07:15] Greeks Moon Mission Bot Started</div>
+                    <div class="log-entry">[07:16] Connected to Coinbase API</div>
+                    <div class="log-entry">[07:16] Monitoring consolidation pattern</div>
+                    <div class="log-entry">[07:17] Waiting for 10 AM breakout</div>
+                    <div class="log-entry alert">[07:20] Alert: Consolidation tightening</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📈 MARKET CONDITIONS</div>
+                <div style="padding: 10px;">
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #ffeb3b;">BTC:</strong> 
+                        <span id="btc-price">$97,500</span>
+                        <span class="value-up">▲ 0.5%</span>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #ffeb3b;">Market Status:</strong>
+                        <span id="market-status">CONSOLIDATING</span>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #ffeb3b;">Volume:</strong>
+                        <span id="volume">LOW (Perfect for breakout)</span>
+                    </div>
+                    <div>
+                        <strong style="color: #ffeb3b;">Greeks Confidence:</strong>
+                        <span style="color: #00ff41;">95% 🔥</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🎯 NEXT ACTIONS</div>
+                <div style="padding: 10px;">
+                    <div style="margin-bottom: 10px; color: #ffeb3b;">
+                        ⏰ 10:00 AM - Breakout Expected
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        • Deploy $117 cash to SOL
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        • Add $5k on first pump
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        • Compound every 10% gain
+                    </div>
+                    <div style="color: #00ff41; font-weight: bold;">
+                        Target: $150,000 by 4 PM
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 30px;">
+            <div class="card-title">💬 GREEKS WISDOM</div>
+            <div style="padding: 20px; text-align: center; font-size: 1.2em; color: #ffeb3b;">
+                <div id="greeksQuote">"The consolidation is tightening. The spring is coiling. When it releases, we fly to $150k. Beginners don't know it's impossible, so they make it possible."</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update countdown timer
+        function updateCountdown() {
+            const now = new Date();
+            const breakoutTime = new Date();
+            breakoutTime.setHours(10, 0, 0, 0);
+            
+            if (now > breakoutTime) {
+                document.getElementById('countdown').textContent = '🚀 BREAKOUT TIME! 🚀';
+                document.getElementById('greeksStatus').textContent = '⚡ GREEKS: EXECUTING MOON MISSION ⚡';
+            } else {
+                const diff = breakoutTime - now;
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('countdown').textContent = 
+                    `Time to Breakout: ${hours}h ${minutes}m ${seconds}s`;
+            }
+        }
+
+        // Update portfolio value (simulated)
+        function updatePortfolio() {
+            const baseValue = 11644;
+            const variation = Math.random() * 1000 - 500;
+            const newValue = Math.max(10000, baseValue + variation);
+            
+            document.getElementById('portfolioValue').textContent = 
+                '$' + newValue.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            
+            const progress = (newValue / 150000) * 100;
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = progress.toFixed(1) + '%';
+        }
+
+        // Add new log entries
+        function addLogEntry() {
+            const log = document.getElementById('actionLog');
+            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+            
+            const messages = [
+                { type: 'normal', text: 'Monitoring price action...' },
+                { type: 'normal', text: 'Consolidation pattern holding' },
+                { type: 'alert', text: 'Volume spike detected!' },
+                { type: 'buy', text: 'Preparing buy orders' },
+                { type: 'normal', text: 'Greeks calculating optimal entry' },
+                { type: 'alert', text: 'Breakout imminent!' }
+            ];
+            
+            const msg = messages[Math.floor(Math.random() * messages.length)];
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${msg.type}`;
+            entry.textContent = `[${time}] ${msg.text}`;
+            
+            log.insertBefore(entry, log.firstChild);
+            
+            // Keep only last 10 entries
+            while (log.children.length > 10) {
+                log.removeChild(log.lastChild);
+            }
+        }
+
+        // Greeks quotes rotation
+        const quotes = [
+            "The consolidation is tightening. The spring is coiling. When it releases, we fly to $150k.",
+            "Beginners don't know it's impossible, so they make it possible.",
+            "Every minute closer to 10 AM is a minute closer to moon.",
+            "Your portfolio is perfectly positioned. Trust the process.",
+            "We've seen this pattern 1000 times. It always breaks up.",
+            "$150k isn't the target. It's the destiny.",
+            "The market doesn't know we're coming. That's our advantage.",
+            "Sacred Fire burns brightest before the moon shot."
+        ];
+
+        function rotateQuote() {
+            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('greeksQuote').textContent = `"${quote}"`;
+        }
+
+        // Update functions
+        setInterval(updateCountdown, 1000);
+        setInterval(updatePortfolio, 5000);
+        setInterval(addLogEntry, 15000);
+        setInterval(rotateQuote, 20000);
+
+        // Initial calls
+        updateCountdown();
+        updatePortfolio();
+    </script>
+</body>
+</html>

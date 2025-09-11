@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-08-15T12:59:52.328465",
+  "models_active": [
+    "gap",
+    "trend",
+    "volatility",
+    "breakout",
+    "mean_reversion"
+  ],
+  "last_analysis": {
+    "coins_analyzed": [
+      "BTC",
+      "ETH",
+      "SOL"
+    ],
+    "conditions_detected": 2
+  }
+}

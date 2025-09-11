@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-09-02T14:29:44.337092",
+  "prices": {
+    "BTC": 110518.45,
+    "ETH": 4268.98,
+    "SOL": 204.96,
+    "XRP": 2.8073,
+    "AVAX": 23.74,
+    "LINK": 22.94
+  },
+  "coil_count": 3,
+  "ultra_tight": 1,
+  "tightness_score": -788.05,
+  "phase": "second_coil",
+  "breakout_eta": "2_hours"
+}

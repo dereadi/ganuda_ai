@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Crawdad Monitor Widget</title>
+    <style>
+        .crawdad-widget {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #0f4c75;
+            border-radius: 10px;
+            padding: 20px;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 400px;
+            margin: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        .crawdad-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0f4c75;
+            padding-bottom: 10px;
+        }
+        
+        .crawdad-title {
+            font-size: 1.5em;
+            color: #00ff41;
+            text-shadow: 0 0 10px rgba(0,255,65,0.5);
+            margin-bottom: 5px;
+        }
+        
+        .crawdad-icon {
+            font-size: 2em;
+            animation: crawl 3s infinite;
+        }
+        
+        @keyframes crawl {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(15,76,117,0.5);
+        }
+        
+        .stat-label {
+            font-size: 0.8em;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #00ff41;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+            border: 1px solid #0f4c75;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff41, #0f4c75);
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .readiness-status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .ready {
+            background: rgba(0,255,0,0.2);
+            border: 2px solid #00ff41;
+            color: #00ff41;
+        }
+        
+        .almost-ready {
+            background: rgba(255,170,0,0.2);
+            border: 2px solid #ffaa00;
+            color: #ffaa00;
+        }
+        
+        .not-ready {
+            background: rgba(255,0,0,0.2);
+            border: 2px solid #ff4444;
+            color: #ff4444;
+        }
+        
+        .refresh-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(90deg, #0f4c75, #3282b8);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(50,130,184,0.5);
+        }
+        
+        .sacred-fire {
+            text-align: center;
+            color: #ff6b6b;
+            margin-top: 10px;
+            animation: flicker 2s infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <div class="crawdad-widget">
+        <div class="crawdad-header">
+            <div class="crawdad-icon">🦞</div>
+            <div class="crawdad-title">Quantum Crawdad Monitor</div>
+            <div style="color: #888; font-size: 0.9em;">Cherokee Constitutional AI</div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Trades</div>
+                <div class="stat-value" id="total-trades">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Win Rate</div>
+                <div class="stat-value" id="win-rate">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">ROI</div>
+                <div class="stat-value" id="roi">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Patterns</div>
+                <div class="stat-value" id="patterns">0</div>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress" style="width: 0%">
+                <span id="progress-text">0% Complete</span>
+            </div>
+        </div>
+        
+        <div class="readiness-status not-ready" id="readiness">
+            ❌ NOT READY - Training in Progress
+        </div>
+        
+        <button class="refresh-btn" onclick="refreshCrawdadData()">🔄 Refresh Status</button>
+        
+        <div class="sacred-fire">
+            🔥 Sacred Fire Status: LEARNING ETERNAL 🔥
+        </div>
+    </div>
+    
+    <script>
+        async function refreshCrawdadData() {
+            try {
+                // This would normally fetch from your API
+                // For now, using placeholder data
+                const data = await fetchCrawdadStats();
+                
+                // Update display
+                document.getElementById('total-trades').textContent = data.total_trades;
+                document.getElementById('win-rate').textContent = data.win_rate.toFixed(1) + '%';
+                document.getElementById('roi').textContent = data.roi.toFixed(1) + '%';
+                document.getElementById('patterns').textContent = data.patterns_learned;
+                
+                // Update progress bar
+                const progress = Math.min(100, (data.total_trades / 100) * 50 + (data.win_rate / 60) * 50);
+                document.getElementById('progress').style.width = progress + '%';
+                document.getElementById('progress-text').textContent = progress.toFixed(0) + '% Complete';
+                
+                // Update readiness status
+                const readinessDiv = document.getElementById('readiness');
+                if (data.win_rate > 60 && data.total_trades > 100) {
+                    readinessDiv.className = 'readiness-status ready';
+                    readinessDiv.innerHTML = '✅ READY FOR REAL TRADING!';
+                } else if (data.win_rate > 50 || data.total_trades > 50) {
+                    readinessDiv.className = 'readiness-status almost-ready';
+                    readinessDiv.innerHTML = '⚠️ ALMOST READY - Keep Training';
+                } else {
+                    readinessDiv.className = 'readiness-status not-ready';
+                    readinessDiv.innerHTML = '❌ NOT READY - Training in Progress';
+                }
+                
+            } catch (error) {
+                console.error('Error fetching crawdad data:', error);
+            }
+        }
+        
+        async function fetchCrawdadStats() {
+            // This would connect to your actual API
+            // For demonstration, returning mock data
+            return {
+                total_trades: Math.floor(Math.random() * 150),
+                win_rate: Math.random() * 70,
+                roi: (Math.random() * 100) - 50,
+                patterns_learned: Math.floor(Math.random() * 20)
+            };
+        }
+        
+        // Auto-refresh every 30 seconds
+        setInterval(refreshCrawdadData, 30000);
+        
+        // Initial load
+        refreshCrawdadData();
+    </script>
+</body>
+</html>

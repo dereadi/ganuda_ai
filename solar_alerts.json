@@ -1,0 +1,20 @@
+[
+  {
+    "timestamp": "2025-08-14T23:23:19.247232",
+    "type": "WIND_SURGE",
+    "details": {
+      "speed": 509.3
+    },
+    "action": "\ud83d\udca8 STRONG WIND: Increased volatility likely",
+    "urgency": "MODERATE"
+  },
+  {
+    "timestamp": "2025-08-15T00:46:22.438055",
+    "type": "WIND_SURGE",
+    "details": {
+      "speed": 507.5
+    },
+    "action": "\ud83d\udca8 STRONG WIND: Increased volatility likely",
+    "urgency": "MODERATE"
+  }
+]

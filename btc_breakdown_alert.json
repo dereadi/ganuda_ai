@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-08-29T15:11:28.100186",
+  "btc_price": 108769,
+  "warning": "Broke below $110k support",
+  "indicators": {
+    "rsi": 34.5,
+    "macd": -199.85,
+    "volume": "1.3K BTC (low)"
+  },
+  "scenarios": [
+    {
+      "name": "Oversold Bounce",
+      "prob": 35,
+      "target": "$112-115k",
+      "timeline": "Days"
+    },
+    {
+      "name": "Extended Correction",
+      "prob": 40,
+      "target": "$105-99k",
+      "timeline": "1-2 weeks"
+    },
+    {
+      "name": "Deeper Capitulation",
+      "prob": 25,
+      "target": "$95-100k",
+      "timeline": "2-4 weeks"
+    }
+  ],
+  "action": "Prepare to buy dips with $500 liquidity"
+}

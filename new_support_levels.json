@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-09-02T15:37:45.079088",
+  "prices": {
+    "BTC": 111343.08,
+    "ETH": 4315.21,
+    "SOL": 207.88,
+    "XRP": 2.852,
+    "AVAX": 24.13,
+    "LINK": 23.328
+  },
+  "old_support": {
+    "BTC": 108000,
+    "ETH": 4250,
+    "SOL": 200,
+    "XRP": 2.75,
+    "AVAX": 23,
+    "LINK": 22
+  },
+  "new_support": {
+    "BTC": 110500,
+    "ETH": 4280,
+    "SOL": 205,
+    "XRP": 2.8,
+    "AVAX": 23.5,
+    "LINK": 23
+  },
+  "raised_count": 6,
+  "portfolio_value": 14764.3780208,
+  "support_value": 14632.1425
+}

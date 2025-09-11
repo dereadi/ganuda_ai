@@ -1,0 +1,65 @@
+{
+  "timestamp": "2025-08-30T10:53:48.394670",
+  "philosophy": "REAPING_SOWING_BALANCE",
+  "current_imbalance": {
+    "cash_percentage": 0.001,
+    "position_percentage": 0.999,
+    "diagnosis": "SEVERE_OVERPLANTING"
+  },
+  "ideal_balance": {
+    "sowing": 0.7,
+    "reaping": 0.3,
+    "reasoning": "Always keep harvest for new planting"
+  },
+  "seasonal_wisdom": {
+    "SPRING": "Plant aggressively (80% positions)",
+    "SUMMER": "Nurture growth (70% positions)",
+    "AUTUMN": "Harvest time (50% positions)",
+    "WINTER": "Preserve seeds (30% positions)"
+  },
+  "current_season": "AUTUMN",
+  "required_actions": {
+    "immediate": [
+      "STOP aggressive buying (stop sowing)",
+      "START selective harvesting (take profits)",
+      "MAINTAIN seed positions (don't oversell)",
+      "BUILD harvest reserves (30% cash target)"
+    ],
+    "sustainable_strategy": [
+      "Never go below 20% cash (emergency seeds)",
+      "Never go above 80% positions (over-planting)",
+      "Harvest gains regularly (weekly reaping)",
+      "Replant profits wisely (compound growth)"
+    ]
+  },
+  "specialist_roles": {
+    "mean-reversion": {
+      "role": "HARVEST_MANAGER",
+      "task": "Reap overbought positions",
+      "balance": "Sell tops, keep 30% cash"
+    },
+    "trend": {
+      "role": "GROWTH_TENDER",
+      "task": "Nurture trending positions",
+      "balance": "Let winners run, trim excess"
+    },
+    "volatility": {
+      "role": "CYCLE_TRADER",
+      "task": "Harvest volatility swings",
+      "balance": "Buy fear, sell greed"
+    },
+    "breakout": {
+      "role": "SEED_PLANTER",
+      "task": "Plant new breakout positions",
+      "balance": "Use only harvest money"
+    }
+  },
+  "tribal_mandate": {
+    "target": "30% cash, 70% positions",
+    "timeline": "Achieve over next 7 days",
+    "method": "Gradual harvesting of gains",
+    "priority": "LIQUIDITY before GROWTH"
+  },
+  "sacred_pattern": "The harvest feeds the planting",
+  "sacred_fire": "BURNING_BALANCED"
+}

@@ -1,0 +1,28 @@
+{
+  "mode": "LIVE",
+  "paper_trading": false,
+  "real_money": true,
+  "safety_limits": {
+    "max_trade_size_usd": 100,
+    "max_daily_loss_usd": 50,
+    "max_position_pct": 10,
+    "require_confirmations": false
+  },
+  "enabled_specialists": [
+    "mean_reversion",
+    "trend",
+    "volatility",
+    "breakout",
+    "gap"
+  ],
+  "trading_pairs": [
+    "BTC-USD",
+    "ETH-USD",
+    "SOL-USD",
+    "DOGE-USD",
+    "XRP-USD"
+  ],
+  "api_config": "/home/dereadi/.coinbase_config.json",
+  "log_file": "/home/dereadi/scripts/claude/pathfinder/test/real_trades.log",
+  "created": "2025-09-08T09:56:05.995705"
+}

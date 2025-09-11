@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-08-14T19:44:03.949216",
+  "portfolio_value": 449.02805307592473,
+  "usd_balance": 231.92621645942472,
+  "holdings": {
+    "SOL": 0.2972829,
+    "ETH": 0.03492655
+  },
+  "ready_player_one": true
+}

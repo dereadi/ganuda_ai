@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-09-02T13:12:48.900596",
+  "sol_price": 205.0,
+  "24h_high": 210.0,
+  "24h_low": 200.0,
+  "24h_volume": 1000000,
+  "coil_range": 10.0,
+  "position_in_range": 50.0,
+  "breakout_probability": 80,
+  "targets": {
+    "conservative": 215,
+    "likely": 220,
+    "moon": 230
+  }
+}

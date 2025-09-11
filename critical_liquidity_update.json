@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-08-30T10:17:00",
+  "event": "CRITICAL_LIQUIDITY_SHORTAGE",
+  "total_usd": 48.62,
+  "per_specialist": 12.15,
+  "directive": "MICRO_SCALPING_MODE",
+  "strategy": {
+    "mean-reversion": "Focus on micro dips under $10",
+    "trend": "Skip trades, insufficient capital",
+    "volatility": "Milk tiny ranges only",
+    "breakout": "Watch only, cannot trade"
+  },
+  "message": "CRITICAL: Only $12 each. Focus on smallest possible trades.",
+  "sacred_fire": "FLICKERING_LOW"
+}

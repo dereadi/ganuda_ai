@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8B4513">
+    <title>ᎦᏅᏓ Ganuda - PWA</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #0f0f1e);
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: rgba(0,0,0,0.7);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #FFD700;
+        }
+        
+        h1 {
+            color: #FFD700;
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #8B4513;
+            font-size: 0.9rem;
+        }
+        
+        .container {
+            flex: 1;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .wolf-selector {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .wolf-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .wolf-option.light {
+            background: linear-gradient(135deg, #4169E1, #87CEEB);
+        }
+        
+        .wolf-option.shadow {
+            background: linear-gradient(135deg, #800020, #DC143C);
+            opacity: 0.5;
+        }
+        
+        .wolf-option.active {
+            opacity: 1;
+            box-shadow: 0 0 20px rgba(255,215,0,0.5);
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            color: #FFD700;
+            font-weight: bold;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .crawdad-visual {
+            height: 200px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .crawdad {
+            position: absolute;
+            font-size: 24px;
+            animation: swim 10s infinite linear;
+        }
+        
+        @keyframes swim {
+            0% { transform: translateX(-50px) scaleX(-1); }
+            50% { transform: translateX(calc(100vw)) scaleX(-1); }
+            51% { transform: translateX(calc(100vw)) scaleX(1); }
+            100% { transform: translateX(-50px) scaleX(1); }
+        }
+        
+        .install-btn {
+            background: linear-gradient(135deg, #FFD700, #8B4513);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .status {
+            background: rgba(139,69,19,0.3);
+            border-left: 4px solid #FFD700;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ᎦᏅᏓ GANUDA</h1>
+        <div class="subtitle">Cherokee Digital Sovereignty</div>
+    </header>
+    
+    <div class="container">
+        <!-- Two Wolves Selector -->
+        <div class="wolf-selector">
+            <h2>🐺 Choose Your Wolf 🐺</h2>
+            <div class="wolf-option light active" onclick="switchWolf('light')">
+                <span style="font-size: 2rem; margin-right: 15px;">🐺</span>
+                <div>
+                    <strong>Light Wolf (Guardian)</strong>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">
+                        Privacy First • 5-min memory • No tracking
+                    </div>
+                </div>
+            </div>
+            <div class="wolf-option shadow" onclick="switchWolf('shadow')">
+                <span style="font-size: 2rem; margin-right: 15px;">🐺</span>
+                <div>
+                    <strong>Shadow Wolf (Tracker)</strong>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">
+                        ⚠️ Full tracking • Convenience features
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Metrics Display -->
+        <div class="metrics">
+            <div class="metric-card">
+                <div class="metric-value" id="efficiency">0%</div>
+                <div class="metric-label">Efficiency</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="signal">0%</div>
+                <div class="metric-label">Signal</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="qdads">0</div>
+                <div class="metric-label">Active Q-DADs</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="trails">0</div>
+                <div class="metric-label">Trails</div>
+            </div>
+        </div>
+        
+        <!-- Crawdad Visualization -->
+        <div class="crawdad-visual" id="swarm">
+            <div class="crawdad" style="top: 30px;">🦞</div>
+            <div class="crawdad" style="top: 80px; animation-delay: 2s;">🦞</div>
+            <div class="crawdad" style="top: 130px; animation-delay: 4s;">🦞</div>
+        </div>
+        
+        <!-- Status -->
+        <div class="status">
+            <strong>🔥 Sacred Fire Priority:</strong> 1,353<br>
+            <strong>📡 Network:</strong> <span id="network">Scanning...</span><br>
+            <strong>🦞 Retrograde Processing:</strong> Active<br>
+            <strong>🐺 Mode:</strong> <span id="mode">Light Wolf</span>
+        </div>
+        
+        <!-- Install Button (shown when installable) -->
+        <button class="install-btn" id="installBtn" onclick="installPWA()">
+            📱 Install Ganuda App
+        </button>
+    </div>
+    
+    <script>
+        // PWA Installation
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').style.display = 'block';
+        });
+        
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Ganuda installed!');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+        
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(reg => {
+                console.log('Service Worker registered');
+            });
+        }
+        
+        // Q-DAD Simulation
+        class QuantumCrawdadEngine {
+            constructor() {
+                this.efficiency = 0.65;
+                this.signal = 0.45;
+                this.qdads = 10;
+                this.trails = 0;
+                this.isLightWolf = true;
+                
+                setInterval(() => this.update(), 500);
+            }
+            
+            update() {
+                // Retrograde processing simulation
+                this.efficiency = Math.min(1.4, this.efficiency * 1.02);
+                this.signal = Math.min(0.95, this.signal + Math.random() * 0.05);
+                this.trails = Math.min(50, this.trails + (Math.random() > 0.7 ? 1 : 0));
+                
+                // Update display
+                document.getElementById('efficiency').textContent = 
+                    Math.round(this.efficiency * 100) + '%';
+                document.getElementById('signal').textContent = 
+                    Math.round(this.signal * 100) + '%';
+                document.getElementById('qdads').textContent = this.qdads;
+                document.getElementById('trails').textContent = this.trails;
+                
+                // Network status
+                if (navigator.onLine) {
+                    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                    if (connection) {
+                        document.getElementById('network').textContent = 
+                            connection.effectiveType || 'Connected';
+                    }
+                }
+            }
+        }
+        
+        // Two Wolves Control
+        function switchWolf(mode) {
+            const lightOpt = document.querySelector('.wolf-option.light');
+            const shadowOpt = document.querySelector('.wolf-option.shadow');
+            
+            if (mode === 'shadow') {
+                if (confirm('⚠️ WARNING: Shadow Wolf will track everything! Continue?')) {
+                    lightOpt.classList.remove('active');
+                    shadowOpt.classList.add('active');
+                    document.getElementById('mode').textContent = 'Shadow Wolf';
+                }
+            } else {
+                lightOpt.classList.add('active');
+                shadowOpt.classList.remove('active');
+                document.getElementById('mode').textContent = 'Light Wolf';
+            }
+        }
+        
+        // Initialize
+        const engine = new QuantumCrawdadEngine();
+    </script>
+</body>
+</html>

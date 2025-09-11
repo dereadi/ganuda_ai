@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-09-02T12:14:25.048661",
+  "current_nodes": {
+    "redfin": {
+      "os": "Ubuntu",
+      "role": "Primary trading"
+    },
+    "bluefin": {
+      "os": "Ubuntu",
+      "role": "Backup/VMs"
+    },
+    "sasass": {
+      "os": "macOS",
+      "role": "Database",
+      "ip": "192.168.132.222"
+    },
+    "sasass2": {
+      "os": "macOS",
+      "role": "Secondary services"
+    }
+  },
+  "recommendation": {
+    "new_node": "Dell PowerEdge R740XD",
+    "name": "Thunderbird",
+    "price": 4500,
+    "purpose": "Central compute hub",
+    "specs": {
+      "cores": 36,
+      "ram": 256,
+      "storage": 48,
+      "os": "Ubuntu 24.04 LTS"
+    }
+  },
+  "total_investment_year1": 9500,
+  "phases": 3
+}

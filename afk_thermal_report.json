@@ -1,0 +1,54 @@
+{
+  "timestamp": "2025-08-08T14:58:03.377024",
+  "afk_status": {
+    "is_afk": true,
+    "minutes_idle": 7.1,
+    "status": "AFK"
+  },
+  "thermal_zones": {
+    "WHITE_HOT": {
+      "temp": 90,
+      "decay_rate": 0.5,
+      "idle_minutes": 1
+    },
+    "RED_HOT": {
+      "temp": 70,
+      "decay_rate": 0.3,
+      "idle_minutes": 5
+    },
+    "WARM": {
+      "temp": 40,
+      "decay_rate": 0.2,
+      "idle_minutes": 15
+    },
+    "COOL": {
+      "temp": 20,
+      "decay_rate": 0.1,
+      "idle_minutes": 30
+    },
+    "COLD": {
+      "temp": 5,
+      "decay_rate": 0.05,
+      "idle_minutes": 60
+    },
+    "EMBER": {
+      "temp": 0,
+      "decay_rate": 0.01,
+      "idle_minutes": 120
+    }
+  },
+  "benefits": {
+    "memory_savings": "Reduces memory usage by 60-80% during idle",
+    "performance": "Faster queries on return (less context to search)",
+    "accuracy": "Fresh perspective reduces confirmation bias",
+    "energy": "System uses 0.1W during AFK vs 8W active",
+    "database": "Automatic cleanup prevents bloat",
+    "mental_model": "Mimics human memory consolidation during rest"
+  },
+  "protections": [
+    "Sacred memory minimum 40\u00b0",
+    "Heat budget cap 100",
+    "Max 5 WHITE_HOT",
+    "Gradual reheat"
+  ]
+}

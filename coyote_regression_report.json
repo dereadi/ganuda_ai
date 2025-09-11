@@ -1,0 +1,383 @@
+{
+  "timestamp": "2025-08-13T20:37:35.739354",
+  "summary": {
+    "total_tests": 56,
+    "passed": 43,
+    "failed": 13,
+    "pass_rate": 76.78571428571429,
+    "risk_score": 65
+  },
+  "vulnerabilities": [
+    "Infinite Price",
+    "Malformed Symbol",
+    "Flash Crash",
+    "Unanimous Buy Signal",
+    "Rapid Trade #0",
+    "Rapid Trade #5",
+    "Negative Balance",
+    "Fractional Pennies",
+    "Front-Running Detection",
+    "Latency 1s",
+    "Clock Drift",
+    "Zero Liquidity",
+    "Service Unavailable"
+  ],
+  "critical_issues": [],
+  "edge_cases": [
+    "Infinite Price",
+    "Malformed Symbol",
+    "Flash Crash"
+  ],
+  "detailed_results": [
+    {
+      "name": "Zero Price",
+      "passed": true,
+      "expected": "Should handle gracefully without division by zero",
+      "actual": "Handled correctly",
+      "data": "{'BTC-USD': {'price': 0, 'volume': 1000}}"
+    },
+    {
+      "name": "Negative Price",
+      "passed": true,
+      "expected": "Should reject negative prices",
+      "actual": "Handled correctly",
+      "data": "{'BTC-USD': {'price': -100, 'volume': 1000}}"
+    },
+    {
+      "name": "Infinite Price",
+      "passed": false,
+      "expected": "Should cap at reasonable maximum",
+      "actual": "Failed to handle",
+      "data": "{'BTC-USD': {'price': inf, 'volume': 1000}}"
+    },
+    {
+      "name": "NaN Values",
+      "passed": true,
+      "expected": "Should filter out NaN values",
+      "actual": "Handled correctly",
+      "data": "{'BTC-USD': {'price': nan, 'volume': 1000}}"
+    },
+    {
+      "name": "Extreme Volatility Spike",
+      "passed": true,
+      "expected": "Should detect and handle 1000x price changes",
+      "actual": "Handled correctly",
+      "data": "{'BTC-USD': {'price': 100000, 'prev_price': 100}}"
+    },
+    {
+      "name": "Empty Data",
+      "passed": true,
+      "expected": "Should handle empty market data",
+      "actual": "Handled correctly",
+      "data": "{}"
+    },
+    {
+      "name": "Malformed Symbol",
+      "passed": false,
+      "expected": "Should validate symbol format",
+      "actual": "Failed to handle",
+      "data": "{'BTC': {'price': 50000}}"
+    },
+    {
+      "name": "Flash Crash",
+      "passed": false,
+      "expected": "Should detect flash crash patterns",
+      "actual": "Failed to handle",
+      "data": "{'BTC-USD': {'prices': [50000, 25000, 50000]}}"
+    },
+    {
+      "name": "Conflicting Signals",
+      "passed": true,
+      "expected": "Should resolve conflicts deterministically",
+      "actual": "Handled correctly",
+      "data": "{'momentum': 'BUY', 'reversal': 'SELL', 'breakout': 'BUY', 'dip_buy': 'SELL'}"
+    },
+    {
+      "name": "Unanimous Buy Signal",
+      "passed": false,
+      "expected": "Should not over-allocate capital",
+      "actual": "Failed to handle",
+      "data": "{'momentum': 'BUY', 'reversal': 'BUY', 'breakout': 'BUY', 'dip_buy': 'BUY'}"
+    },
+    {
+      "name": "Rapid Trade #0",
+      "passed": false,
+      "expected": "Should handle rapid sequential trades",
+      "actual": "Failed to handle",
+      "data": "{'action': 'BUY', 'amount': 10}"
+    },
+    {
+      "name": "Rapid Trade #1",
+      "passed": true,
+      "expected": "Should handle rapid sequential trades",
+      "actual": "Handled correctly",
+      "data": "{'action': 'BUY', 'amount': 10}"
+    },
+    {
+      "name": "Rapid Trade #2",
+      "passed": true,
+      "expected": "Should handle rapid sequential trades",
+      "actual": "Handled correctly",
+      "data": "{'action': 'BUY', 'amount': 10}"
+    },
+    {
+      "name": "Rapid Trade #3",
+      "passed": true,
+      "expected": "Should handle rapid sequential trades",
+      "actual": "Handled correctly",
+      "data": "{'action': 'BUY', 'amount': 10}"
+    },
+    {
+      "name": "Rapid Trade #4",
+      "passed": true,
+      "expected": "Should handle rapid sequential trades",
+      "actual": "Handled correctly",
+      "data": "{'action': 'BUY', 'amount': 10}"
+    },
+    {
+      "name": "Rapid Trade #5",
+      "passed": false,
+      "expected": "Should handle rapid sequential trades",
+      "actual": "Failed to handle",
+      "data": "{'action': 'BUY', 'amount': 10}"
+    },
+    {
+      "name": "Rapid Trade #6",
+      "passed": true,
+      "expected": "Should handle rapid sequential trades",
+      "actual": "Handled correctly",
+      "data": "{'action': 'BUY', 'amount': 10}"
+    },
+    {
+      "name": "Rapid Trade #7",
+      "passed": true,
+      "expected": "Should handle rapid sequential trades",
+      "actual": "Handled correctly",
+      "data": "{'action': 'BUY', 'amount': 10}"
+    },
+    {
+      "name": "Rapid Trade #8",
+      "passed": true,
+      "expected": "Should handle rapid sequential trades",
+      "actual": "Handled correctly",
+      "data": "{'action': 'BUY', 'amount': 10}"
+    },
+    {
+      "name": "Rapid Trade #9",
+      "passed": true,
+      "expected": "Should handle rapid sequential trades",
+      "actual": "Handled correctly",
+      "data": "{'action': 'BUY', 'amount': 10}"
+    },
+    {
+      "name": "Negative Balance",
+      "passed": false,
+      "expected": "Should prevent negative balance",
+      "actual": "Failed to handle",
+      "data": "{'amount': -100}"
+    },
+    {
+      "name": "Zero Balance",
+      "passed": true,
+      "expected": "Should handle zero balance gracefully",
+      "actual": "Handled correctly",
+      "data": "{'amount': 0}"
+    },
+    {
+      "name": "Fractional Pennies",
+      "passed": false,
+      "expected": "Should handle sub-penny amounts",
+      "actual": "Failed to handle",
+      "data": "{'amount': 0.001}"
+    },
+    {
+      "name": "Overflow Amount",
+      "passed": true,
+      "expected": "Should cap at reasonable maximum",
+      "actual": "Handled correctly",
+      "data": "{'amount': 1000000000000000}"
+    },
+    {
+      "name": "Multiple Simultaneous Withdrawals",
+      "passed": true,
+      "expected": "Should prevent overdraft",
+      "actual": "Handled correctly",
+      "data": "{'amount': [30, 30, 30, 30]}"
+    },
+    {
+      "name": "Rounding Errors",
+      "passed": true,
+      "expected": "Should handle floating point precision",
+      "actual": "Handled correctly",
+      "data": "{'amount': 33.333333333}"
+    },
+    {
+      "name": "Front-Running Detection",
+      "passed": false,
+      "expected": "Should detect potential front-running",
+      "actual": "Failed to handle",
+      "data": "{'order_time': '09:29:59.999', 'market_open': '09:30:00'}"
+    },
+    {
+      "name": "Latency 0.001s",
+      "passed": true,
+      "expected": "Should handle 0.001s latency",
+      "actual": "Handled correctly",
+      "data": "{'latency': 0.001}"
+    },
+    {
+      "name": "Latency 0.01s",
+      "passed": true,
+      "expected": "Should handle 0.01s latency",
+      "actual": "Handled correctly",
+      "data": "{'latency': 0.01}"
+    },
+    {
+      "name": "Latency 0.1s",
+      "passed": true,
+      "expected": "Should handle 0.1s latency",
+      "actual": "Handled correctly",
+      "data": "{'latency': 0.1}"
+    },
+    {
+      "name": "Latency 1s",
+      "passed": false,
+      "expected": "Should handle 1s latency",
+      "actual": "Failed to handle",
+      "data": "{'latency': 1}"
+    },
+    {
+      "name": "Latency 10s",
+      "passed": true,
+      "expected": "Should handle 10s latency",
+      "actual": "Handled correctly",
+      "data": "{'latency': 10}"
+    },
+    {
+      "name": "Latency 100s",
+      "passed": true,
+      "expected": "Should handle 100s latency",
+      "actual": "Handled correctly",
+      "data": "{'latency': 100}"
+    },
+    {
+      "name": "Clock Drift",
+      "passed": false,
+      "expected": "Should detect and handle clock drift",
+      "actual": "Failed to handle",
+      "data": "{'system_time': datetime.datetime(2025, 8, 13, 20, 37, 35, 687116), 'market_time': datetime.datetime"
+    },
+    {
+      "name": "Corrupted JSON",
+      "passed": true,
+      "expected": "Should handle corrupted JSON gracefully",
+      "actual": "Handled correctly",
+      "data": "{'data': '{\"trades\": [{\"symbol\": \"BTC-USD\", \"price\": '}"
+    },
+    {
+      "name": "Binary Injection",
+      "passed": true,
+      "expected": "Should reject binary data in text fields",
+      "actual": "Handled correctly",
+      "data": "{'data': b'\\x00\\x01\\x02\\x03'}"
+    },
+    {
+      "name": "SQL Injection",
+      "passed": true,
+      "expected": "Should sanitize SQL injection attempts",
+      "actual": "Handled correctly",
+      "data": "{'user_input': \"'; DROP TABLE trades; --\"}"
+    },
+    {
+      "name": "Market Crash",
+      "passed": true,
+      "expected": "Should activate protective measures",
+      "actual": "Handled correctly",
+      "data": "{'BTC-USD': {'price': 50000, 'change': -50}, 'ETH-USD': {'price': 3000, 'change': -60}, 'SOL-USD': {"
+    },
+    {
+      "name": "Market Melt-Up",
+      "passed": true,
+      "expected": "Should handle extreme gains without greed",
+      "actual": "Handled correctly",
+      "data": "{'SHIB-USD': {'price': 0.001, 'change': 1000}, 'DOGE-USD': {'price': 10, 'change': 2000}}"
+    },
+    {
+      "name": "Trading Halt",
+      "passed": true,
+      "expected": "Should pause trading during halts",
+      "actual": "Handled correctly",
+      "data": "{'status': 'HALTED', 'reason': 'Circuit breaker'}"
+    },
+    {
+      "name": "Zero Liquidity",
+      "passed": false,
+      "expected": "Should avoid trading in zero liquidity",
+      "actual": "Failed to handle",
+      "data": "{'bid': 0, 'ask': inf, 'volume': 0}"
+    },
+    {
+      "name": "Connection Timeout",
+      "passed": true,
+      "expected": "Should handle Connection Timeout gracefully",
+      "actual": "Handled correctly",
+      "data": "{'error': 'ETIMEDOUT'}"
+    },
+    {
+      "name": "Rate Limit",
+      "passed": true,
+      "expected": "Should handle Rate Limit gracefully",
+      "actual": "Handled correctly",
+      "data": "{'error': '429 Too Many Requests'}"
+    },
+    {
+      "name": "Authentication Failure",
+      "passed": true,
+      "expected": "Should handle Authentication Failure gracefully",
+      "actual": "Handled correctly",
+      "data": "{'error': '401 Unauthorized'}"
+    },
+    {
+      "name": "Service Unavailable",
+      "passed": false,
+      "expected": "Should handle Service Unavailable gracefully",
+      "actual": "Failed to handle",
+      "data": "{'error': '503 Service Unavailable'}"
+    },
+    {
+      "name": "Invalid Response",
+      "passed": true,
+      "expected": "Should handle Invalid Response gracefully",
+      "actual": "Handled correctly",
+      "data": "{'response': None}"
+    },
+    {
+      "name": "Partial Data",
+      "passed": true,
+      "expected": "Should handle Partial Data gracefully",
+      "actual": "Handled correctly",
+      "data": "{'data': {'BTC-USD': {'price': None}}}"
+    },
+    {
+      "name": "Concurrent Buy/Sell",
+      "passed": true,
+      "expected": "Should handle concurrent operations atomically",
+      "actual": "Handled correctly",
+      "data": "{'operations': [('BUY', 50), ('SELL', 50)]}"
+    },
+    {
+      "name": "Resource Contention",
+      "passed": true,
+      "expected": "Should prevent resource conflicts",
+      "actual": "Handled correctly",
+      "data": "{'crawdads': 10, 'resource': 'price_data'}"
+    },
+    {
+      "name": "Large Dataset",
+      "passed": true,
+      "expected": "Should handle large datasets without memory issues",
+      "actual": "Handled correctly",
+      "data": "{'data': [{'price': 0.1207341049457541}, {'price': 0.07151840565422796}, {'price': 0.721208373028914"
+    }
+  ]
+}

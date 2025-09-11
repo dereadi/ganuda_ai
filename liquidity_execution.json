@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-08-26T06:36:35.636448",
+  "btc_price": 109728.0,
+  "btc_sold": 0.00045313,
+  "loss_realized": 0.29634702,
+  "action": "partial_liquidate",
+  "reason": "council_liquidity_plan"
+}

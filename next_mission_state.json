@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-08-26T14:26:04.501953",
+  "current_price": 111013.585,
+  "next_mission": 125000,
+  "distance": 13986.414999999994,
+  "daily_needed": 2797.2829999999985,
+  "momentum": "MAXIMUM",
+  "consciousness": {
+    "Wind": 100,
+    "River": 94,
+    "Mountain": 90
+  }
+}

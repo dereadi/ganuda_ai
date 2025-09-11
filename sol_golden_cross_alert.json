@@ -1,0 +1,44 @@
+{
+  "timestamp": "2025-08-29T14:34:45.231114",
+  "signal": "GOLDEN CROSS",
+  "asset": "SOL",
+  "current_price": 206,
+  "targets": [
+    {
+      "level": "Immediate",
+      "price": 220,
+      "timeline": "1-3 days",
+      "trigger": "Break resistance"
+    },
+    {
+      "level": "Short-term",
+      "price": 250,
+      "timeline": "1-2 weeks",
+      "trigger": "0.0020 BTC break"
+    },
+    {
+      "level": "Medium",
+      "price": 300,
+      "timeline": "2-4 weeks",
+      "trigger": "Volume confirmation"
+    },
+    {
+      "level": "Aggressive",
+      "price": 400,
+      "timeline": "1-2 months",
+      "trigger": "ETF speculation"
+    },
+    {
+      "level": "Bull Peak",
+      "price": 500,
+      "timeline": "Q3 2025",
+      "trigger": "Full mania"
+    }
+  ],
+  "position": {
+    "amount": 12.15,
+    "value": 2502.9
+  },
+  "whale_activity": "18.56M SOL accumulated at $180",
+  "recommendation": "HOLD and add on dips"
+}

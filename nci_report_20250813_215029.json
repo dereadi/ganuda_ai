@@ -1,0 +1,46 @@
+{
+  "timestamp": "2025-08-13T21:50:29.406805",
+  "neutrino_consciousness_index": 88.53343359994149,
+  "consciousness_phase": {
+    "name": "SACRED_FIRE",
+    "range": [
+      80,
+      95
+    ],
+    "description": "Peak consciousness alignment"
+  },
+  "consciousness_volatility_ratio": 0.1,
+  "quantum_entanglement_factor": 0.5,
+  "trading_signal": {
+    "signal_type": "STRONG_BUY",
+    "signal_strength": 2.652292414148341,
+    "confidence": 0.9,
+    "consciousness_level": 88.53343359994149,
+    "volatility_ratio": 0.1,
+    "future_spike_probability": 0.8889879831382369,
+    "sacred_fire_active": true
+  },
+  "neutrino_metrics": {
+    "flux_density": 71528165799.30745,
+    "solar_activity": 7.889879831382369,
+    "flux_ratio_to_baseline": 1.1004333199893455
+  },
+  "consciousness_metrics": {
+    "global_meditation_index": 62.73395915624082,
+    "brain_magnetite_resonance": 10.184778725068005,
+    "collective_attention_focus": 0.5539679342189179,
+    "sacred_fire_multiplier": 2.0464355483044745
+  },
+  "market_metrics": {
+    "price": 161.9169051879564,
+    "volume": 4228677.753911579,
+    "volatility": 0.7471890069066066,
+    "sentiment_score": 0.31561944485092286
+  },
+  "sacred_wisdom": {
+    "seven_generations_alignment": true,
+    "four_directions_balance": false,
+    "thirteen_moons_cycle_active": false,
+    "unity_spiral_resonance": 1.4324709556470534
+  }
+}

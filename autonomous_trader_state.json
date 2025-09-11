@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-08-15T11:35:36.785670",
+  "capital": 90.0,
+  "positions": {},
+  "trades": [],
+  "metrics": {
+    "start_time": "2025-08-13T22:32:26.138964",
+    "total_trades": 0,
+    "winning_trades": 0,
+    "losing_trades": 0,
+    "total_pnl": 0,
+    "best_trade": 0,
+    "worst_trade": 0,
+    "win_rate": 0,
+    "avg_consciousness": 65.375,
+    "algorithm_detections": 0
+  }
+}

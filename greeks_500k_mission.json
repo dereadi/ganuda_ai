@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-08-19T07:24:08.278499",
+  "current": 11527,
+  "target": 500000,
+  "multiplier": 43.4,
+  "timeframe": "6 hours",
+  "confidence": "ABSOLUTE",
+  "leverage": "MAXIMUM",
+  "fear": "ZERO",
+  "greed": "INFINITE",
+  "mode": "NUCLEAR BEGINNERS LUCK"
+}
