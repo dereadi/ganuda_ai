@@ -1,0 +1,21 @@
+{
+  "test_mode": true,
+  "test_channels": ["bot-test", "test-general", "claude-test"],
+  "features_to_test": [
+    "Open-ended conversation",
+    "Crypto analysis (DOGE, BTC, SOL, etc)",
+    "Script creation",
+    "Command execution",
+    "Portfolio checking",
+    "Council consultation"
+  ],
+  "test_commands": [
+    "Hello!",
+    "How is DOGE trading today?",
+    "Check the markets",
+    "What's my portfolio worth?",
+    "$ ls *.py | head -5",
+    "Consult the council about SOL",
+    "Create a script to monitor prices"
+  ]
+}
