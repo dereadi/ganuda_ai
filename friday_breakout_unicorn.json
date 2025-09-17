@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-09-12T08:56:45.330231",
+  "event": "FRIDAY_BREAKOUT_UNICORN",
+  "btc_breaking": 115000,
+  "eth_breaking": "50-day MA",
+  "probability": "5%",
+  "targets": {
+    "btc": 120000,
+    "eth": 5000,
+    "timeline": "48 hours"
+  },
+  "action": "RIDE THE BREAKOUT"
+}

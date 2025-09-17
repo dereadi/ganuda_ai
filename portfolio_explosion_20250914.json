@@ -1,0 +1,78 @@
+{
+  "timestamp": "2025-09-14T09:23:00",
+  "portfolio_value": 26793.98,
+  "total_gains": 26579.45,
+  "unrealized_returns": 1661.19,
+  "positions": {
+    "ETH": {
+      "value": 10008.61,
+      "amount": 2.25933624,
+      "price": 4621.08,
+      "gain": 740.63,
+      "return_pct": 7.07,
+      "status": "LARGEST_POSITION"
+    },
+    "BTC": {
+      "value": 9894.38,
+      "amount": 0.08675272,
+      "price": 115472.74,
+      "gain": 400.93,
+      "return_pct": 5.46,
+      "status": "BROKE_115K"
+    },
+    "XRP": {
+      "value": 3744.23,
+      "amount": 1247.580264,
+      "price": 3.04,
+      "gain": 191.02,
+      "return_pct": 4.39,
+      "status": "SUPPLY_SQUEEZE"
+    },
+    "SOL": {
+      "value": 2091.65,
+      "amount": 9.21090176,
+      "price": 244.18,
+      "gain": 326.14,
+      "return_pct": 11.96,
+      "status": "MOON_MISSION"
+    },
+    "LINK": {
+      "value": 9.05,
+      "amount": 0.38,
+      "price": 24.12,
+      "gain": 0.82,
+      "return_pct": 9.79
+    },
+    "AVAX": {
+      "value": 8.29,
+      "amount": 0.28691157,
+      "price": 29.31,
+      "gain": 1.65,
+      "return_pct": 24.42,
+      "status": "BEST_PERFORMER"
+    }
+  },
+  "critical_levels": {
+    "BTC": {
+      "current": 115472.74,
+      "next_resistance": 120000,
+      "support": 112000
+    },
+    "ETH": {
+      "current": 4621.08,
+      "next_resistance": 5000,
+      "support": 4500
+    },
+    "SOL": {
+      "current": 244.18,
+      "next_resistance": 250,
+      "support": 240
+    },
+    "XRP": {
+      "current": 3.04,
+      "next_resistance": 3.50,
+      "support": 3.00
+    }
+  },
+  "cherokee_council_verdict": "EXPLOSIVE_GAINS_HOLD_EVERYTHING"
+}

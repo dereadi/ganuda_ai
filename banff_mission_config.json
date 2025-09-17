@@ -1,0 +1,25 @@
+{
+  "banff_mission": {
+    "start_date": "Mid-September 2025",
+    "duration": "2-4 weeks",
+    "base_camp": "Tunnel Mountain Campground",
+    "backup_sites": [
+      "Lake Louise",
+      "Two Jack Lake"
+    ],
+    "trading_hours": "5:00 AM - 10:00 PM MST",
+    "expected_discoveries": "Mountain-market correlations"
+  },
+  "technical_setup": {
+    "starlink_dish": "Gen 3 high-performance",
+    "power_system": "Solar + battery + shore",
+    "heating": "Diesel + propane backup",
+    "water": "30 gallons fresh",
+    "food": "2 weeks supplies"
+  },
+  "synchronization": {
+    "main_tribe_updates": "Every 30 minutes",
+    "special_reports": "Sunrise and sunset",
+    "emergency_protocol": "iPhone backup always ready"
+  }
+}

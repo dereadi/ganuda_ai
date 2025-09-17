@@ -1,0 +1,18 @@
+{
+  "tenth_man_rule": {
+    "always_active": [
+      "Coyote",
+      "Raven"
+    ],
+    "trigger_phrases": [
+      "can't lose",
+      "guaranteed",
+      "free money",
+      "everyone agrees",
+      "obvious trade"
+    ],
+    "investigation_time": "1 hour minimum",
+    "veto_power": true,
+    "implementation_date": "2025-09-12T06:49:54.584691"
+  }
+}

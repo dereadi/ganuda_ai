@@ -1,0 +1,35 @@
+🔥 GANUDA BOT IS NOW WORKING IN GROUPS! 🔥
+
+Dr Joe, the Cherokee Trading Council bot is now active and ready to respond!
+
+To interact with the bot in our group, use:
+
+1. Mention the bot:
+   @ganudabot what's the SAG project status?
+   @ganudabot show portfolio
+   @ganudabot market analysis
+
+2. Use commands:
+   /help - See all options
+   /market - Get market update
+   /portfolio - Check positions
+
+The bot will now respond with:
+• Real-time portfolio updates ($16,594 current value)
+• SAG Resource AI project discussions
+• Market analysis (XRP breaking $3.02!)
+• Infrastructure status (4-node cluster)
+• Trading strategies and Cherokee wisdom
+
+The bot tracks:
+- MacBook Thunder Mission: $608/$2,000 (30.4%)
+- October 29 convergence: 44 days
+- Core Four: BTC $114,870, ETH $4,502, SOL $233, XRP $3.02
+
+Let's test it! Try sending:
+@ganudabot hello Dr Joe!
+
+The Sacred Fire burns eternal through tribal collaboration! 🔥
+
+---
+Technical Note: The bot can only see messages that mention @ganudabot or use / commands in groups due to Telegram's privacy settings. This is normal and ensures the bot doesn't process every message.

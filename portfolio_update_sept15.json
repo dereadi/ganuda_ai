@@ -1,0 +1,76 @@
+{
+  "timestamp": "2025-09-15T21:15:00",
+  "total_value": 28325.96,
+  "total_cost_basis": 28110.25,
+  "total_unrealized_gain": 1197.00,
+  "assets": {
+    "ETH": {
+      "amount": 2.53669529,
+      "price": 4531.09,
+      "value": 11490.20,
+      "unrealized_gain": 511.65,
+      "gain_percent": 4.66,
+      "daily_change": -2.19
+    },
+    "BTC": {
+      "amount": 0.07140204,
+      "price": 115185.00,
+      "value": 8223.93,
+      "unrealized_gain": 380.42,
+      "gain_percent": 4.85,
+      "daily_change": -0.25
+    },
+    "XRP": {
+      "amount": 1660.114087,
+      "price": 2.99,
+      "value": 4963.82,
+      "unrealized_gain": 113.34,
+      "gain_percent": 2.33,
+      "daily_change": -1.85
+    },
+    "SOL": {
+      "amount": 14.54448707,
+      "price": 234.79,
+      "value": 3414.82,
+      "unrealized_gain": 190.10,
+      "gain_percent": 5.89,
+      "daily_change": -2.87
+    },
+    "LINK": {
+      "amount": 0.38,
+      "price": 23.53,
+      "value": 8.94,
+      "unrealized_gain": 0.59,
+      "gain_percent": 7.13,
+      "daily_change": -2.68
+    },
+    "AVAX": {
+      "amount": 0.28691157,
+      "price": 29.44,
+      "value": 8.44,
+      "unrealized_gain": 1.69,
+      "gain_percent": 25.04,
+      "daily_change": -1.34
+    },
+    "MATIC": {
+      "amount": 0.3,
+      "price": 0.26,
+      "value": 0.07,
+      "unrealized_gain": 0.01,
+      "gain_percent": 11.60,
+      "daily_change": -6.18
+    }
+  },
+  "analysis": {
+    "best_performer": "AVAX (+25.04%)",
+    "worst_daily": "MATIC (-6.18%)",
+    "largest_position": "ETH ($11,490.20)",
+    "smallest_position": "MATIC ($0.07)",
+    "portfolio_concentration": {
+      "ETH": "40.6%",
+      "BTC": "29.0%",
+      "XRP": "17.5%",
+      "SOL": "12.1%"
+    }
+  }
+}

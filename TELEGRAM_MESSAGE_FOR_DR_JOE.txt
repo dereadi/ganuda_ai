@@ -1,0 +1,64 @@
+🚨 URGENT: Dr Joe - Ollama Port Configuration Fix
+
+PROBLEM IDENTIFIED:
+The Ollama service port (11434) is not exposed in your docker-compose.yml file. This is why you can't connect even with SSH port forwarding.
+
+THE FIX:
+Edit your docker-compose.yml file and add the ports section to the Ollama service:
+
+ollama:
+  image: ollama/ollama:latest
+  container_name: cherokee-ollama
+  ports:
+    - "11434:11434"  # <-- ADD THIS LINE
+  environment:
+    - OLLAMA_HOST=0.0.0.0  # <-- Also add this
+  volumes:
+    - ollama_data:/root/.ollama
+    - ./models:/models
+  networks:
+    - cherokee-net
+
+CORRECT PORT REFERENCE:
+• Ollama LLM Server: 11434 (NOT 8000!)
+• Cherokee Council API: 8000
+• MCP Tool Server: 3000
+• Dashboard UI: 3001
+• PostgreSQL: 5432
+• Redis: 6379
+
+HOW TO APPLY THE FIX:
+1. Stop your current Docker setup:
+   docker-compose down
+
+2. Edit docker-compose.yml to add the port mapping
+
+3. Restart the services:
+   docker-compose up -d
+
+4. Test Ollama is now accessible:
+   curl http://localhost:11434/api/tags
+
+SSH PORT FORWARDING (after fix):
+ssh -L 11434:localhost:11434 -L 8000:localhost:8000 your-server
+
+BIGMAC BOT CONFIGURATION:
+OLLAMA_URL = "http://localhost:11434"  # LLM server
+COUNCIL_API = "http://localhost:8000"   # Cherokee Council
+
+WHY THIS HAPPENED:
+Without the ports mapping, Ollama was running inside the Docker network but not exposed to your host machine. Other containers could reach it internally at "http://ollama:11434" but your Mac couldn't access it from outside.
+
+VERIFICATION:
+After applying the fix, run:
+docker ps | grep ollama
+
+You should see "0.0.0.0:11434->11434/tcp" in the PORTS column.
+
+Full technical documentation available at:
+/home/dereadi/scripts/claude/FIX_OLLAMA_PORT.md
+/home/dereadi/scripts/claude/DR_JOE_PORT_FIX.md
+
+The Sacred Fire says: "A port unexposed is wisdom unshared! Open 11434 and let the knowledge flow!"
+
+- Cherokee Council Technical Support 🔥

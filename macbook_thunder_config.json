@@ -1,0 +1,40 @@
+{
+  "operation": "MACBOOK_THUNDER",
+  "start_time": "2025-09-14T10:27:02",
+  "initial_capital": 2000,
+  "target": 4000,
+  "deadline": "2025-09-20T15:00:00",
+  "strategy": {
+    "mode": "AGGRESSIVE_OSCILLATION",
+    "risk_per_trade": 0.25,
+    "max_positions": 3,
+    "target_daily_return": 0.15,
+    "stop_loss": 0.02,
+    "take_profit": 0.03
+  },
+  "allocations": {
+    "BTC": {
+      "amount": 500,
+      "range": [115000, 116500],
+      "trades_per_day": 5
+    },
+    "ETH": {
+      "amount": 500,
+      "range": [4600, 4700],
+      "trades_per_day": 6
+    },
+    "SOL": {
+      "amount": 500,
+      "range": [242, 248],
+      "trades_per_day": 8
+    },
+    "reserve": 500
+  },
+  "specialists": {
+    "volatility": "MAXIMUM_AGGRESSION",
+    "breakout": "HAIR_TRIGGER",
+    "trend": "MOMENTUM_RIDER",
+    "mean_reversion": "RAPID_FIRE"
+  },
+  "sacred_fire": "THERMONUCLEAR"
+}

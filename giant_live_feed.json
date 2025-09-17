@@ -1,0 +1,55 @@
+{
+  "timestamp": "2025-09-15T20:25:49.111545",
+  "live_data": {
+    "portfolio_value": 16685.447796000004,
+    "positions": {
+      "BTC": {
+        "amount": 0.0276,
+        "price": 115062,
+        "value": 3175.7111999999997,
+        "pct": 19.032819729065416
+      },
+      "ETH": {
+        "amount": 0.7812,
+        "price": 4512.33,
+        "value": 3525.032196,
+        "pct": 21.12638653213164
+      },
+      "SOL": {
+        "amount": 21.405,
+        "price": 233.46,
+        "value": 4997.211300000001,
+        "pct": 29.94951865300241
+      },
+      "AVAX": {
+        "amount": 101.0833,
+        "price": 29.51,
+        "value": 2982.968183,
+        "pct": 17.877663335563014
+      },
+      "MATIC": {
+        "amount": 6571,
+        "price": 0.254527,
+        "value": 1672.496917,
+        "pct": 10.023686133260068
+      },
+      "XRP": {
+        "amount": 108.6,
+        "price": 2.98,
+        "value": 323.628,
+        "pct": 1.9395823471850915
+      }
+    },
+    "hot_memories": 20,
+    "latest_memory": "\ud83d\udd25 PORTFOLIO MONITOR UPDATE\n{\n  \"portfolio\": {\n    \"timestamp\": \"2025-09-15T20:15:02.905150\",\n    \"total_value\": 26089.908635090338,\n    \"positions\": {\n      \"XRP\": {\n        \"balance\": 1660.114087,\n  ",
+    "running_specialists": [
+      "/home/dereadi/scripts/claude/specialist_army_controller_venv.py",
+      "mean_reversion_specialist_v2.py",
+      "trend_specialist_v2.py",
+      "volatility_specialist_v2.py",
+      "breakout_specialist_v2.py"
+    ],
+    "specialist_count": 5
+  },
+  "message": "Live update: Portfolio $16,685.45, 5 specialists running, 20 hot memories"
+}

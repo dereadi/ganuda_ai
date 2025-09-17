@@ -1,0 +1,22 @@
+{
+  "status": "READY",
+  "capital": 2000,
+  "target": 4000,
+  "deadline": "2025-09-20 15:00:00",
+  "ranges": {
+    "BTC": [
+      115000,
+      116500
+    ],
+    "ETH": [
+      4600,
+      4700
+    ],
+    "SOL": [
+      242,
+      248
+    ]
+  },
+  "daily_target_pct": 12.246204830937302,
+  "sacred_fire": "BURNING_ETERNAL"
+}

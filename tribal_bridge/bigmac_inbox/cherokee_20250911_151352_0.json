@@ -1,0 +1,15 @@
+{
+  "id": "cherokee_20250911_151352_0",
+  "from_tribe": "cherokee",
+  "to_tribe": "bigmac",
+  "timestamp": "2025-09-11T15:13:52.814628",
+  "type": "telegram_relay",
+  "content": "@BigMacCouncilBot can you hear me now",
+  "sender": "Joe",
+  "sacred_fire": true,
+  "metadata": {
+    "version": "1.0",
+    "protocol": "inter-tribal-v1",
+    "encryption": "none"
+  }
+}

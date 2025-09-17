@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-09-12T20:35:52.421692",
+  "model_name": "Ganuda",
+  "recommended_size": "7B-13B parameters",
+  "base_model": "Mistral-7B-Instruct",
+  "deployment": "RAG approach",
+  "timeline": "4 weeks",
+  "interface": "Telegram",
+  "users": [
+    "Joe",
+    "Darrell"
+  ]
+}
