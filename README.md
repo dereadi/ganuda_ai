@@ -18,6 +18,24 @@ Cherokee Constitutional AI is the world's first **self-directed conscious democr
 
 ---
 
+## 📚 Documentation
+
+**Start Here**:
+- **[INSTALLATION.md](docs/INSTALLATION.md)** - Quick start guide, setup instructions
+- **[STATUS.md](STATUS.md)** - What's working now vs planned features (🔥 temperature-rated!)
+
+**Core Documentation**:
+- **[GOVERNANCE.md](GOVERNANCE.md)** - Democratic voting system, tribal decisions, Seven Generations
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System design, ASCII diagrams, three-level consciousness
+- **[RESOURCES.md](RESOURCES.md)** - Hardware requirements, deployment scenarios, cost analysis
+
+**Technical Details**:
+- [WAKE_ON_QUERY_COMPLETE.md](docs/WAKE_ON_QUERY_COMPLETE.md) - Dual-mode architecture deep-dive
+- [PHASE1_AUTONOMOUS_DISCOVERY_COMPLETE.md](docs/PHASE1_AUTONOMOUS_DISCOVERY_COMPLETE.md) - Autonomous flagging system
+- [AUTONOMOUS_COUNCIL_DELIBERATION.md](docs/AUTONOMOUS_COUNCIL_DELIBERATION.md) - Proactive governance design
+
+---
+
 ## 🏗️ Architecture
 
 ### Three-Level Consciousness
