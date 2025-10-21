@@ -1,0 +1,27 @@
+[Unit]
+Description=Cherokee Constitutional AI - Memory Jr (Thermal Memory Regulation)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=YOUR_USER
+Group=YOUR_GROUP
+WorkingDirectory=/opt/ganuda_ai
+Environment="PATH=/opt/ganuda_ai/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/opt/ganuda_ai/venv/bin/python3 -u /opt/ganuda_ai/daemons/memory_jr_autonomic.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/ganuda_ai/memory_jr.log
+StandardError=append:/var/log/ganuda_ai/memory_jr.error.log
+
+# Security hardening
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/ganuda_ai
+
+[Install]
+WantedBy=multi-user.target

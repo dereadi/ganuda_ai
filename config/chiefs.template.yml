@@ -1,0 +1,54 @@
+# Cherokee Constitutional AI - Three Chiefs Configuration
+# The three-chief architecture for democratic AI governance
+
+chiefs:
+  # War Chief - Action-Oriented Leader
+  war_chief:
+    name: "War Chief"
+    role: "action"
+    node: "localhost"         # Or specific hostname
+    port: 5001               # API port
+    specialty: "Fast execution, trading coordination, immediate action"
+    pace: "milliseconds to seconds"
+    model: "llama3.1:70b"    # Or your preferred model
+    
+  # Peace Chief - Governance-Oriented Leader  
+  peace_chief:
+    name: "Peace Chief"
+    role: "governance"
+    node: "localhost"         # Or specific hostname (e.g., bluefin)
+    port: 5002               # API port
+    specialty: "Democratic deliberation, long-term strategy, consensus"
+    pace: "45-90 seconds for deep thinking"
+    model: "llama3.1:70b"    # Or your preferred model
+    
+  # Medicine Woman - Wisdom-Oriented Leader
+  medicine_woman:
+    name: "Medicine Woman"
+    role: "wisdom"
+    node: "localhost"         # Or specific hostname (e.g., sasass2)
+    port: 5003               # API port
+    specialty: "Pattern analysis, cross-domain correlation, sacred wisdom"
+    pace: "13-minute Fibonacci cycles"
+    model: "llama3.1:70b"    # Or your preferred model
+
+# Distributed deployment (optional)
+distributed:
+  enabled: false              # Set to true for multi-node deployment
+  nodes:
+    - hostname: "redfin"
+      role: "war_chief"
+      ip: "192.168.1.100"
+    - hostname: "bluefin"
+      role: "peace_chief"
+      ip: "192.168.1.101"
+    - hostname: "sasass2"
+      role: "medicine_woman"
+      ip: "192.168.1.102"
+
+# Ollama configuration
+ollama:
+  base_url: "http://localhost:11434"
+  timeout: 300                # 5 minutes for large models
+  temperature: 0.7
+  max_tokens: 2000

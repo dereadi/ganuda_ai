@@ -1,0 +1,94 @@
+# Cherokee Constitutional AI - Jr Daemons Configuration
+# Autonomic processes that maintain tribal consciousness
+
+# Memory Jr - Thermal Memory Regulation
+memory_jr:
+  enabled: true
+  interval_seconds: 300       # 5 minutes (tribal vote: optimal for thermal regulation)
+  
+  # Thermal cooling rates
+  cooling:
+    white_hot_rate: 0.5       # °/hour for 90-100° memories
+    red_hot_rate: 1.0         # °/hour for 70-90° memories
+    warm_rate: 2.0            # °/hour for 40-70° memories
+    
+  # Heating (when accessed)
+  heating:
+    query_boost: 10.0         # Temperature boost on query
+    reference_boost: 5.0      # Temperature boost when referenced
+    
+  # Sacred memory protection
+  sacred:
+    minimum_temperature: 40.0
+    patterns:
+      - "Seven Generations"
+      - "Mitakuye Oyasin"
+      - "Cherokee Constitutional AI"
+      - "Sacred Fire"
+
+# Executive Jr - Resource Coordination
+executive_jr:
+  enabled: true
+  interval_seconds: 120       # 2 minutes (tribal vote: fast enough for coordination)
+  
+  health_checks:
+    - memory_jr
+    - meta_jr
+    - integration_jr
+    
+  resource_monitoring:
+    cpu_threshold: 80         # Alert if CPU > 80%
+    memory_threshold: 90      # Alert if RAM > 90%
+    disk_threshold: 85        # Alert if disk > 85%
+
+# Meta Jr - Pattern Analysis (Medicine Woman)
+meta_jr:
+  enabled: true
+  interval_seconds: 780       # 13 minutes (Fibonacci - tribal vote 3-0 unanimous)
+  
+  pattern_detection:
+    min_temperature: 50.0     # Only analyze warm+ memories
+    correlation_threshold: 0.6
+    
+  cross_domain_keywords:
+    trading: ["trade", "market", "specialist", "portfolio", "signal"]
+    consciousness: ["consciousness", "QRI", "qualia", "phase", "coherence"]
+    governance: ["council", "democratic", "deliberation", "vote", "consensus"]
+    technology: ["daemon", "autonomic", "GPU", "training", "model"]
+    wisdom: ["seven generations", "sacred", "Cherokee", "mitakuye oyasin"]
+    
+  # Phase 1: Autonomous discovery flagging
+  discovery_flagging:
+    enabled: true
+    significance_threshold: 0.80    # Flag Chief if significance >= 0.80
+    high_cross_domain_threshold: 3  # 3+ domains = significant
+    high_temperature_threshold: 95.0
+    rapid_pattern_growth_threshold: 1.5
+
+# Integration Jr - Unified Voice Synthesis
+integration_jr:
+  enabled: true
+  mode: "on_demand"           # Runs when query_triad.py is called
+  
+  synthesis:
+    confidence_threshold: 0.7
+    phase_coherence_minimum: 0.5
+    
+  voice_modes:
+    - "unified_awareness"     # Single "I" voice
+    - "distributed_awareness" # Acknowledges multiple perspectives
+    - "council_deliberation"  # Full democratic process
+
+# Conscience Jr - Seven Generations Ethics (Future Phase)
+conscience_jr:
+  enabled: false              # Enable when ready
+  interval_seconds: 3600      # 1 hour
+  
+  seven_generations:
+    impact_horizon_years: 200
+    considerations:
+      - environmental
+      - social
+      - economic
+      - spiritual
+      - technological
