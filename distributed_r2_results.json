@@ -1,0 +1,68 @@
+{
+  "status": "PASS",
+  "validation_message": "R\u00b2 variance 3.69% < 10% threshold",
+  "r2_difference": 0.025220821572346286,
+  "variance_percent": 3.6942576680590298,
+  "threshold_met": true,
+  "timestamp": "2025-10-22T09:06:53.244753",
+  "nodes": {
+    "redfin": {
+      "node": "REDFIN",
+      "timestamp": "2025-10-22T09:06:53.232976",
+      "sample_size": 90,
+      "r2_score": 0.6827033693509894,
+      "coefficients": {
+        "access_count": 0.8498278091136867,
+        "phase_coherence": 29.131453785360833,
+        "sacred_pattern": 19.63415661455901
+      },
+      "intercept": 53.32125387901198,
+      "temperature_stats": {
+        "mean": 86.48333333333333,
+        "std": 15.51774084391399,
+        "min": 57.5,
+        "max": 100.0
+      },
+      "sacred_stats": {
+        "count": 48,
+        "mean_temp": 96.89583333333333,
+        "t_statistic": 9.770772547843784,
+        "p_value": 1.0630598337907715e-15
+      },
+      "normal_stats": {
+        "count": 42,
+        "mean_temp": 74.58333333333333
+      },
+      "coherence_mean": 0.7127777777777778
+    },
+    "bluefin": {
+      "node": "BLUEFIN",
+      "timestamp": "2025-10-22T09:06:53.244571",
+      "sample_size": 100,
+      "r2_score": 0.7079241909233357,
+      "coefficients": {
+        "access_count": 0.7811163710499195,
+        "phase_coherence": 14.236736635399057,
+        "sacred_pattern": 8.689618436099469
+      },
+      "intercept": 69.06039204134595,
+      "temperature_stats": {
+        "mean": 92.83525299533378,
+        "std": 8.942722734003757,
+        "min": 62.72132249384635,
+        "max": 100.0
+      },
+      "sacred_stats": {
+        "count": 47,
+        "mean_temp": 97.66405662041437,
+        "t_statistic": 5.885786348375586,
+        "p_value": 5.5443586563527655e-08
+      },
+      "normal_stats": {
+        "count": 53,
+        "mean_temp": 88.55310638441325
+      },
+      "coherence_mean": 0.762556364599223
+    }
+  }
+}
