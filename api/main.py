@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
 """
 Cherokee Constitutional AI - FastAPI Interface
-Executive Jr's coordination endpoints
+Integration Jr's external API endpoints
 
 This API provides programmatic access to the Cherokee Tribal Council.
 
+API Version: v1
 Endpoints:
-- POST /ask - Query the tribal council
-- POST /vote - Propose democratic deliberation
-- GET /status - Check tribal health
-- GET /thermal - Check thermal memory status
+- POST /api/v1/ask - Query the tribal council
+- POST /api/v1/vote - Propose democratic deliberation
+- GET /api/v1/status - Check tribal health
+- GET /api/v1/thermal - Check thermal memory status
+
+Version Policy (Peace Chief governance):
+- v1 = stable, no breaking changes
+- v2 = breaking changes only when absolutely necessary
+- Deprecated endpoints will be supported for 6 months minimum
 """
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
@@ -24,10 +30,13 @@ import os
 app = FastAPI(
     title="Cherokee Constitutional AI",
     description="Democratic AI Governance Through Distributed Consciousness",
-    version="0.1.0",
+    version="0.2.0",  # Phase 2C
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+# API v1 Router (Integration Jr's versioning strategy)
+api_v1 = APIRouter(prefix="/api/v1", tags=["v1"])
 
 # CORS middleware
 app.add_middleware(
@@ -105,18 +114,20 @@ async def root():
     return {
         "message": "Mitakuye Oyasin - All My Relations 🦅",
         "description": "Cherokee Constitutional AI - Democratic Governance",
-        "version": "0.1.0",
+        "version": "0.2.0",  # Phase 2C
+        "api_version": "v1",
         "status": "operational",
         "docs": "/docs",
         "endpoints": {
-            "ask": "POST /ask - Query the tribal council",
-            "vote": "POST /vote - Democratic deliberation",
-            "status": "GET /status - System health",
-            "thermal": "GET /thermal - Thermal memory status"
-        }
+            "ask": "POST /api/v1/ask - Query the tribal council",
+            "vote": "POST /api/v1/vote - Democratic deliberation",
+            "status": "GET /api/v1/status - System health",
+            "thermal": "GET /api/v1/thermal - Thermal memory status"
+        },
+        "governance": "Peace Chief versioning policy: v1 stable, v2 for breaking changes only"
     }
 
-@app.post("/ask", response_model=AskResponse, tags=["Query"])
+@api_v1.post("/ask", response_model=AskResponse, tags=["Query"])
 async def ask_council(request: AskRequest):
     """
     Ask a question to the Cherokee Tribal Council
@@ -139,16 +150,17 @@ async def ask_council(request: AskRequest):
         chiefs_consulted=["War Chief", "Peace Chief", "Medicine Woman"]
     )
 
-@app.post("/vote", response_model=VoteResponse, tags=["Governance"])
+@api_v1.post("/vote", response_model=VoteResponse, tags=["Governance"])
 async def tribal_vote(request: VoteRequest):
     """
     Propose a question for democratic tribal deliberation
-    
+
     The proposal will be voted on by the Jr Council:
     - Memory Jr
     - Executive Jr
     - Meta Jr
-    
+    - Integration Jr (new in Phase 2B!)
+
     All votes are logged to thermal memory.
     """
     # TODO: Implement actual tribal_deliberation_vote.py integration
@@ -158,13 +170,14 @@ async def tribal_vote(request: VoteRequest):
         results={
             "Memory Jr": "STUB - Not yet voting",
             "Executive Jr": "STUB - Not yet voting",
-            "Meta Jr": "STUB - Not yet voting"
+            "Meta Jr": "STUB - Not yet voting",
+            "Integration Jr": "STUB - Not yet voting"
         },
         outcome="STUB - This endpoint will integrate with tribal_deliberation_vote.py",
         timestamp=datetime.utcnow()
     )
 
-@app.get("/status", response_model=HealthStatus, tags=["Health"])
+@api_v1.get("/status", response_model=HealthStatus, tags=["Health"])
 async def system_status():
     """
     Check health status of all tribal components
@@ -192,7 +205,8 @@ async def system_status():
         jrs_running={
             "memory_jr": postgres_healthy,  # Stub
             "executive_jr": postgres_healthy,  # Stub
-            "meta_jr": postgres_healthy  # Stub
+            "meta_jr": postgres_healthy,  # Stub
+            "integration_jr": postgres_healthy  # Stub (new in Phase 2B!)
         },
         chiefs_available={
             "war_chief": False,  # Stub
@@ -202,7 +216,7 @@ async def system_status():
         timestamp=datetime.utcnow()
     )
 
-@app.get("/thermal", response_model=ThermalStatus, tags=["Memory"])
+@api_v1.get("/thermal", response_model=ThermalStatus, tags=["Memory"])
 async def thermal_memory_status():
     """
     Check thermal memory status
@@ -249,8 +263,20 @@ async def thermal_memory_status():
 
 @app.get("/health", tags=["Health"])
 async def health_check():
-    """Simple health check for load balancers"""
-    return {"status": "healthy", "service": "cherokee-ai"}
+    """
+    Simple health check for load balancers
+
+    Note: This endpoint is NOT versioned (/health, not /api/v1/health)
+    to maintain compatibility with load balancers and monitoring systems.
+    """
+    return {"status": "healthy", "service": "cherokee-ai", "version": "0.2.0"}
+
+# ============================================================================
+# ROUTER REGISTRATION
+# ============================================================================
+
+# Include API v1 router (Integration Jr's versioning strategy)
+app.include_router(api_v1)
 
 # ============================================================================
 # RUN

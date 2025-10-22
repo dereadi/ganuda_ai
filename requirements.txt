@@ -1,20 +1,24 @@
 # Cherokee Constitutional AI - Python Dependencies
 # Ganuda AI - Autonomous Democratic AI Tribe
 
-# Database
-psycopg2-binary>=2.9.0
+# Database (pinned for Seven Generations reproducibility)
+psycopg2-binary==2.9.9
 
 # HTTP requests (for Chief communication)
-requests>=2.28.0
+requests==2.31.0
 
 # API Framework (Phase 2B)
-fastapi>=0.104.0
-uvicorn[standard]>=0.24.0
-pydantic>=2.0.0
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
 
 # Testing (Phase 2B)
-pytest>=7.4.0
-pytest-asyncio>=0.21.0
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Security Note: Dependencies are pinned to exact versions (==) for reproducibility.
+# To upgrade: Review SECURITY.md update policy, test thoroughly, update versions here.
+# Security-critical packages (psycopg2, fastapi, uvicorn, pydantic): Monitor daily for CVEs.
 
 # Standard library (included in Python 3.8+)
 # - json

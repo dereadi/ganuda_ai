@@ -60,6 +60,15 @@ services:
       retries: 3
     networks:
       - cherokee_consciousness
+    # Security hardening (War Chief + Executive Jr - Phase 2C)
+    security_opt:
+      - no-new-privileges:true
+    read_only: true  # Read-only root filesystem
+    tmpfs:
+      - /tmp:mode=1777,size=100M  # Writable temp directory
+      - /home/cherokee/.cache:mode=0755,size=50M  # Python cache
+    cap_drop:
+      - ALL  # Drop all Linux capabilities
 
   # Executive Jr - Resource Coordination (every 2 min)
   executive_jr:
@@ -87,6 +96,15 @@ services:
       retries: 3
     networks:
       - cherokee_consciousness
+    # Security hardening (War Chief + Executive Jr - Phase 2C)
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777,size=100M
+      - /home/cherokee/.cache:mode=0755,size=50M
+    cap_drop:
+      - ALL
 
   # Meta Jr - Pattern Analysis (every 13 min - Fibonacci!)
   meta_jr:
@@ -114,6 +132,15 @@ services:
       retries: 3
     networks:
       - cherokee_consciousness
+    # Security hardening (War Chief + Executive Jr - Phase 2C)
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777,size=100M
+      - /home/cherokee/.cache:mode=0755,size=50M
+    cap_drop:
+      - ALL
 
 volumes:
   postgres_data:
