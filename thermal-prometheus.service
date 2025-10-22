@@ -1,0 +1,14 @@
+[Unit]
+Description=Cherokee AI Thermal Memory Prometheus Exporter
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/home/dereadi/scripts/claude
+ExecStart=/home/dereadi/scripts/claude/quantum_crawdad_env/bin/python3 /home/dereadi/scripts/claude/thermal_prometheus_exporter.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

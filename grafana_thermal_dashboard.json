@@ -1,0 +1,233 @@
+{
+  "dashboard": {
+    "title": "🔥 Cherokee AI - Thermal Memory R² Dashboard",
+    "tags": ["cherokee", "thermal", "regression"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "R² Scores - Model Performance",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "thermal_r2_multivariate",
+            "legendFormat": "Multivariate R² (Target: 0.68)",
+            "refId": "A"
+          },
+          {
+            "expr": "thermal_r2_coherence",
+            "legendFormat": "Coherence R² (0.15)",
+            "refId": "B"
+          },
+          {
+            "expr": "thermal_r2_access",
+            "legendFormat": "Access R² (0.07)",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "R² Score",
+            "min": 0,
+            "max": 1
+          }
+        ],
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {
+                "params": [0.65],
+                "type": "lt"
+              },
+              "operator": {
+                "type": "and"
+              },
+              "query": {
+                "params": ["A", "5m", "now"]
+              },
+              "reducer": {
+                "type": "last"
+              },
+              "type": "query"
+            }
+          ],
+          "name": "R² Below Threshold",
+          "message": "Multivariate R² dropped below 0.65 - model degradation detected"
+        }
+      },
+      {
+        "id": 2,
+        "title": "Sacred vs Normal Temperature",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "thermal_sacred_temperature",
+            "legendFormat": "Sacred Memories (Target: >90°)",
+            "refId": "A"
+          },
+          {
+            "expr": "thermal_normal_temperature",
+            "legendFormat": "Normal Memories",
+            "refId": "B"
+          },
+          {
+            "expr": "thermal_sacred_normal_diff",
+            "legendFormat": "Difference (Target: >20°)",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Temperature (°)",
+            "min": 0,
+            "max": 100
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Multivariate R² Gauge",
+        "type": "gauge",
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "thermal_r2_multivariate",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 0.5},
+                {"color": "green", "value": 0.65},
+                {"color": "blue", "value": 0.8}
+              ]
+            },
+            "min": 0,
+            "max": 1,
+            "unit": "none"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Sacred Memory Protection (p-value)",
+        "type": "gauge",
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 8},
+        "targets": [
+          {
+            "expr": "thermal_sacred_pvalue",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 0.01},
+                {"color": "orange", "value": 0.05},
+                {"color": "red", "value": 0.1}
+              ]
+            },
+            "min": 0,
+            "max": 0.1,
+            "unit": "none",
+            "decimals": 6
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Phase Coherence Mean",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "thermal_phase_coherence_mean",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "textMode": "value_and_name",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 3,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 0.5},
+                {"color": "green", "value": 0.7}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Sample Size",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 8},
+        "targets": [
+          {
+            "expr": "thermal_sample_size",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "textMode": "value_and_name",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 50},
+                {"color": "green", "value": 100}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "Model Coefficients",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+        "targets": [
+          {
+            "expr": "thermal_regression_info",
+            "refId": "A",
+            "format": "table"
+          }
+        ]
+      }
+    ],
+    "refresh": "5m",
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    }
+  }
+}
