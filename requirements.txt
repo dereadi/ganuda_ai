@@ -7,6 +7,15 @@ psycopg2-binary>=2.9.0
 # HTTP requests (for Chief communication)
 requests>=2.28.0
 
+# API Framework (Phase 2B)
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+
+# Testing (Phase 2B)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
 # Standard library (included in Python 3.8+)
 # - json
 # - hashlib

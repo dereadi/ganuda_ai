@@ -1,0 +1,125 @@
+version: '3.8'
+
+# Cherokee Constitutional AI - Infrastructure Orchestration
+# Led by Executive Jr - Coordination Specialist
+#
+# Quick start:
+#   make up      # Start the tribe
+#   make logs    # Watch tribal activity
+#   make down    # Stop gracefully
+
+services:
+  # Thermal Memory Database (Peace Chief's domain)
+  postgres:
+    image: postgres:17-alpine
+    container_name: cherokee_thermal_memory
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cherokee_ai}
+      POSTGRES_USER: ${POSTGRES_USER:-cherokee}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      # RAM optimization for thermal memory (Peace Chief configuration)
+      POSTGRES_SHARED_BUFFERS: ${POSTGRES_SHARED_BUFFERS:-256MB}
+      POSTGRES_EFFECTIVE_CACHE_SIZE: ${POSTGRES_EFFECTIVE_CACHE_SIZE:-1GB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../sql/thermal_memory_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cherokee}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - cherokee_consciousness
+
+  # Memory Jr - Thermal Memory Regulation (every 5 min)
+  memory_jr:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    container_name: cherokee_memory_jr
+    environment:
+      DAEMON_NAME: memory_jr
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-cherokee_ai}
+      DB_USER: ${POSTGRES_USER:-cherokee}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      MEMORY_JR_INTERVAL: ${MEMORY_JR_INTERVAL:-300}  # 5 minutes
+    command: python3 -u daemons/memory_jr_autonomic.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f memory_jr_autonomic.py || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - cherokee_consciousness
+
+  # Executive Jr - Resource Coordination (every 2 min)
+  executive_jr:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    container_name: cherokee_executive_jr
+    environment:
+      DAEMON_NAME: executive_jr
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-cherokee_ai}
+      DB_USER: ${POSTGRES_USER:-cherokee}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      EXECUTIVE_JR_INTERVAL: ${EXECUTIVE_JR_INTERVAL:-120}  # 2 minutes
+    command: python3 -u daemons/executive_jr_autonomic.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f executive_jr_autonomic.py || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - cherokee_consciousness
+
+  # Meta Jr - Pattern Analysis (every 13 min - Fibonacci!)
+  meta_jr:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    container_name: cherokee_meta_jr
+    environment:
+      DAEMON_NAME: meta_jr
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-cherokee_ai}
+      DB_USER: ${POSTGRES_USER:-cherokee}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      META_JR_INTERVAL: ${META_JR_INTERVAL:-780}  # 13 minutes (Fibonacci - tribal vote 3-0!)
+    command: python3 -u daemons/meta_jr_autonomic_phase1.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f meta_jr_autonomic_phase1.py || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - cherokee_consciousness
+
+volumes:
+  postgres_data:
+    name: cherokee_thermal_memory_data
+
+networks:
+  cherokee_consciousness:
+    name: cherokee_consciousness_network
+    driver: bridge
