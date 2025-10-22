@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-10-22T07:43:16.281015",
+  "sample_size": 90,
+  "temperature_mean": 86.48333333333333,
+  "temperature_std": 15.51774084391399,
+  "r2_access": 0.07397470907362103,
+  "r2_coherence": 0.1543228089375479,
+  "r2_multivariate": 0.6827033693509894,
+  "sacred_temp_mean": 96.89583333333333,
+  "normal_temp_mean": 74.58333333333333,
+  "sacred_significance": 1.0630598337907715e-15
+}
