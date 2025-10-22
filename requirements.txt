@@ -16,6 +16,9 @@ pydantic==2.5.0
 pytest==7.4.3
 pytest-asyncio==0.21.1
 
+# Observability (Phase 3A - Challenge 3, 4)
+prometheus-client==0.19.0
+
 # Security Note: Dependencies are pinned to exact versions (==) for reproducibility.
 # To upgrade: Review SECURITY.md update policy, test thoroughly, update versions here.
 # Security-critical packages (psycopg2, fastapi, uvicorn, pydantic): Monitor daily for CVEs.

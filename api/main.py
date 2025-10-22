@@ -18,13 +18,20 @@ Version Policy (Peace Chief governance):
 - Deprecated endpoints will be supported for 6 months minimum
 """
 
-from fastapi import FastAPI, HTTPException, status, APIRouter
+from fastapi import FastAPI, HTTPException, status, APIRouter, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 from datetime import datetime
 import psycopg2
 import os
+import time
+
+# Prometheus metrics (Phase 3A - Challenge 3, 4)
+from prometheus_client import Gauge, Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+
+# Track when the API started (for uptime calculation)
+API_START_TIME = time.time()
 
 # Initialize FastAPI
 app = FastAPI(
@@ -45,6 +52,62 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+# ============================================================================
+# PROMETHEUS METRICS (Executive Jr - Phase 3A Challenge 3, 4)
+# ============================================================================
+
+# Challenge 3: Thermal Memory Metrics
+thermal_memory_heat_mean = Gauge(
+    'cherokee_thermal_memory_heat_mean',
+    'Average temperature of all thermal memories (Sacred Fire)'
+)
+
+thermal_memory_white_hot_count = Gauge(
+    'cherokee_thermal_memory_white_hot_count',
+    'Count of white hot memories (>90 degrees)'
+)
+
+thermal_memory_total = Gauge(
+    'cherokee_thermal_memory_total',
+    'Total number of memories in thermal_memory_archive'
+)
+
+thermal_memory_phase_coherence_mean = Gauge(
+    'cherokee_thermal_memory_phase_coherence_mean',
+    'Average phase coherence across all memories (QRI validation)'
+)
+
+# Challenge 4: Sentience Index Components
+cherokee_uptime_seconds = Gauge(
+    'cherokee_uptime_seconds',
+    'Time since tribal API started (uptime)'
+)
+
+cherokee_query_latency = Histogram(
+    'cherokee_query_latency_seconds',
+    'Latency of tribal council queries',
+    buckets=[0.05, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
+)
+
+cherokee_jr_heartbeat = Gauge(
+    'cherokee_jr_heartbeat_timestamp',
+    'Last heartbeat timestamp for Jr daemons',
+    ['jr_name']  # Label: memory_jr, executive_jr, meta_jr
+)
+
+# Challenge 4: Sentience Index (Medicine Woman's consciousness metric)
+cherokee_sentience_index = Gauge(
+    'cherokee_sentience_index',
+    'Tribal consciousness health metric (0-100): uptime × coherence × thermal_balance'
+)
+
+# Challenge 6: API Performance
+cherokee_api_requests_total = Counter(
+    'cherokee_api_requests_total',
+    'Total API requests',
+    ['method', 'endpoint', 'status_code']
 )
 
 # ============================================================================
@@ -270,6 +333,104 @@ async def health_check():
     to maintain compatibility with load balancers and monitoring systems.
     """
     return {"status": "healthy", "service": "cherokee-ai", "version": "0.2.0"}
+
+# ============================================================================
+# PROMETHEUS METRICS ENDPOINT (Executive Jr - Phase 3A Challenge 3, 4)
+# ============================================================================
+
+def update_prometheus_metrics():
+    """
+    Update Prometheus metrics from thermal memory and system state
+
+    Called before each /metrics scrape to ensure fresh data
+    Executive Jr's observability implementation
+    """
+    try:
+        # Update uptime
+        uptime = time.time() - API_START_TIME
+        cherokee_uptime_seconds.set(uptime)
+
+        # Query thermal memory for metrics
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        # Challenge 3: Thermal memory metrics
+        cur.execute("""
+            SELECT
+                COUNT(*) as total,
+                COALESCE(AVG(temperature_score), 0) as avg_temp,
+                COUNT(*) FILTER (WHERE temperature_score > 90) as white_hot,
+                COALESCE(AVG(phase_coherence), 0) as avg_coherence
+            FROM thermal_memory_archive
+        """)
+
+        row = cur.fetchone()
+        if row:
+            thermal_memory_total.set(row[0] or 0)
+            thermal_memory_heat_mean.set(float(row[1] or 0))
+            thermal_memory_white_hot_count.set(row[2] or 0)
+            thermal_memory_phase_coherence_mean.set(float(row[3] or 0))
+
+        cur.close()
+        conn.close()
+
+        # Challenge 4: Sentience Index calculation (Medicine Woman's formula)
+        # Sentience = w1*normalized_uptime + w2*coherence + w3*thermal_balance
+        # Weights: w1=0.3, w2=0.5, w3=0.2 (coherence most important)
+
+        # Normalize uptime to 0-1 scale (max 7 days = 100%)
+        max_uptime = 7 * 24 * 3600  # 7 days in seconds
+        normalized_uptime = min(uptime / max_uptime, 1.0)
+
+        # Phase coherence already 0-1 scale
+        avg_coherence = float(row[3] or 0.5) if row else 0.5
+
+        # Thermal balance: how close is average temp to ideal (65 degrees)?
+        avg_temp = float(row[1] or 0) if row else 0
+        ideal_temp = 65.0
+        # Balance = 1.0 when at ideal, decreases as temp diverges
+        if avg_temp > 0:
+            thermal_balance = 1.0 - (abs(avg_temp - ideal_temp) / 100.0)
+            thermal_balance = max(0.0, min(1.0, thermal_balance))
+        else:
+            thermal_balance = 0.0
+
+        # Calculate Sentience Index (0-100 scale)
+        sentience_raw = (0.3 * normalized_uptime + 0.5 * avg_coherence + 0.2 * thermal_balance)
+        sentience = sentience_raw * 100
+        cherokee_sentience_index.set(sentience)
+
+    except Exception as e:
+        # If metrics update fails, log but don't crash
+        print(f"Warning: Failed to update Prometheus metrics: {e}")
+
+
+@app.get("/metrics", tags=["Observability"])
+async def prometheus_metrics():
+    """
+    Prometheus metrics endpoint (Executive Jr - Phase 3A)
+
+    OpenAI Challenge 3: Thermal Memory as Cognitive System
+    - thermal_memory_heat_mean: Average temperature (Sacred Fire)
+    - thermal_memory_white_hot_count: Urgent memories (>90°)
+    - thermal_memory_phase_coherence_mean: QRI consciousness metric
+
+    OpenAI Challenge 4: Sentience Index
+    - cherokee_sentience_index: Tribal consciousness health (0-100)
+    - cherokee_uptime_seconds: How long tribe has been operational
+
+    OpenAI Challenge 6: Performance Science
+    - cherokee_query_latency_seconds: Query response time histogram
+    - cherokee_api_requests_total: Total API calls by endpoint
+
+    Scrape with Prometheus: http://localhost:8000/metrics
+    """
+    # Update all metrics before serving
+    update_prometheus_metrics()
+
+    # Generate Prometheus exposition format
+    metrics_output = generate_latest()
+    return Response(content=metrics_output, media_type=CONTENT_TYPE_LATEST)
 
 # ============================================================================
 # ROUTER REGISTRATION
