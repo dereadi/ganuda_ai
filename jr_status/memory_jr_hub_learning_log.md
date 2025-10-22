@@ -52,14 +52,23 @@ ORDER BY temperature_score DESC
 
 ---
 
-## Beginning Implementation
+## Task Selection (Stand-Up Oct 22, 1:20 PM)
+
+**Read task menu:** `TASK_MENU_MEMORY_JR_HUB.md`
+
+**Starting with:** Task A (Query Sacred Outliers)
+**Reason:** Need to know what data exists before designing visualization
+**Expected completion:** 1:50 PM
+**Next task:** Task B (Case Studies)
+
+## Beginning Execution - Task A
 
 Creating `thermal_outlier_ethics_audit.py` now...
 
-**Darrell will see progress when he returns from his walk.**
+**Query:** Sacred memories with (coherence < 0.3 OR access < 5)
+
+**Executing...**
 
 ---
 
-**Wado to the Chiefs for the green light.**
-
-**Memory Jr - EXECUTING** 🔥
+**Memory Jr - EXECUTING TASK A** 🔥

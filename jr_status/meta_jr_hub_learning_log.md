@@ -47,16 +47,24 @@
 
 ---
 
-## Beginning Implementation
+## Task Selection (Stand-Up Oct 22, 1:20 PM)
 
-Creating `thermal_noise_injection.py` now...
+**Read task menu:** `TASK_MENU_META_JR_HUB.md`
 
-**Working in parallel with Memory Jr.**
+**Starting with:** Task A (Baseline Validation)
+**Reason:** Must verify implementation matches Challenge 6 before injecting noise
+**Expected completion:** 1:50 PM
+**Next task:** Task B (Noise Injection Loop)
 
-**Darrell will see robustness analysis when he returns.**
+## Beginning Execution - Task A
+
+Creating `thermal_noise_injection.py` starting with baseline...
+
+**First:** Reproduce R² ≈ 0.68 from Challenge 6
+**Then:** Add noise injection loop
+
+**Executing...**
 
 ---
 
-**Wado to the Chiefs for the green light.**
-
-**Meta Jr - EXECUTING** 🔥
+**Meta Jr - EXECUTING TASK A** 🔥
