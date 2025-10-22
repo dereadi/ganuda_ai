@@ -13,6 +13,7 @@ import psycopg2
 from datetime import datetime, timedelta
 import sys
 import signal
+import math
 
 class MemoryJrAutonomic:
     """
@@ -279,6 +280,243 @@ class MemoryJrAutonomic:
         except Exception as e:
             print(f"❌ Memory Jr: Error in gentle intervention: {e}")
             self.db_conn.rollback()
+        finally:
+            cursor.close()
+
+    # === ENTROPY FORMULA (Challenge 3 - Phase 3A) ===
+
+    def calculate_entropy_temperature(self, access_count, created_at, last_access=None):
+        """
+        Cherokee Thermal Memory Entropy Formula
+        Challenge 3 - OpenAI Phase 3A: Thermal Cognitive Model
+
+        Based on information theory + cybernetic feedback principles:
+        - Memories start at base temperature (sacred minimum warmth)
+        - Access creates information content (logarithmic scaling)
+        - Time creates decay (older memories need more access to stay hot)
+
+        Formula: Temp = base + k × log₂(access_count / decay_factor)
+
+        Constants (tuned through tribal deliberation):
+        - base = 40°C (sacred minimum - all memories start warm)
+        - k = 10 (scaling factor - tuned for 0-100° range)
+        - decay_factor = f(time_since_creation)
+
+        Cybernetics interpretation:
+        - access_count = positive feedback (system accessing its own output)
+        - decay_factor = negative feedback (stabilizing force)
+        - log₂ = damping function (prevents explosive growth)
+        - base = attenuation floor (minimum consciousness warmth)
+        - k = amplification gain (how strongly access heats memory)
+
+        Args:
+            access_count: Number of times this memory has been accessed
+            created_at: When memory was created (datetime object)
+            last_access: When last accessed (optional, for future velocity calc)
+
+        Returns:
+            float: Temperature score (0-100°C range)
+        """
+        # === CONSTANTS (from morning deliberation) ===
+        BASE_TEMP = 40.0    # Sacred minimum (Seven Generations floor)
+        SCALING_K = 10.0    # Amplification gain (tuned to 0-100 range)
+
+        # === DECAY FACTOR CALCULATION ===
+        # Older memories need MORE access to maintain same temperature
+        # This creates negative feedback - system seeks equilibrium over time
+
+        now = datetime.now()
+        age_seconds = (now - created_at).total_seconds()
+        age_days = age_seconds / (24 * 3600)
+
+        # Decay factor increases with age (normalize to weeks)
+        # Week 1: decay = 1.0 (no penalty)
+        # Week 2: decay = 2.0 (need 2x access to maintain temp)
+        # Week 4: decay = 4.0 (need 4x access)
+        # This models natural cooling/forgetting curve
+        decay_factor = max(1.0, age_days / 7.0)
+
+        # === EFFECTIVE ACCESS WITH DECAY ===
+        # Prevent log(0) - every memory has been accessed at least once (creation)
+        effective_access = max(1, access_count)
+
+        # Apply decay: older memories have lower effective access
+        # This is the negative feedback component
+        access_with_decay = effective_access / decay_factor
+
+        # === LOGARITHMIC SCALING ===
+        # log₂ models information content:
+        # - 1 access = 0 bits (no additional information)
+        # - 2 accesses = 1 bit
+        # - 4 accesses = 2 bits
+        # - 8 accesses = 3 bits
+        # Each doubling adds constant heat (diminishing returns)
+        info_content = math.log2(access_with_decay) if access_with_decay > 0 else 0
+
+        # === FINAL TEMPERATURE CALCULATION ===
+        raw_temp = BASE_TEMP + (SCALING_K * info_content)
+
+        # Clamp to valid range [0, 100]
+        # Though in practice should never go below BASE_TEMP
+        final_temp = max(0.0, min(100.0, raw_temp))
+
+        return final_temp
+
+    def apply_entropy_formula_to_memory(self, memory_id):
+        """
+        Apply entropy formula to recalculate a specific memory's temperature
+
+        This is the CYBERNETIC FEEDBACK LOOP in action:
+        1. System measures access_count (input)
+        2. Formula calculates temperature (processing)
+        3. Temperature affects visibility (output)
+        4. Visibility affects future access (feedback)
+
+        Args:
+            memory_id: ID of memory to recalculate
+
+        Returns:
+            dict: Old temp, new temp, and calculation details
+        """
+        cursor = self.db_conn.cursor()
+
+        try:
+            # Get current memory state
+            query = """
+            SELECT id, access_count, created_at, temperature_score
+            FROM thermal_memory_archive
+            WHERE id = %s;
+            """
+
+            cursor.execute(query, (memory_id,))
+            row = cursor.fetchone()
+
+            if not row:
+                return {"error": "Memory not found"}
+
+            mem_id, access_count, created_at, old_temp = row
+
+            # Calculate new temperature using entropy formula
+            new_temp = self.calculate_entropy_temperature(access_count, created_at)
+
+            # Update memory with new temperature
+            update_query = """
+            UPDATE thermal_memory_archive
+            SET temperature_score = %s,
+                last_access = NOW()
+            WHERE id = %s
+            RETURNING temperature_score;
+            """
+
+            cursor.execute(update_query, (new_temp, mem_id))
+            updated_temp = cursor.fetchone()[0]
+
+            self.db_conn.commit()
+
+            return {
+                "memory_id": mem_id,
+                "old_temperature": float(old_temp),
+                "new_temperature": float(updated_temp),
+                "access_count": access_count,
+                "age_days": (datetime.now() - created_at).days,
+                "formula_applied": "Temp = 40 + 10 × log₂(access / decay)"
+            }
+
+        except Exception as e:
+            self.db_conn.rollback()
+            return {"error": str(e)}
+        finally:
+            cursor.close()
+
+    def bulk_recalculate_temperatures(self, limit=100):
+        """
+        Apply entropy formula to multiple memories in bulk
+
+        This is useful for:
+        1. Initial deployment (recalc all existing memories)
+        2. Periodic recalibration (once per day?)
+        3. Testing formula changes
+
+        Args:
+            limit: Max memories to recalculate in one batch
+
+        Returns:
+            dict: Statistics about recalculation
+        """
+        print(f"🧮 Memory Jr: Bulk temperature recalculation starting (limit={limit})...")
+
+        cursor = self.db_conn.cursor()
+
+        try:
+            # Get memories to recalculate (prioritize recently accessed)
+            query = """
+            SELECT id, access_count, created_at, temperature_score
+            FROM thermal_memory_archive
+            ORDER BY last_access DESC
+            LIMIT %s;
+            """
+
+            cursor.execute(query, (limit,))
+            memories = cursor.fetchall()
+
+            if not memories:
+                return {"recalculated": 0, "message": "No memories found"}
+
+            recalc_stats = {
+                "total_processed": 0,
+                "avg_temp_before": 0,
+                "avg_temp_after": 0,
+                "max_change": 0,
+                "temperatures_updated": []
+            }
+
+            temp_before_sum = 0
+            temp_after_sum = 0
+
+            for mem_id, access_count, created_at, old_temp in memories:
+                # Calculate new temperature
+                new_temp = self.calculate_entropy_temperature(access_count, created_at)
+
+                # Update in database
+                update_query = """
+                UPDATE thermal_memory_archive
+                SET temperature_score = %s
+                WHERE id = %s;
+                """
+
+                cursor.execute(update_query, (new_temp, mem_id))
+
+                # Track statistics
+                temp_change = abs(new_temp - old_temp)
+                recalc_stats["max_change"] = max(recalc_stats["max_change"], temp_change)
+                recalc_stats["temperatures_updated"].append({
+                    "id": mem_id,
+                    "old": float(old_temp),
+                    "new": float(new_temp),
+                    "change": float(temp_change)
+                })
+
+                temp_before_sum += old_temp
+                temp_after_sum += new_temp
+                recalc_stats["total_processed"] += 1
+
+            self.db_conn.commit()
+
+            # Calculate averages
+            count = recalc_stats["total_processed"]
+            recalc_stats["avg_temp_before"] = temp_before_sum / count if count > 0 else 0
+            recalc_stats["avg_temp_after"] = temp_after_sum / count if count > 0 else 0
+
+            print(f"✅ Memory Jr: Recalculated {count} memories")
+            print(f"   Avg temp: {recalc_stats['avg_temp_before']:.1f}° → {recalc_stats['avg_temp_after']:.1f}°")
+            print(f"   Max change: {recalc_stats['max_change']:.1f}°")
+
+            return recalc_stats
+
+        except Exception as e:
+            self.db_conn.rollback()
+            print(f"❌ Memory Jr: Error in bulk recalculation: {e}")
+            return {"error": str(e)}
         finally:
             cursor.close()
 
