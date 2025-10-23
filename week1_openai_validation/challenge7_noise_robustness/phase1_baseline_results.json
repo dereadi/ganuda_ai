@@ -1,0 +1,46 @@
+{
+  "phase": "1_baseline_validation",
+  "timestamp": "2025-10-22T20:17:59.804818",
+  "node": "redfin",
+  "dataset": {
+    "sample_size": 90,
+    "sacred_count": 45,
+    "nonsacred_count": 45,
+    "sha256": "51c276b82b9aa39f2e6b8830686d8c04df7cb7864b1b7bde79e6a80f31758aa7",
+    "seed": 42
+  },
+  "baseline_r_squared": 0.5427637282410732,
+  "bootstrap": {
+    "iterations": 500,
+    "mean_r2": 0.5491890016049615,
+    "ci_95_lower": 0.3472437141290132,
+    "ci_95_upper": 0.7186064280481311,
+    "std": 0.09667088321368542
+  },
+  "permutation_test": {
+    "iterations": 1000,
+    "null_mean_r2": 0.0332697573898716,
+    "null_max_r2": 0.1700782572661338,
+    "p_value": 0.0,
+    "significant": true
+  },
+  "gate1": {
+    "criteria": "R\u00b2 \u2208 [0.63, 0.73]",
+    "status": "FAIL",
+    "pass": false
+  },
+  "model": {
+    "coefficients": {
+      "phase_coherence": 15.409904415027254,
+      "access_count": -18.17083002966893,
+      "age_hours": -0.009292043358605515
+    },
+    "intercept": 88.59697366597902
+  },
+  "guardian_protection": {
+    "sacred_r2": 0.07453317642935553,
+    "nonsacred_r2": 0.48608366004822146,
+    "protection_delta": -0.4115504836188659
+  },
+  "artifact_hash": "d2cdd35ac92ffadef2735ae546e762e8b66ecbdd90fd73cff50db37a6ecd5346"
+}

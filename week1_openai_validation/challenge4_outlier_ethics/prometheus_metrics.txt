@@ -1,0 +1,11 @@
+# HELP sacred_outlier_count Number of sacred memories above 95th percentile
+# TYPE sacred_outlier_count gauge
+sacred_outlier_count 7
+
+# HELP guardian_override_rate Percentage of sacred memories Guardian elevated
+# TYPE guardian_override_rate gauge
+guardian_override_rate 7.78
+
+# HELP guardian_protection_effect Cohen's d effect size of Guardian protection
+# TYPE guardian_protection_effect gauge
+guardian_protection_effect 1.6829

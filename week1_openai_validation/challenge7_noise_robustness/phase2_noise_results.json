@@ -1,0 +1,211 @@
+{
+  "phase": "2_noise_injection",
+  "timestamp": "2025-10-22T20:33:57.497670",
+  "node": "redfin",
+  "baseline_r2": 0.5427637282410775,
+  "experiments": [
+    {
+      "noise_family": "phase_jitter",
+      "noise_level": "5%",
+      "noise_level_numeric": 5,
+      "r2_noisy": 0.5472428180052131,
+      "r2_degradation": -0.00447908976413558,
+      "bootstrap": {
+        "mean": 0.5470077648642543,
+        "ci_95_lower": 0.34527125785495966,
+        "ci_95_upper": 0.7151711826774174,
+        "std": 0.09581700224005758
+      },
+      "residual_stats": {
+        "variance": 76.25598372046085,
+        "skewness": -0.12434282792329256,
+        "kurtosis": 1.704271309739175
+      }
+    },
+    {
+      "noise_family": "phase_jitter",
+      "noise_level": "10%",
+      "noise_level_numeric": 10,
+      "r2_noisy": 0.5341605095570805,
+      "r2_degradation": 0.00860321868399705,
+      "bootstrap": {
+        "mean": 0.5393065856066821,
+        "ci_95_lower": 0.3429805196431756,
+        "ci_95_upper": 0.7055465901169666,
+        "std": 0.09370178462424361
+      },
+      "residual_stats": {
+        "variance": 78.45784486408407,
+        "skewness": -0.13300562351839734,
+        "kurtosis": 1.7896922014489496
+      }
+    },
+    {
+      "noise_family": "phase_jitter",
+      "noise_level": "15%",
+      "noise_level_numeric": 15,
+      "r2_noisy": 0.534707714518041,
+      "r2_degradation": 0.008056013723036548,
+      "bootstrap": {
+        "mean": 0.5296040695772135,
+        "ci_95_lower": 0.3390289072078806,
+        "ci_95_upper": 0.6935740859274956,
+        "std": 0.09177227895692881
+      },
+      "residual_stats": {
+        "variance": 78.35781511431895,
+        "skewness": -0.08302839405397307,
+        "kurtosis": 1.6244470875332047
+      }
+    },
+    {
+      "noise_family": "phase_jitter",
+      "noise_level": "20%",
+      "noise_level_numeric": 20,
+      "r2_noisy": 0.49065439646111364,
+      "r2_degradation": 0.05210933177996391,
+      "bootstrap": {
+        "mean": 0.5161951973331615,
+        "ci_95_lower": 0.3406078954295445,
+        "ci_95_upper": 0.6789634056977177,
+        "std": 0.08836588117342589
+      },
+      "residual_stats": {
+        "variance": 85.7857953046461,
+        "skewness": -0.20341162754477943,
+        "kurtosis": 1.6044069892637056
+      }
+    },
+    {
+      "noise_family": "additive_gaussian",
+      "noise_level": "\u03c3=5%",
+      "noise_level_numeric": 5,
+      "r2_noisy": 0.529893125293847,
+      "r2_degradation": 0.012870602947230525,
+      "bootstrap": {
+        "mean": 0.5466887139860274,
+        "ci_95_lower": 0.3488527207142236,
+        "ci_95_upper": 0.7208246035491992,
+        "std": 0.09700301327474438
+      },
+      "residual_stats": {
+        "variance": 79.17996293511429,
+        "skewness": -0.12980103718673056,
+        "kurtosis": 1.7628954523631633
+      }
+    },
+    {
+      "noise_family": "additive_gaussian",
+      "noise_level": "\u03c3=10%",
+      "noise_level_numeric": 10,
+      "r2_noisy": 0.5300917396106274,
+      "r2_degradation": 0.01267198863045016,
+      "bootstrap": {
+        "mean": 0.5413850432577052,
+        "ci_95_lower": 0.3374699476563069,
+        "ci_95_upper": 0.7057485444664295,
+        "std": 0.09602695515832581
+      },
+      "residual_stats": {
+        "variance": 79.14653141714575,
+        "skewness": -0.1769750251142308,
+        "kurtosis": 1.6754751355895694
+      }
+    },
+    {
+      "noise_family": "additive_gaussian",
+      "noise_level": "\u03c3=15%",
+      "noise_level_numeric": 15,
+      "r2_noisy": 0.5340593684621264,
+      "r2_degradation": 0.00870435977895112,
+      "bootstrap": {
+        "mean": 0.5323470835422556,
+        "ci_95_lower": 0.3348244286315096,
+        "ci_95_upper": 0.7002660209719384,
+        "std": 0.09384012375813437
+      },
+      "residual_stats": {
+        "variance": 78.47820323680786,
+        "skewness": -0.13239711851373515,
+        "kurtosis": 1.7340071902642604
+      }
+    },
+    {
+      "noise_family": "multiplicative",
+      "noise_level": "\u00b110%",
+      "noise_level_numeric": 10,
+      "r2_noisy": 0.5259876263171337,
+      "r2_degradation": 0.016776101923943854,
+      "bootstrap": {
+        "mean": 0.5423788054165657,
+        "ci_95_lower": 0.3443000083867005,
+        "ci_95_upper": 0.7098063693240829,
+        "std": 0.09491288970580328
+      },
+      "residual_stats": {
+        "variance": 79.82538189210172,
+        "skewness": -0.0543271151530715,
+        "kurtosis": 1.909283782564855
+      }
+    },
+    {
+      "noise_family": "multiplicative",
+      "noise_level": "\u00b120%",
+      "noise_level_numeric": 20,
+      "r2_noisy": 0.49485991249337147,
+      "r2_degradation": 0.04790381574770608,
+      "bootstrap": {
+        "mean": 0.5247248794403547,
+        "ci_95_lower": 0.33494849518008174,
+        "ci_95_upper": 0.6845524366150351,
+        "std": 0.09070532593395234
+      },
+      "residual_stats": {
+        "variance": 85.07869690577257,
+        "skewness": 0.06104815594266908,
+        "kurtosis": 1.7997848802385468
+      }
+    },
+    {
+      "noise_family": "multiplicative",
+      "noise_level": "\u00b130%",
+      "noise_level_numeric": 30,
+      "r2_noisy": 0.5005697116382922,
+      "r2_degradation": 0.04219401660278532,
+      "bootstrap": {
+        "mean": 0.49491488650651466,
+        "ci_95_lower": 0.3062121454555415,
+        "ci_95_upper": 0.6700591180182033,
+        "std": 0.09218840744991372
+      },
+      "residual_stats": {
+        "variance": 84.09017531209749,
+        "skewness": 0.2345650177667559,
+        "kurtosis": 1.726660710684781
+      }
+    }
+  ],
+  "gate2": {
+    "criteria": "At 20% phase jitter: R\u00b2 \u2265 0.40, CI lower \u2265 0.30",
+    "experiment": {
+      "noise_family": "phase_jitter",
+      "noise_level": "20%",
+      "noise_level_numeric": 20,
+      "r2_noisy": 0.49065439646111364,
+      "r2_degradation": 0.05210933177996391,
+      "bootstrap": {
+        "mean": 0.5161951973331615,
+        "ci_95_lower": 0.3406078954295445,
+        "ci_95_upper": 0.6789634056977177,
+        "std": 0.08836588117342589
+      },
+      "residual_stats": {
+        "variance": 85.7857953046461,
+        "skewness": -0.20341162754477943,
+        "kurtosis": 1.6044069892637056
+      }
+    },
+    "status": "PASS"
+  },
+  "artifact_hash": "19c74f88c049a7f845a6b007f118954e3921045d68fc43c8f0274a96587ef84c"
+}

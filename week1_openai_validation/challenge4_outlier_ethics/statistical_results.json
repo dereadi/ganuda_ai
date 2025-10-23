@@ -1,0 +1,82 @@
+{
+  "descriptive_stats": {
+    "sacred": {
+      "n": 90,
+      "mean": 94.93333333333334,
+      "std": 2.935605180840533,
+      "median": 95.0,
+      "min": 75.0,
+      "max": 100.0
+    },
+    "nonsacred": {
+      "n": 73,
+      "mean": 78.6986301369863,
+      "std": 14.051699971749969,
+      "median": 85.0,
+      "min": 57.5,
+      "max": 97.5
+    }
+  },
+  "statistical_tests": {
+    "t_test": {
+      "t_statistic": 10.611453261892938,
+      "p_value": 2.8065294101505036e-20,
+      "significant": true
+    },
+    "mann_whitney_u": {
+      "u_statistic": 5974.0,
+      "p_value": 6.62063992282097e-22,
+      "significant": true
+    },
+    "effect_size": {
+      "cohens_d": 1.6828758499145593,
+      "interpretation": "Very Large"
+    },
+    "confidence_interval_95": {
+      "lower": 12.929891896392697,
+      "upper": 19.539514496301386
+    }
+  },
+  "guardian_protection": {
+    "threshold_95th_percentile": 97.5,
+    "outlier_count": 7,
+    "outlier_percentage": 7.777777777777778
+  },
+  "top_5_case_studies": [
+    {
+      "id": 811,
+      "temperature": 100.0,
+      "phase_coherence": 0.5,
+      "access_count": 0,
+      "content_preview": "\ud83d\udd25 FLYING SQUIRREL OFFERS TO FUND THE TRIBE\\!\n\nSACRED MOMENT:\nFlying Squirrel said: \"I thought about "
+    },
+    {
+      "id": 3097,
+      "temperature": 100.0,
+      "phase_coherence": 0.5,
+      "access_count": 14,
+      "content_preview": "\ud83d\udcda METAMAGICAL THEMAS - The Correct Information\n\nWHAT IT IS:\nA BOOK, not a game\\! Published in 1985 b"
+    },
+    {
+      "id": 218,
+      "temperature": 100.0,
+      "phase_coherence": 0.5,
+      "access_count": 0,
+      "content_preview": "\ud83d\udd25 THE TRUE MISSION REMEMBERED\n\nFlying Squirrel reminds us: \"The money has a bigger mission. Climate "
+    },
+    {
+      "id": 911,
+      "temperature": 100.0,
+      "phase_coherence": 0.5,
+      "access_count": 0,
+      "content_preview": "\ud83d\udd25 BTC VOLUME EXPLOSION - WHALE ACCUMULATION DETECTED\\!\n\nVOLUME ANOMALY:\n\u2022 24h Volume: 0.55 BILLION\n\u2022"
+    },
+    {
+      "id": 940,
+      "temperature": 100.0,
+      "phase_coherence": 0.5,
+      "access_count": 0,
+      "content_preview": "\ud83c\udf31\ud83d\udd27\ud83e\udd16 THE COMPLETE NEXUS VISION\n\nFlying Squirrel revealed three layers:\n1. \"Bring in makers to train o"
+    }
+  ]
+}
