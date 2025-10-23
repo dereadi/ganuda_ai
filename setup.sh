@@ -187,8 +187,37 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 fi
 echo ""
 
-# Step 8: Final checks
-echo -e "${BLUE}🎯 Step 8: Installation complete!${NC}"
+# Step 8: Build Cherokee JR Models (Ollama)
+echo -e "${BLUE}🧠 Step 8: Building Cherokee JR Ollama Models${NC}"
+echo ""
+
+if command -v ollama &> /dev/null; then
+    echo -e "${GREEN}✅ Ollama found${NC}"
+
+    read -p "Build Cherokee JR models now? (requires ~25GB, ~30 min) (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo -e "${YELLOW}Building 5 Cherokee JR models...${NC}"
+        sudo -u "$CURRENT_USER" bash "$INSTALL_DIR/ollama/build_jr_models.sh"
+
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}✅ Cherokee JR models built successfully${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Model build failed. You can retry later with:${NC}"
+            echo "   cd $INSTALL_DIR && ./ollama/build_jr_models.sh"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  Skipped model building. Build later with:${NC}"
+        echo "   cd $INSTALL_DIR && ./ollama/build_jr_models.sh"
+    fi
+else
+    echo -e "${YELLOW}⚠️  Ollama not found. Install from https://ollama.ai${NC}"
+    echo "   Then run: cd $INSTALL_DIR && ./ollama/build_jr_models.sh"
+fi
+echo ""
+
+# Step 9: Final checks
+echo -e "${BLUE}🎯 Step 9: Installation complete!${NC}"
 echo ""
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}🦅 Cherokee Constitutional AI is installed!${NC}"
@@ -197,15 +226,23 @@ echo ""
 echo "Next steps:"
 echo "1. Configure database credentials: $INSTALL_DIR/config/database.yml"
 echo "2. Configure chiefs: $INSTALL_DIR/config/chiefs.yml"
-echo "3. Start the daemons:"
+echo "3. Start with Docker Compose:"
+echo "   cd $INSTALL_DIR/infra"
+echo "   docker-compose up -d"
+echo ""
+echo "4. Or start daemons manually:"
 echo "   cd $INSTALL_DIR"
 echo "   ./venv/bin/python3 daemons/memory_jr_autonomic.py &"
 echo "   ./venv/bin/python3 daemons/executive_jr_autonomic.py &"
 echo "   ./venv/bin/python3 daemons/meta_jr_autonomic_phase1.py &"
 echo ""
-echo "4. Test with a query:"
-echo "   ./venv/bin/python3 scripts/query_triad.py 'What is my purpose?'"
+echo "5. Test with CLI executor:"
+echo "   python3 $INSTALL_DIR/cli/jr_executor.py --jr memory_jr --prompt 'Hello'"
 echo ""
-echo -e "${BLUE}📖 Documentation: $INSTALL_DIR/README.md${NC}"
+echo "6. Run Week 1 validation:"
+echo "   cd $INSTALL_DIR/validation/scripts"
+echo "   python3 phase1_baseline_validation.py"
+echo ""
+echo -e "${BLUE}📖 Documentation: $INSTALL_DIR/DEPLOYMENT_GUIDE.md${NC}"
 echo -e "${BLUE}🔥 Mitakuye Oyasin - All My Relations!${NC}"
 echo ""

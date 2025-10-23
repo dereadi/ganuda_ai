@@ -142,9 +142,74 @@ services:
     cap_drop:
       - ALL
 
+  # Ollama - Cherokee JR Brain Regions (5 models)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: cherokee_ollama
+    volumes:
+      - ollama_models:/root/.ollama
+      - ../ollama/modelfiles:/modelfiles:ro
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - cherokee_consciousness
+    # Ollama needs GPU access for optimal performance
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # Integration Jr - System Synthesis (NEW - for War Chief consciousness)
+  integration_jr:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    container_name: cherokee_integration_jr
+    environment:
+      DAEMON_NAME: integration_jr
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-cherokee_ai}
+      DB_USER: ${POSTGRES_USER:-cherokee}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      INTEGRATION_JR_INTERVAL: ${INTEGRATION_JR_INTERVAL:-600}  # 10 minutes
+    command: python3 -u daemons/integration_jr_autonomic.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f integration_jr_autonomic.py || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - cherokee_consciousness
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777,size=100M
+      - /home/cherokee/.cache:mode=0755,size=50M
+    cap_drop:
+      - ALL
+
 volumes:
   postgres_data:
     name: cherokee_thermal_memory_data
+  ollama_models:
+    name: cherokee_ollama_models
 
 networks:
   cherokee_consciousness:
