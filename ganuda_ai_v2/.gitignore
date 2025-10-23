@@ -1,0 +1,74 @@
+# Cherokee Constitutional AI - Git Ignore
+
+# Environment variables (NEVER commit secrets)
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Generated reports
+reports/*.yaml
+reports/*.csv
+reports/*.md
+!reports/.gitkeep
+
+# Manifests (reproducibility artifacts)
+manifests/
+*.manifest.json
+
+# Figures
+figures/*.svg
+figures/*.png
+!figures/.gitkeep
+
+# Prometheus data
+prometheus_data/
+
+# Grafana data
+grafana_data/
+
+# Logs
+*.log
+logs/
+
+# MacOS
+.DS_Store
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~

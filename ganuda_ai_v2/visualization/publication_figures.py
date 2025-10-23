@@ -36,12 +36,12 @@ COLORS = {
     'grey': '#BBBBBB'       # Reference/baselines
 }
 
-# Database connection
+# Database connection (use environment variables)
 DB_CONFIG = {
     'host': os.getenv('PGHOST', '192.168.132.222'),
     'port': os.getenv('PGPORT', '5432'),
     'user': os.getenv('PGUSER', 'claude'),
-    'password': os.getenv('PGPASSWORD', 'jawaseatlasers2'),
+    'password': os.getenv('PGPASSWORD'),  # REQUIRED: Set via env or secret manager
     'dbname': os.getenv('PGDATABASE', 'zammad_production')
 }
 
