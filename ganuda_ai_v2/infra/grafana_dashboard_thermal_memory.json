@@ -1,0 +1,342 @@
+{
+  "dashboard": {
+    "title": "Cherokee Constitutional AI - Thermal Memory Health",
+    "tags": ["thermal-memory", "cherokee-ai", "ganuda"],
+    "timezone": "utc",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "1m",
+    "panels": [
+      {
+        "id": 1,
+        "title": "R² Baseline (No Noise)",
+        "type": "gauge",
+        "gridPos": { "x": 0, "y": 0, "w": 6, "h": 8 },
+        "targets": [
+          {
+            "expr": "thermal_memory_r2_baseline",
+            "legendFormat": "{{node}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 1,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "red" },
+                { "value": 0.63, "color": "yellow" },
+                { "value": 0.73, "color": "green" }
+              ]
+            }
+          }
+        },
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        }
+      },
+      {
+        "id": 2,
+        "title": "R² at 20% Noise (Gate 2)",
+        "type": "gauge",
+        "gridPos": { "x": 6, "y": 0, "w": 6, "h": 8 },
+        "targets": [
+          {
+            "expr": "thermal_memory_r2_noise20",
+            "legendFormat": "{{node}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 1,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "red" },
+                { "value": 0.52, "color": "orange" },
+                { "value": 0.56, "color": "yellow" },
+                { "value": 0.60, "color": "green" }
+              ]
+            }
+          }
+        },
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        }
+      },
+      {
+        "id": 3,
+        "title": "Guardian Compliance Rate",
+        "type": "gauge",
+        "gridPos": { "x": 12, "y": 0, "w": 6, "h": 8 },
+        "targets": [
+          {
+            "expr": "thermal_guardian_compliance_rate",
+            "legendFormat": "{{node}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "red" },
+                { "value": 80, "color": "yellow" },
+                { "value": 95, "color": "green" }
+              ]
+            }
+          }
+        },
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        },
+        "description": "Percentage of sacred memories protected at 100° temperature"
+      },
+      {
+        "id": 4,
+        "title": "Sacred Outlier Ratio",
+        "type": "gauge",
+        "gridPos": { "x": 18, "y": 0, "w": 6, "h": 8 },
+        "targets": [
+          {
+            "expr": "thermal_sacred_outlier_ratio",
+            "legendFormat": "{{node}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 50, "color": "yellow" },
+                { "value": 90, "color": "orange" },
+                { "value": 95, "color": "red" }
+              ]
+            }
+          }
+        },
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        },
+        "description": "Percentage of sacred memories with low metrics (phase<0.3 OR access<5) - the 99.8% phenomenon"
+      },
+      {
+        "id": 5,
+        "title": "R² Trend (7 days)",
+        "type": "timeseries",
+        "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "thermal_memory_r2_baseline",
+            "legendFormat": "Baseline ({{node}})"
+          },
+          {
+            "expr": "thermal_memory_r2_noise20",
+            "legendFormat": "20% Noise ({{node}})"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 1,
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "lineWidth": 2,
+              "fillOpacity": 10
+            }
+          },
+          "overrides": [
+            {
+              "matcher": { "id": "byName", "options": "Baseline" },
+              "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }]
+            },
+            {
+              "matcher": { "id": "byName", "options": "20% Noise" },
+              "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }]
+            }
+          ]
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Memory Distribution by Type",
+        "type": "piechart",
+        "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "thermal_memory_total{sacred=\"true\"}",
+            "legendFormat": "Sacred"
+          },
+          {
+            "expr": "thermal_memory_total{sacred=\"false\"}",
+            "legendFormat": "Typical"
+          }
+        ],
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "right"
+          },
+          "pieType": "donut",
+          "displayLabels": ["percent"]
+        }
+      },
+      {
+        "id": 7,
+        "title": "Mean Temperature Score",
+        "type": "stat",
+        "gridPos": { "x": 0, "y": 16, "w": 8, "h": 4 },
+        "targets": [
+          {
+            "expr": "thermal_temperature_mean",
+            "legendFormat": "{{node}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "celsius",
+            "decimals": 1,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "blue" },
+                { "value": 50, "color": "yellow" },
+                { "value": 80, "color": "red" }
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "textMode": "value_and_name"
+        }
+      },
+      {
+        "id": 8,
+        "title": "Mean Phase Coherence",
+        "type": "stat",
+        "gridPos": { "x": 8, "y": 16, "w": 8, "h": 4 },
+        "targets": [
+          {
+            "expr": "thermal_phase_coherence_mean",
+            "legendFormat": "{{node}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 1,
+            "decimals": 3,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "red" },
+                { "value": 0.3, "color": "yellow" },
+                { "value": 0.7, "color": "green" }
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "textMode": "value_and_name"
+        }
+      },
+      {
+        "id": 9,
+        "title": "Metrics Scrape Duration",
+        "type": "timeseries",
+        "gridPos": { "x": 16, "y": 16, "w": 8, "h": 4 },
+        "targets": [
+          {
+            "expr": "rate(thermal_metrics_scrape_duration_seconds_sum[5m]) / rate(thermal_metrics_scrape_duration_seconds_count[5m])",
+            "legendFormat": "{{node}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "decimals": 2,
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 1
+            }
+          }
+        },
+        "description": "Time spent collecting thermal metrics from database (averaged over 5m)"
+      },
+      {
+        "id": 10,
+        "title": "Scrape Errors (24h)",
+        "type": "stat",
+        "gridPos": { "x": 0, "y": 20, "w": 24, "h": 4 },
+        "targets": [
+          {
+            "expr": "increase(thermal_metrics_scrape_errors_total[24h])",
+            "legendFormat": "{{node}} - {{error_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 1, "color": "yellow" },
+                { "value": 10, "color": "red" }
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "textMode": "value_and_name"
+        },
+        "description": "Total scrape errors in last 24 hours"
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "node",
+          "type": "query",
+          "query": "label_values(thermal_memory_r2_baseline, node)",
+          "multi": true,
+          "includeAll": true
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Deployments",
+          "datasource": "Prometheus",
+          "enable": true,
+          "expr": "changes(thermal_memory_total[5m]) > 100"
+        }
+      ]
+    }
+  }
+}
