@@ -53,25 +53,14 @@ if command -v python3 &> /dev/null; then
 
     echo -e "${BLUE}Python version detected: $PYTHON_VERSION${NC}"
 
-    # Check for Python 3.13 (not supported due to pydantic-core)
-    if [ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -ge 13 ]; then
-        echo -e "${RED}❌ Python 3.13+ is not yet supported due to pydantic-core compatibility${NC}"
-        echo -e "${YELLOW}Please install Python 3.11 or 3.12:${NC}"
-        echo "  Ubuntu/Debian: sudo apt install python3.12 python3.12-venv"
-        echo "  Then specify: python3.12 -m venv venv"
+    # Check for minimum Python 3.11
+    if [ "$PYTHON_MAJOR" -lt 3 ] || ([ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -lt 11 ]); then
+        echo -e "${RED}❌ Python 3.11+ required (you have $PYTHON_VERSION)${NC}"
+        echo "  Ubuntu/Debian: sudo apt install python3.11 python3.11-venv"
         exit 1
     fi
 
-    # Check for minimum Python 3.11
-    if [ "$PYTHON_MAJOR" -lt 3 ] || ([ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -lt 11 ]); then
-        echo -e "${YELLOW}⚠️  Python 3.11+ recommended (you have $PYTHON_VERSION)${NC}"
-        read -p "Continue anyway? (y/n) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            exit 1
-        fi
-    fi
-
+    # Python 3.11, 3.12, and 3.13 all supported
     echo -e "${GREEN}✅ Python version compatible: $PYTHON_VERSION${NC}"
 else
     echo -e "${RED}❌ Python 3 not found. Please install Python 3.11 or 3.12${NC}"
@@ -122,20 +111,8 @@ echo ""
 # Step 4: Create virtual environment
 echo -e "${BLUE}🐍 Step 4: Creating Python virtual environment${NC}"
 
-# Prefer python3.12 if available (avoid python3.13)
-if command -v python3.12 &> /dev/null; then
-    PYTHON_CMD="python3.12"
-    echo -e "${GREEN}Using python3.12${NC}"
-elif command -v python3.11 &> /dev/null; then
-    PYTHON_CMD="python3.11"
-    echo -e "${GREEN}Using python3.11${NC}"
-else
-    PYTHON_CMD="python3"
-    echo -e "${YELLOW}Using default python3 ($PYTHON_VERSION)${NC}"
-fi
-
 cd "$INSTALL_DIR"
-sudo -u "$CURRENT_USER" $PYTHON_CMD -m venv venv
+sudo -u "$CURRENT_USER" python3 -m venv venv
 sudo -u "$CURRENT_USER" "$INSTALL_DIR/venv/bin/pip" install --upgrade pip
 sudo -u "$CURRENT_USER" "$INSTALL_DIR/venv/bin/pip" install -r requirements.txt
 
@@ -262,9 +239,29 @@ echo ""
 echo "Next steps:"
 echo "1. Configure database credentials: $INSTALL_DIR/config/database.yml"
 echo "2. Configure chiefs: $INSTALL_DIR/config/chiefs.yml"
-echo "3. Start with Docker Compose:"
-echo "   cd $INSTALL_DIR/infra"
-echo "   docker-compose up -d"
+
+# Detect container runtime
+if command -v docker-compose &> /dev/null || command -v docker &> /dev/null; then
+    echo "3. Start with Docker Compose:"
+    echo "   cd $INSTALL_DIR/infra"
+    if command -v docker-compose &> /dev/null; then
+        echo "   docker-compose up -d"
+    else
+        echo "   docker compose up -d"
+    fi
+elif command -v podman-compose &> /dev/null || command -v podman &> /dev/null; then
+    echo "3. Start with Podman Compose:"
+    echo "   cd $INSTALL_DIR/infra"
+    if command -v podman-compose &> /dev/null; then
+        echo "   podman-compose up -d"
+    else
+        echo "   podman compose up -d"
+    fi
+else
+    echo "3. Install container runtime (Docker or Podman):"
+    echo "   Docker: https://docs.docker.com/engine/install/"
+    echo "   Podman: sudo apt install podman podman-compose"
+fi
 echo ""
 echo "4. Or start daemons manually:"
 echo "   cd $INSTALL_DIR"

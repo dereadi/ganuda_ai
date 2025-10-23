@@ -1,8 +1,8 @@
 # Cherokee Constitutional AI - Python Dependencies
 # Ganuda AI - Autonomous Democratic AI Tribe
 
-# IMPORTANT: Requires Python 3.11 or 3.12 (NOT 3.13 - pydantic compatibility)
-# python_requires = ">=3.11,<3.13"
+# IMPORTANT: Python 3.11, 3.12, or 3.13 supported
+# python_requires = ">=3.11"
 
 # Database (pinned for Seven Generations reproducibility)
 psycopg2-binary==2.9.9
@@ -10,11 +10,11 @@ psycopg2-binary==2.9.9
 # HTTP requests (for Chief communication)
 requests==2.31.0
 
-# API Framework (Phase 2B)
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-pydantic==2.6.0
-pydantic-core==2.16.1
+# API Framework (Phase 2B) - Updated for Python 3.13 support
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.9.0
+pydantic-core==2.23.0
 
 # Week 1 Validation - Scientific Computing
 scikit-learn==1.4.0
