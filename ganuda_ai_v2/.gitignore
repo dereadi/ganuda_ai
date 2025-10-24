@@ -72,3 +72,4 @@ logs/
 *.bak
 *.swp
 *~
+desktop_assistant_env/
