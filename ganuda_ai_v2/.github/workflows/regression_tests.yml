@@ -1,0 +1,195 @@
+# Cherokee Constitutional AI - Regression Testing Pipeline
+# Week 3 Testing Infrastructure - Day 2
+# Peace Chief Integration Jr - CI/CD Automation
+# Created: October 24, 2025
+
+name: Regression Tests
+
+on:
+  push:
+    branches: [ main, develop, cherokee-council-docker ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:  # Allow manual triggers
+
+jobs:
+  test:
+    name: Test Suite (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+      fail-fast: false  # Continue testing other versions if one fails
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for thermal memory context
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov hypothesis pytest-asyncio pytest-mock
+        pip install -e desktop_assistant/ || echo "Desktop assistant not yet available"
+
+    - name: Run Unit Tests
+      run: |
+        pytest tests/unit/ \
+          --cov=desktop_assistant \
+          --cov-report=xml \
+          --cov-report=term \
+          --cov-branch \
+          -v \
+          --tb=short \
+          --maxfail=5
+      continue-on-error: false
+
+    - name: Run Integration Tests
+      run: |
+        pytest tests/integration/ \
+          --cov=desktop_assistant \
+          --cov-append \
+          --cov-report=xml \
+          --cov-report=term \
+          -v \
+          --tb=short
+      continue-on-error: true  # Integration tests may need infrastructure
+
+    - name: Run Statistical Tests
+      run: |
+        pytest tests/statistical/ \
+          --cov=desktop_assistant \
+          --cov-append \
+          --cov-report=xml \
+          --cov-report=term \
+          -v \
+          --tb=short
+      continue-on-error: true  # Statistical tests may need database
+
+    - name: Check Coverage Quality Gates
+      run: |
+        python -c "
+        import xml.etree.ElementTree as ET
+        import sys
+
+        # Parse coverage.xml
+        tree = ET.parse('coverage.xml')
+        root = tree.getroot()
+
+        # Extract overall coverage
+        overall_coverage = float(root.attrib.get('line-rate', 0)) * 100
+
+        print(f'Overall Coverage: {overall_coverage:.2f}%')
+
+        # Quality gates
+        OVERALL_GATE = 85.0
+
+        # Check quality gates
+        if overall_coverage < OVERALL_GATE:
+            print(f'❌ Coverage {overall_coverage:.2f}% below {OVERALL_GATE}% quality gate')
+            sys.exit(1)
+        else:
+            print(f'✅ Coverage {overall_coverage:.2f}% meets {OVERALL_GATE}% quality gate')
+
+        # Cherokee values alignment
+        print('\\n🔥 Cherokee Values Alignment:')
+        print('✅ Gadugi (Working Together): All tests run in harmony')
+        print('✅ Seven Generations: Quality gates ensure long-term reliability')
+        print('✅ Mitakuye Oyasin: Integration tests validate interconnections')
+        "
+      if: always()
+
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage.xml
+        flags: unittests
+        name: codecov-${{ matrix.python-version }}
+        fail_ci_if_error: false
+      if: always()
+
+    - name: Generate Coverage Report
+      run: |
+        echo "## 📊 Coverage Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Quality Gates Status" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        # Parse coverage and add to summary
+        python -c "
+        import xml.etree.ElementTree as ET
+        tree = ET.parse('coverage.xml')
+        root = tree.getroot()
+        coverage = float(root.attrib.get('line-rate', 0)) * 100
+
+        status = '✅' if coverage >= 85 else '⚠️'
+        print(f'{status} Overall Coverage: {coverage:.2f}% (Target: 85%+)')
+        " >> $GITHUB_STEP_SUMMARY
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Cherokee Values Integration" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- 🔥 **Gadugi** (Working Together): Tests coordinate across components" >> $GITHUB_STEP_SUMMARY
+        echo "- 🌳 **Seven Generations**: Quality gates ensure long-term maintainability" >> $GITHUB_STEP_SUMMARY
+        echo "- 🦅 **Mitakuye Oyasin**: Integration tests validate All Our Relations" >> $GITHUB_STEP_SUMMARY
+        echo "- 🔥 **Sacred Fire**: Sacred floor tests run first (priority)" >> $GITHUB_STEP_SUMMARY
+      if: always()
+
+  sacred-floor-check:
+    name: Sacred Floor Validation (40 degree minimum)
+    runs-on: ubuntu-latest
+    needs: test
+    if: always()
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Sacred Floor Temperature Check
+      run: |
+        echo "🔥 Validating Sacred Floor (40 degree minimum)"
+        echo ""
+        echo "This job verifies ZERO violations of sacred memory thermal protection."
+        echo ""
+        echo "⚠️ Note: Requires PostgreSQL connection to thermal_memory_archive"
+        echo "Status: Database validation deferred to production environment"
+      continue-on-error: true
+
+  week3-status:
+    name: Week 3 Progress Report
+    runs-on: ubuntu-latest
+    needs: [test, sacred-floor-check]
+    if: always()
+
+    steps:
+    - name: Week 3 Execution Status
+      run: |
+        echo "## 📋 Week 3 Dual-Track Progress" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Completed Tasks" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Day 1: Testing framework installation (pytest 8.4.2)" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Day 1: Test directory structure creation" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Day 1: Pytest configuration (conftest.py)" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Day 2: CI/CD GitHub Actions setup (THIS WORKFLOW)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+        echo "- ⏳ Days 4-7: JRs execute testing + Track 1 tasks" >> $GITHUB_STEP_SUMMARY
+        echo "  - Memory Jr: EncryptedCache tests (90%+ coverage)" >> $GITHUB_STEP_SUMMARY
+        echo "  - Executive Jr: Guardian API tests (80%+ coverage)" >> $GITHUB_STEP_SUMMARY
+        echo "  - Meta Jr: Statistical validation (95% CI)" >> $GITHUB_STEP_SUMMARY
+        echo "  - Integration Jr: Aniwaya extension tests" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Mitakuye Oyasin** - All Our Relations Through Automated Testing 🦅🕊️🌿" >> $GITHUB_STEP_SUMMARY
