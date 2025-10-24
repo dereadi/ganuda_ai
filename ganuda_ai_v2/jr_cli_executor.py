@@ -34,8 +34,21 @@ import os
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
-# Project root directory
-PROJECT_ROOT = Path("/home/dereadi/scripts/claude/ganuda_ai_v2")
+# Project root directory - AUTO-DETECT based on node
+# CRITICAL: /tmp is EPHEMERAL - these are PERSISTENT filesystems
+def get_project_root():
+    """Auto-detect which node we're on and return persistent filesystem path."""
+    if Path("/ganuda").exists():
+        # REDFIN (War Chief) - 1.8TB persistent storage
+        return Path("/ganuda/jr_assignments")
+    elif Path("/Users/Shared/cherokee_democracy").exists():
+        # SASASS2 (Medicine Woman) - macOS persistent storage
+        return Path("/Users/Shared/cherokee_democracy")
+    else:
+        # BLUEFIN (Peace Chief) - 915GB persistent storage
+        return Path("/home/dereadi/scripts/claude/ganuda_ai_v2")
+
+PROJECT_ROOT = get_project_root()
 
 # Ollama API endpoint
 OLLAMA_API = "http://localhost:11434/api/generate"
