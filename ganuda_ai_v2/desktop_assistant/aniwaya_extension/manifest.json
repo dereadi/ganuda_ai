@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Aniwaya - Cherokee Constitutional AI Dashboard",
+  "version": "0.1.0",
+  "description": "I2 Transparency Dashboard - Wind over the Mountains",
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "action": {
+    "default_popup": "dashboard/index.html",
+    "default_title": "Aniwaya Dashboard (Skiyakwa)"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

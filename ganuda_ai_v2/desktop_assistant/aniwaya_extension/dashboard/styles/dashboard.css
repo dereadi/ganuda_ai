@@ -1,0 +1,309 @@
+/* Aniwaya I2 Transparency Dashboard - Cherokee Constitutional AI */
+/* War Chief Integration Jr - Phase 1 Styling */
+
+:root {
+  --primary-blue: #2196F3;
+  --sacred-orange: #FF9800;
+  --consent-green: #4CAF50;
+  --war-red: #F44336;
+  --thermal-fire: #FF5722;
+  --background-dark: #1a1a1a;
+  --panel-bg: #2a2a2a;
+  --text-light: #e0e0e0;
+  --border-color: #444;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background-dark);
+  color: var(--text-light);
+  width: 800px;
+  min-height: 600px;
+  overflow-x: hidden;
+}
+
+#aniwaya-dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+}
+
+/* Header Styling */
+.dashboard-header {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--sacred-orange) 100%);
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.dashboard-header h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.dashboard-header .subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+
+.dashboard-header .codename {
+  font-size: 12px;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 16px;
+  padding: 16px;
+  flex-grow: 1;
+}
+
+/* Panel Styling */
+.panel {
+  background-color: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+.panel h2 {
+  font-size: 16px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--primary-blue);
+}
+
+.panel-content {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.panel .status {
+  margin-top: 12px;
+  font-size: 11px;
+  opacity: 0.8;
+  padding: 8px;
+  background-color: rgba(76, 175, 80, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid var(--consent-green);
+}
+
+/* Provenance Panel */
+.provenance-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.provenance-table th {
+  background-color: rgba(33, 150, 243, 0.2);
+  padding: 8px;
+  text-align: left;
+  border-bottom: 2px solid var(--primary-blue);
+}
+
+.provenance-table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.provenance-table tbody tr:hover {
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+/* Flow Visualization Panel */
+.flow-graph-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.flow-graph-placeholder svg {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.flow-graph-placeholder .legend {
+  font-size: 11px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.consent-green {
+  color: var(--consent-green);
+  font-weight: bold;
+}
+
+.consent-yellow {
+  color: #FFC107;
+  font-weight: bold;
+}
+
+.consent-red {
+  color: var(--war-red);
+  font-weight: bold;
+}
+
+/* Privacy Controls Panel */
+.privacy-status {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.privacy-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  border-left: 3px solid var(--primary-blue);
+  font-size: 12px;
+}
+
+.privacy-metric .metric-label {
+  opacity: 0.9;
+}
+
+.privacy-metric .metric-value {
+  font-weight: bold;
+  color: var(--consent-green);
+}
+
+.privacy-metric .metric-value.sacred {
+  color: var(--thermal-fire);
+}
+
+.delete-request-btn {
+  margin-top: 12px;
+  padding: 10px;
+  background-color: var(--war-red);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.delete-request-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Thermal Memory Monitor */
+.thermal-gauge {
+  margin-bottom: 16px;
+}
+
+.gauge-container {
+  width: 100%;
+  height: 40px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid var(--border-color);
+  margin-bottom: 8px;
+}
+
+.gauge-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sacred-orange) 0%, var(--thermal-fire) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  transition: width 0.3s ease;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.thermal-gauge label {
+  font-size: 11px;
+  opacity: 0.8;
+  display: block;
+  text-align: center;
+}
+
+.thermal-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.thermal-metrics .metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.thermal-metrics .metric.sacred-floor-metric {
+  border: 2px solid var(--thermal-fire);
+  background-color: rgba(255, 87, 34, 0.1);
+}
+
+.thermal-metrics .metric-label {
+  opacity: 0.9;
+}
+
+.thermal-metrics .metric-value {
+  font-weight: bold;
+  color: var(--primary-blue);
+}
+
+/* Footer Styling */
+.dashboard-footer {
+  background-color: var(--panel-bg);
+  border-top: 2px solid var(--primary-blue);
+  padding: 16px;
+  text-align: center;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.dashboard-footer .version {
+  margin-top: 6px;
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-blue);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sacred-orange);
+}

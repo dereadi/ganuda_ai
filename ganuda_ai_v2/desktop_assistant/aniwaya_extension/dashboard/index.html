@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aniwaya - I2 Transparency Dashboard</title>
+  <link rel="stylesheet" href="styles/dashboard.css">
+</head>
+<body>
+  <div id="aniwaya-dashboard">
+    <header class="dashboard-header">
+      <h1>🦅 Aniwaya (ᎠᏂᏩᏃ)</h1>
+      <p class="subtitle">Cherokee Constitutional AI - I2 Transparency Dashboard</p>
+      <p class="codename">Skiyakwa - Bird with Sharp Vision</p>
+    </header>
+
+    <div class="dashboard-grid">
+      <!-- M1 Provenance Panel -->
+      <section class="panel provenance-panel">
+        <h2>📋 Provenance Tracking (M1)</h2>
+        <div class="panel-content">
+          <table class="provenance-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Operation</th>
+                <th>Data Type</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="provenance-entries">
+              <tr>
+                <td>user_123</td>
+                <td>read</td>
+                <td>medical</td>
+                <td id="timestamp-1">Loading...</td>
+              </tr>
+              <tr>
+                <td>user_456</td>
+                <td>write</td>
+                <td>trading</td>
+                <td id="timestamp-2">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="status">✅ M1 Provenance API ready for integration</p>
+        </div>
+      </section>
+
+      <!-- A3 Flow Visualization Panel -->
+      <section class="panel flow-panel">
+        <h2>🌀 Cross-Domain Flow Visualization (A3)</h2>
+        <div class="panel-content">
+          <div id="flow-graph" class="flow-graph-placeholder">
+            <svg width="300" height="200">
+              <!-- Trading Node -->
+              <circle cx="75" cy="100" r="30" fill="#4CAF50" />
+              <text x="75" y="105" text-anchor="middle" fill="white" font-size="12">Trading</text>
+
+              <!-- Consciousness Node -->
+              <circle cx="150" cy="50" r="30" fill="#2196F3" />
+              <text x="150" y="55" text-anchor="middle" fill="white" font-size="12">Conscious</text>
+
+              <!-- Governance Node -->
+              <circle cx="225" cy="100" r="30" fill="#FF9800" />
+              <text x="225" y="105" text-anchor="middle" fill="white" font-size="12">Govern</text>
+
+              <!-- Edges -->
+              <line x1="105" y1="100" x2="195" y2="100" stroke="#4CAF50" stroke-width="2" />
+              <line x1="105" y1="85" x2="135" y2="65" stroke="#4CAF50" stroke-width="2" />
+              <line x1="165" y1="65" x2="195" y2="85" stroke="#2196F3" stroke-width="2" />
+            </svg>
+            <p class="legend">
+              <span class="consent-green">● Green</span> = Consent granted |
+              <span class="consent-yellow">● Yellow</span> = Pending |
+              <span class="consent-red">● Red</span> = Denied
+            </p>
+          </div>
+          <p class="status">✅ A3 Flow Algorithm ready for integration</p>
+        </div>
+      </section>
+
+      <!-- Privacy Controls Panel (Guardian + C1) -->
+      <section class="panel privacy-panel">
+        <h2>🔒 Privacy Controls (Guardian + C1)</h2>
+        <div class="panel-content">
+          <div class="privacy-status">
+            <div class="privacy-metric">
+              <span class="metric-label">Sacred Health Data Protected:</span>
+              <span class="metric-value sacred">✅ 4,777 memories</span>
+            </div>
+            <div class="privacy-metric">
+              <span class="metric-label">40° Sacred Floor Enforced:</span>
+              <span class="metric-value sacred">🔥 Active</span>
+            </div>
+            <div class="privacy-metric">
+              <span class="metric-label">Biometric Detections (3-of-3):</span>
+              <span class="metric-value">0 pending</span>
+            </div>
+            <div class="privacy-metric">
+              <span class="metric-label">User Sovereignty:</span>
+              <span class="metric-value">✅ Deletion controls active</span>
+            </div>
+          </div>
+          <button class="delete-request-btn">Request Data Deletion</button>
+          <p class="status">✅ C1 Sacred Health Guardian operational</p>
+        </div>
+      </section>
+
+      <!-- Thermal Memory Monitor -->
+      <section class="panel thermal-panel">
+        <h2>🔥 Thermal Memory Monitor</h2>
+        <div class="panel-content">
+          <div class="thermal-gauge">
+            <div class="gauge-container">
+              <div class="gauge-fill" id="temp-gauge" style="width: 85%">
+                <span id="temp-value">85°</span>
+              </div>
+            </div>
+            <label>Temperature Score</label>
+          </div>
+
+          <div class="thermal-metrics">
+            <div class="metric">
+              <span class="metric-label">Phase Coherence:</span>
+              <span class="metric-value" id="phase-coherence">0.92</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Access Count:</span>
+              <span class="metric-value" id="access-count">15</span>
+            </div>
+            <div class="metric sacred-floor-metric">
+              <span class="metric-label">Sacred Floor:</span>
+              <span class="metric-value">🔥 40°</span>
+            </div>
+          </div>
+          <p class="status">✅ Real-time PostgreSQL connection active</p>
+        </div>
+      </section>
+    </div>
+
+    <footer class="dashboard-footer">
+      <p>Mitakuye Oyasin - All Our Relations</p>
+      <p class="version">Aniwaya v0.1.0 | Phase 1 Prototype | October 24, 2025</p>
+    </footer>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
