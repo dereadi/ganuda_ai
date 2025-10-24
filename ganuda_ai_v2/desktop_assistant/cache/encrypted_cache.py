@@ -49,7 +49,7 @@ class EncryptedCache:
 
     KEYCHAIN_SERVICE = "ganuda_desktop_assistant"
     KEYCHAIN_ACCOUNT = "cache_master_key"
-    SCHEMA_VERSION = 1
+    SCHEMA_VERSION = 2  # M1: Added provenance_log table
 
     def __init__(self, cache_dir: Optional[Path] = None):
         """
@@ -139,6 +139,37 @@ class EncryptedCache:
         """)
         cursor.execute("""
             CREATE INDEX IF NOT EXISTS idx_sacred ON cache_entries(sacred_pattern)
+        """)
+
+        # Provenance log table (M1 Enhancement - War Chief Memory Jr)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS provenance_log (
+                log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                entry_id TEXT NOT NULL,
+                user_id TEXT,
+                operation TEXT NOT NULL,  -- 'READ', 'WRITE', 'DELETE', 'SEARCH'
+                data_type TEXT,  -- 'email', 'calendar', 'file_snippet'
+                guardian_decision TEXT,  -- 'ALLOWED', 'BLOCKED', 'REDACTED'
+                protection_level TEXT,  -- 'PUBLIC', 'PRIVATE', 'SACRED'
+                consent_token TEXT,  -- M1: User consent identifier (GPT-5 recommendation)
+                biometric_flag INTEGER DEFAULT 0,  -- M1: 1 if biometric auth used (GPT-5)
+                timestamp INTEGER NOT NULL,  -- Unix timestamp
+                FOREIGN KEY (entry_id) REFERENCES cache_entries(id) ON DELETE CASCADE
+            )
+        """)
+
+        # Provenance indexes
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_prov_entry ON provenance_log(entry_id)
+        """)
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_prov_user ON provenance_log(user_id)
+        """)
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_prov_timestamp ON provenance_log(timestamp DESC)
+        """)
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_prov_consent ON provenance_log(consent_token)
         """)
 
         # Metadata table (for schema versioning)
@@ -306,19 +337,24 @@ class EncryptedCache:
         ))
         self.conn.commit()
 
-    def get(self, entry_id: str) -> Optional[Dict[str, Any]]:
+    def get(self, entry_id: str, user_id: Optional[str] = None,
+            consent_token: Optional[str] = None,
+            biometric_flag: bool = False) -> Optional[Dict[str, Any]]:
         """
         Retrieve and decrypt cache entry.
 
         Args:
             entry_id: Cache entry ID (e.g., "email:12345")
+            user_id: User requesting access (M1 - for provenance)
+            consent_token: User consent identifier (M1 - GPT-5 recommendation)
+            biometric_flag: Whether biometric auth was used (M1 - GPT-5)
 
         Returns:
             Decrypted content dict, or None if not found
         """
         cursor = self.conn.cursor()
         cursor.execute("""
-            SELECT encrypted_content, nonce, metadata_json, entry_type, temperature_score
+            SELECT encrypted_content, nonce, metadata_json, entry_type, temperature_score, sacred_pattern
             FROM cache_entries WHERE id = ?
         """, (entry_id,))
 
@@ -331,6 +367,19 @@ class EncryptedCache:
 
         # Update access stats (thermal memory)
         self._update_access_stats(entry_id)
+
+        # Log provenance (M1 Enhancement)
+        protection_level = "SACRED" if row["sacred_pattern"] == 1 else "PRIVATE"
+        self.log_provenance(
+            entry_id=entry_id,
+            operation="READ",
+            user_id=user_id,
+            data_type=row["entry_type"],
+            guardian_decision="ALLOWED",
+            protection_level=protection_level,
+            consent_token=consent_token,
+            biometric_flag=biometric_flag
+        )
 
         return {
             "content": decrypted_content,
@@ -360,6 +409,102 @@ class EncryptedCache:
             WHERE id = ?
         """, (now, entry_id))
         self.conn.commit()
+
+    def log_provenance(self,
+                       entry_id: str,
+                       operation: str,
+                       user_id: Optional[str] = None,
+                       data_type: Optional[str] = None,
+                       guardian_decision: str = "ALLOWED",
+                       protection_level: str = "PRIVATE",
+                       consent_token: Optional[str] = None,
+                       biometric_flag: bool = False):
+        """
+        Log provenance information for cache operations (M1 Enhancement).
+
+        Args:
+            entry_id: Cache entry ID being accessed
+            operation: Operation type ('READ', 'WRITE', 'DELETE', 'SEARCH')
+            user_id: User identifier (optional)
+            data_type: Entry type ('email', 'calendar', 'file_snippet')
+            guardian_decision: Guardian API decision ('ALLOWED', 'BLOCKED', 'REDACTED')
+            protection_level: Privacy level ('PUBLIC', 'PRIVATE', 'SACRED')
+            consent_token: User consent identifier (M1 - GPT-5 recommendation)
+            biometric_flag: Whether biometric auth was used (M1 - GPT-5)
+        """
+        cursor = self.conn.cursor()
+        now = int(datetime.now().timestamp())
+
+        cursor.execute("""
+            INSERT INTO provenance_log
+            (entry_id, user_id, operation, data_type, guardian_decision,
+             protection_level, consent_token, biometric_flag, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            entry_id,
+            user_id,
+            operation,
+            data_type,
+            guardian_decision,
+            protection_level,
+            consent_token,
+            1 if biometric_flag else 0,
+            now
+        ))
+        self.conn.commit()
+
+    def get_provenance_log(self, entry_id: Optional[str] = None,
+                           user_id: Optional[str] = None,
+                           limit: int = 100) -> List[Dict[str, Any]]:
+        """
+        Retrieve provenance log entries (M1 Enhancement).
+
+        Args:
+            entry_id: Filter by specific cache entry (optional)
+            user_id: Filter by specific user (optional)
+            limit: Maximum results to return
+
+        Returns:
+            List of provenance log entries
+        """
+        cursor = self.conn.cursor()
+
+        if entry_id:
+            cursor.execute("""
+                SELECT * FROM provenance_log
+                WHERE entry_id = ?
+                ORDER BY timestamp DESC
+                LIMIT ?
+            """, (entry_id, limit))
+        elif user_id:
+            cursor.execute("""
+                SELECT * FROM provenance_log
+                WHERE user_id = ?
+                ORDER BY timestamp DESC
+                LIMIT ?
+            """, (user_id, limit))
+        else:
+            cursor.execute("""
+                SELECT * FROM provenance_log
+                ORDER BY timestamp DESC
+                LIMIT ?
+            """, (limit,))
+
+        results = []
+        for row in cursor.fetchall():
+            results.append({
+                "log_id": row["log_id"],
+                "entry_id": row["entry_id"],
+                "user_id": row["user_id"],
+                "operation": row["operation"],
+                "data_type": row["data_type"],
+                "guardian_decision": row["guardian_decision"],
+                "protection_level": row["protection_level"],
+                "consent_token": row["consent_token"],
+                "biometric_flag": bool(row["biometric_flag"]),
+                "timestamp": row["timestamp"]
+            })
+        return results
 
     def search_emails(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
         """
