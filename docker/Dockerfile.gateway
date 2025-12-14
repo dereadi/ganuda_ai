@@ -1,0 +1,50 @@
+# Ganuda Gateway
+# OpenAI-compatible LLM API Gateway
+# Works with Docker and Podman
+
+FROM python:3.11-slim
+
+LABEL maintainer="Cherokee AI Federation"
+LABEL version="1.0"
+LABEL description="Ganuda Gateway - Private AI Inference"
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m -s /bin/bash ganuda
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY lib/ ./lib/
+COPY services/llm_gateway/ ./services/llm_gateway/
+COPY config/ ./config/
+
+# Create log directory
+RUN mkdir -p /app/logs && chown -R ganuda:ganuda /app
+
+# Switch to non-root user
+USER ganuda
+
+# Environment
+ENV GANUDA_CONFIG=/app/config/ganuda.yaml
+ENV PYTHONPATH=/app:/app/lib
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Expose port
+EXPOSE 8080
+
+# Run gateway
+WORKDIR /app/services/llm_gateway
+CMD ["python", "-m", "uvicorn", "gateway:app", "--host", "0.0.0.0", "--port", "8080"]

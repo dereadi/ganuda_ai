@@ -1,0 +1,38 @@
+{
+  "generated_at": "2025-12-14T09:02:28.706626",
+  "endpoint": "http://localhost:8080",
+  "model": "cherokee-council",
+  "health": {
+    "status": "healthy",
+    "version": "1.2.0",
+    "components": {
+      "vllm": "healthy",
+      "model": "nvidia/NVIDIA-Nemotron-Nano-9B-v2",
+      "database": "healthy",
+      "council": "available",
+      "tpm_vote": "enabled"
+    },
+    "latency_ms": 30,
+    "timestamp": "2025-12-14T15:02:16.038468Z"
+  },
+  "benchmarks": {
+    "latency": {
+      "name": "Response Latency",
+      "p50_ms": 753.6313533782959,
+      "p99_ms": 761.9936466217041,
+      "min_ms": 746.4418411254883,
+      "samples": 5
+    },
+    "throughput": {
+      "name": "Throughput",
+      "tokens_per_sec": 72.72959734987978,
+      "total_tokens": 600,
+      "total_time_sec": 8.249736309051514
+    },
+    "consistency": {
+      "name": "Consistency",
+      "success_rate": 100.0,
+      "samples": 3
+    }
+  }
+}

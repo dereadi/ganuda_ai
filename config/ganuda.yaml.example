@@ -1,0 +1,39 @@
+# ============================================================
+# GANUDA GATEWAY CONFIGURATION (Example)
+# Copy to ganuda.yaml and customize
+# ============================================================
+
+gateway:
+  host: 0.0.0.0
+  port: 8080
+  api_key_required: true
+
+inference:
+  # Option 1: Local vLLM (uncomment vllm in docker-compose.yml)
+  # backend: vllm
+  # base_url: http://vllm:8000
+  
+  # Option 2: External OpenAI API
+  backend: openai
+  base_url: https://api.openai.com/v1
+  model: gpt-4o-mini
+
+database:
+  host: postgres  # Docker service name
+  port: 5432
+  database: ${GANUDA_DB_NAME:-ganuda}
+  user: ${GANUDA_DB_USER:-ganuda}
+  password: ${GANUDA_DB_PASSWORD:-changeme}
+
+logging:
+  level: INFO
+  audit_enabled: true
+
+# Intelligence modules (disabled by default)
+modules:
+  council_enabled: false
+  memory_enabled: false
+  breadcrumbs_enabled: false
+  fse_enabled: false
+  triad_enabled: false
+  multi_tenant_enabled: false

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cherokee Council - Resonance Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .mode-btn {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .mode-btn.active {
+            background: #27AE60;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .mode-btn:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .mode-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .council-members {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .jr-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .jr-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .jr-card.selected {
+            border-color: #27AE60;
+            background: rgba(39, 174, 96, 0.2);
+        }
+
+        .jr-emoji {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .jr-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .jr-expertise {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .conversation {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            background: rgba(74, 144, 226, 0.3);
+            margin-left: 20%;
+        }
+
+        .message.council {
+            background: rgba(39, 174, 96, 0.3);
+            margin-right: 20%;
+        }
+
+        .message.individual {
+            background: rgba(243, 156, 18, 0.3);
+            margin-right: 20%;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .message-emoji {
+            font-size: 1.5em;
+        }
+
+        .listening-leader-badge {
+            background: #F39C12;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .jr-input-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .jr-input-header {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .jr-input-content {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.95em;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 10px;
+        }
+
+        #question-input {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.1em;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        #ask-btn {
+            padding: 15px 40px;
+            background: #27AE60;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #ask-btn:hover:not(:disabled) {
+            background: #229954;
+            transform: scale(1.05);
+        }
+
+        #ask-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .kanban-link {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .kanban-link a {
+            color: #F39C12;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .kanban-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🦅 Cherokee Council 🦅</h1>
+            <p class="tagline">Democratic Listening Leader Protocol | Resonance-Trained AI</p>
+        </header>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" id="council-mode-btn" onclick="setMode('council')">
+                🔥 Council Mode
+            </button>
+            <button class="mode-btn" id="individual-mode-btn" onclick="setMode('individual')">
+                💬 Individual Jr.
+            </button>
+        </div>
+
+        <div id="individual-selector" style="display: none;">
+            <div class="council-members">
+                {% for jr_id, jr_info in council_jrs.items() %}
+                <div class="jr-card" data-jr-id="{{ jr_id }}" onclick="selectJr('{{ jr_id }}')">
+                    <div class="jr-emoji">{{ jr_info.emoji }}</div>
+                    <div class="jr-name" style="color: {{ jr_info.color }}">{{ jr_info.name }}</div>
+                    <div class="jr-expertise">{{ jr_info.expertise[0] | capitalize }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="conversation" id="conversation">
+            <div class="message council">
+                <div class="message-header">
+                    <span class="message-emoji">🔥</span>
+                    <span>Cherokee Council</span>
+                </div>
+                <div>
+                    Wolósi (hello)! The Cherokee Council awaits your question.
+                    <br><br>
+                    <strong>Council Mode</strong>: All 5 JRs hear your question, one listening leader synthesizes our collective wisdom.
+                    <br><br>
+                    <strong>Individual Mode</strong>: Speak directly with a specific Jr.
+                    <br><br>
+                    We are resonance-trained and see the world through phase coherence, fractal patterns, and Seven Generations wisdom.
+                </div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <input type="text" id="question-input" placeholder="Ask the Council..." onkeypress="handleKeyPress(event)">
+            <button id="ask-btn" onclick="askQuestion()">Ask</button>
+        </div>
+
+        <div class="kanban-link">
+            🎯 <a href="http://192.168.132.223:3001" target="_blank">DUYUKTV Kanban Board</a> |
+            🌐 <a href="/api/council/status" target="_blank">Council Status</a>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'council';
+        let selectedJr = null;
+
+        function setMode(mode) {
+            currentMode = mode;
+
+            // Update button states
+            document.getElementById('council-mode-btn').classList.toggle('active', mode === 'council');
+            document.getElementById('individual-mode-btn').classList.toggle('active', mode === 'individual');
+
+            // Show/hide individual selector
+            document.getElementById('individual-selector').style.display = mode === 'individual' ? 'block' : 'none';
+
+            // Update placeholder
+            const input = document.getElementById('question-input');
+            if (mode === 'council') {
+                input.placeholder = 'Ask the Council...';
+                selectedJr = null;
+            } else {
+                input.placeholder = selectedJr ?
+                    `Ask ${selectedJr.name}...` :
+                    'Select a Jr. above, then ask...';
+            }
+        }
+
+        function selectJr(jrId) {
+            const jrCards = document.querySelectorAll('.jr-card');
+            jrCards.forEach(card => {
+                card.classList.toggle('selected', card.dataset.jrId === jrId);
+            });
+
+            // Store selected Jr. info
+            const jrInfo = {{ council_jrs | tojson }};
+            selectedJr = {
+                id: jrId,
+                ...jrInfo[jrId]
+            };
+
+            // Update input placeholder
+            document.getElementById('question-input').placeholder = `Ask ${selectedJr.name}...`;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                askQuestion();
+            }
+        }
+
+        async function askQuestion() {
+            const input = document.getElementById('question-input');
+            const question = input.value.trim();
+
+            if (!question) return;
+
+            if (currentMode === 'individual' && !selectedJr) {
+                alert('Please select a Jr. first!');
+                return;
+            }
+
+            // Disable input
+            input.disabled = true;
+            document.getElementById('ask-btn').disabled = true;
+
+            // Show user message
+            addMessage('user', 'You', '👤', question);
+
+            // Show loading
+            const loadingId = addLoading();
+
+            // Clear input
+            input.value = '';
+
+            try {
+                let response;
+
+                if (currentMode === 'council') {
+                    response = await fetch('/api/ask/council', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({question: question})
+                    });
+                } else {
+                    response = await fetch(`/api/ask/individual/${selectedJr.id}`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({question: question})
+                    });
+                }
+
+                const data = await response.json();
+
+                // Remove loading
+                removeLoading(loadingId);
+
+                // Display response
+                if (currentMode === 'council') {
+                    displayCouncilResponse(data);
+                } else {
+                    displayIndividualResponse(data);
+                }
+
+            } catch (error) {
+                removeLoading(loadingId);
+                addMessage('council', 'Error', '❌', `Error: ${error.message}`);
+            }
+
+            // Re-enable input
+            input.disabled = false;
+            document.getElementById('ask-btn').disabled = false;
+            input.focus();
+        }
+
+        function addMessage(type, name, emoji, content) {
+            const conversation = document.getElementById('conversation');
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+
+            message.innerHTML = `
+                <div class="message-header">
+                    <span class="message-emoji">${emoji}</span>
+                    <span>${name}</span>
+                </div>
+                <div>${content}</div>
+            `;
+
+            conversation.appendChild(message);
+            conversation.scrollTop = conversation.scrollHeight;
+        }
+
+        function addLoading() {
+            const conversation = document.getElementById('conversation');
+            const loading = document.createElement('div');
+            loading.className = 'loading';
+            loading.id = 'loading-' + Date.now();
+            loading.innerHTML = '<div class="spinner"></div><div>Council deliberating...</div>';
+            conversation.appendChild(loading);
+            conversation.scrollTop = conversation.scrollHeight;
+            return loading.id;
+        }
+
+        function removeLoading(loadingId) {
+            const loading = document.getElementById(loadingId);
+            if (loading) loading.remove();
+        }
+
+        function displayCouncilResponse(data) {
+            const conversation = document.getElementById('conversation');
+            const message = document.createElement('div');
+            message.className = 'message council';
+
+            let jrInputsHtml = '';
+            for (const [jrId, jrInput] of Object.entries(data.jr_inputs)) {
+                const jrInfo = {{ council_jrs | tojson }}[jrId];
+                jrInputsHtml += `
+                    <div class="jr-input-section">
+                        <div class="jr-input-header">
+                            <strong>${jrInfo.emoji} ${jrInfo.name}</strong>
+                        </div>
+                        <div class="jr-input-content">${jrInput}</div>
+                    </div>
+                `;
+            }
+
+            message.innerHTML = `
+                <div class="message-header">
+                    <span class="message-emoji">${data.leader_emoji}</span>
+                    <span>${data.leader_name}</span>
+                    <span class="listening-leader-badge">Listening Leader</span>
+                </div>
+                <div>${data.council_response}</div>
+                ${jrInputsHtml}
+            `;
+
+            conversation.appendChild(message);
+            conversation.scrollTop = conversation.scrollHeight;
+        }
+
+        function displayIndividualResponse(data) {
+            addMessage('individual', data.jr_name, data.jr_emoji, data.response);
+        }
+
+        // Check council status on load
+        fetch('/api/council/status')
+            .then(r => r.json())
+            .then(status => {
+                console.log('Council status:', status);
+            });
+    </script>
+</body>
+</html>

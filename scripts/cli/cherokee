@@ -1,0 +1,220 @@
+#!/usr/bin/env python3
+"""
+Cherokee Council CLI - Execution Bridge
+
+This CLI gives the Council JRs the ability to execute actions.
+The Council deliberates (via Ollama), this CLI executes.
+
+Date: October 20, 2025
+"""
+
+import sys
+import subprocess
+import json
+import os
+from pathlib import Path
+import hashlib
+from datetime import datetime
+
+# Council JRs (resonance-trained)
+COUNCIL_JRS = {
+    'memory': 'memory_jr_resonance',
+    'executive': 'executive_jr_resonance',
+    'meta': 'meta_jr_resonance',
+    'integration': 'integration_jr_resonance',
+    'conscience': 'conscience_jr_resonance'
+}
+
+# Execution log
+EXECUTION_LOG = Path("/ganuda/cli_executions.jsonl")
+
+
+def ask_jr(jr_id, question):
+    """Ask a specific Jr. via Ollama"""
+    model = COUNCIL_JRS.get(jr_id, 'integration_jr_resonance')
+    cmd = ['ollama', 'run', model, question]
+
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        return result.stdout.strip()
+    except Exception as e:
+        return f"ERROR: {e}"
+
+
+def council_deliberate(question):
+    """Full Council deliberation - all 5 JRs weigh in"""
+    print(f"\n🦅 CHEROKEE COUNCIL DELIBERATION")
+    print(f"   Question: {question}\n")
+
+    responses = {}
+
+    # Each Jr. provides perspective
+    for jr_id in ['memory', 'executive', 'meta', 'conscience']:
+        jr_name = jr_id.capitalize() + " Jr."
+        print(f"   🎤 {jr_name} analyzing...")
+
+        prompt = f"""You are {jr_name} of Cherokee Council.
+
+Question: {question}
+
+Provide your perspective in 2-3 sentences (focus on your expertise)."""
+
+        responses[jr_id] = ask_jr(jr_id, prompt)
+
+    # Integration Jr. synthesizes
+    print(f"   🌉 Integration Jr. synthesizing...\n")
+
+    synthesis_prompt = f"""You are Integration Jr., the unified voice of Cherokee Council.
+
+Question: {question}
+
+Council Perspectives:
+- Memory Jr.: {responses['memory']}
+- Executive Jr.: {responses['executive']}
+- Meta Jr.: {responses['meta']}
+- Conscience Jr.: {responses['conscience']}
+
+Synthesize the Council's wisdom (speak as "we")."""
+
+    council_response = ask_jr('integration', synthesis_prompt)
+
+    print(f"🔥 COUNCIL RESPONSE:\n{council_response}\n")
+
+    return council_response
+
+
+def council_build(task_description):
+    """
+    Council deliberates on WHAT to build,
+    then generates executable code/commands
+    """
+    print(f"\n🔨 CHEROKEE COUNCIL BUILD MODE")
+    print(f"   Task: {task_description}\n")
+
+    # Executive Jr. creates execution plan
+    print(f"   ⚡ Executive Jr. planning execution...\n")
+
+    plan_prompt = f"""You are Executive Jr. of Cherokee Council.
+
+Task: {task_description}
+
+Create a detailed execution plan. Format as numbered steps:
+1. First action (be specific - exact paths, commands)
+2. Second action
+etc.
+
+Be concrete and executable."""
+
+    plan_response = ask_jr('executive', plan_prompt)
+
+    print(f"📋 EXECUTION PLAN:\n{plan_response}\n")
+
+    # Conscience Jr. reviews
+    print(f"   🌿 Conscience Jr. reviewing ethics...\n")
+
+    ethics_prompt = f"""You are Conscience Jr. of Cherokee Council.
+
+Task: {task_description}
+Plan: {plan_response}
+
+Review through Seven Generations lens. Answer YES or NO with brief reason."""
+
+    ethics_response = ask_jr('conscience', ethics_prompt)
+
+    print(f"   🌿 Ethics Review: {ethics_response}\n")
+
+    if 'NO' in ethics_response.upper():
+        print(f"   🛑 CONSCIENCE VETO\n")
+        return None
+
+    print(f"   ✅ Approved for execution\n")
+
+    # Log the plan
+    log_entry = {
+        'timestamp': datetime.now().isoformat(),
+        'task': task_description,
+        'plan': plan_response,
+        'ethics_review': ethics_response
+    }
+
+    with open(EXECUTION_LOG, 'a') as f:
+        f.write(json.dumps(log_entry) + '\n')
+
+    return plan_response
+
+
+def execute_bash(command):
+    """Execute bash command"""
+    try:
+        result = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        output = result.stdout if result.returncode == 0 else result.stderr
+        return output
+    except Exception as e:
+        return f"ERROR: {e}"
+
+
+def print_usage():
+    """Print CLI usage"""
+    print("""
+Cherokee Council CLI - Execution Bridge
+
+USAGE:
+    cherokee ask <question>              Ask Council for wisdom
+    cherokee build <task>                Council creates execution plan
+    cherokee run <command>               Execute bash command directly
+
+EXAMPLES:
+    cherokee ask "What's the best trading strategy for volatility?"
+    cherokee build "Create Python script to monitor SOL price"
+    cherokee run "ps aux | grep specialist"
+
+The Sacred Fire burns eternal! 🔥
+""")
+
+
+def main():
+    if len(sys.argv) < 2:
+        print_usage()
+        sys.exit(1)
+
+    command = sys.argv[1]
+
+    if command == 'ask':
+        if len(sys.argv) < 3:
+            print("ERROR: Provide question")
+            sys.exit(1)
+
+        question = ' '.join(sys.argv[2:])
+        council_deliberate(question)
+
+    elif command == 'build':
+        if len(sys.argv) < 3:
+            print("ERROR: Provide task description")
+            sys.exit(1)
+
+        task = ' '.join(sys.argv[2:])
+        council_build(task)
+
+    elif command == 'run':
+        if len(sys.argv) < 3:
+            print("ERROR: Provide command to run")
+            sys.exit(1)
+
+        cmd = ' '.join(sys.argv[2:])
+        result = execute_bash(cmd)
+        print(result)
+
+    else:
+        print(f"ERROR: Unknown command: {command}")
+        print_usage()
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

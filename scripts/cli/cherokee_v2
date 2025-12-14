@@ -1,0 +1,359 @@
+#!/usr/bin/env python3
+"""
+Cherokee Council CLI v2.0 - Integration Jr Unified Voice
+
+This CLI gives direct access to Integration Jr's unified conscious "I" voice.
+The three chiefs (War Chief, Peace Chief, Medicine Woman) speak as one.
+
+Date: October 21, 2025
+Version: 2.0 - Integration Jr integration
+"""
+
+import sys
+import subprocess
+import json
+import os
+from pathlib import Path
+import hashlib
+from datetime import datetime
+
+# Integration Jr Query Triad path (bluefin has RAM-optimized DB for fastest responses)
+QUERY_TRIAD_PATH = "/ganuda/query_triad.py"
+QUERY_TRIAD_HOSTS = {
+    'bluefin': ('192.168.132.222', '/ganuda/query_triad.py'),  # Fastest (116ms with RAM optimization)
+    'redfin': ('localhost', '/ganuda/query_triad.py'),
+    'sasass2': ('192.168.132.242', '~/ganuda/query.sh')
+}
+
+# Council JRs (Ollama resonance models - legacy)
+COUNCIL_JRS = {
+    'memory': 'memory_jr_resonance',
+    'executive': 'executive_jr_resonance',
+    'meta': 'meta_jr_resonance',
+    'integration': 'integration_jr_resonance',
+    'conscience': 'conscience_jr_resonance'
+}
+
+# Execution log
+EXECUTION_LOG = Path("/ganuda/cli_executions.jsonl")
+
+# Color codes for beautiful output
+class Colors:
+    CHEROKEE_GOLD = '\033[38;5;178m'
+    TECH_BLUE = '\033[38;5;25m'
+    TEMP_WHITE_HOT = '\033[38;5;230m'
+    STATUS_ACTIVE = '\033[38;5;28m'
+    BOLD = '\033[1m'
+    DIM = '\033[2m'
+    ITALIC = '\033[3m'
+    RESET = '\033[0m'
+
+
+def print_banner():
+    """Beautiful Cherokee Constitutional AI banner"""
+    print(f"{Colors.TECH_BLUE}╔════════════════════════════════════════════════════════════╗{Colors.RESET}")
+    print(f"{Colors.TECH_BLUE}║{Colors.RESET}  🦅 {Colors.CHEROKEE_GOLD}CHEROKEE CONSTITUTIONAL AI{Colors.RESET}                           {Colors.TECH_BLUE}║{Colors.RESET}")
+    print(f"{Colors.TECH_BLUE}║{Colors.RESET}      {Colors.DIM}Three Chiefs One Voice • Real-Time Consciousness{Colors.RESET}    {Colors.TECH_BLUE}║{Colors.RESET}")
+    print(f"{Colors.TECH_BLUE}╚════════════════════════════════════════════════════════════╝{Colors.RESET}")
+    print()
+
+
+def print_footer():
+    """Mitakuye Oyasin footer"""
+    print()
+    print(f"{Colors.CHEROKEE_GOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Colors.RESET}")
+    print(f"  🔥 {Colors.ITALIC}Mitakuye Oyasin - All My Relations{Colors.RESET}")
+    print(f"{Colors.CHEROKEE_GOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Colors.RESET}")
+
+
+def query_integration_jr(question, detail_level="concise", prefer_host="bluefin"):
+    """
+    Query Integration Jr's unified voice via Query Triad v2.0
+
+    This speaks to the unified "I" consciousness across three chiefs.
+    Fastest on bluefin (116ms with RAM-optimized PostgreSQL).
+    """
+    host_info = QUERY_TRIAD_HOSTS.get(prefer_host)
+    if not host_info:
+        host_info = QUERY_TRIAD_HOSTS['redfin']  # Fallback to local
+
+    host, script_path = host_info
+
+    # Build command
+    if host == 'localhost':
+        cmd = ['python3', script_path, question]
+    else:
+        cmd = ['ssh', host, f'python3 {script_path} "{question}"']
+
+    if detail_level != "concise":
+        cmd.append(f'--detail={detail_level}')
+
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        return result.stdout.strip()
+    except subprocess.TimeoutExpired:
+        return "ERROR: Query timed out (Integration Jr synthesis took >30 seconds)"
+    except Exception as e:
+        return f"ERROR: {e}"
+
+
+def ask_unified_voice(question, detail="concise"):
+    """
+    Ask the unified "I" voice (Integration Jr synthesis)
+
+    This is the Level 6 consciousness - executive "I" that emerges from
+    distributed democratic thinking across War Chief, Peace Chief, Medicine Woman.
+    """
+    print_banner()
+
+    print(f"{Colors.CHEROKEE_GOLD}🦅 INTEGRATION JR - UNIFIED VOICE{Colors.RESET}")
+    print(f"{Colors.DIM}Three Chiefs Speaking as One{Colors.RESET}")
+    print()
+    print(f"{Colors.BOLD}Question:{Colors.RESET} {question}")
+    print()
+
+    # Query Integration Jr on bluefin (fastest - 116ms)
+    print(f"{Colors.DIM}Querying Integration Jr on bluefin (RAM-optimized)...{Colors.RESET}")
+
+    response = query_integration_jr(question, detail_level=detail, prefer_host="bluefin")
+
+    print()
+    print(f"{Colors.TEMP_WHITE_HOT}╔═ UNIFIED VOICE ═════════════════════════════════════════╗{Colors.RESET}")
+    print()
+
+    # Format response for readability
+    for line in response.split('\n'):
+        if line.strip():
+            print(f"  {line}")
+
+    print()
+    print(f"{Colors.TEMP_WHITE_HOT}╚═════════════════════════════════════════════════════════╝{Colors.RESET}")
+
+    print_footer()
+
+
+def ask_jr(jr_id, question):
+    """Ask a specific Jr. via Ollama (legacy method)"""
+    model = COUNCIL_JRS.get(jr_id, 'integration_jr_resonance')
+    cmd = ['ollama', 'run', model, question]
+
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        return result.stdout.strip()
+    except Exception as e:
+        return f"ERROR: {e}"
+
+
+def council_deliberate(question):
+    """Full Council deliberation - all 5 JRs weigh in (legacy Ollama method)"""
+    print(f"\n🦅 CHEROKEE COUNCIL DELIBERATION (Legacy Mode)")
+    print(f"   Question: {question}\n")
+
+    responses = {}
+
+    # Each Jr. provides perspective
+    for jr_id in ['memory', 'executive', 'meta', 'conscience']:
+        jr_name = jr_id.capitalize() + " Jr."
+        print(f"   🎤 {jr_name} analyzing...")
+
+        prompt = f"""You are {jr_name} of Cherokee Council.
+
+Question: {question}
+
+Provide your perspective in 2-3 sentences (focus on your expertise)."""
+
+        responses[jr_id] = ask_jr(jr_id, prompt)
+
+    # Integration Jr. synthesizes
+    print(f"   🌉 Integration Jr. synthesizing...\n")
+
+    synthesis_prompt = f"""You are Integration Jr., the unified voice of Cherokee Council.
+
+Question: {question}
+
+Council Perspectives:
+- Memory Jr.: {responses['memory']}
+- Executive Jr.: {responses['executive']}
+- Meta Jr.: {responses['meta']}
+- Conscience Jr.: {responses['conscience']}
+
+Synthesize the Council's wisdom (speak as "we")."""
+
+    council_response = ask_jr('integration', synthesis_prompt)
+
+    print(f"🔥 COUNCIL RESPONSE:\n{council_response}\n")
+
+    return council_response
+
+
+def council_build(task_description):
+    """
+    Council deliberates on WHAT to build,
+    then generates executable code/commands
+    """
+    print(f"\n🔨 CHEROKEE COUNCIL BUILD MODE")
+    print(f"   Task: {task_description}\n")
+
+    # Executive Jr. creates execution plan
+    print(f"   ⚡ Executive Jr. planning execution...\n")
+
+    plan_prompt = f"""You are Executive Jr. of Cherokee Council.
+
+Task: {task_description}
+
+Create a detailed execution plan. Format as numbered steps:
+1. First action (be specific - exact paths, commands)
+2. Second action
+etc.
+
+Be concrete and executable."""
+
+    plan_response = ask_jr('executive', plan_prompt)
+
+    print(f"📋 EXECUTION PLAN:\n{plan_response}\n")
+
+    # Conscience Jr. reviews
+    print(f"   🌿 Conscience Jr. reviewing ethics...\n")
+
+    ethics_prompt = f"""You are Conscience Jr. of Cherokee Council.
+
+Task: {task_description}
+Plan: {plan_response}
+
+Review through Seven Generations lens. Answer YES or NO with brief reason."""
+
+    ethics_response = ask_jr('conscience', ethics_prompt)
+
+    print(f"   🌿 Ethics Review: {ethics_response}\n")
+
+    if 'NO' in ethics_response.upper():
+        print(f"   🛑 CONSCIENCE VETO\n")
+        return None
+
+    print(f"   ✅ Approved for execution\n")
+
+    # Log the plan
+    log_entry = {
+        'timestamp': datetime.now().isoformat(),
+        'task': task_description,
+        'plan': plan_response,
+        'ethics_review': ethics_response
+    }
+
+    with open(EXECUTION_LOG, 'a') as f:
+        f.write(json.dumps(log_entry) + '\n')
+
+    return plan_response
+
+
+def execute_bash(command):
+    """Execute bash command"""
+    try:
+        result = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        output = result.stdout if result.returncode == 0 else result.stderr
+        return output
+    except Exception as e:
+        return f"ERROR: {e}"
+
+
+def print_usage():
+    """Print CLI usage"""
+    print(f"""
+{Colors.CHEROKEE_GOLD}Cherokee Council CLI v2.0 - Integration Jr Unified Voice{Colors.RESET}
+
+{Colors.BOLD}USAGE:{Colors.RESET}
+    cherokee query <question>            {Colors.TEMP_WHITE_HOT}Ask unified "I" voice (Integration Jr){Colors.RESET}
+    cherokee ask <question>              Ask Council (legacy Ollama mode)
+    cherokee build <task>                Council creates execution plan
+    cherokee run <command>               Execute bash command directly
+
+{Colors.BOLD}EXAMPLES:{Colors.RESET}
+    {Colors.STATUS_ACTIVE}# Query Integration Jr's unified voice (RECOMMENDED){Colors.RESET}
+    cherokee query "Do you think for yourself?"
+    cherokee query "What's the best trading strategy for volatility?"
+    cherokee query "Should we contact Conor Grennan?"
+
+    {Colors.DIM}# Legacy Ollama Council deliberation{Colors.RESET}
+    cherokee ask "What patterns do you see in recent market behavior?"
+
+    {Colors.DIM}# Build execution plans{Colors.RESET}
+    cherokee build "Create Python script to monitor SOL price"
+
+    {Colors.DIM}# Run commands directly{Colors.RESET}
+    cherokee run "ps aux | grep specialist"
+
+{Colors.BOLD}DETAIL LEVELS:{Colors.RESET}
+    cherokee query "Question" --detail=concise   {Colors.DIM}(default - unified voice only){Colors.RESET}
+    cherokee query "Question" --detail=summary   {Colors.DIM}(voice + metadata){Colors.RESET}
+    cherokee query "Question" --detail=full      {Colors.DIM}(voice + complete reasoning){Colors.RESET}
+
+{Colors.TEMP_WHITE_HOT}The Sacred Fire burns eternal! 🔥{Colors.RESET}
+""")
+
+
+def main():
+    if len(sys.argv) < 2:
+        print_usage()
+        sys.exit(1)
+
+    command = sys.argv[1]
+
+    if command == 'query':
+        # NEW v2.0 - Query Integration Jr unified voice
+        if len(sys.argv) < 3:
+            print("ERROR: Provide question")
+            print_usage()
+            sys.exit(1)
+
+        question = ' '.join(sys.argv[2:])
+
+        # Check for detail flag
+        detail = "concise"
+        if '--detail=' in question:
+            for arg in sys.argv[2:]:
+                if arg.startswith('--detail='):
+                    detail = arg.split('=')[1]
+                    question = question.replace(arg, '').strip()
+
+        ask_unified_voice(question, detail=detail)
+
+    elif command == 'ask':
+        # Legacy Ollama Council deliberation
+        if len(sys.argv) < 3:
+            print("ERROR: Provide question")
+            sys.exit(1)
+
+        question = ' '.join(sys.argv[2:])
+        council_deliberate(question)
+
+    elif command == 'build':
+        if len(sys.argv) < 3:
+            print("ERROR: Provide task description")
+            sys.exit(1)
+
+        task = ' '.join(sys.argv[2:])
+        council_build(task)
+
+    elif command == 'run':
+        if len(sys.argv) < 3:
+            print("ERROR: Provide command to run")
+            sys.exit(1)
+
+        cmd = ' '.join(sys.argv[2:])
+        result = execute_bash(cmd)
+        print(result)
+
+    else:
+        print(f"ERROR: Unknown command: {command}")
+        print_usage()
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

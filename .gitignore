@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+*.egg-info/
+dist/
+build/
+
+# Logs
+*.log
+*.log.gz
+*.log.old.gz
+logs/
+
+# Environment
+.env
+*.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files
+*.tar.gz
+*.zip
+*.model
+*.bin
+*.gguf
+
+# Research (large)
+research/
+week1_integration_env/
+week2_integrations/
+
+# Temp
+tmp/
+*.tmp

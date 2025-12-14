@@ -1,0 +1,66 @@
+# ============================================================
+# GANUDA GATEWAY CONFIGURATION
+# Single source of truth for all settings
+# ============================================================
+
+# Gateway API Settings
+gateway:
+  host: 0.0.0.0
+  port: 8080
+  workers: 4
+  api_key_required: true
+  cors_origins:
+    - "*"
+  request_timeout_sec: 300
+
+# Inference Backend
+inference:
+  backend: vllm
+  base_url: http://localhost:8000
+  model: nvidia/Llama-3.1-Nemotron-70B-Instruct-HF
+  max_concurrent: 4
+  max_tokens_default: 2048
+  temperature_default: 0.7
+
+# Database Connection
+database:
+  host: 192.168.132.222
+  port: 5432
+  database: zammad_production
+  user: claude
+  password: jawaseatlasers2
+  pool_size: 10
+
+# Logging
+logging:
+  level: INFO
+  format: text
+  file: /ganuda/logs/gateway.log
+  audit_enabled: true
+  audit_retention_days: 90
+
+# ============================================================
+# INTELLIGENCE MODULES
+# Advanced features - disabled by default for Gateway v1
+# Enable only if needed and you understand implications
+# ============================================================
+modules:
+  # 7-Specialist Council for multi-perspective decisions
+  council_enabled: true
+  council_specialists: 7
+  
+  # Thermal Memory for persistent context
+  memory_enabled: true
+  memory_thermal_decay: true
+  
+  # Breadcrumb trails for decision tracking
+  breadcrumbs_enabled: true
+  
+  # Fractal Stigmergic Encryption for key evolution
+  fse_enabled: false
+  
+  # Query Triad (Two Wolves) for privacy/security
+  triad_enabled: true
+  
+  # Multi-tenant namespace isolation
+  multi_tenant_enabled: false

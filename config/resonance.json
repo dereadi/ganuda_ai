@@ -1,0 +1,9 @@
+{
+    "vllm_url": "http://192.168.132.223:8000",
+    "default_model": "nvidia/NVIDIA-Nemotron-Nano-9B-v2",
+    "fast_model": "nvidia/Nemotron-Mini-4B-Instruct",
+    "max_context": 131072,
+    "default_max_tokens": 2048,
+    "deep_think_tokens": 4096,
+    "note": "Upgraded from 8B Ollama to Nemotron on redfin Blackwell - 2025-12-12"
+}
