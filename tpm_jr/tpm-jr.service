@@ -1,0 +1,16 @@
+[Unit]
+Description=TPM Jr Redfin - Autonomous Mission Router
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda/tpm_jr
+ExecStart=/ganuda/home/dereadi/cherokee_venv/bin/python3 /ganuda/tpm_jr/tpm_jr_redfin.py --daemon
+Restart=always
+RestartSec=30
+StandardOutput=append:/u/ganuda/logs/tpm_jr.log
+StandardError=append:/u/ganuda/logs/tpm_jr.log
+
+[Install]
+WantedBy=default.target

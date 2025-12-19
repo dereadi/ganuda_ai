@@ -3,43 +3,67 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.Python
 venv/
+*/venv/
+ENV/
 *.egg-info/
-dist/
-build/
+.eggs/
+
+# Backup files
+*.backup
+*.backup_*
+*.bak
+*.bak.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
 
 # Logs
 *.log
-*.log.gz
-*.log.old.gz
 logs/
 
 # Environment
 .env
-*.env.local
+.env.local
+.env.*.local
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Large files
-*.tar.gz
-*.zip
-*.model
+# Model files (large)
 *.bin
 *.gguf
+*.safetensors
+*.pt
+*.pth
+models/
+*_model/
+*_checkpoints/
+cherokee_merged_model/
+cherokee_phase31_lora/
 
-# Research (large)
+# Training data (can be regenerated)
+*_training_data.jsonl
+phase*_*.txt
+phase*_*.json
+
+# Cache
+.cache/
+pip_cache/
+tribal_memory_cache/
+*.pyc
+
+# Nested git repos (managed separately)
+services/llm_gateway/
+pathfinder/
 research/
-week1_integration_env/
-week2_integrations/
+sparsegpt-for-LLaMA/
+llama.cpp/
 
-# Temp
-tmp/
-*.tmp
+# Temporary/generated
+*.png
+*.jpg
+home/
+data/

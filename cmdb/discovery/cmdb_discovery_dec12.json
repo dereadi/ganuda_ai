@@ -1,0 +1,138 @@
+{
+  "discovery_date": "2025-12-12",
+  "discovered_by": "TPM-Claude",
+  "configuration_items": [
+    {
+      "ci_name": "run_topology_tests.py",
+      "ci_type": "Application",
+      "hostname": "redfin",
+      "location": "/ganuda/scripts/topology_tests/run_topology_tests.py",
+      "status": "active",
+      "environment": "production",
+      "owner": "TPM-Claude",
+      "description": "Multi-agent topology test suite validating Google/MIT study findings",
+      "custom_attributes": {
+        "language": "python3",
+        "dependencies": ["requests", "concurrent.futures"],
+        "api_endpoint": "http://192.168.132.223:8000",
+        "created": "2025-12-12"
+      }
+    },
+    {
+      "ci_name": "jr_resonance_client.py",
+      "ci_type": "Application",
+      "hostname": "bluefin,greenfin,redfin",
+      "location": "/ganuda/lib/jr_resonance_client.py",
+      "status": "active",
+      "environment": "production",
+      "owner": "TPM-Claude",
+      "description": "Jr resonance client for vLLM inference with Nemotron models",
+      "custom_attributes": {
+        "language": "python3",
+        "vllm_url": "http://192.168.132.223:8000",
+        "default_model": "nvidia/NVIDIA-Nemotron-Nano-9B-v2",
+        "created": "2025-12-12"
+      }
+    },
+    {
+      "ci_name": "resonance.json",
+      "ci_type": "Application",
+      "hostname": "bluefin,greenfin,redfin",
+      "location": "/ganuda/config/resonance.json",
+      "status": "active",
+      "environment": "production",
+      "owner": "TPM-Claude",
+      "description": "Configuration for Jr resonance client",
+      "custom_attributes": {
+        "type": "json_config",
+        "created": "2025-12-12"
+      }
+    },
+    {
+      "ci_name": "vLLM Service",
+      "ci_type": "Web Service",
+      "hostname": "redfin",
+      "ip_address": "192.168.132.223",
+      "location": "port 8000",
+      "status": "active",
+      "environment": "production",
+      "owner": "dereadi",
+      "description": "vLLM OpenAI-compatible inference server",
+      "software_version": "0.11.2",
+      "custom_attributes": {
+        "model": "nvidia/NVIDIA-Nemotron-Nano-9B-v2",
+        "gpu_memory_utilization": 0.70,
+        "max_context": 131072,
+        "tokens_per_second": 27.3
+      }
+    },
+    {
+      "ci_name": "benchmark_models.py",
+      "ci_type": "Application",
+      "hostname": "redfin",
+      "location": "/ganuda/scripts/benchmark_models.py",
+      "status": "active",
+      "environment": "production",
+      "owner": "TPM-Claude",
+      "description": "Model benchmarking script for Nemotron evaluation",
+      "custom_attributes": {
+        "language": "python3",
+        "created": "2025-12-12"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "parent": "vLLM Service",
+      "child": "jr_resonance_client.py",
+      "relationship_type": "depends_on"
+    },
+    {
+      "parent": "jr_resonance_client.py",
+      "child": "resonance.json",
+      "relationship_type": "uses_config"
+    },
+    {
+      "parent": "run_topology_tests.py",
+      "child": "vLLM Service",
+      "relationship_type": "depends_on"
+    },
+    {
+      "parent": "benchmark_models.py",
+      "child": "vLLM Service",
+      "relationship_type": "depends_on"
+    }
+  ],
+  "documentation": [
+    {
+      "name": "CHEROKEE-AI-DEPLOYMENT-SIZING-GUIDE.md",
+      "location": "/ganuda/missions/",
+      "type": "architecture"
+    },
+    {
+      "name": "TOPOLOGY-TEST-RESULTS-2025-12-12.md",
+      "location": "/ganuda/missions/",
+      "type": "test_results"
+    },
+    {
+      "name": "NEMOTRON-BENCHMARK-RESULTS-2025-12-12.md",
+      "location": "/ganuda/missions/",
+      "type": "benchmark"
+    },
+    {
+      "name": "KB-DEPLOYMENT-SIZING-001.md",
+      "location": "/ganuda/kb/",
+      "type": "knowledge_base"
+    },
+    {
+      "name": "KB-MULTI-AGENT-TOPOLOGY-001.md",
+      "location": "/ganuda/kb/",
+      "type": "knowledge_base"
+    },
+    {
+      "name": "KB-VLLM-NEMOTRON-001.md",
+      "location": "/ganuda/kb/",
+      "type": "knowledge_base"
+    }
+  ]
+}

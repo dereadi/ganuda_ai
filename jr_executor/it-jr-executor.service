@@ -1,0 +1,22 @@
+[Unit]
+Description=Cherokee IT Jr Mission Executor
+Documentation=See /ganuda/jr_instructions/JR-EXECUTOR-BUILD-001.md
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda/jr_executor
+Environment=PYTHONPATH=/ganuda/lib:/ganuda/jr_executor
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 -u /ganuda/jr_executor/jr_cli.py --daemon --poll-interval 30
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+# Resource limits
+MemoryMax=1G
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

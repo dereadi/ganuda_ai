@@ -1,0 +1,756 @@
+/*
+ * Cherokee Constitutional AI - Unified Design System
+ * Created: October 15, 2025
+ * Vision Jr. Lead Designer
+ *
+ * This design system unifies all Cherokee Constitutional AI web interfaces
+ * with Cherokee-inspired aesthetics and professional appearance.
+ */
+
+/* ========================================
+   CSS VARIABLES - COLOR PALETTE
+   ======================================== */
+
+:root {
+    /* Primary Cherokee Colors - Earth & Heritage */
+    --cherokee-red: #8B0000;
+    --cherokee-gold: #DAA520;
+    --cherokee-earth: #8B4513;
+    --cherokee-forest: #2F4F2F;
+    --cherokee-sky: #87CEEB;
+
+    /* Tech Accents - Modern Infrastructure */
+    --tech-blue: #2a5298;
+    --tech-blue-light: #3d6cb9;
+    --tech-purple: #764ba2;
+    --tech-purple-dark: #5a3777;
+    --tech-teal: #20B2AA;
+    --tech-indigo: #667eea;
+
+    /* Thermal Memory Temperature Gradient */
+    --temp-white-hot: #FFE4B5;
+    --temp-red-hot: #FF6347;
+    --temp-warm: #FFA500;
+    --temp-cool: #4682B4;
+    --temp-cold: #191970;
+    --temp-ember: #DC143C;
+
+    /* Status Colors */
+    --status-active-bg: #d5e8d4;
+    --status-active-text: #2d662d;
+    --status-degraded-bg: #fff2cc;
+    --status-degraded-text: #8a6d1b;
+    --status-down-bg: #f8cecc;
+    --status-down-text: #b85450;
+    --status-planning-bg: #e1d5e7;
+    --status-planning-text: #5a3777;
+
+    /* Neutrals & Backgrounds */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #f5f5f5;
+    --bg-dark: #2c3e50;
+    --text-primary: #2c3e50;
+    --text-secondary: #7f8c8d;
+    --text-light: #95a5a6;
+    --text-white: #ffffff;
+
+    /* Borders & Shadows */
+    --border-light: #e1e8ed;
+    --border-medium: #ddd;
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   TYPOGRAPHY
+   ======================================== */
+
+:root {
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --font-code: 'Fira Code', 'Courier New', Consolas, monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1rem; }
+
+p {
+    margin-bottom: 1rem;
+    line-height: 1.8;
+}
+
+code, pre {
+    font-family: var(--font-code);
+    background: var(--bg-tertiary);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+pre {
+    padding: 1rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+a {
+    color: var(--tech-blue);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--tech-blue-light);
+    text-decoration: underline;
+}
+
+.emoji {
+    font-size: 1.3em;
+    margin-right: 0.3em;
+}
+
+/* ========================================
+   LAYOUT UTILITIES
+   ======================================== */
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.container-fluid {
+    width: 100%;
+    padding: 0 20px;
+}
+
+.section {
+    padding: 60px 0;
+}
+
+.section-sm {
+    padding: 40px 0;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -15px;
+}
+
+.col {
+    flex: 1;
+    padding: 0 15px;
+}
+
+.col-2 { flex: 0 0 16.666%; max-width: 16.666%; }
+.col-3 { flex: 0 0 25%; max-width: 25%; }
+.col-4 { flex: 0 0 33.333%; max-width: 33.333%; }
+.col-6 { flex: 0 0 50%; max-width: 50%; }
+.col-8 { flex: 0 0 66.666%; max-width: 66.666%; }
+.col-12 { flex: 0 0 100%; max-width: 100%; }
+
+.grid {
+    display: grid;
+    gap: 20px;
+}
+
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 768px) {
+    .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+    }
+    .col-2, .col-3, .col-4, .col-6, .col-8 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Spacing */
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+.mt-5 { margin-top: 3rem; }
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+.mb-5 { margin-bottom: 3rem; }
+
+.p-1 { padding: 0.5rem; }
+.p-2 { padding: 1rem; }
+.p-3 { padding: 1.5rem; }
+.p-4 { padding: 2rem; }
+.p-5 { padding: 3rem; }
+
+/* ========================================
+   HEADER COMPONENT
+   ======================================== */
+
+.cherokee-header {
+    background: linear-gradient(135deg, var(--tech-indigo) 0%, var(--tech-purple) 100%);
+    color: var(--text-white);
+    padding: 30px 0;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+}
+
+.cherokee-header h1 {
+    color: var(--text-white);
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.cherokee-header .subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 15px;
+}
+
+.cherokee-header .header-badges {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ========================================
+   NAVIGATION COMPONENT
+   ======================================== */
+
+.cherokee-nav {
+    background: var(--bg-primary);
+    border-bottom: 2px solid var(--border-medium);
+    box-shadow: var(--shadow-sm);
+}
+
+.nav-tabs {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-tab {
+    flex: 1;
+    padding: 20px;
+    text-align: center;
+    background: var(--bg-secondary);
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+}
+
+.nav-tab:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.nav-tab.active {
+    background: var(--bg-primary);
+    color: var(--tech-blue);
+    border-bottom: 3px solid var(--tech-blue);
+}
+
+/* ========================================
+   CARD COMPONENTS
+   ======================================== */
+
+.cherokee-card {
+    background: linear-gradient(135deg, var(--tech-blue), var(--tech-purple));
+    color: var(--text-white);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.cherokee-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.cherokee-card h3 {
+    color: var(--text-white);
+    margin-bottom: 15px;
+}
+
+.card-white {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-light);
+}
+
+.card-earth {
+    background: linear-gradient(135deg, var(--cherokee-earth), var(--cherokee-gold));
+}
+
+.card-thermal {
+    background: linear-gradient(135deg, var(--temp-red-hot), var(--temp-warm));
+}
+
+.stat-card {
+    background: linear-gradient(135deg, var(--tech-indigo) 0%, var(--tech-purple) 100%);
+    color: var(--text-white);
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.info-card {
+    background: var(--bg-tertiary);
+    border-left: 4px solid var(--tech-blue);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+/* ========================================
+   BUTTON COMPONENTS
+   ======================================== */
+
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--tech-blue);
+    color: var(--text-white);
+}
+
+.btn-primary:hover {
+    background: var(--tech-blue-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(42, 82, 152, 0.3);
+}
+
+.btn-secondary {
+    background: var(--tech-purple);
+    color: var(--text-white);
+}
+
+.btn-secondary:hover {
+    background: var(--tech-purple-dark);
+}
+
+.btn-success {
+    background: var(--status-active-text);
+    color: var(--text-white);
+}
+
+.btn-danger {
+    background: var(--status-down-text);
+    color: var(--text-white);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--tech-blue);
+    color: var(--tech-blue);
+}
+
+.btn-outline:hover {
+    background: var(--tech-blue);
+    color: var(--text-white);
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ========================================
+   STATUS BADGES
+   ======================================== */
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 4px;
+}
+
+.status-active {
+    background: var(--status-active-bg);
+    color: var(--status-active-text);
+}
+
+.status-degraded {
+    background: var(--status-degraded-bg);
+    color: var(--status-degraded-text);
+}
+
+.status-down {
+    background: var(--status-down-bg);
+    color: var(--status-down-text);
+}
+
+.status-planning {
+    background: var(--status-planning-bg);
+    color: var(--status-planning-text);
+}
+
+/* Temperature Badges */
+.temp-white-hot {
+    background: var(--temp-white-hot);
+    color: var(--text-primary);
+}
+
+.temp-red-hot {
+    background: var(--temp-red-hot);
+    color: var(--text-white);
+}
+
+.temp-warm {
+    background: var(--temp-warm);
+    color: var(--text-white);
+}
+
+.temp-cool {
+    background: var(--temp-cool);
+    color: var(--text-white);
+}
+
+.temp-cold {
+    background: var(--temp-cold);
+    color: var(--text-white);
+}
+
+/* ========================================
+   FOOTER COMPONENT
+   ======================================== */
+
+.cherokee-footer {
+    background: var(--bg-tertiary);
+    padding: 30px 0;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    border-top: 2px solid var(--border-light);
+    margin-top: 60px;
+}
+
+.cherokee-footer p {
+    margin-bottom: 10px;
+}
+
+.cherokee-footer code {
+    background: var(--bg-secondary);
+    padding: 2px 6px;
+}
+
+/* ========================================
+   FORM COMPONENTS
+   ======================================== */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-light);
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--tech-blue);
+    box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* ========================================
+   TABLE COMPONENTS
+   ======================================== */
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background: var(--bg-primary);
+}
+
+.table th,
+.table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.table th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.table tr:hover {
+    background: var(--bg-secondary);
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.6s ease-out;
+}
+
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.glow {
+    animation: glow 2s ease-in-out infinite;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-white { color: var(--text-white); }
+
+.bg-primary { background: var(--bg-primary); }
+.bg-secondary { background: var(--bg-secondary); }
+.bg-dark { background: var(--bg-dark); }
+
+.rounded { border-radius: 6px; }
+.rounded-lg { border-radius: 12px; }
+.rounded-full { border-radius: 9999px; }
+
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+
+.d-none { display: none; }
+.d-block { display: block; }
+.d-flex { display: flex; }
+.d-grid { display: grid; }
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .cherokee-header h1 {
+        font-size: 2rem;
+    }
+
+    .nav-tabs {
+        flex-direction: column;
+    }
+
+    .nav-tab {
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .btn-group {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   CHEROKEE CULTURAL ELEMENTS
+   ======================================== */
+
+.sacred-fire {
+    background: linear-gradient(135deg, var(--temp-red-hot), var(--temp-warm), var(--temp-ember));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: bold;
+}
+
+.tribal-border {
+    border: 2px solid var(--cherokee-gold);
+    border-radius: 8px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.1), rgba(218, 165, 32, 0.1));
+}
+
+.seven-generations {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 0;
+}
+
+.generation-marker {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--cherokee-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-white);
+    font-weight: bold;
+}
+
+/* ========================================
+   MITAKUYE OYASIN SIGNATURE
+   ======================================== */
+
+.mitakuye-oyasin {
+    font-style: italic;
+    color: var(--cherokee-gold);
+    font-weight: 600;
+    text-align: center;
+    margin: 30px 0;
+    font-size: 1.1rem;
+}
+
+/*
+ * End of Cherokee Constitutional AI Design System
+ * Mitakuye Oyasin - All My Relations
+ */

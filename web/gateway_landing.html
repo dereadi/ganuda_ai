@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cherokee Constitutional AI Gateway API - Central routing hub for all Jr. APIs">
+    <title>Gateway API | Cherokee Constitutional AI</title>
+    <link rel="stylesheet" href="/web/cherokee_design_system.css">
+</head>
+<body>
+    <!-- Cherokee Header -->
+    <header class="cherokee-header">
+        <div class="container">
+            <h1><span class="emoji">🚪</span> Gateway API</h1>
+            <p class="subtitle">Central Routing Hub for Cherokee Jr.s</p>
+            <div class="header-badges">
+                <span class="status-badge status-active">Port 8000</span>
+                <span class="status-badge status-active">PID 3227757</span>
+                <span class="status-badge status-active">Live</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="cherokee-nav">
+        <div class="container">
+            <div class="nav-tabs">
+                <a href="/web/site_map.html" class="nav-tab">
+                    <span class="emoji">🗺️</span> Site Map
+                </a>
+                <a href="/web/gateway_landing.html" class="nav-tab active">
+                    <span class="emoji">🚪</span> Gateway API
+                </a>
+                <a href="/web/four_mountains_landing.html" class="nav-tab">
+                    <span class="emoji">⛰️</span> Four Mountains
+                </a>
+                <a href="/ganuda/diagrams/viewer.html" class="nav-tab">
+                    <span class="emoji">📊</span> Diagrams
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container" style="margin-top: 40px; margin-bottom: 40px;">
+
+        <!-- What is the Gateway? -->
+        <section class="mb-5">
+            <div class="info-card">
+                <h2><span class="emoji">🚪</span> What is the Gateway API?</h2>
+                <p>The Gateway API is the central entry point for all Cherokee Constitutional AI services. It routes requests to the appropriate Jr. based on the API path, handles authentication, and provides unified health monitoring.</p>
+                <p><strong>Location:</strong> <code>http://192.168.132.223:8000</code> (REDFIN node)</p>
+            </div>
+        </section>
+
+        <!-- Available Jr.s -->
+        <section class="mb-5">
+            <h2><span class="emoji">🦅</span> Available Jr.s Through Gateway</h2>
+
+            <div class="grid grid-3">
+                <div class="cherokee-card">
+                    <h3><span class="emoji">📈</span> Trading Jr.</h3>
+                    <p><code>POST /api/trading_jr/ask</code></p>
+                    <p>Market analysis, portfolio management, trading strategies</p>
+                    <span class="status-badge status-active">Active</span>
+                </div>
+
+                <div class="cherokee-card">
+                    <h3><span class="emoji">📧</span> Email Jr.</h3>
+                    <p><code>POST /api/email_jr/ask</code></p>
+                    <p>Gmail integration, email parsing, communication management</p>
+                    <span class="status-badge status-active">Active</span>
+                </div>
+
+                <div class="cherokee-card">
+                    <h3><span class="emoji">🔧</span> Infrastructure Jr.</h3>
+                    <p><code>POST /api/infra_jr/ask</code></p>
+                    <p>System monitoring, infrastructure management</p>
+                    <span class="status-badge status-active">Forwarded to :8002</span>
+                </div>
+
+                <div class="cherokee-card">
+                    <h3><span class="emoji">⚖️</span> Legal Jr.</h3>
+                    <p><code>POST /api/legal_jr/ask</code></p>
+                    <p>Documentation review, compliance, governance</p>
+                    <span class="status-badge status-degraded">Degraded :8003</span>
+                </div>
+
+                <div class="cherokee-card">
+                    <h3><span class="emoji">💭</span> Dreamers Jr.</h3>
+                    <p><code>POST /api/dreamers_jr/ask</code></p>
+                    <p>Cross-tribal bridge, Dr. Joe's node</p>
+                    <span class="status-badge status-degraded">BIGMAC :8004</span>
+                </div>
+
+                <div class="cherokee-card card-thermal">
+                    <h3><span class="emoji">🔮</span> More Jr.s</h3>
+                    <p>Synthesis, Archive, Vision</p>
+                    <p>Routed through Ollama models</p>
+                    <span class="status-badge status-planning">Via Gateway</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Documentation -->
+        <section class="mb-5">
+            <h2><span class="emoji">📖</span> API Documentation</h2>
+
+            <div class="tribal-border">
+                <h3>Standard Request Format</h3>
+                <pre><code>POST http://192.168.132.223:8000/api/{jr_name}/ask
+Content-Type: application/json
+
+{
+  "question": "Your question here",
+  "context": "Optional context",
+  "stream": false
+}</code></pre>
+            </div>
+
+            <div class="tribal-border mt-3">
+                <h3>Standard Response Format</h3>
+                <pre><code>{
+  "answer": "Response from Jr.",
+  "jr": "jr_name",
+  "timestamp": "2025-10-15T20:00:00Z",
+  "confidence": 0.95,
+  "thinking_time_ms": 1234
+}</code></pre>
+            </div>
+
+            <div class="tribal-border mt-3">
+                <h3>Example: Ask Trading Jr.</h3>
+                <pre><code>curl -X POST http://192.168.132.223:8000/api/trading_jr/ask \
+  -H "Content-Type: application/json" \
+  -d '{
+    "question": "What is the current portfolio status?",
+    "context": "Need summary for daily standup"
+  }'</code></pre>
+            </div>
+        </section>
+
+        <!-- Health Check -->
+        <section class="mb-5">
+            <h2><span class="emoji">💚</span> Health Check</h2>
+
+            <div class="info-card">
+                <p><code>GET http://192.168.132.223:8000/health</code></p>
+                <p>Returns current gateway health, active endpoints, and service status.</p>
+            </div>
+
+            <div class="btn-group mt-3">
+                <a href="http://192.168.132.223:8000/health" class="btn btn-primary" target="_blank">
+                    <span class="emoji">🏥</span> Check Health
+                </a>
+                <a href="/ganuda/CHEROKEE_API_STANDARDS_AND_REGISTRY.md" class="btn btn-secondary">
+                    <span class="emoji">📋</span> View Registry
+                </a>
+                <a href="/ganuda/diagrams/viewer.html" class="btn btn-outline">
+                    <span class="emoji">📊</span> View Diagrams
+                </a>
+            </div>
+        </section>
+
+        <!-- Statistics -->
+        <section class="mb-5">
+            <h2><span class="emoji">📊</span> Gateway Statistics</h2>
+
+            <div class="grid grid-4">
+                <div class="stat-card">
+                    <div class="stat-number">5+</div>
+                    <div class="stat-label">Active Jr.s</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">8000</div>
+                    <div class="stat-label">Port Number</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">REDFIN</div>
+                    <div class="stat-label">Host Node</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Services -->
+        <section class="mb-5">
+            <h2><span class="emoji">🔗</span> Related Services</h2>
+
+            <div class="grid grid-3">
+                <a href="/web/four_mountains_landing.html" class="cherokee-card" style="text-decoration: none;">
+                    <h3><span class="emoji">⛰️</span> Four Mountains</h3>
+                    <p>Port 9000 - Cross-mountain coordination</p>
+                </a>
+                <a href="/web/a2a_bridge_landing.html" class="cherokee-card" style="text-decoration: none;">
+                    <h3><span class="emoji">🌉</span> A2A Bridge</h3>
+                    <p>Port 9001 - Agent-to-agent communication</p>
+                </a>
+                <a href="/ganuda/diagrams/viewer.html" class="cherokee-card" style="text-decoration: none;">
+                    <h3><span class="emoji">📊</span> Infrastructure Diagrams</h3>
+                    <p>Visual network topology</p>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="cherokee-footer">
+        <div class="container">
+            <p class="mitakuye-oyasin"><span class="emoji">🦅</span> Mitakuye Oyasin - All My Relations</p>
+            <p><strong>Cherokee Constitutional AI</strong> | October 15, 2025</p>
+            <p>Source: <code>/ganuda/web/gateway_landing.html</code></p>
+            <p>Hosted: <code>http://192.168.132.223:8000</code></p>
+            <p style="margin-top: 15px;">
+                <span class="emoji">🔥</span> Thermal Memory System Active |
+                <span class="emoji">🏛️</span> Democratic Governance |
+                <span class="emoji">⚖️</span> Standards Initiative
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

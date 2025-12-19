@@ -1,0 +1,24 @@
+[Unit]
+Description=Executive Jr Autonomic Daemon - Cherokee Constitutional AI
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/daemons
+ExecStart=/usr/bin/python3 -u /ganuda/daemons/executive_jr_autonomic.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=executive-jr
+
+# Resource limits (low priority autonomic process)
+Nice=10
+CPUQuota=10%
+MemoryMax=500M
+
+[Install]
+WantedBy=multi-user.target

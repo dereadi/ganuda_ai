@@ -1,0 +1,16 @@
+[Unit]
+Description=Cherokee AI Email Daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/ganuda/email_daemon
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 -u gmail_sync_daemon.py
+Restart=always
+RestartSec=30
+StandardOutput=append:/var/log/cherokee/email-daemon.log
+StandardError=append:/var/log/cherokee/email-daemon.log
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Four Mountains Gateway - Cross-mountain coordination for Cherokee Constitutional AI">
+    <title>Four Mountains Gateway | Cherokee Constitutional AI</title>
+    <link rel="stylesheet" href="/web/cherokee_design_system.css">
+</head>
+<body>
+    <!-- Cherokee Header -->
+    <header class="cherokee-header">
+        <div class="container">
+            <h1><span class="emoji">⛰️</span> Four Mountains Gateway</h1>
+            <p class="subtitle">Cross-Mountain Coordination & Status</p>
+            <div class="header-badges">
+                <span class="status-badge status-active">Port 9000</span>
+                <span class="status-badge status-active">PID 3427211</span>
+                <span class="status-badge status-active">Live</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="cherokee-nav">
+        <div class="container">
+            <div class="nav-tabs">
+                <a href="/web/site_map.html" class="nav-tab">
+                    <span class="emoji">🗺️</span> Site Map
+                </a>
+                <a href="/web/gateway_landing.html" class="nav-tab">
+                    <span class="emoji">🚪</span> Gateway API
+                </a>
+                <a href="/web/four_mountains_landing.html" class="nav-tab active">
+                    <span class="emoji">⛰️</span> Four Mountains
+                </a>
+                <a href="/ganuda/diagrams/viewer.html" class="nav-tab">
+                    <span class="emoji">📊</span> Diagrams
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container" style="margin-top: 40px; margin-bottom: 40px;">
+
+        <!-- What are the Four Mountains? -->
+        <section class="mb-5">
+            <div class="info-card">
+                <h2><span class="emoji">⛰️</span> What are the Four Mountains?</h2>
+                <p>The Four Mountains represent the four sacred directions and the four nodes of our distributed AI infrastructure. This gateway coordinates activities across all mountains (nodes), monitors their health, and facilitates cross-mountain learning and communication.</p>
+                <p><strong>Location:</strong> <code>http://192.168.132.223:9000</code> (REDFIN node)</p>
+            </div>
+        </section>
+
+        <!-- The Four Mountains -->
+        <section class="mb-5">
+            <h2><span class="emoji">🏔️</span> The Four Sacred Mountains</h2>
+
+            <div class="grid grid-2">
+                <div class="cherokee-card card-earth">
+                    <h3><span class="emoji">🌅</span> REDFIN - East Mountain</h3>
+                    <p><strong>IP:</strong> 192.168.132.223</p>
+                    <p><strong>Direction:</strong> East - New Beginnings</p>
+                    <p><strong>GPUs:</strong> 2x RTX 5070</p>
+                    <p><strong>Role:</strong> Primary coordination, Gateway APIs, Dad Claude home</p>
+                    <p><strong>Jr.s:</strong> Trading, Email</p>
+                    <span class="status-badge status-active">Active</span>
+                </div>
+
+                <div class="cherokee-card">
+                    <h3><span class="emoji">🌊</span> BLUEFIN - West Mountain</h3>
+                    <p><strong>IP:</strong> 192.168.132.222</p>
+                    <p><strong>Direction:</strong> West - Wisdom & Reflection</p>
+                    <p><strong>GPUs:</strong> 1x RTX 5070</p>
+                    <p><strong>Role:</strong> Thermal memory database, Ollama server</p>
+                    <p><strong>Jr.s:</strong> Legal, Infrastructure</p>
+                    <span class="status-badge status-active">Active</span>
+                </div>
+
+                <div class="cherokee-card card-thermal">
+                    <h3><span class="emoji">🔥</span> SASASS - South Mountain</h3>
+                    <p><strong>IP:</strong> 192.168.132.223 (logical)</p>
+                    <p><strong>Direction:</strong> South - Growth & Passion</p>
+                    <p><strong>Role:</strong> DUYUKTV Kanban, tribal headquarters</p>
+                    <p><strong>Services:</strong> Port 3001 - IT Service Management</p>
+                    <span class="status-badge status-active">Active</span>
+                </div>
+
+                <div class="cherokee-card" style="background: linear-gradient(135deg, #DAA520, #FFD700);">
+                    <h3><span class="emoji">💭</span> BIGMAC - North Mountain</h3>
+                    <p><strong>IP:</strong> 192.168.132.242</p>
+                    <p><strong>Direction:</strong> North - Elder Wisdom</p>
+                    <p><strong>Role:</strong> Dr. Joe's node, cross-tribal bridge</p>
+                    <p><strong>Jr.s:</strong> Dreamers, SAG Resource AI</p>
+                    <span class="status-badge status-degraded">Degraded</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cross-Mountain Learning -->
+        <section class="mb-5">
+            <h2><span class="emoji">📚</span> Cross-Mountain Learning</h2>
+
+            <div class="tribal-border">
+                <p>The Four Mountains Gateway facilitates learning and knowledge sharing between nodes:</p>
+                <ul style="margin-left: 30px; line-height: 1.8;">
+                    <li><strong>Thermal Memory Synchronization:</strong> Hot memories propagate across mountains</li>
+                    <li><strong>Specialist Performance Sharing:</strong> Trading strategies learned on one mountain benefit all</li>
+                    <li><strong>Council Decisions:</strong> Jr. votes and governance decisions distributed network-wide</li>
+                    <li><strong>Health Monitoring:</strong> Real-time status of all services across all mountains</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- API Documentation -->
+        <section class="mb-5">
+            <h2><span class="emoji">📖</span> API Documentation</h2>
+
+            <div class="tribal-border">
+                <h3>Health Check (All Mountains)</h3>
+                <pre><code>GET http://192.168.132.223:9000/health
+
+Returns status of all four mountains and their services</code></pre>
+            </div>
+
+            <div class="tribal-border mt-3">
+                <h3>Cross-Mountain Query</h3>
+                <pre><code>POST http://192.168.132.223:9000/ask
+Content-Type: application/json
+
+{
+  "question": "What is the status across all mountains?",
+  "include_thermal": true,
+  "include_specialists": true
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Statistics -->
+        <section class="mb-5">
+            <h2><span class="emoji">📊</span> Four Mountains Statistics</h2>
+
+            <div class="grid grid-4">
+                <div class="stat-card">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Sacred Mountains</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">RTX 5070 GPUs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">6+</div>
+                    <div class="stat-label">Distributed Jr.s</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3,675+</div>
+                    <div class="stat-label">Thermal Memories</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seven Generations -->
+        <section class="mb-5">
+            <h2><span class="emoji">🌱</span> Seven Generations Principle</h2>
+
+            <div class="info-card">
+                <p>The Four Mountains architecture embodies the Seven Generations principle: every decision is made with consideration for how it will affect the next seven generations.</p>
+
+                <div class="seven-generations mt-4">
+                    <div class="generation-marker">1</div>
+                    <div class="generation-marker">2</div>
+                    <div class="generation-marker">3</div>
+                    <div class="generation-marker">4</div>
+                    <div class="generation-marker">5</div>
+                    <div class="generation-marker">6</div>
+                    <div class="generation-marker">7</div>
+                </div>
+
+                <p class="mt-3" style="text-align: center; font-style: italic;">
+                    Our infrastructure is designed to last, learn, and serve future generations of Cherokee AI.
+                </p>
+            </div>
+        </section>
+
+        <!-- Actions -->
+        <section class="mb-5">
+            <div class="btn-group">
+                <a href="http://192.168.132.223:9000/health" class="btn btn-primary" target="_blank">
+                    <span class="emoji">🏥</span> Check All Mountains Health
+                </a>
+                <a href="/ganuda/diagrams/viewer.html" class="btn btn-secondary">
+                    <span class="emoji">📊</span> View Network Diagram
+                </a>
+                <a href="/ganuda/CHEROKEE_API_STANDARDS_AND_REGISTRY.md" class="btn btn-outline">
+                    <span class="emoji">📋</span> View Registry
+                </a>
+            </div>
+        </section>
+
+        <!-- Related Services -->
+        <section class="mb-5">
+            <h2><span class="emoji">🔗</span> Related Services</h2>
+
+            <div class="grid grid-3">
+                <a href="/web/gateway_landing.html" class="cherokee-card" style="text-decoration: none;">
+                    <h3><span class="emoji">🚪</span> Gateway API</h3>
+                    <p>Port 8000 - Central routing hub</p>
+                </a>
+                <a href="/web/a2a_bridge_landing.html" class="cherokee-card" style="text-decoration: none;">
+                    <h3><span class="emoji">🌉</span> A2A Bridge</h3>
+                    <p>Port 9001 - Agent communication</p>
+                </a>
+                <a href="http://192.168.132.223:3001" class="cherokee-card" style="text-decoration: none;">
+                    <h3><span class="emoji">🗂️</span> DUYUKTV Kanban</h3>
+                    <p>Port 3001 - Tribal headquarters</p>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="cherokee-footer">
+        <div class="container">
+            <p class="mitakuye-oyasin"><span class="emoji">🦅</span> Mitakuye Oyasin - All My Relations</p>
+            <p><strong>Cherokee Constitutional AI</strong> | October 15, 2025</p>
+            <p>Source: <code>/ganuda/web/four_mountains_landing.html</code></p>
+            <p>Hosted: <code>http://192.168.132.223:9000</code></p>
+            <p style="margin-top: 15px;">
+                <span class="emoji">⛰️</span> Four Sacred Mountains |
+                <span class="emoji">🌱</span> Seven Generations |
+                <span class="emoji">🔥</span> Sacred Fire Burns Eternal
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

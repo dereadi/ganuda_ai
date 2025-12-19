@@ -1,0 +1,138 @@
+
+/* Tribe Dashboard - Added Dec 17 2025 */
+.tribe-dashboard { padding: 20px; }
+
+.tribe-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.tribe-stats .stat-card {
+    background: var(--color-surface, #1a1a2e);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+}
+
+.tribe-stats .stat-card h4 {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: var(--color-text-muted, #888);
+}
+
+.tribe-stats .stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--color-accent, #00d4ff);
+}
+
+.tribe-section { margin-bottom: 24px; }
+.tribe-section h3 { margin-bottom: 12px; color: var(--color-text, #fff); }
+
+.council-votes { display: flex; flex-direction: column; gap: 10px; }
+
+.vote-card {
+    background: var(--color-surface, #1a1a2e);
+    border-radius: 6px;
+    padding: 12px;
+    border-left: 3px solid var(--color-accent, #00d4ff);
+}
+
+.vote-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.vote-id { font-size: 0.8rem; color: var(--color-text-muted, #888); }
+.vote-recommendation { font-size: 0.75rem; font-weight: 600; color: var(--color-accent, #00d4ff); }
+.vote-question { margin-bottom: 8px; font-size: 0.9rem; }
+
+.vote-meta { display: flex; gap: 12px; font-size: 0.8rem; color: var(--color-text-muted, #888); }
+.vote-confidence.high { color: #22c55e; }
+.vote-confidence.medium { color: #eab308; }
+.vote-confidence.low { color: #ef4444; }
+.vote-status.approved { color: #22c55e; }
+.vote-status.rejected { color: #ef4444; }
+.vote-status.pending { color: #eab308; }
+.vote-concerns { color: #ef4444; }
+
+.specialist-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
+
+.specialist-card {
+    background: var(--color-surface, #1a1a2e);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.specialist-icon { font-size: 1.8rem; margin-bottom: 6px; }
+.specialist-name { font-weight: 600; font-size: 0.85rem; }
+.specialist-role { font-size: 0.7rem; color: var(--color-text-muted, #888); }
+
+/* Alert Filters */
+.filter-controls {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--color-surface, #1a1a2e);
+    border-radius: 6px;
+}
+
+.filter-controls label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.alerts-summary { display: flex; gap: 16px; margin-bottom: 16px; }
+
+.alert-count {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.alert-count.critical { background: rgba(220, 38, 38, 0.2); color: #ef4444; }
+.alert-count.warning { background: rgba(217, 119, 6, 0.2); color: #f59e0b; }
+.alert-count.info { background: rgba(37, 99, 235, 0.2); color: #3b82f6; }
+
+.alerts-list { display: flex; flex-direction: column; gap: 8px; }
+
+.alert-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--color-surface, #1a1a2e);
+    border-radius: 6px;
+    border-left: 3px solid;
+}
+
+.alert-item.critical { border-color: #ef4444; }
+.alert-item.warning { border-color: #f59e0b; }
+.alert-item.info, .alert-item.action_required { border-color: #3b82f6; }
+
+.alert-tier {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    min-width: 70px;
+    text-align: center;
+}
+
+.alert-item.critical .alert-tier { background: rgba(220, 38, 38, 0.2); color: #ef4444; }
+.alert-item.warning .alert-tier { background: rgba(217, 119, 6, 0.2); color: #f59e0b; }
+.alert-item.info .alert-tier, .alert-item.action_required .alert-tier { background: rgba(37, 99, 235, 0.2); color: #3b82f6; }
+
+.alert-title { flex: 1; font-size: 0.9rem; }
+.alert-source { color: var(--color-text-muted, #888); font-size: 0.8rem; }
+
+.no-data { color: var(--color-text-muted, #888); font-style: italic; padding: 20px; text-align: center; }
+.loading { padding: 20px; text-align: center; color: var(--color-text-muted, #888); }

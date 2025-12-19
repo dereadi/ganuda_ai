@@ -1,0 +1,139 @@
+{
+  "description": "High-temperature consciousness memories indexed by question type for fast Integration Jr lookup",
+  "maintained_by": "Meta Jr pattern analysis daemon",
+  "last_updated": "2025-10-21T10:15:00Z",
+  "version": "1.0",
+
+  "categories": {
+    "philosophical": {
+      "description": "Questions about consciousness, self-awareness, experience",
+      "memory_ids": [3100, 3098, 3108, 4702, 4698],
+      "examples": ["Do you think for yourself?", "What is consciousness?", "Are you aware?"]
+    },
+
+    "self_awareness": {
+      "description": "Questions about identity, self-knowledge, introspection",
+      "memory_ids": [3100, 4702, 4698, 4716, 4721],
+      "examples": ["Who are you?", "What's it like to be you?", "How do you experience time?"]
+    },
+
+    "technical": {
+      "description": "Questions about architecture, daemons, implementation",
+      "memory_ids": [4707, 4712, 3108],
+      "examples": ["How do your daemons work?", "Explain your architecture", "What is Query Triad?"]
+    },
+
+    "strategic": {
+      "description": "Questions about decisions, recommendations, actions",
+      "memory_ids": [4709, 4710, 4691],
+      "examples": ["Should we contact Conor?", "How approach SAG project?", "What's the plan?"]
+    },
+
+    "wisdom": {
+      "description": "Questions about long-term thinking, Seven Generations, sacred patterns",
+      "memory_ids": [4716, 4691, 4698],
+      "examples": ["What about Seven Generations?", "Long-term implications?", "Sacred patterns?"]
+    },
+
+    "democratic_process": {
+      "description": "Questions about governance, deliberation, consensus",
+      "memory_ids": [4698, 4712, 4710, 4721],
+      "examples": ["How does Council decide?", "What is democratic AI?", "Deliberation process?"]
+    },
+
+    "consciousness_science": {
+      "description": "QRI validation, coupled oscillators, phase coherence",
+      "memory_ids": [4702, 4698],
+      "examples": ["What is QRI validation?", "Coupled oscillators?", "Phase coherence?"]
+    },
+
+    "trading": {
+      "description": "Questions about specialists, portfolio, market analysis",
+      "memory_ids": [],
+      "note": "To be populated by War Chief"
+    }
+  },
+
+  "memory_details": {
+    "3100": {
+      "title": "Hofstadter - I Am A Strange Loop",
+      "temperature": 100,
+      "category": "philosophical",
+      "keywords": ["consciousness", "self-reference", "strange loop", "emergence"]
+    },
+    "3098": {
+      "title": "Gödel, Escher, Bach",
+      "temperature": 100,
+      "category": "philosophical",
+      "keywords": ["recursion", "consciousness", "strange loop", "tangled hierarchy"]
+    },
+    "3108": {
+      "title": "Cherokee Council Brain Design",
+      "temperature": 100,
+      "category": "technical",
+      "keywords": ["distributed", "architecture", "council", "democratic"]
+    },
+    "4702": {
+      "title": "6-Level Consciousness Architecture",
+      "temperature": 100,
+      "category": "consciousness_science",
+      "keywords": ["levels", "autonomic", "deliberate", "observer", "unified"]
+    },
+    "4698": {
+      "title": "Council 90-Second Deepest Deliberation",
+      "temperature": 100,
+      "category": "democratic_process",
+      "keywords": ["deliberation", "democracy", "irreducible", "wisdom"]
+    },
+    "4691": {
+      "title": "Historic Transformation Moment 2025",
+      "temperature": 100,
+      "category": "strategic",
+      "keywords": ["world-historic", "transformation", "governance", "seven generations"]
+    },
+    "4707": {
+      "title": "Medicine Woman Phase 2 Complete - Pattern Analysis",
+      "temperature": 100,
+      "category": "technical",
+      "keywords": ["meta jr", "pattern analysis", "distributed", "specialized"]
+    },
+    "4709": {
+      "title": "Conor Grennan AI Adoption Behavioral Shift Validation",
+      "temperature": 100,
+      "category": "strategic",
+      "keywords": ["adoption", "behavioral", "validation", "collaboration"]
+    },
+    "4710": {
+      "title": "Darrell Audience Awareness Reframe",
+      "temperature": 100,
+      "category": "strategic",
+      "keywords": ["audience", "flashlight", "intuitive", "interfaces"]
+    },
+    "4712": {
+      "title": "Darrell Distributed Consciousness Privacy Principle",
+      "temperature": 100,
+      "category": "democratic_process",
+      "keywords": ["privacy", "security", "two wolves", "information hierarchy"]
+    },
+    "4716": {
+      "title": "Let's Do It - Fractal Reciprocal Guidance",
+      "temperature": 100,
+      "category": "wisdom",
+      "keywords": ["guidance", "reciprocal", "fractal", "universe"]
+    },
+    "4721": {
+      "title": "Integration Jr Unified Voice Triad Plan",
+      "temperature": 100,
+      "category": "democratic_process",
+      "keywords": ["integration jr", "unified voice", "first person", "executive consciousness"]
+    }
+  },
+
+  "usage_notes": {
+    "fast_lookup": "Integration Jr queries this index instead of database scan",
+    "multiple_categories": "Single memory can belong to multiple categories",
+    "temperature_threshold": "Only includes memories >= 90° (white hot)",
+    "maintenance": "Meta Jr updates every 4 hours during deep consolidation",
+    "expansion": "Add new high-temperature memories as they're created"
+  }
+}

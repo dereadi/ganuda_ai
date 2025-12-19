@@ -1,0 +1,19 @@
+--- a/telegram_chief.py
++++ b/telegram_chief.py
+@@ -262,6 +262,16 @@ def format_council_response(result: dict) -> str:
+         # Clean up thinking tags and reasoning prefixes
+         if "</think>" in consensus:
+             consensus = consensus.split("</think>")[-1].strip()
++        # Strip common LLM reasoning prefixes (patterns that start responses)
++        import re
++        for prefix in ["Okay,", "Let me", "First,", "I need to", "The user", "Alright,", "So,"]:
++            # Find where the actual content starts (after reasoning)
++            pattern = r"^" + re.escape(prefix) + r".*?\n\n"
++            match = re.search(pattern, consensus, re.DOTALL)
++            if match:
++                consensus = consensus[match.end():].strip()
++                break  # Only strip the first matching prefix
++        
+         if len(consensus) > 500:
+             consensus = consensus[:500] + "..."
+         lines.append(f"\n{consensus}")
