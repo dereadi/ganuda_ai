@@ -9,6 +9,7 @@ Enhanced with Triad Consensus:
 - ARCHITECTURE: Code block extraction, file task structure
 
 UPDATED 2025-12-10: Now uses intent-based constitutional checking (orthogonal approach)
+UPDATED 2026-01-17: Phase 3 - Wired JrLLMReasoner for instruction understanding
 
 For Seven Generations
 """
@@ -16,9 +17,14 @@ For Seven Generations
 import subprocess
 import psycopg2
 import os
+import sys
 import shutil
+import re
 from datetime import datetime
 from typing import Dict, Any, List
+
+# Add lib to path for reasoner import
+sys.path.insert(0, '/ganuda/lib')
 
 # Import intent classifier for orthogonal constitutional checking
 try:
@@ -27,8 +33,79 @@ try:
 except ImportError:
     INTENT_CLASSIFIER_AVAILABLE = False
 
+# Import JrLLMReasoner for instruction understanding (Phase 3)
+try:
+    from jr_llm_reasoner import get_reasoner_sync
+    LLM_REASONER_AVAILABLE = True
+    print("[INFO] JrLLMReasoner loaded - using Qwen 32B for instruction understanding")
+except ImportError as e:
+    LLM_REASONER_AVAILABLE = False
+    print(f"[WARN] JrLLMReasoner not available: {e}, falling back to regex parsing")
+
+# Import RLM Executor for recursive task decomposition (Phase 4)
+try:
+    from rlm_executor import RLMExecutor, RLM_AVAILABLE
+    if RLM_AVAILABLE:
+        print("[INFO] RLM Executor loaded - recursive task decomposition enabled")
+    else:
+        print("[WARN] RLM library not installed, recursive execution disabled")
+except ImportError as e:
+    RLM_AVAILABLE = False
+    print(f"[WARN] RLM Executor not available: {e}")
+
+# Import M-GRPO Momentum Learner for self-improvement (Phase 5)
+try:
+    from jr_momentum_learner import MomentumJrLearner
+    MGRPO_AVAILABLE = True
+    print("[INFO] M-GRPO Momentum Learner loaded - self-improvement enabled")
+except ImportError as e:
+    MGRPO_AVAILABLE = False
+    print(f"[WARN] M-GRPO not available: {e}")
+
+# Import ICL Dynamics for implicit learning measurement (Phase 6)
+try:
+    from icl_dynamics import ICLDynamicsMeasurer
+    ICL_AVAILABLE = True
+    print("[INFO] ICL Dynamics loaded - implicit learning measurement enabled")
+except ImportError as e:
+    ICL_AVAILABLE = False
+    print(f"[WARN] ICL Dynamics not available: {e}")
+
+# Import Learning Store for recording execution outcomes (Phase 7)
+try:
+    from jr_learning_store import JrLearningStore
+    LEARNING_STORE_AVAILABLE = True
+    print("[INFO] JrLearningStore loaded - execution learning enabled")
+except ImportError as e:
+    LEARNING_STORE_AVAILABLE = False
+    print(f"[WARN] JrLearningStore not available: {e}")
+
+# Import Research Task Executor for web research tasks (Phase 8 - Jan 22, 2026)
+try:
+    from research_task_executor import ResearchTaskExecutor, is_research_task
+    RESEARCH_EXECUTOR_AVAILABLE = True
+    print("[INFO] ResearchTaskExecutor loaded - web research enabled")
+except ImportError as e:
+    RESEARCH_EXECUTOR_AVAILABLE = False
+    print(f"[WARN] ResearchTaskExecutor not available: {e}")
+
 
 class TaskExecutor:
+    # Path validation constants (Phase 9 - Jan 23, 2026 - Council Vote 28d18d80e447505f)
+    PLACEHOLDER_PATTERNS = [
+        r'/path/to/',
+        r'/example/',
+        r'<[^>]+>',           # <placeholder>
+        r'\$\{[^}]+\}',       # ${variable}
+        r'\{\{[^}]+\}\}',     # {{template}}
+        r'/your/',
+        r'/my/',
+        r'TODO',
+        r'FIXME',
+    ]
+
+    ALLOWED_PATH_PREFIXES = ['/ganuda/', '/tmp/', '/home/dereadi/']
+
     # Actions that are NEVER allowed (Constitutional Forbidden - from DOF Phase 4)
     FORBIDDEN_PATTERNS = [
         'rm -rf /',
@@ -89,13 +166,28 @@ class TaskExecutor:
         '.sudoers',  # sudo config
     ]
 
-    def __init__(self):
+    def __init__(self, jr_type: str = "it_triad_jr"):
+        self.jr_type = jr_type
         self.db_config = {
             'host': '192.168.132.222',
-            'database': 'triad_federation',
+            'database': 'zammad_production',
             'user': 'claude',
             'password': 'jawaseatlasers2'
         }
+
+        # Phase 5: Initialize M-GRPO momentum learner
+        if MGRPO_AVAILABLE:
+            self.momentum_learner = MomentumJrLearner(jr_type)
+            print(f"[M-GRPO] Momentum learner initialized for {jr_type}")
+        else:
+            self.momentum_learner = None
+
+        # Phase 7: Initialize learning store for recording outcomes
+        if LEARNING_STORE_AVAILABLE:
+            self.learning_store = JrLearningStore(jr_name=jr_type)
+            print(f"[LEARNING] Learning store initialized for {jr_type}")
+        else:
+            self.learning_store = None
 
     def execute_steps(self, steps: List[Dict]) -> List[Dict[str, Any]]:
         """Execute a list of steps and return results"""
@@ -107,6 +199,654 @@ class TaskExecutor:
             if not result.get('success') and step.get('critical', True):
                 break
         return results
+
+    def _validate_path(self, path: str) -> tuple:
+        """
+        Validate a file path before any file operations.
+
+        Phase 9 Security Layer (Council Vote 28d18d80e447505f - Crawdad requirement)
+        Prevents placeholder paths and directory traversal attacks.
+
+        Args:
+            path: The file path to validate
+
+        Returns:
+            Tuple of (is_valid: bool, error_message: str)
+        """
+        if not path:
+            return False, "Empty path"
+
+        # Check for placeholder patterns (LLM hallucination detection)
+        for pattern in self.PLACEHOLDER_PATTERNS:
+            if re.search(pattern, path, re.IGNORECASE):
+                return False, f"Placeholder pattern detected: {pattern}"
+
+        # Require absolute path
+        if not path.startswith('/'):
+            return False, "Path must be absolute (start with /)"
+
+        # Check allowed directories
+        if not any(path.startswith(prefix) for prefix in self.ALLOWED_PATH_PREFIXES):
+            return False, f"Path not in allowed directories: {self.ALLOWED_PATH_PREFIXES}"
+
+        # Reject directory traversal
+        if '..' in path:
+            return False, "Directory traversal (..) not allowed"
+
+        # Reject paths with shell injection characters
+        if any(c in path for c in [';', '|', '&', '`', '\n', '\r']):
+            return False, "Path contains forbidden shell characters"
+
+        return True, ""
+
+    def process_queue_task(self, task: Dict) -> Dict[str, Any]:
+        """
+        Process a Jr work queue task by reading and executing instructions.
+
+        Supports both instruction_file (path to .md file) and instruction_content
+        (inline instructions stored in database). Fixed Jan 17, 2026.
+
+        Args:
+            task: Dict with task_id, title, instruction_file OR instruction_content, assigned_jr
+
+        Returns:
+            Dict with success status and execution details
+        """
+        result = {
+            'task_id': task.get('task_id'),
+            'title': task.get('title'),
+            'success': False,
+            'steps_executed': [],
+            'error': None
+        }
+
+        # Try instruction_content first (inline from database), then instruction_file
+        instructions = task.get('instruction_content')
+        instruction_source = 'instruction_content'
+
+        if not instructions:
+            instruction_file = task.get('instruction_file')
+            if not instruction_file:
+                result['error'] = 'No instruction_file or instruction_content specified in task'
+                return result
+
+            instruction_source = 'instruction_file'
+            # Read the instruction file
+            try:
+                with open(instruction_file, 'r') as f:
+                    instructions = f.read()
+            except FileNotFoundError:
+                result['error'] = f'Instruction file not found: {instruction_file}'
+                return result
+            except Exception as e:
+                result['error'] = f'Failed to read instruction file: {str(e)}'
+                return result
+
+        print(f"[TaskExecutor] Using instructions from {instruction_source} ({len(instructions)} chars)")
+
+        # Phase 8: Check if task should use Research Executor (web research)
+        if RESEARCH_EXECUTOR_AVAILABLE and is_research_task(task, instructions):
+            print(f"[Research] Task flagged for web research: {task.get('title')}")
+            try:
+                research_executor = ResearchTaskExecutor()
+                research_result = research_executor.execute_research_task({
+                    'title': task.get('title'),
+                    'instructions': instructions,
+                    'parameters': task.get('parameters', {})
+                })
+                # Map research result to standard format
+                result['success'] = research_result.get('success', False)
+                result['steps_executed'] = research_result.get('steps_executed', [])
+                result['artifacts'] = research_result.get('artifacts', [])
+                result['error'] = None if research_result.get('success') else 'Research task failed'
+                print(f"[Research] Complete: {research_result.get('summary')}")
+                return result
+            except Exception as e:
+                print(f"[Research] Executor error: {e}")
+                result['error'] = f'Research executor error: {e}'
+                return result
+
+        # Phase 4: Check if task should use RLM recursive execution
+        if self._should_use_rlm(task, instructions):
+            print(f"[RLM] Task flagged for recursive execution: {task.get('title')}")
+            return self._execute_with_rlm(task, instructions)
+
+        # Extract code blocks from instructions
+        steps = self._extract_steps_from_instructions(instructions)
+
+        if not steps:
+            result['error'] = 'No executable steps found in instruction file'
+            return result
+
+        # Execute extracted steps
+        try:
+            step_results = self.execute_steps(steps)
+            result['steps_executed'] = step_results
+
+            # CRITICAL FIX: Empty step_results = failure, not success
+            # Python's all([]) returns True, which caused false completions
+            if not step_results:
+                result['success'] = False
+                result['error'] = f'No steps were executed (extracted {len(steps)} steps but execution returned empty)'
+                print(f"[EXECUTOR] FAIL: 0 steps executed despite {len(steps)} steps extracted")
+                return result
+
+            # Check if all steps succeeded
+            all_success = all(s.get('success') for s in step_results)
+            result['success'] = all_success
+
+            if not all_success:
+                failed = [s for s in step_results if not s.get('success')]
+                error_msg = f'{len(failed)} step(s) failed'
+                result['error'] = error_msg
+
+                # Phase 3: Use MAR Reflexion to analyze failure
+                if LLM_REASONER_AVAILABLE:
+                    failed_details = "; ".join([
+                        f"{s.get('type', 'unknown')}: {s.get('error', 'unknown error')}"
+                        for s in failed
+                    ])
+                    reflection = self.reflect_on_failure(task, error_msg, failed_details)
+                    result['reflection'] = reflection
+
+                    # Log improvements for future learning
+                    if reflection.get('improvements'):
+                        print(f"[REFLECT] Improvements suggested: {reflection['improvements']}")
+
+                    # Phase 7: Record execution outcome for learning
+                    if self.learning_store:
+                        try:
+                            self.learning_store.record_execution(task, result, reflection)
+                            print(f"[LEARNING] Recorded outcome: success={result.get('success')}")
+                        except Exception as le:
+                            print(f"[LEARNING] Failed to record: {le}")
+
+        except Exception as e:
+            result['error'] = f'Execution error: {str(e)}'
+
+            # Reflect on execution errors too
+            if LLM_REASONER_AVAILABLE:
+                reflection = self.reflect_on_failure(task, str(e), "")
+                result['reflection'] = reflection
+
+        # Phase 5: Record outcome for M-GRPO momentum learning
+        if self.momentum_learner:
+            execution_mode = result.get('execution_mode', 'standard')
+            approach = 'use_rlm' if execution_mode == 'rlm' else 'direct_code'
+            self.momentum_learner.record_outcome(task, approach, result['success'])
+            print(f"[M-GRPO] Recorded: {approach} -> {'SUCCESS' if result['success'] else 'FAIL'}")
+
+        return result
+
+    def _extract_steps_from_instructions(self, instructions: str) -> List[Dict]:
+        """
+        Extract executable steps from a Jr instruction markdown file.
+
+        Phase 9 Enhancement (Jan 23, 2026 - Council Vote 28d18d80e447505f):
+        REGEX-FIRST strategy to prevent LLM path hallucination.
+
+        Order:
+        1. Try regex extraction first (reliable for ATOMIC format)
+        2. Validate all paths before accepting
+        3. Only use LLM if regex finds nothing
+
+        Returns list of step dicts ready for execute_steps()
+        """
+        # Phase 9: Try regex FIRST (more reliable, no hallucination)
+        regex_steps = self._extract_steps_via_regex(instructions)
+
+        if regex_steps:
+            # Validate paths in regex-extracted steps
+            validated_steps = []
+            for step in regex_steps:
+                if step.get('type') == 'file':
+                    path = step.get('args', {}).get('path', '')
+                    is_valid, error = self._validate_path(path)
+                    if is_valid:
+                        validated_steps.append(step)
+                        print(f"[Regex] Valid path: {path}")
+                    else:
+                        print(f"[Regex] REJECTED path: {path} - {error}")
+                else:
+                    # Non-file steps (sql, bash) pass through
+                    validated_steps.append(step)
+
+            if validated_steps:
+                print(f"[Extraction] Regex-first found {len(validated_steps)} valid steps")
+                return validated_steps
+
+        # Fallback: Try LLM only if regex found nothing
+        if LLM_REASONER_AVAILABLE:
+            print("[Extraction] No regex matches, trying LLM extraction...")
+            try:
+                llm_steps = self._extract_steps_via_llm(instructions)
+
+                # Validate LLM-extracted paths (critical - prevents hallucination)
+                validated_llm = []
+                for step in llm_steps:
+                    if step.get('type') == 'file':
+                        path = step.get('path', '') or step.get('args', {}).get('path', '')
+                        is_valid, error = self._validate_path(path)
+                        if is_valid:
+                            validated_llm.append(step)
+                            print(f"[LLM] Valid path: {path}")
+                        else:
+                            print(f"[LLM] REJECTED hallucinated path: {path} - {error}")
+                    else:
+                        validated_llm.append(step)
+
+                if validated_llm:
+                    print(f"[Extraction] LLM found {len(validated_llm)} valid steps")
+                    return validated_llm
+
+            except Exception as e:
+                print(f"[WARN] LLM extraction failed: {e}")
+
+        print("[Extraction] WARNING: No valid steps extracted from instructions")
+        return []
+
+    def _extract_steps_via_llm(self, instructions: str) -> List[Dict]:
+        """
+        Use structured planning approach to extract steps (Devika AI pattern).
+
+        Two-phase approach:
+        1. Planning phase: Extract structure (files, steps) using structured prompt
+        2. Code generation phase: Generate code for each identified file
+
+        Enhanced Jan 17, 2026 based on Devika AI and GPT-Engineer research.
+        """
+        # Import planning modules
+        try:
+            from jr_planning_prompt import get_planning_prompt, get_code_generation_prompt
+            from jr_plan_parser import parse_planning_response, extract_files_from_prose
+        except ImportError as e:
+            print(f"[WARN] Planning modules not available: {e}, using legacy approach")
+            return self._extract_steps_via_legacy_llm(instructions)
+
+        reasoner = get_reasoner_sync()
+        steps = []
+
+        # Phase 1: Planning - get structured breakdown
+        print("[LLM] Phase 1: Generating structured plan...")
+        planning_prompt = get_planning_prompt(instructions)
+
+        try:
+            plan_response = reasoner.simple_completion(planning_prompt)
+        except Exception as e:
+            print(f"[LLM] Planning failed: {e}, trying prose extraction")
+            plan_response = ""
+
+        print(f"[LLM] Planning response received ({len(plan_response)} chars)")
+
+        # Parse the structured response
+        plan = parse_planning_response(plan_response)
+
+        print(f"[LLM] Parsed plan: {plan['project_name']}")
+        print(f"[LLM] Focus: {plan['focus'][:80] if plan['focus'] else 'none'}")
+        print(f"[LLM] Files to create: {len(plan['files_to_create'])}")
+        print(f"[LLM] Files to modify: {len(plan['files_to_modify'])}")
+        print(f"[LLM] Steps: {len(plan['steps'])}")
+
+        # Fallback: if no files found, try prose extraction
+        if not plan['files_to_create'] and not plan['files_to_modify']:
+            print("[LLM] No files in plan, trying prose extraction fallback...")
+            prose_files = extract_files_from_prose(instructions)
+            plan['files_to_create'] = [(f, 'Extracted from prose') for f in prose_files['files_to_create']]
+            plan['files_to_modify'] = [(f, 'Extracted from prose') for f in prose_files['files_to_modify']]
+            print(f"[LLM] Prose extraction found: {len(plan['files_to_create'])} create, {len(plan['files_to_modify'])} modify")
+
+        # Phase 2: Code generation for each file
+        print("[LLM] Phase 2: Generating code for files...")
+
+        for file_path, description in plan['files_to_create']:
+            print(f"[LLM] Generating: {file_path}")
+            code_prompt = get_code_generation_prompt(file_path, description, instructions)
+
+            try:
+                code = reasoner.simple_completion(code_prompt)
+
+                # Extract code from markdown block if present
+                code_match = re.search(r'```\w*\n(.*?)```', code, re.DOTALL)
+                if code_match:
+                    code = code_match.group(1)
+
+                if code and len(code.strip()) > 10:
+                    steps.append({
+                        'type': 'file',
+                        'args': {
+                            'operation': 'write',
+                            'path': file_path,
+                            'content': code.strip()
+                        },
+                        'description': f"Create {file_path}: {description}"
+                    })
+                    print(f"[LLM] Generated {len(code)} chars for {file_path}")
+                else:
+                    print(f"[WARN] Empty or too short code for {file_path}")
+            except Exception as e:
+                print(f"[ERROR] Code generation failed for {file_path}: {e}")
+
+        for file_path, description in plan['files_to_modify']:
+            print(f"[LLM] Modifying: {file_path}")
+            # Read existing file
+            existing_code = None
+            if os.path.exists(file_path):
+                try:
+                    with open(file_path, 'r') as f:
+                        existing_code = f.read()
+                except Exception as e:
+                    print(f"[WARN] Could not read existing file {file_path}: {e}")
+
+            context = instructions
+            if existing_code:
+                context += f"\n\n## EXISTING CODE IN {file_path}:\n```\n{existing_code}\n```"
+
+            code_prompt = get_code_generation_prompt(file_path, description, context)
+
+            try:
+                code = reasoner.simple_completion(code_prompt)
+
+                # Extract code from markdown block
+                code_match = re.search(r'```\w*\n(.*?)```', code, re.DOTALL)
+                if code_match:
+                    code = code_match.group(1)
+
+                if code and len(code.strip()) > 10:
+                    steps.append({
+                        'type': 'file',
+                        'args': {
+                            'operation': 'write',
+                            'path': file_path,
+                            'content': code.strip()
+                        },
+                        'description': f"Modify {file_path}: {description}"
+                    })
+                    print(f"[LLM] Generated {len(code)} chars for {file_path}")
+            except Exception as e:
+                print(f"[ERROR] Code generation failed for {file_path}: {e}")
+
+        # ALWAYS run regex extraction to capture SQL/bash blocks
+        # that LLM file generation may have missed (FIX: Jan 20, 2026)
+        regex_steps = self._extract_steps_via_regex(instructions)
+        if regex_steps:
+            print(f"[LLM] Regex found {len(regex_steps)} additional steps (SQL/bash)")
+            # Add regex steps BEFORE file steps so dependencies (tables) are created first
+            steps = regex_steps + steps
+        elif not steps:
+            print("[LLM] No steps from LLM or regex - task may need manual review")
+
+        print(f"[LLM] Total steps generated: {len(steps)} (file: {len(steps) - len(regex_steps)}, sql/bash: {len(regex_steps)})")
+        return steps
+
+    def _extract_steps_via_legacy_llm(self, instructions: str) -> List[Dict]:
+        """Legacy LLM extraction for backwards compatibility."""
+        reasoner = get_reasoner_sync()
+        understanding = reasoner.understand_instruction(instructions)
+
+        steps = []
+        files_to_create = understanding.get('files_to_create', [])
+        files_to_modify = understanding.get('files_to_modify', [])
+        language = understanding.get('language', 'python')
+
+        for filepath in files_to_create:
+            step_desc = f"Create {filepath}: {understanding.get('summary', '')}"
+            code = reasoner.generate_code(step_desc, {
+                'language': language,
+                'file_path': filepath,
+                'patterns': []
+            })
+            if code and len(code) > 10:
+                steps.append({
+                    'type': 'file',
+                    'args': {'operation': 'write', 'path': filepath, 'content': code},
+                    'description': step_desc
+                })
+
+        for filepath in files_to_modify:
+            existing_code = None
+            if os.path.exists(filepath):
+                try:
+                    with open(filepath, 'r') as f:
+                        existing_code = f.read()
+                except:
+                    pass
+            step_desc = f"Modify {filepath}: {understanding.get('summary', '')}"
+            code = reasoner.generate_code(step_desc, {
+                'language': language,
+                'file_path': filepath,
+                'existing_code': existing_code,
+                'patterns': []
+            })
+            if code and len(code) > 10:
+                steps.append({
+                    'type': 'file',
+                    'args': {'operation': 'write', 'path': filepath, 'content': code},
+                    'description': step_desc
+                })
+
+        # ALWAYS capture SQL/bash from regex (FIX: Jan 20, 2026)
+        regex_steps = self._extract_steps_via_regex(instructions)
+        if regex_steps:
+            steps = regex_steps + steps
+
+        return steps
+
+    def reflect_on_failure(self, task: Dict, error: str, result: str = "") -> Dict:
+        """
+        Use MAR Reflexion to analyze task failure and suggest improvements.
+        Phase 3 enhancement for self-improving execution.
+
+        Returns:
+            {
+                "should_retry": bool,
+                "modified_approach": str,
+                "analysis": str
+            }
+        """
+        if not LLM_REASONER_AVAILABLE:
+            return {"should_retry": False, "analysis": "LLM not available for reflection"}
+
+        try:
+            reasoner = get_reasoner_sync()
+            task_desc = f"{task.get('title', 'Unknown')} - {task.get('instruction_file', '')}"
+
+            reflection = reasoner.reflect_on_execution(
+                task=task_desc,
+                result=result,
+                error=error
+            )
+
+            print(f"[REFLECT] Success: {reflection.get('success')}")
+            print(f"[REFLECT] Retry suggested: {reflection.get('retry_suggested')}")
+            print(f"[REFLECT] Analysis: {reflection.get('analysis', '')[:100]}")
+
+            return {
+                "should_retry": reflection.get('retry_suggested', False),
+                "modified_approach": reflection.get('modified_approach'),
+                "analysis": reflection.get('analysis', ''),
+                "improvements": reflection.get('improvements', [])
+            }
+        except Exception as e:
+            print(f"[REFLECT] Reflection error: {e}")
+            return {"should_retry": False, "analysis": f"Reflection failed: {e}"}
+
+    def _should_use_rlm(self, task: Dict, instructions: str) -> bool:
+        """
+        Determine if a task should use RLM recursive execution.
+        Phase 4 enhancement for complex task decomposition.
+
+        Criteria:
+        - use_rlm flag is True in task
+        - Task has many files to create/modify (>3)
+        - Instructions are very long (>3000 chars)
+        - Task title contains keywords like 'implement', 'build', 'create system'
+        """
+        if not RLM_AVAILABLE:
+            return False
+
+        # Explicit flag takes precedence
+        if task.get('use_rlm', False):
+            return True
+
+        # Check instruction length
+        if len(instructions) > 3000:
+            return True
+
+        # Check for complex task keywords in title
+        title = task.get('title', '').lower()
+        complex_keywords = ['implement', 'build system', 'create api', 'authentication',
+                          'full stack', 'migration', 'refactor entire', 'redesign']
+        if any(kw in title for kw in complex_keywords):
+            return True
+
+        # Count files mentioned in instructions
+        file_patterns = re.findall(r'(?:Create|Modify|Update):\s*[`/][^\s`]+', instructions)
+        if len(file_patterns) > 3:
+            return True
+
+        return False
+
+    def _execute_with_rlm(self, task: Dict, instructions: str) -> Dict[str, Any]:
+        """
+        Execute a task using RLM recursive decomposition.
+        Phase 4 enhancement for complex multi-step tasks.
+        """
+        result = {
+            'task_id': task.get('task_id'),
+            'title': task.get('title'),
+            'success': False,
+            'steps_executed': [],
+            'error': None,
+            'execution_mode': 'rlm'
+        }
+
+        try:
+            from rlm_executor import RLMExecutor
+
+            print(f"[RLM] Initializing recursive executor...")
+            executor = RLMExecutor(sandbox="local")
+
+            # Build task dict for RLM
+            rlm_task = {
+                "task_id": task.get('task_id', 'unknown'),
+                "title": task.get('title', 'Unknown task'),
+                "instructions": instructions,
+                "files_to_create": [],
+                "files_to_modify": []
+            }
+
+            # Extract files from instructions if LLM reasoner is available
+            if LLM_REASONER_AVAILABLE:
+                try:
+                    reasoner = get_reasoner_sync()
+                    understanding = reasoner.understand_instruction(instructions)
+                    rlm_task["files_to_create"] = understanding.get('files_to_create', [])
+                    rlm_task["files_to_modify"] = understanding.get('files_to_modify', [])
+                    print(f"[RLM] Files to create: {rlm_task['files_to_create']}")
+                    print(f"[RLM] Files to modify: {rlm_task['files_to_modify']}")
+                except Exception as e:
+                    print(f"[RLM] Could not extract files via LLM: {e}")
+
+            # Execute with RLM
+            print(f"[RLM] Executing task with recursive decomposition...")
+            rlm_result = executor.execute_task(rlm_task)
+
+            result['success'] = rlm_result.get('success', False)
+            result['rlm_result'] = rlm_result.get('result', '')
+            result['subtasks_completed'] = rlm_result.get('subtasks_completed', 0)
+            result['artifacts'] = rlm_result.get('artifacts', [])
+
+            # CRITICAL FIX: RLM must have done actual work to be successful
+            # Check for artifacts created or subtasks completed
+            subtasks = result.get('subtasks_completed', 0)
+            artifacts = result.get('artifacts', [])
+            if result['success'] and subtasks == 0 and not artifacts:
+                result['success'] = False
+                result['error'] = 'RLM execution reported success but no subtasks completed and no artifacts created'
+                print(f"[RLM] FAIL: Reported success but no actual work done")
+
+            if not result['success']:
+                result['error'] = result.get('error') or rlm_result.get('error', 'RLM execution failed')
+
+            print(f"[RLM] Execution complete. Success: {result['success']}, Subtasks: {subtasks}, Artifacts: {len(artifacts)}")
+            return result
+
+        except ImportError as e:
+            result['error'] = f"RLM not available: {e}"
+            print(f"[RLM] Import error: {e}")
+            return result
+        except Exception as e:
+            result['error'] = f"RLM execution error: {e}"
+            print(f"[RLM] Execution error: {e}")
+            return result
+
+    def _extract_steps_via_regex(self, instructions: str) -> List[Dict]:
+        """
+        Legacy regex-based extraction for backward compatibility.
+
+        Looks for code blocks with action hints:
+        - ```sql → SQL action
+        - ```bash or ```shell → Bash action
+        - ```python with Create `/path/file` → File action
+        """
+        steps = []
+
+        # Pattern to match code blocks with language hint
+        code_block_pattern = r'```(\w+)\n(.*?)```'
+
+        # Find all code blocks
+        matches = re.findall(code_block_pattern, instructions, re.DOTALL)
+
+        for lang, content in matches:
+            content = content.strip()
+
+            if lang.lower() == 'sql':
+                steps.append({
+                    'type': 'sql',
+                    'command': content
+                })
+            elif lang.lower() in ('bash', 'shell', 'sh'):
+                steps.append({
+                    'type': 'bash',
+                    'command': content
+                })
+            elif lang.lower() in ('python', 'typescript', 'javascript'):
+                # Look for file creation pattern before this code block
+                # Patterns supported (Jan 20, 2026 fix):
+                #   Create `/path/to/file`:
+                #   **File:** `/path/to/file`
+                #   File: `/path/to/file`
+                #   Modify: `/path/to/file`
+                file_patterns = [
+                    r"Create\s+`([^`]+)`",
+                    r"\*\*File:\*\*\s*`([^`]+)`",
+                    r"File:\s*`([^`]+)`",
+                    r"Modify:\s*`([^`]+)`",
+                ]
+
+                # Search in the text before this code block
+                block_start = instructions.find(f'```{lang}\n{content}')
+                if block_start > 0:
+                    preceding_text = instructions[max(0, block_start-300):block_start]
+
+                    filepath = None
+                    for pattern in file_patterns:
+                        file_match = re.search(pattern, preceding_text)
+                        if file_match:
+                            filepath = file_match.group(1)
+                            break
+
+                    if filepath:
+                        steps.append({
+                            'type': 'file',
+                            'args': {
+                                'operation': 'write',
+                                'path': filepath,
+                                'content': content
+                            }
+                        })
+
+        return steps
 
     def execute(self, step: Dict) -> Dict[str, Any]:
         """Execute a single step and return result"""
@@ -273,7 +1013,16 @@ class TaskExecutor:
             content = args.get('content', '')
             backup = args.get('backup', True)
 
-            # SECURITY: Validate path basics
+            # SECURITY Phase 9: Validate path against placeholder patterns
+            is_valid, error = self._validate_path(path)
+            if not is_valid:
+                return {
+                    'success': False,
+                    'error': f'Path validation failed: {error}',
+                    'blocked_by': 'path_validator'
+                }
+
+            # SECURITY: Validate path basics (legacy, kept for defense in depth)
             if not path or '..' in path:
                 return {'success': False, 'error': 'Invalid path (empty or contains ..)'}
 

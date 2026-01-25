@@ -88,7 +88,7 @@ class JrQueueClient:
         return self._execute("""
             SELECT id, task_id, title, description, priority, sacred_fire_priority,
                    instruction_file, instruction_content, parameters,
-                   seven_gen_impact, tags, created_at
+                   seven_gen_impact, tags, created_at, use_rlm
             FROM jr_work_queue
             WHERE assigned_jr = %s
               AND status IN ('pending', 'assigned')
@@ -112,7 +112,7 @@ class JrQueueClient:
                 SET status = 'in_progress',
                     started_at = NOW(),
                     status_message = 'Task claimed by Jr'
-                WHERE task_id = %s
+                WHERE id = %s
                   AND assigned_jr = %s
                   AND status IN ('pending', 'assigned')
                 RETURNING id
@@ -145,7 +145,7 @@ class JrQueueClient:
                 query += ", status_message = %s"
                 params.append(message)
 
-            query += " WHERE task_id = %s AND assigned_jr = %s"
+            query += " WHERE id = %s AND assigned_jr = %s"
             params.extend([task_id, self.jr_name])
 
             self._execute(query, tuple(params), fetch=False)
@@ -167,6 +167,17 @@ class JrQueueClient:
             True if task was marked complete
         """
         try:
+            # Handle artifacts - extract paths if dicts, otherwise use as-is
+            processed_artifacts = None
+            if artifacts:
+                processed_artifacts = []
+                for a in artifacts:
+                    if isinstance(a, dict):
+                        # Extract path from dict artifact
+                        processed_artifacts.append(a.get('path', str(a)))
+                    else:
+                        processed_artifacts.append(str(a))
+
             self._execute("""
                 UPDATE jr_work_queue
                 SET status = 'completed',
@@ -175,10 +186,10 @@ class JrQueueClient:
                     result = %s,
                     artifacts = %s,
                     status_message = 'Task completed successfully'
-                WHERE task_id = %s AND assigned_jr = %s
+                WHERE id = %s AND assigned_jr = %s
             """, (
                 json.dumps(result) if result else None,
-                artifacts,
+                processed_artifacts,
                 task_id,
                 self.jr_name
             ), fetch=False)
@@ -207,7 +218,7 @@ class JrQueueClient:
                     error_message = %s,
                     result = %s,
                     status_message = 'Task failed'
-                WHERE task_id = %s AND assigned_jr = %s
+                WHERE id = %s AND assigned_jr = %s
             """, (
                 error_message,
                 json.dumps(result) if result else None,
@@ -235,7 +246,7 @@ class JrQueueClient:
                 UPDATE jr_work_queue
                 SET status = 'blocked',
                     status_message = %s
-                WHERE task_id = %s AND assigned_jr = %s
+                WHERE id = %s AND assigned_jr = %s
             """, (f"BLOCKED: {reason}", task_id, self.jr_name), fetch=False)
             return True
         except Exception as e:

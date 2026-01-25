@@ -1,0 +1,26 @@
+import datetime
+
+def main() -> None:
+    """
+    Main function to create a test file and verify file creation functionality.
+    """
+    # Define the file path
+    file_path: str = "/ganuda/docs/jr_instructions/test_output.txt"
+    
+    # Define the content to write to the file
+    content: str = (
+        "# Test file created by Jr executor\n"
+        f"# Timestamp: {datetime.datetime.now().strftime('%B %d, %Y')}\n"
+        "# If you see this, the regex fix worked!\n\n"
+        "TEST_PASSED = True\n"
+        'print("Jr file creation is working!")\n'
+    )
+    
+    # Write the content to the file
+    with open(file_path, 'w') as file:
+        file.write(content)
+    
+    print(f"Test file created at {file_path}")
+
+if __name__ == "__main__":
+    main()

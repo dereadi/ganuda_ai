@@ -1,296 +1,375 @@
 #!/usr/bin/env python3
 """
-S-MADRL Pheromone System for Cherokee AI Federation
-Based on arXiv:2510.03592 - Stigmergic Multi-Agent Deep RL
+S-MADRL Pheromone Library - Stigmergic Multi-Agent Coordination
 
-Virtual pheromone mechanics for decentralized Jr agent coordination.
+Based on SwarmSys (arXiv:2510.10047) pheromone-based coordination.
+Validates our existing stigmergy implementation with academic research.
+
+Pheromone Types:
+- task_completed: Success trail (intensity=1.0)
+- task_failed: Failure warning (intensity=0.2)
+- task_claimed: Agent working here
+- exploration_success: New capability discovered
+
+For Seven Generations - Cherokee AI Federation
 """
 
+import os
 import psycopg2
-import psycopg2.extras
-from datetime import datetime, timedelta
-from typing import Dict, List, Tuple, Optional
-import math
+from typing import List, Dict, Optional
+from datetime import datetime
 
 DB_CONFIG = {
-    'host': '192.168.132.222',
-    'database': 'zammad_production',
-    'user': 'claude',
-    'password': 'jawaseatlasers2'
+    'host': os.environ.get('CHEROKEE_DB_HOST', '192.168.132.222'),
+    'database': os.environ.get('CHEROKEE_DB_NAME', 'zammad_production'),
+    'user': os.environ.get('CHEROKEE_DB_USER', 'claude'),
+    'password': os.environ.get('CHEROKEE_DB_PASS', 'jawaseatlasers2')
 }
 
-# S-MADRL Parameters (from paper)
-DEFAULT_DECAY_RATE = 0.05        # α: pheromone evaporation rate
-DEFAULT_REINFORCEMENT = 0.1      # β: pheromone deposit increment
-INITIAL_PHEROMONE = 1.0          # ρ₀: initial pheromone value
-MIN_PHEROMONE = 0.01             # Minimum before removal
-MAX_PHEROMONE = 10.0             # Cap to prevent runaway
-
-# Reward weights (from paper)
-REWARD_WEIGHTS = {
-    'distance': 0.2,     # w_d: getting closer to goal
-    'collision': 0.2,    # w_c: avoiding conflicts
-    'pickup': 0.2,       # w_p: claiming task
-    'success': 0.4       # w_s: completing task
-}
-
-REWARD_VALUES = {
-    'closer_to_goal': 2.5,
-    'collision_penalty': -2.0,
-    'task_claimed': 50.0,
-    'task_success': 50.0,
-    'task_failed': -25.0
-}
+# Pheromone configuration
+DEFAULT_DECAY_RATE = 0.1  # 10% decay per hour
+MIN_INTENSITY_THRESHOLD = 0.01  # Remove pheromones below this
 
 
 def get_connection():
+    """Get database connection."""
     return psycopg2.connect(**DB_CONFIG)
 
 
-def deposit_pheromone(memory_key: str, agent_id: str,
-                      agent_state: str, task_type: str = None,
-                      action: str = None) -> Dict:
+def deposit_pheromone(
+    location_type: str,
+    location_id: str,
+    pheromone_type: str,
+    intensity: float,
+    agent_id: str,
+    decay_rate: float = DEFAULT_DECAY_RATE
+) -> bool:
     """
-    Deposit pheromone trace at memory location.
-    Implements: ρ(t+1) = (1-α)ρ(t) + β
+    Deposit a pheromone at a location.
+
+    Args:
+        location_type: 'task_type', 'task', 'file', 'endpoint', etc.
+        location_id: Specific identifier (e.g., 'implementation', 'task-123')
+        pheromone_type: 'task_completed', 'task_failed', 'task_claimed', etc.
+        intensity: Strength of signal (0.0-1.0, can accumulate higher)
+        agent_id: Which agent deposited this
+        decay_rate: How fast this decays (0.0-1.0 per hour)
+
+    Returns:
+        True if successful, False otherwise
     """
-    conn = get_connection()
-
-    with conn.cursor() as cur:
-        # Check for existing pheromone at this location from this agent
-        cur.execute("""
-            SELECT pheromone_id, intensity, decay_rate
-            FROM stigmergy_pheromones
-            WHERE location_id = %s AND deposited_by = %s
-            ORDER BY deposited_at DESC
-            LIMIT 1
-        """, (memory_key, agent_id))
-
-        existing = cur.fetchone()
-
-        if existing:
-            # Reinforce existing pheromone
-            pid, current_value, decay = existing
-            new_value = (1 - decay) * current_value + DEFAULT_REINFORCEMENT
-            new_value = min(MAX_PHEROMONE, max(MIN_PHEROMONE, new_value))
-
-            cur.execute("""
-                UPDATE stigmergy_pheromones
-                SET intensity = %s,
-                    pheromone_type = %s,
-                    deposited_at = NOW()
-                WHERE pheromone_id = %s
-            """, (new_value, agent_state, pid))
-
-            result = {'action': 'reinforced', 'old_value': current_value, 'new_value': new_value}
-        else:
-            # Deposit new pheromone
+    try:
+        conn = get_connection()
+        with conn.cursor() as cur:
+            # Upsert: add to existing intensity or insert new
             cur.execute("""
                 INSERT INTO stigmergy_pheromones
                 (location_type, location_id, pheromone_type, intensity, deposited_by, decay_rate)
-                VALUES ('memory', %s, %s, %s, %s, %s)
-                RETURNING pheromone_id
-            """, (memory_key, agent_state, INITIAL_PHEROMONE, agent_id, DEFAULT_DECAY_RATE))
+                VALUES (%s, %s, %s, %s, %s, %s)
+                ON CONFLICT (location_type, location_id, pheromone_type, deposited_by)
+                DO UPDATE SET
+                    intensity = stigmergy_pheromones.intensity + EXCLUDED.intensity,
+                    deposited_at = NOW(),
+                    decay_rate = EXCLUDED.decay_rate
+            """, (location_type, location_id, pheromone_type, intensity, agent_id, decay_rate))
+            conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"[PHEROMONE] Error depositing: {e}")
+        return False
 
-            pid = cur.fetchone()[0]
-            result = {'action': 'deposited', 'pheromone_id': pid, 'value': INITIAL_PHEROMONE}
 
-        conn.commit()
-
-    conn.close()
-    return result
-
-
-def read_pheromones(memory_key: str, time_window_minutes: int = 60) -> Dict:
+def read_pheromones(
+    location_type: str,
+    location_id: str,
+    pheromone_type: Optional[str] = None
+) -> List[Dict]:
     """
-    Read pheromone traces at memory location.
-    Returns aggregate pheromone information for agent decision-making.
+    Read all pheromones at a location.
+
+    Args:
+        location_type: Type of location to query
+        location_id: Specific location identifier
+        pheromone_type: Optional filter by type
+
+    Returns:
+        List of pheromone dicts with intensity, type, depositor, etc.
     """
-    conn = get_connection()
+    try:
+        conn = get_connection()
+        with conn.cursor() as cur:
+            if pheromone_type:
+                cur.execute("""
+                    SELECT pheromone_id, pheromone_type, intensity,
+                           deposited_by, deposited_at, decay_rate
+                    FROM stigmergy_pheromones
+                    WHERE location_type = %s AND location_id = %s
+                      AND pheromone_type = %s
+                      AND intensity > %s
+                    ORDER BY intensity DESC
+                """, (location_type, location_id, pheromone_type, MIN_INTENSITY_THRESHOLD))
+            else:
+                cur.execute("""
+                    SELECT pheromone_id, pheromone_type, intensity,
+                           deposited_by, deposited_at, decay_rate
+                    FROM stigmergy_pheromones
+                    WHERE location_type = %s AND location_id = %s
+                      AND intensity > %s
+                    ORDER BY intensity DESC
+                """, (location_type, location_id, MIN_INTENSITY_THRESHOLD))
 
-    with conn.cursor() as cur:
-        cur.execute("""
-            SELECT deposited_by, intensity, pheromone_type, deposited_at
-            FROM stigmergy_pheromones
-            WHERE location_id = %s
-            AND deposited_at > NOW() - INTERVAL '%s minutes'
-            ORDER BY intensity DESC
-        """, (memory_key, time_window_minutes))
+            rows = cur.fetchall()
+        conn.close()
 
-        traces = cur.fetchall()
+        return [
+            {
+                'pheromone_id': row[0],
+                'pheromone_type': row[1],
+                'intensity': float(row[2]),
+                'deposited_by': row[3],
+                'deposited_at': row[4],
+                'decay_rate': float(row[5])
+            }
+            for row in rows
+        ]
+    except Exception as e:
+        print(f"[PHEROMONE] Error reading: {e}")
+        return []
 
-    conn.close()
 
-    if not traces:
-        return {
-            'memory_key': memory_key,
-            'total_pheromone': 0,
-            'agent_count': 0,
-            'traces': [],
-            'dominant_state': None,
-            'recommendation': 'explore'
-        }
+def get_total_intensity(location_type: str, location_id: str, pheromone_type: str = None) -> float:
+    """Get sum of all pheromone intensities at a location."""
+    pheromones = read_pheromones(location_type, location_id, pheromone_type)
+    return sum(p['intensity'] for p in pheromones)
 
-    total_pheromone = sum(t[1] for t in traces)
-    agent_count = len(set(t[0] for t in traces))
 
-    # Count agent states
-    state_counts = {}
-    for t in traces:
-        state = t[2]
-        state_counts[state] = state_counts.get(state, 0) + 1
+def get_agent_pheromone_affinity(agent_id: str, task_type: str) -> float:
+    """
+    Get agent's affinity for a task type based on their pheromone history.
 
-    dominant_state = max(state_counts, key=state_counts.get) if state_counts else None
+    Returns:
+        0.0 = all failures
+        0.5 = neutral (no history or equal success/failure)
+        1.0 = all successes
+    """
+    try:
+        conn = get_connection()
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT
+                    COALESCE(SUM(CASE WHEN pheromone_type = 'task_completed' THEN intensity END), 0) as success,
+                    COALESCE(SUM(CASE WHEN pheromone_type = 'task_failed' THEN intensity END), 0) as failure
+                FROM stigmergy_pheromones
+                WHERE deposited_by = %s
+                  AND location_type = 'task_type'
+                  AND location_id = %s
+            """, (agent_id, task_type))
+            row = cur.fetchone()
+        conn.close()
 
-    # Generate recommendation based on pheromone patterns
-    if dominant_state == 'blocked':
-        recommendation = 'avoid'
-    elif dominant_state == 'success' and total_pheromone > 5:
-        recommendation = 'exploit'
-    elif agent_count > 3:
-        recommendation = 'disperse'
+        if not row or (row[0] == 0 and row[1] == 0):
+            return 0.5  # Neutral - no history
+
+        success = float(row[0])
+        failure = float(row[1])
+        total = success + failure
+
+        return success / total if total > 0 else 0.5
+
+    except Exception as e:
+        print(f"[PHEROMONE] Error getting affinity: {e}")
+        return 0.5
+
+
+def should_explore(agent_id: str, task_type: str) -> bool:
+    """
+    Decide if agent should explore (try new) or exploit (stick to known).
+
+    Based on SwarmSys exploration/exploitation balance.
+
+    Returns:
+        True = explore (try new task types)
+        False = exploit (stick to proven paths)
+    """
+    import random
+
+    affinity = get_agent_pheromone_affinity(agent_id, task_type)
+    total_intensity = get_total_intensity('task_type', task_type)
+
+    # Low pheromone intensity = unexplored territory = explore
+    if total_intensity < 0.3:
+        return True
+    # High intensity with good affinity = exploit proven path
+    elif total_intensity > 0.7 and affinity > 0.6:
+        return False
+    # Middle ground = probabilistic based on affinity
     else:
-        recommendation = 'follow'
-
-    return {
-        'memory_key': memory_key,
-        'total_pheromone': total_pheromone,
-        'agent_count': agent_count,
-        'traces': [
-            {'agent_id': t[0], 'value': t[1], 'state': t[2]}
-            for t in traces[:10]
-        ],
-        'dominant_state': dominant_state,
-        'state_distribution': state_counts,
-        'recommendation': recommendation
-    }
+        return random.random() < (1 - affinity)
 
 
-def calculate_reward(agent_id: str, task_id: str,
-                     outcome: str, metrics: Dict = None) -> float:
+def calculate_pheromone_boost(task_type: str, agent_id: str) -> float:
     """
-    Calculate S-MADRL style composite reward.
-    outcome: 'claimed', 'success', 'failed', 'collision', 'progress'
+    Calculate bid score boost based on pheromone data.
+
+    Returns:
+        Boost value to add to base bid score (can be negative for penalties)
     """
-    metrics = metrics or {}
+    # Read pheromones at this task type
+    pheromones = read_pheromones('task_type', task_type)
 
-    r_d = REWARD_VALUES['closer_to_goal'] if outcome == 'progress' and metrics.get('closer') else 0
-    r_c = REWARD_VALUES['collision_penalty'] if outcome == 'collision' or metrics.get('collisions', 0) > 0 else 0
-    r_p = REWARD_VALUES['task_claimed'] if outcome == 'claimed' else 0
-    
-    if outcome == 'success':
-        r_s = REWARD_VALUES['task_success']
-    elif outcome == 'failed':
-        r_s = REWARD_VALUES['task_failed']
-    else:
-        r_s = 0
-
-    composite = (
-        REWARD_WEIGHTS['distance'] * r_d +
-        REWARD_WEIGHTS['collision'] * r_c +
-        REWARD_WEIGHTS['pickup'] * r_p +
-        REWARD_WEIGHTS['success'] * r_s
+    # Sum intensities by type
+    success_intensity = sum(
+        p['intensity'] for p in pheromones
+        if p['pheromone_type'] == 'task_completed'
+    )
+    failure_intensity = sum(
+        p['intensity'] for p in pheromones
+        if p['pheromone_type'] == 'task_failed'
     )
 
-    # Log reward
-    conn = get_connection()
-    with conn.cursor() as cur:
-        cur.execute("""
-            INSERT INTO memory_usage_attribution
-            (memory_hash, task_id, usage_type, reward_signal)
-            VALUES (%s, %s, %s, %s)
-        """, (task_id, task_id, f'smadrl_{outcome}', composite))
-        conn.commit()
-    conn.close()
+    # Boost for proven task types (max +0.3)
+    pheromone_boost = min(success_intensity * 0.1, 0.3)
 
-    return composite
+    # Penalty for failure-prone tasks (max -0.15)
+    failure_penalty = min(failure_intensity * 0.05, 0.15)
+
+    # Agent's personal affinity bonus (max +0.2)
+    affinity = get_agent_pheromone_affinity(agent_id, task_type)
+    affinity_boost = (affinity - 0.5) * 0.4  # -0.2 to +0.2
+
+    return pheromone_boost - failure_penalty + affinity_boost
 
 
-def decay_all_pheromones() -> Dict:
+def decay_all_pheromones() -> tuple:
     """
-    Apply decay to all pheromones.
-    Run as periodic job (every 5-15 minutes).
+    Apply decay to all pheromones. Called hourly by decay daemon.
+
+    Returns:
+        (decayed_count, deleted_count)
     """
-    conn = get_connection()
+    try:
+        conn = get_connection()
+        with conn.cursor() as cur:
+            # Apply decay: intensity = intensity * (1 - decay_rate)
+            cur.execute("""
+                UPDATE stigmergy_pheromones
+                SET intensity = intensity * (1 - decay_rate)
+                WHERE intensity > %s
+            """, (MIN_INTENSITY_THRESHOLD,))
+            decayed = cur.rowcount
 
-    with conn.cursor() as cur:
-        # Apply decay: ρ = (1-α)ρ
-        cur.execute("""
-            UPDATE stigmergy_pheromones
-            SET intensity = (1 - decay_rate) * intensity
-            WHERE intensity > %s
-        """, (MIN_PHEROMONE,))
+            # Remove pheromones that have decayed below threshold
+            cur.execute("""
+                DELETE FROM stigmergy_pheromones
+                WHERE intensity < %s
+            """, (MIN_INTENSITY_THRESHOLD,))
+            deleted = cur.rowcount
 
-        decayed = cur.rowcount
+            conn.commit()
+        conn.close()
 
-        # Remove very old/weak pheromones
-        cur.execute("""
-            DELETE FROM stigmergy_pheromones
-            WHERE intensity < %s
-            OR deposited_at < NOW() - INTERVAL '24 hours'
-        """, (MIN_PHEROMONE,))
+        return decayed, deleted
 
-        removed = cur.rowcount
-
-        conn.commit()
-
-    conn.close()
-
-    return {'decayed': decayed, 'removed': removed}
+    except Exception as e:
+        print(f"[PHEROMONE] Error decaying: {e}")
+        return 0, 0
 
 
-def get_pheromone_landscape(limit: int = 50) -> List[Dict]:
-    """Get overview of current pheromone landscape."""
-    conn = get_connection()
+def get_pheromone_stats() -> Dict:
+    """Get summary statistics of pheromone system."""
+    try:
+        conn = get_connection()
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT
+                    COUNT(*) as total_pheromones,
+                    COUNT(DISTINCT deposited_by) as unique_agents,
+                    COUNT(DISTINCT location_id) as unique_locations,
+                    SUM(intensity) as total_intensity,
+                    AVG(intensity) as avg_intensity,
+                    SUM(CASE WHEN pheromone_type = 'task_completed' THEN 1 ELSE 0 END) as success_count,
+                    SUM(CASE WHEN pheromone_type = 'task_failed' THEN 1 ELSE 0 END) as failure_count
+                FROM stigmergy_pheromones
+                WHERE intensity > %s
+            """, (MIN_INTENSITY_THRESHOLD,))
+            row = cur.fetchone()
+        conn.close()
 
-    with conn.cursor() as cur:
-        cur.execute("""
-            SELECT location_id,
-                   SUM(intensity) as total_pheromone,
-                   COUNT(DISTINCT deposited_by) as agent_count,
-                   MAX(deposited_at) as last_activity
-            FROM stigmergy_pheromones
-            WHERE deposited_at > NOW() - INTERVAL '2 hours'
-            GROUP BY location_id
-            ORDER BY total_pheromone DESC
-            LIMIT %s
-        """, (limit,))
-
-        rows = cur.fetchall()
-
-    conn.close()
-
-    return [
-        {
-            'memory_key': r[0],
-            'total_pheromone': float(r[1]),
-            'agent_count': r[2],
-            'last_activity': r[3].isoformat() if r[3] else None
+        return {
+            'total_pheromones': row[0] or 0,
+            'unique_agents': row[1] or 0,
+            'unique_locations': row[2] or 0,
+            'total_intensity': float(row[3]) if row[3] else 0,
+            'avg_intensity': float(row[4]) if row[4] else 0,
+            'success_count': row[5] or 0,
+            'failure_count': row[6] or 0
         }
-        for r in rows
-    ]
+    except Exception as e:
+        print(f"[PHEROMONE] Error getting stats: {e}")
+        return {}
+
+
+# Convenience function for task execution integration
+def on_task_complete(task_id: str, task_type: str, success: bool, agent_id: str):
+    """
+    Deposit pheromones after task completion.
+    Call this from jr_task_executor after each task.
+
+    Args:
+        task_id: The task identifier
+        task_type: Type of task (implementation, research, etc.)
+        success: Whether task succeeded
+        agent_id: Which agent completed the task
+    """
+    pheromone_type = 'task_completed' if success else 'task_failed'
+    intensity = 1.0 if success else 0.2
+
+    # Deposit at task_type location (for future similar tasks)
+    deposit_pheromone(
+        location_type='task_type',
+        location_id=task_type,
+        pheromone_type=pheromone_type,
+        intensity=intensity,
+        agent_id=agent_id
+    )
+
+    # Also deposit at specific task (for debugging/tracking)
+    deposit_pheromone(
+        location_type='task',
+        location_id=task_id,
+        pheromone_type=pheromone_type,
+        intensity=intensity,
+        agent_id=agent_id
+    )
+
+    print(f"[PHEROMONE] {agent_id} deposited {pheromone_type} ({intensity}) at {task_type}")
 
 
 if __name__ == '__main__':
-    import sys
+    # Test the library
+    print("Testing smadrl_pheromones.py...")
 
-    if len(sys.argv) > 1:
-        if sys.argv[1] == 'decay':
-            result = decay_all_pheromones()
-            print(f"Decay result: {result}")
-        elif sys.argv[1] == 'landscape':
-            landscape = get_pheromone_landscape()
-            for loc in landscape:
-                print(f"{loc['memory_key']}: {loc['total_pheromone']:.2f} ({loc['agent_count']} agents)")
-        elif sys.argv[1] == 'test':
-            # Quick test
-            result = deposit_pheromone('test-memory-001', 'test-agent', 'working', action='test')
-            print(f"Deposit: {result}")
-            info = read_pheromones('test-memory-001')
-            print(f"Read: {info}")
-    else:
-        print("S-MADRL Pheromone System")
-        print("Usage:")
-        print("  python smadrl_pheromones.py decay     - Run pheromone decay")
-        print("  python smadrl_pheromones.py landscape - View pheromone landscape")
-        print("  python smadrl_pheromones.py test      - Run quick test")
+    # Test deposit
+    success = deposit_pheromone(
+        location_type='task_type',
+        location_id='test_implementation',
+        pheromone_type='task_completed',
+        intensity=1.0,
+        agent_id='test-agent'
+    )
+    print(f"Deposit test: {'PASS' if success else 'FAIL'}")
+
+    # Test read
+    pheromones = read_pheromones('task_type', 'test_implementation')
+    print(f"Read test: Found {len(pheromones)} pheromones")
+
+    # Test affinity
+    affinity = get_agent_pheromone_affinity('test-agent', 'test_implementation')
+    print(f"Affinity test: {affinity}")
+
+    # Test stats
+    stats = get_pheromone_stats()
+    print(f"Stats: {stats}")
+
+    print("Tests complete!")

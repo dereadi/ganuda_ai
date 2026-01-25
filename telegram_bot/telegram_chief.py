@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
-Cherokee Chief Telegram Bot v2.0
-Tribe Interface Edition
+Cherokee Chief Telegram Bot v2.1
+Tribe Interface Edition with Persistent Sessions
 
 This bot is a thin interface to the 7-Specialist Council.
 All decisions go through the Council. TPM has oversight.
+Now with conversation context through session management.
 """
 
 import os
+import sys
 import asyncio
 import logging
 import requests
@@ -15,7 +17,10 @@ from datetime import datetime
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 
-from tribal_knowledge import lookup_tribal_knowledge
+# Add lib path for session manager
+sys.path.insert(0, '/ganuda/lib')
+from telegram_session_manager import get_or_create_session, TelegramSessionManager
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -37,6 +42,18 @@ class TribeInterface:
             "Content-Type": "application/json"
         }
 
+    def get_db(self):
+        """Get database connection."""
+        import psycopg2
+        if not hasattr(self, "_db_conn") or self._db_conn.closed:
+            self._db_conn = psycopg2.connect(
+                host="192.168.132.222",
+                database="zammad_production",
+                user="claude",
+                password="jawaseatlasers2"
+            )
+        return self._db_conn
+
     def query_council(self, question: str, include_responses: bool = False) -> dict:
         """Submit question to Council for vote"""
         try:
@@ -45,7 +62,7 @@ class TribeInterface:
                 headers=self.headers,
                 json={
                     "question": question,
-                    "max_tokens": 200,
+                    "max_tokens": 1500,
                     "include_responses": include_responses
                 },
                 timeout=120
@@ -105,8 +122,8 @@ class TribeInterface:
             response = requests.post(
                 f"{GATEWAY_URL}/v1/specialist/{specialist_id}/query",
                 headers=self.headers,
-                json={"question": question, "max_tokens": 300},
-                timeout=30
+                json={"question": question, "max_tokens": 1500},
+                timeout=120
             )
             response.raise_for_status()
             return response.json()
@@ -330,16 +347,16 @@ def format_specialist_response(result: dict) -> str:
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle regular messages - route appropriately"""
+    """Handle regular messages - route appropriately with session context"""
     user = update.effective_user
     message = update.message.text
+    chat_id = update.effective_chat.id
 
-    # Check tribal knowledge first - instant answers for common questions
-    tribal_answer = lookup_tribal_knowledge(message)
-    if tribal_answer:
-        await update.message.reply_text(f"📚 Tribal Knowledge\n\n{tribal_answer}")
-        return
-        return
+    # Get or create session for conversation context
+    session = get_or_create_session(user.id, chat_id, user.username or user.first_name)
+
+    # Store user message in session
+    session.add_message('user', message)
 
     # Classify request
     classification = classify_request(message)
@@ -350,6 +367,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         thinking_msg = await update.message.reply_text("Asking Eagle Eye (IT Jr)...")
         result = tribe.query_specialist("eagle_eye", message)
         response = format_specialist_response(result)
+
+        # Store response in session
+        session.add_message('assistant', response[:500], specialist='Eagle Eye')
+
         try:
             await thinking_msg.edit_text(response)
         except:
@@ -359,8 +380,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # For actions/decisions, use full Council
     thinking_msg = await update.message.reply_text("Consulting the Council... (this may take 30-60 seconds)")
 
-    # Build council question with context
+    # Build council question with conversation context
+    session_context = session.build_context_prompt()
+    thermal_context = session.get_thermal_context(limit=2)
+
     question = f"Telegram user {user.first_name} asks: {message}"
+
+    # Add conversation context if available
+    if session_context:
+        question = f"{session_context}\n\n{question}"
+
+    # Add thermal memory context if available
+    if thermal_context:
+        question = f"{thermal_context}\n\n{question}"
 
     if classification["type"] == "destructive":
         question += "\n\n[WARNING] This is a DESTRUCTIVE action request. Evaluate carefully."
@@ -369,6 +401,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     result = tribe.query_council(question)
     response = format_council_response(result, classification)
+
+    # Store Council response in session
+    consensus = result.get('consensus', '')[:500]
+    session.add_message('assistant', consensus, specialist='Council', audit_hash=result.get('audit_hash'))
 
     try:
         await thinking_msg.edit_text(response)
@@ -469,8 +505,8 @@ async def ask_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response = requests.post(
             f"{GATEWAY_URL}/v1/specialist/{specialist}/query",
             headers={"X-API-Key": API_KEY, "Content-Type": "application/json"},
-            json={"question": question, "max_tokens": 500},
-            timeout=30
+            json={"question": question, "max_tokens": 1500},
+            timeout=120
         )
 
         if response.ok:
@@ -564,7 +600,7 @@ async def remember_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             cur = conn.cursor()
             search_pattern = "%" + "%".join(query.split()) + "%"
             cur.execute("""
-                SELECT LEFT(original_content, 200), temperature_score, created_at
+                SELECT LEFT(original_content, 800), temperature_score, created_at
                 FROM thermal_memory_archive
                 WHERE original_content ILIKE %s
                 ORDER BY temperature_score DESC, created_at DESC
@@ -581,7 +617,7 @@ async def remember_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             temp_label = "HOT" if temp and temp > 80 else "WARM" if temp and temp > 50 else "COOL"
             date_str = created.strftime("%m/%d") if created else "?"
             lines.append(f"{i}. [{temp_label}] [{date_str}]")
-            lines.append(f"   {content[:150]}...\n")
+            lines.append(f"   {content[:700]}...\n")
 
         await thinking_msg.edit_text("\n".join(lines))
     except Exception as e:
@@ -589,34 +625,64 @@ async def remember_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 
-async def look_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Visual analysis of sasass screen: /look [question]"""
-    question = " ".join(context.args) if context.args else "What do you see on this screen?"
-    safe_question = question.replace("'", "'\"'\"'")    
-    thinking_msg = await update.message.reply_text("Looking at sasass screen (~30 sec)...")
-    
+async def thermal_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Show latest thermal memories: /thermal [count]"""
+    count = 5
+    if context.args and context.args[0].isdigit():
+        count = min(10, int(context.args[0]))
+
     try:
-        cmd = f"ssh dereadi@192.168.132.241 \"python3 /Users/Shared/ganuda/scripts/fara_look.py '{safe_question}'\""
-        
-        proc = await asyncio.create_subprocess_shell(
-            cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=120)
-        
-        output = stdout.decode()
-        if "FARA Response:" in output:
-            response = output.split("FARA Response:")[-1].strip()
-            response = response.replace("=" * 60, "").strip()
-            await thinking_msg.edit_text(f"FARA: {response[:3000]}")
-        else:
-            await thinking_msg.edit_text(f"FARA output: {output[-1000:]}")
-            
-    except asyncio.TimeoutError:
-        await thinking_msg.edit_text("FARA timed out - model loading takes ~30 seconds")
+        tribe = TribeInterface()
+        with tribe.get_db() as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT LEFT(original_content, 500), temperature_score, created_at, memory_hash
+                FROM thermal_memory_archive
+                ORDER BY created_at DESC
+                LIMIT %s
+            """, (count,))
+            rows = cur.fetchall()
+
+        if not rows:
+            await update.message.reply_text("No thermal memories found.")
+            return
+
+        lines = [f"Latest {len(rows)} Thermal Memories:\n"]
+        for i, (content, temp, created, mhash) in enumerate(rows, 1):
+            temp_val = temp or 0
+            temp_label = "HOT" if temp_val > 80 else "WARM" if temp_val > 50 else "COOL"
+            date_str = created.strftime("%m/%d %H:%M") if created else "?"
+            lines.append(f"{i}. [{temp_label} {temp_val:.0f}C] [{date_str}]")
+            lines.append(f"   {content[:400]}...\n")
+
+        await update.message.reply_text("\n".join(lines))
     except Exception as e:
-        await thinking_msg.edit_text(f"FARA error: {str(e)}")
+        await update.message.reply_text(f"Thermal query error: {e}")
+
+
+async def context_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /context command - show conversation context"""
+    user = update.effective_user
+    chat_id = update.effective_chat.id
+
+    session = get_or_create_session(user.id, chat_id, user.username or user.first_name)
+    session_context = session.build_context_prompt()
+
+    if session_context:
+        await update.message.reply_text(f"Your conversation context:\n\n{session_context[:3000]}")
+    else:
+        await update.message.reply_text("No conversation context yet. Start chatting!")
+
+
+async def forget_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /forget command - clear conversation context"""
+    user = update.effective_user
+    chat_id = update.effective_chat.id
+
+    session = get_or_create_session(user.id, chat_id, user.username or user.first_name)
+    session.clear_session()
+
+    await update.message.reply_text("Conversation context cleared. Starting fresh!")
 
 
 def main():
@@ -626,8 +692,8 @@ def main():
         return
 
     print("=" * 50)
-    print("Cherokee Chief Telegram Bot v2.0")
-    print("Tribe Interface Edition")
+    print("Cherokee Chief Telegram Bot v2.1")
+    print("Tribe Interface Edition with Sessions")
     print("=" * 50)
 
     # Create application
@@ -643,8 +709,10 @@ def main():
     app.add_handler(CommandHandler("health", health_command))
     app.add_handler(CommandHandler("concerns", concerns_command))
     app.add_handler(CommandHandler("remember", remember_command))
+    app.add_handler(CommandHandler("thermal", thermal_command))
+    app.add_handler(CommandHandler("context", context_command))  # Show conversation context
+    app.add_handler(CommandHandler("forget", forget_command))    # Clear conversation context
     app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("look", look_command))
     app.add_handler(CallbackQueryHandler(button_callback))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
@@ -654,3 +722,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -57,7 +57,7 @@ modules:
   breadcrumbs_enabled: true
   
   # Fractal Stigmergic Encryption for key evolution
-  fse_enabled: false
+  fse_enabled: true
   
   # Query Triad (Two Wolves) for privacy/security
   triad_enabled: true

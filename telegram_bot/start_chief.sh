@@ -4,7 +4,7 @@
 # For Seven Generations - Cherokee AI Federation
 
 export TELEGRAM_BOT_TOKEN='7913555407:AAGRDrqslkv4GPfPUcEZ9SJkfPHEghpyjq8'
-export TELEGRAM_GROUP_CHAT_ID='-1001234567890'  # TODO: Get actual group ID
+export TELEGRAM_GROUP_CHAT_ID='-1003439875431'
 export GATEWAY_URL='http://localhost:8080'
 
 cd /ganuda/telegram_bot
