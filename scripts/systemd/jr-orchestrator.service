@@ -1,0 +1,21 @@
+[Unit]
+Description=Cherokee AI Jr Orchestrator - Graduated Priority Queue
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/jr_executor
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/ganuda/lib
+ExecStart=/home/dereadi/cherokee_venv/bin/python jr_orchestrator.py
+Restart=always
+RestartSec=30
+StandardOutput=append:/ganuda/logs/jr_orchestrator.log
+StandardError=append:/ganuda/logs/jr_orchestrator.log
+SyslogIdentifier=jr-orchestrator
+
+[Install]
+WantedBy=multi-user.target
