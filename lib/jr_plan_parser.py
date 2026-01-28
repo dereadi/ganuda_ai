@@ -146,11 +146,14 @@ def extract_files_from_prose(instructions: str) -> Dict[str, List[str]]:
         result['files_to_create'].extend(matches)
 
     # Patterns for files to modify
+    # Updated Jan 26, 2026: Added bracket support for Next.js dynamic routes like [sessionId]
     modify_patterns = [
-        r'MODIFY:\s*`?([/\w\.\-_]+)`?',
-        r'UPDATE:\s*`?([/\w\.\-_]+)`?',
-        r'File\s+to\s+Modify:\s*`?([/\w\.\-_]+)`?',
-        r'UPDATE\s+FILE[S]?:\s*`?([/\w\.\-_]+)`?',
+        r'MODIFY:\s*`([^`]+)`',  # MODIFY: `/path/with/[brackets]/file.tsx`
+        r'MODIFY:\s*([/\w\.\-_\[\]]+)',  # MODIFY: /path/with/[brackets]/file.tsx
+        r'UPDATE:\s*`([^`]+)`',
+        r'UPDATE:\s*([/\w\.\-_\[\]]+)',
+        r'File\s+to\s+Modify:\s*`([^`]+)`',
+        r'UPDATE\s+FILE[S]?:\s*`([^`]+)`',
         r'Modify\s+`([^`]+)`',
         r'Update\s+`([^`]+)`',
         r'Edit\s+`([^`]+)`',

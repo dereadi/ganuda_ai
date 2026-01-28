@@ -1,0 +1,24 @@
+[Unit]
+Description=Cherokee AI Jr - Research
+After=network.target llm-gateway.service
+Wants=llm-gateway.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/jr_executor
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/ganuda/lib
+ExecStart=/home/dereadi/cherokee_venv/bin/python -u jr_queue_worker.py "Research Jr."
+Restart=always
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jr-research
+
+MemoryMax=4G
+CPUQuota=200%
+
+[Install]
+WantedBy=multi-user.target

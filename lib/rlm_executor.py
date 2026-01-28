@@ -14,6 +14,11 @@ Created: January 17, 2026
 
 import json
 import logging
+import shutil
+import fnmatch
+import yaml
+from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 # Configure logging
@@ -45,6 +50,71 @@ PLACEHOLDER_PATTERNS = [
     r'/your/',
     r'/my/',
 ]
+
+# ============== P0 SAFEGUARDS (Jan 27, 2026) ==============
+
+PROTECTED_PATHS_CONFIG = Path('/ganuda/config/rlm_protected_paths.yaml')
+BACKUP_DIR = Path('/ganuda/.rlm-backups')
+BACKUP_RETENTION_DAYS = 7
+_protected_patterns = []
+
+def load_protected_paths():
+    """Load protected paths from config file."""
+    global _protected_patterns
+    if PROTECTED_PATHS_CONFIG.exists():
+        with open(PROTECTED_PATHS_CONFIG) as f:
+            config = yaml.safe_load(f)
+            _protected_patterns = config.get('protected_patterns', [])
+            logger.info(f"[RLM] Loaded {len(_protected_patterns)} protected path patterns")
+    else:
+        logger.warning("[RLM] No protected paths config - using defaults")
+        _protected_patterns = [
+            "/ganuda/vetassist/**/*.tsx",
+            "/ganuda/vetassist/**/*.ts",
+            "/ganuda/vetassist/**/*.py",
+            "/ganuda/lib/*.py",
+            "/ganuda/jr_executor/*.py",
+            "/ganuda/config/*.yaml",
+        ]
+    return _protected_patterns
+
+def is_path_protected(file_path: str) -> bool:
+    """Check if a path matches any protected pattern."""
+    global _protected_patterns
+    if not _protected_patterns:
+        load_protected_paths()
+    for pattern in _protected_patterns:
+        if fnmatch.fnmatch(file_path, pattern):
+            logger.warning(f"[RLM] Path matches protected pattern: {file_path} -> {pattern}")
+            return True
+    return False
+
+def backup_file_before_write(file_path: str) -> Optional[str]:
+    """Create timestamped backup of file before modification."""
+    import os
+    if not os.path.exists(file_path):
+        return None
+
+    BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
+    file_name = Path(file_path).name
+
+    # Preserve directory structure in backup
+    rel_path = file_path.replace('/ganuda/', '')
+    backup_subdir = BACKUP_DIR / Path(rel_path).parent
+    backup_subdir.mkdir(parents=True, exist_ok=True)
+
+    backup_path = backup_subdir / f"{file_name}.{timestamp}.bak"
+
+    try:
+        shutil.copy2(file_path, backup_path)
+        logger.info(f"[RLM] Backed up {file_path} -> {backup_path}")
+        return str(backup_path)
+    except Exception as e:
+        logger.error(f"[RLM] Backup failed for {file_path}: {e}")
+        return None
+
+# ============== END P0 SAFEGUARDS ==============
 
 def validate_path(path: str) -> tuple:
     """Validate path to prevent LLM hallucination and injection."""
@@ -140,15 +210,29 @@ class RLMExecutor:
             # Also check for any artifacts the RLM library created
             artifacts.extend(self._extract_artifacts(response))
 
+            # P0 FIX Jan 27, 2026: Accurate success detection
+            # Only report success if actual files were created
+            files_created = len([a for a in artifacts if a.get('type') == 'file_created'])
+            actual_subtasks = getattr(response, 'recursion_count', 0) if hasattr(response, 'recursion_count') else 0
+
+            # Success requires actual work - not just an LLM response
+            actual_success = files_created > 0 or actual_subtasks > 0
+
             result = {
-                "success": True,
+                "success": actual_success,
                 "result": response_text,
-                "subtasks_completed": getattr(response, 'recursion_count', 1) if hasattr(response, 'recursion_count') else 1,
+                "subtasks_completed": actual_subtasks,
                 "artifacts": artifacts,
-                "files_created": len([a for a in artifacts if a.get('type') == 'file_created']),
+                "files_created": files_created,
                 "execution_tree": {}
             }
-            self.logger.info(f"[RLM] Task completed: {len(artifacts)} artifacts created")
+
+            if not actual_success:
+                result["error"] = f"RLM generated response but created 0 files (no matching file patterns in output)"
+                self.logger.warning(f"[RLM] Task generated text but no files - marking as failed")
+            else:
+                self.logger.info(f"[RLM] Task completed: {files_created} files created")
+
             return result
 
         except Exception as e:
@@ -164,66 +248,69 @@ class RLMExecutor:
     def _build_execution_prompt(self, task: Dict) -> str:
         """Build the RLM execution prompt for a task.
 
-        FIXED Jan 22, 2026: Changed to execution model - model writes Python code
-        that actually creates files using open(), not markdown output.
+        FIXED Jan 27, 2026: Changed to MARKDOWN OUTPUT format that parser expects.
+        Previous "execution model" prompt created Python code that wasn't executed.
+        Now asks for File: `path` format that _write_files_from_response() parses.
         """
-        files_create = json.dumps(task.get('files_to_create', []))
-        files_modify = json.dumps(task.get('files_to_modify', []))
+        files_create = task.get('files_to_create', [])
+        files_modify = task.get('files_to_modify', [])
 
-        return f"""You are a Jr engineer. Write Python code to CREATE files on disk.
+        # Build file list for context
+        file_list = ""
+        if files_create:
+            file_list += f"FILES TO CREATE: {json.dumps(files_create)}\n"
+        if files_modify:
+            file_list += f"FILES TO MODIFY: {json.dumps(files_modify)}\n"
+
+        return f"""You are a software engineer. Generate the complete file contents for the requested task.
 
 TASK: {task.get('title', 'Unknown task')}
 
 INSTRUCTIONS:
 {task.get('instructions', '')}
 
-FILES TO CREATE: {files_create}
-FILES TO MODIFY: {files_modify}
+{file_list}
 
-EXECUTION MODEL - You must write Python code that CREATES FILES using open().
+OUTPUT FORMAT - For EACH file, output in this EXACT format:
 
-EXAMPLE - Creating a Python file:
-```repl
-import os
-os.makedirs('/ganuda/example', exist_ok=True)
-with open('/ganuda/example/myfile.py', 'w') as f:
-    f.write('''#!/usr/bin/env python3
+File: `/path/to/file.py`
+
+```python
+<complete file contents here>
+```
+
+EXAMPLE OUTPUT:
+
+File: `/ganuda/lib/example_module.py`
+
+```python
+#!/usr/bin/env python3
+\"\"\"Example module for demonstration.\"\"\"
+
 def hello():
     return "world"
 
 if __name__ == "__main__":
     print(hello())
-''')
-print("Created: /ganuda/example/myfile.py")
 ```
 
-EXAMPLE - Creating a JavaScript file:
-```repl
-import os
-os.makedirs('/ganuda/sag/static/js', exist_ok=True)
-with open('/ganuda/sag/static/js/vision.js', 'w') as f:
-    f.write('''async function processFrame(framePath, cameraId) {{
-    const response = await fetch("/api/optic/process", {{
-        method: "POST",
-        headers: {{"Content-Type": "application/json"}},
-        body: JSON.stringify({{frame_path: framePath, camera_id: cameraId}})
-    }});
-    return await response.json();
-}}
-''')
-print("Created: /ganuda/sag/static/js/vision.js")
+File: `/ganuda/config/example.yaml`
+
+```yaml
+# Example configuration
+setting: value
+enabled: true
 ```
 
-RULES:
-1. Write Python code using open() to create each file
-2. Use triple single-quotes ''' for file content (avoids escaping issues)
-3. Double curly braces {{{{ }}}} in f-strings for literal braces in JS/JSON
-4. Always os.makedirs(dir, exist_ok=True) first
-5. Print "Created: <path>" after each file
-6. Only /ganuda/ or /tmp/ paths allowed
-7. After ALL files created, call: FINAL_VAR({{"files_created": ["path1", "path2"], "success": True}})
+CRITICAL RULES:
+1. Output COMPLETE file contents, not snippets or explanations
+2. Use the EXACT format: File: `/path` followed by code block
+3. Only use paths starting with /ganuda/ or /tmp/
+4. Include ALL imports and dependencies in each file
+5. Do NOT include explanatory text between files
+6. Generate ALL files listed in FILES TO CREATE/MODIFY
 
-Write the Python code to create the files now:
+Generate the files now:
 """
 
     def _extract_artifacts(self, response) -> List[Dict]:
@@ -346,6 +433,17 @@ Write the Python code to create the files now:
                     })
                     continue
 
+                # P0 SAFEGUARD: Check protected paths FIRST (Jan 27, 2026)
+                if is_path_protected(file_path):
+                    self.logger.error(f"[RLM] BLOCKED modification of PROTECTED file: {file_path}")
+                    artifacts.append({
+                        'type': 'file_blocked',
+                        'path': file_path,
+                        'reason': 'Protected path - modification not allowed',
+                        'blocked_by': 'protected_paths'
+                    })
+                    continue
+
                 # Skip placeholder code (too short or just a comment)
                 code_stripped = code.strip()
                 if len(code_stripped) < 50:
@@ -377,6 +475,16 @@ Write the Python code to create the files now:
                     self.logger.warning(
                         f"[RLM] Overwriting {file_path} (existing={existing_size}b, new={new_size}b)"
                     )
+
+                # P0 SAFEGUARD: Backup existing file before any modification (Jan 27, 2026)
+                if os.path.exists(file_path):
+                    backup_path = backup_file_before_write(file_path)
+                    if backup_path:
+                        artifacts.append({
+                            'type': 'file_backed_up',
+                            'original_path': file_path,
+                            'backup_path': backup_path
+                        })
 
                 # Create directory if needed
                 dir_path = os.path.dirname(file_path)
@@ -417,11 +525,20 @@ Write the Python code to create the files now:
                 if not is_valid:
                     continue
 
+                # P0 SAFEGUARD: Check protected paths (Jan 27, 2026)
+                if is_path_protected(file_path):
+                    self.logger.error(f"[RLM] BLOCKED modification of PROTECTED file: {file_path}")
+                    continue
+
                 code_stripped = code.strip()
                 if len(code_stripped) < 50:
                     continue
 
                 found_files.add(file_path)
+
+                # P0 SAFEGUARD: Backup existing file (Jan 27, 2026)
+                if os.path.exists(file_path):
+                    backup_file_before_write(file_path)
 
                 # Create directory and write
                 dir_path = os.path.dirname(file_path)

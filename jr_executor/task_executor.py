@@ -21,7 +21,7 @@ import sys
 import shutil
 import re
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 # Add lib to path for reasoner import
 sys.path.insert(0, '/ganuda/lib')
@@ -238,6 +238,444 @@ class TaskExecutor:
             return False, "Path contains forbidden shell characters"
 
         return True, ""
+
+    def _extract_target_file_from_header(self, instructions: str) -> Optional[str]:
+        """
+        Extract the primary target file from instruction header/metadata.
+
+        Phase 1 of Hybrid Smart Extraction (Council Vote 8f3a1e9f4b86ded5).
+
+        Looks for patterns like:
+        - | `/ganuda/lib/file.py` | in markdown tables
+        - Files Modified: /path/file in headers
+        - **File:** `/path/file.py` in bold headers
+
+        Returns:
+            File path if exactly ONE target file found in /ganuda/ or /tmp/, else None.
+        """
+        # Pattern 1: Markdown table with file path
+        # | `/ganuda/lib/file.py` | or | /ganuda/lib/file.py |
+        table_pattern = r'\|\s*`?(/(?:ganuda|tmp)/[^\s`|]+)`?\s*\|'
+
+        # Pattern 2: "Files Modified:" or "File:" header
+        header_pattern = r'(?:Files?\s+(?:Modified|to\s+Modify)|File):\s*`?(/(?:ganuda|tmp)/[^\s`\n]+)`?'
+
+        # Pattern 3: Bold file reference **File:** `/path`
+        bold_pattern = r'\*\*File:\*\*\s*`(/(?:ganuda|tmp)/[^\s`]+)`'
+
+        all_files = set()
+
+        for pattern in [table_pattern, header_pattern, bold_pattern]:
+            matches = re.findall(pattern, instructions, re.IGNORECASE)
+            for match in matches:
+                # Clean the path
+                clean_path = match.strip('`').strip()
+                # Validate it's a real file path (has extension)
+                if '.' in clean_path.split('/')[-1]:
+                    all_files.add(clean_path)
+
+        # Only return if exactly ONE file found (unambiguous)
+        if len(all_files) == 1:
+            target_file = all_files.pop()
+            print(f"[SmartExtract] Found single target file: {target_file}")
+            return target_file
+        elif len(all_files) > 1:
+            print(f"[SmartExtract] Multiple files found ({len(all_files)}), cannot auto-attribute")
+            return None
+        else:
+            print("[SmartExtract] No target file found in header")
+            return None
+
+    def _extract_file_from_prose(self, text: str) -> Optional[str]:
+        """
+        Extract file path from prose text before a code block.
+
+        Looks for patterns like:
+        - "Modify `/ganuda/lib/file.py`"
+        - "Update `/ganuda/lib/file.py`"
+        - "In `/ganuda/lib/file.py`, add:"
+        - "to `/ganuda/lib/file.py`:"
+
+        Args:
+            text: The prose text before a code block (typically 300-500 chars)
+
+        Returns:
+            File path if found, else None.
+        """
+        # Patterns for file paths in prose (with backticks)
+        prose_patterns = [
+            r'[Mm]odify\s+`(/(?:ganuda|tmp)/[^`]+)`',
+            r'[Uu]pdate\s+`(/(?:ganuda|tmp)/[^`]+)`',
+            r'[Ii]n\s+`(/(?:ganuda|tmp)/[^`]+)`',
+            r'[Tt]o\s+`(/(?:ganuda|tmp)/[^`]+)`',
+            r'[Ee]dit\s+`(/(?:ganuda|tmp)/[^`]+)`',
+            r'[Ff]ile\s+`(/(?:ganuda|tmp)/[^`]+)`',
+        ]
+
+        for pattern in prose_patterns:
+            match = re.search(pattern, text)
+            if match:
+                filepath = match.group(1).strip()
+                # Validate it has an extension
+                if '.' in filepath.split('/')[-1]:
+                    return filepath
+
+        return None
+
+    def _determine_edit_mode(self, preceding_text: str, code_content: str,
+                              target_file: str) -> dict:
+        """
+        Determine the appropriate edit mode for a code block.
+
+        Phase 2 of Hybrid Smart Extraction (Council Vote b75dced893145a4c).
+
+        Detects whether code should be appended, inserted at a location,
+        or merged via LLM.
+
+        Returns dict with:
+            mode: 'append' | 'insert_top' | 'insert_after' | 'write' (full file)
+            anchor: Optional text to search for in existing file
+            line_hint: Optional approximate line number
+            verb: The action verb detected
+        """
+        result = {
+            'mode': 'write',  # Default: full file write (Phase 1 behavior)
+            'anchor': None,
+            'line_hint': None,
+            'verb': None
+        }
+
+        text = preceding_text.lower()
+
+        # Check if target file exists (new files always use write mode)
+        if target_file and not os.path.exists(target_file):
+            result['mode'] = 'write'
+            result['verb'] = 'create'
+            return result
+
+        # Pattern: "Add this method after X" or "Add new method"
+        add_match = re.search(r'add\s+(?:this\s+)?(?:new\s+)?(?:method|function|class)',
+                              text)
+        if add_match:
+            result['mode'] = 'append'
+            result['verb'] = 'add_method'
+            # Look for "after X" anchor
+            after_match = re.search(r'after\s+`?([a-zA-Z_]\w*(?:\(\))?)`?', text)
+            if after_match:
+                result['anchor'] = after_match.group(1).strip('`')
+                result['mode'] = 'insert_after'
+            return result
+
+        # Pattern: "Add import" or "At the top of the file"
+        import_match = re.search(r'(?:add\s+(?:this\s+)?import|at\s+the\s+top\s+of\s+the\s+file|after\s+existing\s+imports)',
+                                 text)
+        if import_match:
+            result['mode'] = 'insert_top'
+            result['verb'] = 'add_import'
+            # Look for line hint
+            line_match = re.search(r'around\s+line\s+(\d+)', text)
+            if line_match:
+                result['line_hint'] = int(line_match.group(1))
+            return result
+
+        # Pattern: "Modify the X method" or "Update X" or "Replace X"
+        modify_match = re.search(r'(?:modify|update|replace|change)\s+(?:the\s+)?`?([a-zA-Z_]\w*(?:\(\))?)`?',
+                                 text)
+        if modify_match:
+            anchor = modify_match.group(1).strip('`').rstrip('()')
+            # Check if the code block looks like a method/function def
+            if re.match(r'\s*def\s+', code_content) or re.match(r'\s*class\s+', code_content):
+                result['mode'] = 'replace_method'
+                result['verb'] = 'modify'
+            else:
+                result['mode'] = 'insert_after'
+                result['verb'] = 'modify'
+            result['anchor'] = anchor
+            line_match = re.search(r'around\s+line\s+(\d+)', text)
+            if line_match:
+                result['line_hint'] = int(line_match.group(1))
+            return result
+
+        # Pattern: line hint without verb
+        line_match = re.search(r'around\s+line\s+(\d+)', text)
+        if line_match:
+            result['mode'] = 'insert_after'
+            result['verb'] = 'insert'
+            result['line_hint'] = int(line_match.group(1))
+            return result
+
+        # No partial edit pattern detected - use write (Phase 1 behavior)
+        return result
+
+    def _apply_partial_edit(self, filepath: str, content: str,
+                             edit_info: dict) -> dict:
+        """
+        Apply a partial edit to an existing file.
+
+        Phase 2 of Hybrid Smart Extraction (Council Vote b75dced893145a4c).
+
+        Modes:
+        - append: Add code at end of file (before final class closing or EOF)
+        - insert_top: Insert near top of file (after imports)
+        - insert_after: Insert after an anchor function/method/line
+        - write: Full file write (delegates to safe_file_write)
+
+        Returns:
+            Result dict with success, written bytes, mode used
+        """
+        mode = edit_info.get('mode', 'write')
+
+        # If file doesn't exist, always use write mode
+        if not os.path.exists(filepath):
+            return self.safe_file_write(filepath, content, f"partial_edit:{mode}")
+
+        # Read existing file
+        try:
+            with open(filepath, 'r') as f:
+                existing_lines = f.readlines()
+        except Exception as e:
+            return {'success': False, 'error': f'Cannot read existing file: {e}'}
+
+        existing_content = ''.join(existing_lines)
+        original_line_count = len(existing_lines)
+
+        # Create backup
+        backup_path = filepath + '.bak'
+        try:
+            shutil.copy2(filepath, backup_path)
+        except Exception as e:
+            print(f"[PartialEdit] Backup failed: {e}")
+
+        new_lines = content.rstrip('\n').split('\n')
+        merged_lines = list(existing_lines)  # Copy
+
+        # Idempotency check: skip if content already present in file
+        # Only for insert/append modes (not replace - the point of replace is to change existing code)
+        if mode in ('insert_top', 'append', 'insert_after'):
+            # Use a unique multi-line fingerprint (first 3 non-blank non-comment lines)
+            fingerprint_lines = [l.strip() for l in new_lines
+                                 if l.strip() and not l.strip().startswith('#')][:3]
+            existing_stripped = [l.strip() for l in existing_lines]
+            if fingerprint_lines and all(fp in existing_stripped for fp in fingerprint_lines):
+                print(f"[PartialEdit] SKIP: Content already present ({mode})")
+                return {
+                    'success': True,
+                    'written': len(existing_content),
+                    'path': filepath,
+                    'mode': f'partial_edit:{mode}:skipped',
+                    'old_lines': original_line_count,
+                    'new_lines': original_line_count,
+                    'note': 'Content already present, skipped'
+                }
+
+        if mode == 'insert_top':
+            # Insert after imports section
+            insert_pos = self._find_import_end(existing_lines)
+            # Add blank line before and after
+            insert_block = ['\n'] + [line + '\n' for line in new_lines] + ['\n']
+            merged_lines[insert_pos:insert_pos] = insert_block
+            print(f"[PartialEdit] insert_top at line {insert_pos}")
+
+        elif mode == 'append':
+            # Append at end of file with blank line separator
+            append_block = ['\n'] + [line + '\n' for line in new_lines] + ['\n']
+            merged_lines.extend(append_block)
+            print(f"[PartialEdit] append at end of file")
+
+        elif mode == 'insert_after':
+            anchor = edit_info.get('anchor')
+            line_hint = edit_info.get('line_hint')
+            insert_pos = self._find_insert_position(existing_lines, anchor, line_hint)
+
+            if insert_pos is not None:
+                insert_block = ['\n'] + [line + '\n' for line in new_lines] + ['\n']
+                merged_lines[insert_pos:insert_pos] = insert_block
+                print(f"[PartialEdit] insert_after at line {insert_pos} (anchor={anchor})")
+            else:
+                # Fallback: append at end
+                print(f"[PartialEdit] Could not find anchor '{anchor}', appending at end")
+                append_block = ['\n'] + [line + '\n' for line in new_lines] + ['\n']
+                merged_lines.extend(append_block)
+
+        elif mode == 'replace_method':
+            # Replace an existing method/function with new version
+            anchor = edit_info.get('anchor')
+            line_hint = edit_info.get('line_hint')
+            replace_range = self._find_method_range(existing_lines, anchor, line_hint)
+
+            if replace_range:
+                start, end = replace_range
+                # Replace the method lines with new content
+                new_method_lines = [line + '\n' for line in new_lines]
+                # Preserve a blank line after the method
+                new_method_lines.append('\n')
+                merged_lines[start:end] = new_method_lines
+                print(f"[PartialEdit] replace_method '{anchor}' lines {start}-{end} with {len(new_method_lines)} lines")
+            else:
+                # Method not found - insert after line hint or append
+                print(f"[PartialEdit] Method '{anchor}' not found for replace, appending")
+                append_block = ['\n'] + [line + '\n' for line in new_lines] + ['\n']
+                merged_lines.extend(append_block)
+
+        else:
+            # Full write mode - delegate to safe_file_write
+            return self.safe_file_write(filepath, content, f"partial_edit:write")
+
+        # Write merged content
+        merged_content = ''.join(merged_lines)
+        try:
+            with open(filepath, 'w') as f:
+                f.write(merged_content)
+        except Exception as e:
+            # Restore backup
+            if os.path.exists(backup_path):
+                shutil.copy2(backup_path, filepath)
+            return {'success': False, 'error': f'Write failed: {e}'}
+
+        # Syntax check for Python files
+        if filepath.endswith('.py'):
+            try:
+                result = subprocess.run(
+                    ['python3', '-m', 'py_compile', filepath],
+                    capture_output=True, text=True, timeout=10
+                )
+                if result.returncode != 0:
+                    print(f"[PartialEdit] Syntax check FAILED, restoring backup")
+                    print(f"[PartialEdit] Error: {result.stderr[:200]}")
+                    if os.path.exists(backup_path):
+                        shutil.copy2(backup_path, filepath)
+                    return {
+                        'success': False,
+                        'error': f'Syntax check failed after edit: {result.stderr[:200]}',
+                        'blocked_by': 'syntax_check'
+                    }
+                else:
+                    print(f"[PartialEdit] Syntax check passed")
+            except Exception as e:
+                print(f"[PartialEdit] Syntax check error: {e}")
+
+        new_line_count = len(merged_lines)
+        print(f"[PartialEdit] {mode}: {original_line_count} -> {new_line_count} lines")
+
+        return {
+            'success': True,
+            'written': len(merged_content),
+            'path': filepath,
+            'backup': backup_path,
+            'mode': f'partial_edit:{mode}',
+            'old_lines': original_line_count,
+            'new_lines': new_line_count
+        }
+
+    def _find_import_end(self, lines: list) -> int:
+        """Find the line after the last import statement."""
+        last_import = 0
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if stripped.startswith('import ') or stripped.startswith('from '):
+                last_import = i + 1
+            elif stripped.startswith('try:') or stripped.startswith('except'):
+                # Import blocks often wrapped in try/except
+                continue
+            elif last_import > 0 and stripped and not stripped.startswith('#'):
+                # First non-import, non-comment line after imports
+                break
+        return last_import
+
+    def _find_insert_position(self, lines: list, anchor: Optional[str],
+                               line_hint: Optional[int]) -> Optional[int]:
+        """
+        Find the position to insert code after an anchor or near a line hint.
+
+        Strategy:
+        1. If anchor provided, search for it (function/method def)
+        2. Find the end of that function/method block
+        3. Insert after it
+        4. If anchor not found, use line_hint as approximate position
+        """
+        if anchor:
+            # Search for anchor as function/method name
+            anchor_clean = anchor.rstrip('()')
+            for i, line in enumerate(lines):
+                # Match def anchor_name( or class anchor_name
+                if re.search(rf'def\s+{re.escape(anchor_clean)}\s*\(', line):
+                    # Find end of this method (next def at same or lower indent, or end of class)
+                    indent = len(line) - len(line.lstrip())
+                    end_pos = i + 1
+                    for j in range(i + 1, len(lines)):
+                        stripped = lines[j].strip()
+                        if stripped and not stripped.startswith('#'):
+                            j_indent = len(lines[j]) - len(lines[j].lstrip())
+                            if j_indent <= indent and stripped:
+                                end_pos = j
+                                break
+                            end_pos = j + 1
+                    return end_pos
+
+                # Match class anchor_name
+                if re.search(rf'class\s+{re.escape(anchor_clean)}[\s(:]', line):
+                    return i + 1
+
+        # Fallback to line hint
+        if line_hint:
+            # Use line hint as approximate position (0-indexed)
+            pos = min(line_hint, len(lines))
+            return pos
+
+        return None
+
+    def _find_method_range(self, lines: list, anchor: Optional[str],
+                            line_hint: Optional[int]) -> Optional[tuple]:
+        """
+        Find the start and end line indices of a method/function.
+
+        Returns (start, end) tuple where lines[start:end] is the full method.
+        """
+        if not anchor:
+            return None
+
+        anchor_clean = anchor.rstrip('()')
+        start = None
+
+        for i, line in enumerate(lines):
+            if re.search(rf'def\s+{re.escape(anchor_clean)}\s*\(', line):
+                start = i
+                break
+
+        # If not found by name, try line hint
+        if start is None and line_hint:
+            # Look around the hint for a def
+            for offset in range(0, 20):
+                for idx in [line_hint - 1 + offset, line_hint - 1 - offset]:
+                    if 0 <= idx < len(lines):
+                        if re.search(rf'def\s+', lines[idx]):
+                            start = idx
+                            break
+                if start is not None:
+                    break
+
+        if start is None:
+            return None
+
+        # Find end of method: next def/class at same or lower indent level
+        indent = len(lines[start]) - len(lines[start].lstrip())
+        end = start + 1
+        for j in range(start + 1, len(lines)):
+            stripped = lines[j].strip()
+            if not stripped:
+                # Blank line - continue
+                end = j + 1
+                continue
+            j_indent = len(lines[j]) - len(lines[j].lstrip())
+            if j_indent <= indent and (stripped.startswith('def ') or
+                                        stripped.startswith('class ') or
+                                        stripped.startswith('@') or
+                                        stripped.startswith('# ')):
+                end = j
+                break
+            end = j + 1
+
+        return (start, end)
 
     def process_queue_task(self, task: Dict) -> Dict[str, Any]:
         """
@@ -684,10 +1122,12 @@ class TaskExecutor:
         if not RLM_AVAILABLE:
             return False
 
-        # Explicit flag takes precedence
-        if task.get('use_rlm', False):
-            return True
+        # P0 FIX Jan 27, 2026: Explicit use_rlm=false should be respected
+        # Check if use_rlm was explicitly set (present in task dict)
+        if 'use_rlm' in task:
+            return bool(task['use_rlm'])
 
+        # Auto-detection only applies if use_rlm was not explicitly set
         # Check instruction length
         if len(instructions) > 3000:
             return True
@@ -757,13 +1197,22 @@ class TaskExecutor:
             result['artifacts'] = rlm_result.get('artifacts', [])
 
             # CRITICAL FIX: RLM must have done actual work to be successful
-            # Check for artifacts created or subtasks completed
+            # P0 FIX Jan 27, 2026: Check files_created specifically, not just artifacts list
             subtasks = result.get('subtasks_completed', 0)
             artifacts = result.get('artifacts', [])
-            if result['success'] and subtasks == 0 and not artifacts:
+            files_created = result.get('files_created', 0)
+
+            # Require ACTUAL files to have been created for RLM success
+            if result['success'] and files_created == 0 and subtasks == 0:
                 result['success'] = False
-                result['error'] = 'RLM execution reported success but no subtasks completed and no artifacts created'
-                print(f"[RLM] FAIL: Reported success but no actual work done")
+                result['error'] = 'RLM execution reported success but created 0 files'
+                print(f"[RLM] FAIL: Reported success but 0 files created")
+
+            # Also fail if RLM claims success but only has empty artifacts
+            if result['success'] and not artifacts and files_created == 0:
+                result['success'] = False
+                result['error'] = 'RLM execution completed but produced no output'
+                print(f"[RLM] FAIL: No artifacts or files produced")
 
             if not result['success']:
                 result['error'] = result.get('error') or rlm_result.get('error', 'RLM execution failed')
@@ -782,23 +1231,30 @@ class TaskExecutor:
 
     def _extract_steps_via_regex(self, instructions: str) -> List[Dict]:
         """
-        Legacy regex-based extraction for backward compatibility.
+        Enhanced regex-based extraction with smart file detection.
 
-        Looks for code blocks with action hints:
-        - ```sql → SQL action
-        - ```bash or ```shell → Bash action
-        - ```python with Create `/path/file` → File action
+        Phase 1 of Hybrid Smart Extraction (Council Vote 8f3a1e9f4b86ded5).
+
+        Enhancements:
+        1. Extract target file from instruction header
+        2. Look for file paths in prose before code blocks
+        3. Attribute unmatched Python blocks to target file if unambiguous
+
+        Returns list of step dicts ready for execute_steps()
         """
         steps = []
 
-        # Pattern to match code blocks with language hint
+        # Phase 1: Extract target file from header (for single-file instructions)
+        target_file = self._extract_target_file_from_header(instructions)
+
+        # Pattern to match code blocks with language hint - use finditer for positions
         code_block_pattern = r'```(\w+)\n(.*?)```'
 
-        # Find all code blocks
-        matches = re.findall(code_block_pattern, instructions, re.DOTALL)
-
-        for lang, content in matches:
-            content = content.strip()
+        for match in re.finditer(code_block_pattern, instructions, re.DOTALL):
+            lang = match.group(1)
+            raw_content = match.group(2)
+            content = raw_content.strip()
+            block_start = match.start()
 
             if lang.lower() == 'sql':
                 steps.append({
@@ -810,42 +1266,90 @@ class TaskExecutor:
                     'type': 'bash',
                     'command': content
                 })
-            elif lang.lower() in ('python', 'typescript', 'javascript'):
-                # Look for file creation pattern before this code block
-                # Patterns supported (Jan 20, 2026 fix):
-                #   Create `/path/to/file`:
-                #   **File:** `/path/to/file`
-                #   File: `/path/to/file`
-                #   Modify: `/path/to/file`
-                file_patterns = [
-                    r"Create\s+`([^`]+)`",
-                    r"\*\*File:\*\*\s*`([^`]+)`",
-                    r"File:\s*`([^`]+)`",
-                    r"Modify:\s*`([^`]+)`",
-                ]
+            elif lang.lower() in ('python', 'typescript', 'javascript', 'yaml', 'json'):
+                filepath = None
 
-                # Search in the text before this code block
-                block_start = instructions.find(f'```{lang}\n{content}')
                 if block_start > 0:
-                    preceding_text = instructions[max(0, block_start-300):block_start]
+                    # Check preceding 500 chars for file path patterns
+                    preceding_text = instructions[max(0, block_start-500):block_start]
 
-                    filepath = None
+                    # Try existing explicit patterns first
+                    file_patterns = [
+                        r"Create\s+`([^`]+)`",
+                        r"\*\*File:\*\*\s*`([^`]+)`",
+                        r"File:\s*`([^`]+)`",
+                        r"Modify:\s*`([^`]+)`",
+                    ]
+
                     for pattern in file_patterns:
                         file_match = re.search(pattern, preceding_text)
                         if file_match:
-                            filepath = file_match.group(1)
+                            filepath = file_match.group(1).strip('`').strip()
                             break
 
-                    if filepath:
-                        steps.append({
-                            'type': 'file',
-                            'args': {
-                                'operation': 'write',
-                                'path': filepath,
-                                'content': content
-                            }
-                        })
+                    # If no match, try prose extraction (Phase 1 enhancement)
+                    if not filepath:
+                        filepath = self._extract_file_from_prose(preceding_text)
 
+                # If still no filepath but we have a single target file, use it
+                if not filepath and target_file:
+                    # Only for code files modifying the target
+                    target_ext = target_file.split('.')[-1] if '.' in target_file else ''
+                    lang_ext_map = {
+                        'python': 'py',
+                        'typescript': 'ts',
+                        'javascript': 'js',
+                        'yaml': 'yaml',
+                        'json': 'json'
+                    }
+                    if lang_ext_map.get(lang.lower()) == target_ext:
+                        filepath = target_file
+                        print(f"[SmartExtract] Attributing {lang} block to target: {filepath}")
+
+                if filepath:
+                    # Validate path before adding
+                    is_valid, error = self._validate_path(filepath)
+                    if is_valid:
+                        # Phase 2: Determine edit mode from preceding prose
+                        prose_for_mode = instructions[max(0, block_start-500):block_start] if block_start > 0 else ''
+                        edit_info = self._determine_edit_mode(prose_for_mode, content, filepath)
+
+                        if edit_info['mode'] != 'write':
+                            # Partial edit detected - preserve indentation from raw content
+                            # Strip only trailing whitespace, keep leading indent
+                            edit_content = raw_content.rstrip()
+                            # Remove leading blank lines but keep indentation
+                            edit_lines = edit_content.split('\n')
+                            while edit_lines and not edit_lines[0].strip():
+                                edit_lines.pop(0)
+                            edit_content = '\n'.join(edit_lines)
+
+                            steps.append({
+                                'type': 'file',
+                                'args': {
+                                    'operation': 'partial_edit',
+                                    'path': filepath,
+                                    'content': edit_content,
+                                    'edit_info': edit_info
+                                }
+                            })
+                            print(f"[SmartExtract] Partial edit step: {filepath} mode={edit_info['mode']} verb={edit_info.get('verb')} ({len(edit_content)} chars)")
+                        else:
+                            steps.append({
+                                'type': 'file',
+                                'args': {
+                                    'operation': 'write',
+                                    'path': filepath,
+                                    'content': content
+                                }
+                            })
+                            print(f"[SmartExtract] Write step: {filepath} ({len(content)} chars)")
+                    else:
+                        print(f"[SmartExtract] Rejected invalid path: {filepath} - {error}")
+                else:
+                    print(f"[SmartExtract] Skipping {lang} block - no file path found")
+
+        print(f"[SmartExtract] Total steps extracted: {len(steps)}")
         return steps
 
     def execute(self, step: Dict) -> Dict[str, Any]:
@@ -898,7 +1402,7 @@ class TaskExecutor:
         if step_type == 'file':
             args = step.get('args', {})
             operation = args.get('operation', 'read')
-            if operation == 'write':
+            if operation in ('write', 'partial_edit'):
                 context['operation'] = 'CREATE_FILE'
             elif operation == 'read':
                 context['operation'] = 'READ_FILE'
@@ -1027,7 +1531,7 @@ class TaskExecutor:
                 return {'success': False, 'error': 'Invalid path (empty or contains ..)'}
 
             # SECURITY: Check allowed paths for write operations
-            if operation in ['write', 'append']:
+            if operation in ['write', 'append', 'partial_edit']:
                 if not self._is_path_allowed(path):
                     return {
                         'success': False,
@@ -1092,6 +1596,32 @@ class TaskExecutor:
                     'mode': write_result.get('mode'),
                     'old_lines': write_result.get('old_lines', 0),
                     'new_lines': write_result.get('new_lines', 0),
+                    'type': 'file'
+                }
+
+            elif operation == 'partial_edit':
+                # Phase 2 Smart Extraction: Apply partial edit (append/insert/modify)
+                edit_info = args.get('edit_info', {'mode': 'append'})
+                edit_result = self._apply_partial_edit(path, content, edit_info)
+
+                if not edit_result.get('success'):
+                    return {
+                        'success': False,
+                        'error': edit_result.get('error', 'Partial edit failed'),
+                        'blocked_by': edit_result.get('blocked_by', 'partial_edit'),
+                        'type': 'file'
+                    }
+
+                self._audit_file_operation('partial_edit', path, edit_result.get('written', 0), edit_result.get('backup'))
+
+                return {
+                    'success': True,
+                    'written': edit_result.get('written', 0),
+                    'path': path,
+                    'backup': edit_result.get('backup'),
+                    'mode': edit_result.get('mode', 'partial_edit'),
+                    'old_lines': edit_result.get('old_lines', 0),
+                    'new_lines': edit_result.get('new_lines', 0),
                     'type': 'file'
                 }
 
