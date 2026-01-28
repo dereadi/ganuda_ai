@@ -1,0 +1,91 @@
+# Cherokee AI Federation - Dependency Manifest
+# Node: bluefin (Database & IoT Hub)
+# Security: CIA Triad compliance
+---
+node: bluefin
+updated: 2026-01-27
+updated_by: TPM
+change_reason: Initial manifest creation
+
+system:
+  os: Ubuntu
+  kernel: TBD
+  hostname: bluefin.cherokee.local
+
+hardware:
+  cpu: Intel Core i9-14900KF
+  ram: 128 GB DDR5
+  gpu: NVIDIA RTX 5070
+  storage: 17TB (multiple drives)
+
+services:
+  postgresql:
+    version: "16.x"  # Verify exact version
+    port: 5432
+    databases:
+      - zammad_production
+      - triad_federation
+
+  home_assistant:
+    version: TBD
+    port: 8123
+
+  frigate_nvr:
+    version: TBD
+    port: 8971
+
+  grafana:
+    version: TBD
+    port: 3000
+
+  mosquitto_mqtt:
+    version: TBD
+    port: 1883
+
+  bookstack:
+    version: TBD
+    port: 8085
+    nginx: true
+    php: "8.4"
+
+databases:
+  - name: zammad_production
+    tables:
+      - thermal_memory_archive
+      - breadcrumb_trails
+      - council_votes
+      - vetassist_wizard_sessions
+      - vetassist_files
+      - duyuktv_tickets
+      - hardware_inventory
+      - iot_devices
+      - jr_status
+    user: claude
+    # password in silverfin vault
+
+  - name: triad_federation
+    tables:
+      - users
+      - sessions
+    user: claude
+
+network:
+  ip: 192.168.132.222
+  vlan: 132
+
+security:
+  last_audit: 2026-01-27
+  known_vulnerabilities: []
+  firewall: TBD
+
+upgrade_policy:
+  postgresql: major_version_yearly
+  os_packages: monthly_security
+
+changelog:
+  - date: 2026-01-27
+    change: "Initial manifest created"
+    reason: "Dependency tracking system implementation"
+    jr: JR-DEPENDENCY-TRACKING-SYSTEM-JAN27-2026
+
+# TODO: Fill in exact versions via: dpkg -l | grep <package>

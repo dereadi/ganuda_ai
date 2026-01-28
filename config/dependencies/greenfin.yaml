@@ -1,0 +1,91 @@
+# Cherokee AI Federation - Dependency Manifest
+# Node: greenfin (Inter-VLAN Router & Edge LB)
+# Security: CIA Triad compliance
+---
+node: greenfin
+updated: 2026-01-27
+updated_by: TPM
+change_reason: Initial manifest creation
+
+system:
+  os: Ubuntu 24.04.3 LTS
+  kernel: 6.14.0-37-generic
+  hostname: greenfin.cherokee.local
+
+hardware:
+  cpu: AMD Ryzen AI MAX+ 395 w/ Radeon 8060S
+  ram: 128 GB
+  gpu: Integrated Radeon 8060S
+  storage: 1TB NVMe
+
+services:
+  nftables:
+    purpose: Inter-VLAN firewall/routing
+    config: /etc/nftables.conf
+
+  squid:
+    version: TBD
+    port: 3128
+    purpose: HTTP proxy for isolated VLANs
+
+  promtail:
+    version: TBD
+    purpose: Log aggregation
+
+  # PLANNED: Caddy edge LB
+  caddy:
+    version: TBD
+    port: 80, 443
+    purpose: Edge load balancer
+    status: planned
+    jr: JR-GREENFIN-CADDY-EDGE-LB-JAN27-2026
+
+  postgresql:
+    version: "16"
+    port: 5432
+    purpose: Local/backup database
+
+  freeipa_client:
+    version: TBD
+    purpose: Kerberos/LDAP authentication
+
+network:
+  interfaces:
+    - name: eno1
+      ip: 192.168.132.224
+      vlan: 132
+      purpose: Compute zone
+
+    - name: eno1.10
+      ip: 192.168.10.1
+      vlan: 10
+      purpose: Identity zone gateway
+
+    - name: eno1.20
+      ip: 192.168.20.1
+      vlan: 20
+      purpose: Sanctum zone gateway
+
+  routing:
+    - from: VLAN 132
+      to: VLAN 10
+      via: greenfin
+    - from: VLAN 132
+      to: VLAN 20
+      via: greenfin
+
+security:
+  last_audit: 2026-01-27
+  known_vulnerabilities: []
+  firewall: nftables
+  role: perimeter_gateway
+
+upgrade_policy:
+  os_packages: monthly_security
+  caddy: stable_releases
+
+changelog:
+  - date: 2026-01-27
+    change: "Initial manifest created"
+    reason: "Dependency tracking system implementation"
+    jr: JR-DEPENDENCY-TRACKING-SYSTEM-JAN27-2026

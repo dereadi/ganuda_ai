@@ -1,0 +1,119 @@
+# Cherokee AI Federation - Dependency Manifest
+# Node: redfin (GPU Inference)
+# Security: CIA Triad compliance
+---
+node: redfin
+updated: 2026-01-27
+updated_by: TPM
+change_reason: Post-vLLM incident - baseline established after PyTorch downgrade
+
+system:
+  os: Ubuntu 24.04.3 LTS
+  kernel: 6.14.0-37-generic
+  hostname: redfin.cherokee.local
+
+hardware:
+  cpu: AMD Ryzen 9 9950X3D 16-Core
+  ram: 128 GB DDR5
+  gpu: NVIDIA RTX PRO 6000 Blackwell
+  vram: 96 GB
+
+# CRITICAL: ABI-SENSITIVE - These packages must be upgraded together
+gpu_stack:
+  cuda_driver: "570.195.03"
+  torch: "2.9.0"              # PINNED - ABI-sensitive
+  torchvision: "0.24.0"       # PINNED - must match torch
+  torchaudio: "2.9.0"         # PINNED - must match torch
+  vllm: "0.11.2"              # PINNED - compiled against torch
+  xformers: "0.0.33.post1"    # PINNED - compiled against torch
+  triton: "3.5.0"             # PINNED - CUDA kernels
+  flash_attention: null       # Not installed
+
+# WARNING: Do NOT upgrade torch without also rebuilding vllm/xformers
+abi_warning: |
+  torch, vllm, xformers, and triton are ABI-coupled.
+  Upgrading torch WILL break vllm unless vllm is also rebuilt.
+  NEVER use nightly/dev PyTorch builds in production.
+
+services:
+  vllm:
+    version: "0.11.2"
+    python: "3.12"
+    venv: /home/dereadi/cherokee_venv
+    systemd_unit: vllm.service
+    port: 8000
+    model: /ganuda/models/qwen2.5-coder-32b-awq
+    quantization: awq_marlin
+    max_model_len: 32000
+
+  llm_gateway:
+    version: "1.5.0"
+    python: "3.12"
+    venv: /home/dereadi/cherokee_venv
+    systemd_unit: llm-gateway.service
+    port: 8080
+
+  vetassist_backend:
+    version: "1.0.0"
+    python: "3.12"
+    venv: /ganuda/vetassist/backend/venv
+    systemd_unit: vetassist-backend.service
+    port: 8001
+    framework: FastAPI
+
+  vetassist_frontend:
+    version: "1.0.0"
+    runtime: nodejs
+    node_version: "20.x"
+    systemd_unit: vetassist-frontend.service
+    port: 3000
+    framework: Next.js
+
+  sag_ui:
+    version: "1.0.0"
+    python: "3.12"
+    port: 4000
+
+  kanban:
+    version: "1.0.0"
+    port: 3001
+
+databases:
+  - name: zammad_production
+    host: bluefin
+    port: 5432
+    purpose: operational data, thermal memory
+
+  - name: triad_federation
+    host: bluefin
+    port: 5432
+    purpose: authentication, user sessions
+
+  - name: vetassist_pii
+    host: goldfin
+    port: 5432
+    purpose: PII vault (veteran data)
+    status: tables_created
+
+network:
+  ip: 192.168.132.223
+  vlan: 132
+  gateway: greenfin (192.168.132.224)
+
+security:
+  last_audit: 2026-01-27
+  cve_check: 2026-01-27
+  known_vulnerabilities: []
+  firewall: ufw
+
+# Upgrade policy
+upgrade_policy:
+  pytorch: quarterly_stable_only
+  vllm: with_pytorch_or_security
+  os_packages: monthly_security
+
+changelog:
+  - date: 2026-01-27
+    change: "Downgraded PyTorch from 2.11.0.dev to 2.9.0 stable"
+    reason: "ABI mismatch broke vLLM (517 restart attempts)"
+    jr: JR-VLLM-PYTORCH-STABLE-JAN27-2026

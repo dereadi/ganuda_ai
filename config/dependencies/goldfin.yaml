@@ -1,0 +1,83 @@
+# Cherokee AI Federation - Dependency Manifest
+# Node: goldfin (PII Vault)
+# Security: CIA Triad compliance - HIGHEST SENSITIVITY
+---
+node: goldfin
+updated: 2026-01-27
+updated_by: TPM
+change_reason: Initial manifest after PII tables creation
+
+system:
+  os: Rocky Linux 10.1 (Red Quartz)
+  kernel: TBD
+  hostname: goldfin.cherokee.local
+
+hardware:
+  cpu: TBD
+  ram: TBD
+  storage: 70GB (64GB available)
+
+services:
+  postgresql:
+    version: "16.11"
+    port: 5432
+    extensions:
+      - pgcrypto  # Installed 2026-01-27
+    databases:
+      - vetassist_pii
+
+  cockpit:
+    version: TBD
+    port: 9090
+    purpose: Web console
+
+databases:
+  - name: vetassist_pii
+    purpose: Veteran PII vault
+    owner: vetassist
+    tables:
+      - vetassist_wizard_sessions
+      - vetassist_files
+    encryption: pgcrypto (pgp_sym_encrypt)
+    created: 2026-01-27
+
+network:
+  ip: 192.168.20.10
+  vlan: 20 (Sanctum)
+  gateway: greenfin (192.168.20.1)
+  tailscale: 100.77.238.80
+  access_restricted: true
+
+pg_hba_rules:
+  - host: vetassist_pii
+    user: vetassist
+    source: 192.168.132.224/32  # greenfin only
+    method: scram-sha-256
+
+security:
+  classification: PII_VAULT
+  encryption_at_rest: pgcrypto
+  access_control: pg_hba.conf whitelist
+  last_audit: 2026-01-27
+  known_vulnerabilities: []
+
+upgrade_policy:
+  postgresql: security_only
+  os_packages: security_only
+  # Minimal changes - stability critical for PII
+
+changelog:
+  - date: 2026-01-27
+    change: "pgcrypto extension installed, PII tables created"
+    reason: "VetAssist PII migration preparation"
+    jr: JR-VETASSIST-GOLDFIN-PII-SETUP-JAN27-2026
+
+  - date: 2026-01-14
+    change: "PostgreSQL 16.11 installed and started"
+    reason: "Initial goldfin setup"
+
+# SECURITY NOTES:
+# - Only greenfin can connect to this database
+# - All PII fields must be encrypted with pgcrypto
+# - No direct internet access
+# - Audit all access via pg_stat_activity
