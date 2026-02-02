@@ -1,0 +1,22 @@
+[Unit]
+Description=Sanctuary State Daemon - Drift Detection Phase 3A
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda
+ExecStart=/usr/bin/python3 /ganuda/daemons/sanctuary_state.py
+Restart=always
+RestartSec=60
+Environment=PYTHONPATH=/ganuda
+Environment=TELEGRAM_BOT_TOKEN=7913555407:AAGRDrqslkv4GPfPUcEZ9SJkfPHEghpyjq8
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=sanctuary-state
+
+[Install]
+WantedBy=multi-user.target

@@ -355,8 +355,26 @@ class SpecialistCouncil:
         # Synthesize consensus
         consensus = self._synthesize_consensus(responses, question)
 
-        # Calculate confidence (fewer concerns = higher confidence)
-        confidence = max(0.25, 1.0 - (len(concerns) * 0.15))
+        # Calculate confidence with circuit breaker awareness
+        try:
+            from lib.drift_detection import get_circuit_breaker_states, apply_circuit_breaker_to_confidence, record_specialist_health
+            breaker_states = get_circuit_breaker_states()
+            confidence = apply_circuit_breaker_to_confidence(concerns, responses, breaker_states)
+            # Record health data for each specialist
+            for resp in responses:
+                try:
+                    record_specialist_health(
+                        specialist_id=resp.specialist_id,
+                        vote_id=None,
+                        had_concern=resp.has_concern,
+                        concern_type=resp.concern_type,
+                        response_time_ms=resp.response_time_ms,
+                        coherence_score=None
+                    )
+                except Exception:
+                    pass
+        except ImportError:
+            confidence = max(0.25, 1.0 - (len(concerns) * 0.15))
 
         # Generate recommendation
         if len(concerns) == 0:

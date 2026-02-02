@@ -1,0 +1,16 @@
+[Unit]
+Description=Drift Governance Agent - Always-On Monitoring
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda
+ExecStart=/usr/bin/python3 /ganuda/daemons/governance_agent.py
+Restart=always
+RestartSec=60
+Environment=PYTHONPATH=/ganuda
+Environment=TELEGRAM_BOT_TOKEN=
+
+[Install]
+WantedBy=multi-user.target

@@ -1,14 +1,17 @@
 def seed_memory(self, content: str, memory_type: str = "telegram_interaction",
                 temperature: int = 70, tags: list = None) -> dict:
-    """Write to thermal memory archive"""
+    """Write to thermal memory archive with SHA-256 integrity checksum."""
     try:
+        import hashlib as _hl
+        content_checksum = _hl.sha256(content.encode('utf-8', errors='replace')).hexdigest()
+
         with self.get_db() as conn:
             cur = conn.cursor()
             cur.execute("""
                 INSERT INTO thermal_memory_archive (
                     memory_hash, original_content, current_stage,
                     temperature_score, sacred_pattern, metadata,
-                    time_sense, created_at
+                    time_sense, content_checksum, created_at
                 ) VALUES (
                     md5(%s || %s),
                     %s,
@@ -17,6 +20,7 @@ def seed_memory(self, content: str, memory_type: str = "telegram_interaction",
                     false,
                     %s,
                     'SEVEN_GENERATIONS',
+                    %s,
                     NOW()
                 ) RETURNING id
             """, (
@@ -24,7 +28,8 @@ def seed_memory(self, content: str, memory_type: str = "telegram_interaction",
                 content,
                 temperature, temperature,
                 temperature,
-                json.dumps({"type": memory_type, "source": "telegram_chief", "tags": tags or []})
+                json.dumps({"type": memory_type, "source": "telegram_chief", "tags": tags or []}),
+                content_checksum
             ))
             memory_id = cur.fetchone()[0]
             conn.commit()

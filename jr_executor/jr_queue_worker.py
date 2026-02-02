@@ -97,6 +97,13 @@ class JrQueueWorker:
         while self.running:
             self.current_task = None
             try:
+                # Check sanctuary pause flag
+                import os as _os
+                if _os.path.exists('/tmp/jr_executor_paused'):
+                    print(f"[{self.jr_name}] Paused for sanctuary state")
+                    time.sleep(30)
+                    continue
+
                 self._heartbeat()
 
                 # Check for pending tasks
@@ -110,6 +117,19 @@ class JrQueueWorker:
                     try:
                         result = self.executor.process_queue_task(task)
 
+                        # P0 FIX Jan 27, 2026: Defense in depth - validate work was done
+                        # Don't trust success flag alone if no actual work evidence
+                        steps = result.get('steps_executed', [])
+                        artifacts = result.get('artifacts', [])
+                        files_created = result.get('files_created', 0)
+
+                        if result.get('success'):
+                            # Secondary validation: require evidence of work
+                            if not steps and not artifacts and files_created == 0:
+                                print(f"[{self.jr_name}] WARNING: success=True but no work evidence")
+                                result['success'] = False
+                                result['error'] = 'No work performed (0 steps, 0 artifacts, 0 files)'
+
                         if result.get('success'):
                             print(f"[{self.jr_name}] Task completed successfully")
                             # Mark as completed with meaningful summary
@@ -119,7 +139,15 @@ class JrQueueWorker:
                                 result={
                                     'summary': summary,
                                     'steps_executed': result.get('steps_executed', []),
-                                    'completed_at': datetime.now().isoformat()
+                                    'completed_at': datetime.now().isoformat(),
+                                    # Full result metadata (Jan 28, 2026)
+                                    'execution_mode': result.get('execution_mode', 'unknown'),
+                                    'files_created': result.get('files_created', 0),
+                                    'success': result.get('success', True),
+                                    'subtasks_completed': result.get('subtasks_completed', 0),
+                                    'plan': result.get('plan'),
+                                    'task_id': result.get('task_id'),
+                                    'title': result.get('title')
                                 },
                                 artifacts=result.get('artifacts', [])
                             )
