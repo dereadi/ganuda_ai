@@ -1,0 +1,22 @@
+[Unit]
+Description=VetAssist Backend API - Ganuda AI
+After=network.target postgresql.service
+Wants=vetassist-frontend.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/vetassist/backend
+Environment="PATH=/ganuda/vetassist/backend/venv/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/ganuda/vetassist/backend/venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8001
+Restart=always
+RestartSec=10
+StandardOutput=append:/ganuda/vetassist/logs/backend.log
+StandardError=append:/ganuda/vetassist/logs/backend.log
+
+# Resource limits
+MemoryMax=2G
+
+[Install]
+WantedBy=multi-user.target

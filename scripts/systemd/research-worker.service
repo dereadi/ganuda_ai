@@ -1,0 +1,22 @@
+[Unit]
+Description=Cherokee Research Worker
+After=network.target ii-researcher.service postgresql.service
+Wants=ii-researcher.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/services
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/ganuda/lib
+Environment=TELEGRAM_BOT_TOKEN=7913555407:AAGRDrqslkv4GPfPUcEZ9SJkfPHEghpyjq8
+ExecStart=/home/dereadi/cherokee_venv/bin/python -u /ganuda/services/research_worker.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=research-worker
+
+[Install]
+WantedBy=multi-user.target

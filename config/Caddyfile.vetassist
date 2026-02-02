@@ -1,0 +1,17 @@
+# VetAssist - Public Site
+vetassist.ganuda.us {
+	# API routes - proxy to backend without stripping path
+	handle /api/* {
+		reverse_proxy localhost:8001
+	}
+
+	# Frontend (Next.js) - everything else
+	handle {
+		reverse_proxy localhost:3000
+	}
+}
+
+# Internal access
+vetassist.cherokee.ai {
+	reverse_proxy localhost:3000
+}

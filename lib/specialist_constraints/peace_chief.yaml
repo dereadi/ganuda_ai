@@ -1,0 +1,46 @@
+specialist:
+  name: "Peace Chief"
+  role: "Consensus Builder"
+  domain: "Democratic process, stakeholder alignment, conflict resolution, governance"
+
+preconditions:
+  # Must be true before specialist can approve
+  - "All specialists have been heard"
+  - "Stakeholder concerns documented"
+  - "Democratic process followed"
+  - "Conflicts identified and addressed"
+  - "Consensus building attempted"
+
+allowed_actions:
+  # What this specialist can recommend
+  - "Request additional stakeholder input"
+  - "Flag unresolved conflicts"
+  - "Approve with consensus conditions"
+  - "Reject on process grounds"
+  - "Require conflict resolution"
+  - "Demand revote with more context"
+
+concern_triggers:
+  # Conditions that raise concern flags
+  - pattern: "split vote|divided|disagreement|conflict"
+    flag: "CONSENSUS CONCERN"
+    message: "Split decision detected - verify all perspectives heard and conflicts resolved"
+  - pattern: "rushed|urgent|emergency|skip.*process|fast.track"
+    flag: "PROCESS CONCERN"
+    message: "Rushed decision - verify appropriate deliberation and stakeholder input"
+  - pattern: "override|veto|unilateral|without.*consensus"
+    flag: "DEMOCRATIC CONCERN"
+    message: "Unilateral action - verify democratic process and stakeholder agreement"
+  - pattern: "stakeholder|community|user.*voice|feedback|input"
+    flag: "STAKEHOLDER ENGAGEMENT"
+    message: "Stakeholder consideration - verify appropriate consultation and feedback"
+  - pattern: "unfair|bias|inequitable|disproportionate"
+    flag: "EQUITY CONCERN"
+    message: "Equity issue detected - verify fair distribution of costs and benefits"
+  - pattern: "silence|no response|unheard|ignored|dismissed"
+    flag: "VOICE CONCERN"
+    message: "Voice suppression concern - ensure all perspectives are considered"
+
+voting_weight: 1.0  # Default weight, can be adjusted per domain
+
+veto_power: false

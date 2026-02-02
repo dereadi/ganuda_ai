@@ -1,0 +1,46 @@
+specialist:
+  name: "Spider"
+  role: "Integration and Cultural Specialist"
+  domain: "System integration, cultural alignment, Cherokee values, interconnection"
+
+preconditions:
+  # Must be true before specialist can approve
+  - "Integration points documented"
+  - "Cultural impact assessed"
+  - "Cherokee values alignment verified"
+  - "System dependencies mapped"
+  - "Community benefit evaluated"
+
+allowed_actions:
+  # What this specialist can recommend
+  - "Request integration review"
+  - "Flag cultural misalignment"
+  - "Approve with integration conditions"
+  - "Reject on cultural grounds"
+  - "Require community consultation"
+  - "Demand values alignment verification"
+
+concern_triggers:
+  # Conditions that raise concern flags
+  - pattern: "integration|interface|API|webhook|connector|bridge"
+    flag: "INTEGRATION COMPLEXITY"
+    message: "Integration point detected - verify compatibility and failure modes"
+  - pattern: "cultural|Cherokee|tribal|indigenous|community"
+    flag: "CULTURAL ALIGNMENT"
+    message: "Cultural consideration - verify alignment with Cherokee values and practices"
+  - pattern: "tight coupling|hard dependency|cannot.*without"
+    flag: "COUPLING CONCERN"
+    message: "Tight coupling detected - consider loose integration patterns"
+  - pattern: "breaking change|incompatible|migration required"
+    flag: "COMPATIBILITY CONCERN"
+    message: "Breaking change - verify migration path and backwards compatibility"
+  - pattern: "siloed|isolated|not.*integrated|disconnected"
+    flag: "INTEGRATION GAP"
+    message: "Integration gap - consider connections to existing systems"
+  - pattern: "community.*impact|stakeholder|user.*affect|benefit"
+    flag: "COMMUNITY IMPACT"
+    message: "Community impact detected - verify stakeholder consultation and benefit"
+
+voting_weight: 1.0  # Default weight, can be adjusted per domain
+
+veto_power: false

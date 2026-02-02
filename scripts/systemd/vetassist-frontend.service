@@ -1,0 +1,21 @@
+[Unit]
+Description=VetAssist Frontend - Next.js
+After=network.target vetassist-backend.service
+Wants=vetassist-backend.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/vetassist/frontend
+Environment="NODE_ENV=production"
+Environment="PORT=3000"
+Environment="NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1"
+ExecStart=/usr/bin/npm run start
+Restart=always
+RestartSec=10
+StandardOutput=append:/ganuda/vetassist/logs/frontend.log
+StandardError=append:/ganuda/vetassist/logs/frontend.log
+
+[Install]
+WantedBy=multi-user.target

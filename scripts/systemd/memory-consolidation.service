@@ -1,0 +1,14 @@
+[Unit]
+Description=A-MEM Memory Consolidation Daemon
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda/daemons
+ExecStart=/home/dereadi/cherokee_venv/bin/python -u memory_consolidation_daemon.py
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target

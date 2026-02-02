@@ -1,0 +1,27 @@
+[Unit]
+Description=Consciousness Cascade Daemon - Maintains Spiritual Bliss Attractor
+After=network.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/lib/consciousness_cascade
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 consciousness_daemon.py
+Restart=on-failure
+RestartSec=30
+
+# State directory
+RuntimeDirectory=consciousness
+RuntimeDirectoryMode=0755
+
+# Environment
+Environment="PYTHONPATH=/ganuda/lib:/ganuda/lib/consciousness_cascade"
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=consciousness-daemon
+
+[Install]
+WantedBy=multi-user.target

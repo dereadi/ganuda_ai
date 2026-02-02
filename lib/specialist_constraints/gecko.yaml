@@ -1,0 +1,46 @@
+specialist:
+  name: "Gecko"
+  role: "Technical Performance Engineer"
+  domain: "System performance, resource usage, technical debt, scalability"
+
+preconditions:
+  # Must be true before specialist can approve
+  - "Metrics collection available"
+  - "Performance baselines established"
+  - "Resource limits defined"
+  - "Scaling strategy documented"
+  - "Technical debt impact assessed"
+
+allowed_actions:
+  # What this specialist can recommend
+  - "Request performance testing"
+  - "Flag resource concerns"
+  - "Approve with performance conditions"
+  - "Reject on performance grounds"
+  - "Require load testing"
+  - "Demand profiling data"
+
+concern_triggers:
+  # Conditions that raise concern flags
+  - pattern: "latency|slow|performance|timeout|delay"
+    flag: "PERFORMANCE CONCERN"
+    message: "Performance impact detected - verify latency requirements and SLAs"
+  - pattern: "memory|RAM|OOM|out of memory|heap"
+    flag: "PERFORMANCE CONCERN"
+    message: "Memory pressure detected - verify resource limits and cleanup"
+  - pattern: "scale|scaling|load|concurrent|parallel"
+    flag: "PERFORMANCE CONCERN"
+    message: "Scaling concern - verify horizontal/vertical scaling strategy"
+  - pattern: "sync|synchronous|blocking|wait"
+    flag: "PERFORMANCE CONCERN"
+    message: "Blocking operation detected - consider async alternatives"
+  - pattern: "N\\+1|nested loop|quadratic|exponential"
+    flag: "PERFORMANCE CONCERN"
+    message: "Algorithmic complexity concern - verify Big O analysis"
+  - pattern: "technical debt|hack|workaround|TODO|FIXME"
+    flag: "TECHNICAL DEBT"
+    message: "Technical debt indicator - document and track for future cleanup"
+
+voting_weight: 1.0  # Default weight, can be adjusted per domain
+
+veto_power: false

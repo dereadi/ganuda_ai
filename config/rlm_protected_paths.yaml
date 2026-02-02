@@ -1,0 +1,51 @@
+# RLM Protected Paths Configuration
+# Council Approved: 2026-01-27 (Vote 31653da1507b46ec)
+#
+# Files matching these patterns CANNOT be modified by RLM executor.
+# This is a BLACKLIST - these specific paths are protected.
+
+version: "1.0"
+
+# Protection mode: blacklist (these cannot be modified) or whitelist (only these can)
+mode: blacklist
+
+# Protected path patterns (fnmatch glob syntax)
+# Use * for single dir, NOT ** (fnmatch doesn't support **)
+protected_patterns:
+  # VetAssist - PROTECT ALL
+  - "/ganuda/vetassist/*"
+  - "/ganuda/vetassist/*/*"
+  - "/ganuda/vetassist/*/*/*"
+  - "/ganuda/vetassist/*/*/*/*"
+  - "/ganuda/vetassist/*/*/*/*/*"
+
+  # SAG Core
+  - "/ganuda/sag/*"
+  - "/ganuda/sag/*/*"
+  - "/ganuda/sag/*/*/*"
+
+  # Federation Core - CRITICAL
+  - "/ganuda/lib/*.py"
+  - "/ganuda/lib/*/*.py"
+
+  # Jr Executor - CRITICAL
+  - "/ganuda/jr_executor/*.py"
+
+  # Config files - CRITICAL
+  - "/ganuda/config/*.yaml"
+  - "/ganuda/config/*.yml"
+  - "/ganuda/config/*.json"
+
+  # Daemons
+  - "/ganuda/daemons/*.py"
+
+  # Telegram bot
+  - "/ganuda/telegram_bot/*.py"
+
+# Paths that CAN be modified (override protection)
+# Use sparingly - these are exceptions to protected patterns
+allowed_overrides: []
+
+# Notify on attempted modification of protected files
+notify_on_block: true
+notification_channel: "telegram"  # telegram, slack, or log_only

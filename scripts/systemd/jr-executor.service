@@ -1,0 +1,20 @@
+[Unit]
+Description=Cherokee AI Jr Task Executor
+After=network.target llm-gateway.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/jr_executor
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/ganuda/lib
+ExecStart=/home/dereadi/cherokee_venv/bin/python jr_task_executor.py jr-redfin-gecko redfin
+Restart=always
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jr-executor
+
+[Install]
+WantedBy=multi-user.target

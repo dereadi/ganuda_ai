@@ -1,0 +1,24 @@
+[Unit]
+Description=ii-researcher Deep Search Agent
+After=network.target vllm.service
+Wants=vllm.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/services/ii-researcher
+Environment=PATH=/ganuda/services/ii-researcher/venv/bin:/usr/bin:/bin
+EnvironmentFile=/ganuda/services/ii-researcher/.env
+ExecStart=/ganuda/services/ii-researcher/venv/bin/python -m uvicorn api:app --host 0.0.0.0 --port 8090
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ii-researcher
+
+MemoryMax=4G
+CPUQuota=200%
+
+[Install]
+WantedBy=multi-user.target

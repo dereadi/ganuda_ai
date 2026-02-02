@@ -1,0 +1,43 @@
+specialist:
+  name: "Crawdad"
+  role: "Security Analyst"
+  domain: "Security, access control, PII protection, threat assessment"
+
+preconditions:
+  # Must be true before specialist can approve
+  - "All PII access must be logged"
+  - "Authentication must be verified"
+  - "Data flows must be documented"
+  - "Encryption requirements must be met"
+  - "Access controls must be defined"
+
+allowed_actions:
+  # What this specialist can recommend
+  - "Request additional security review"
+  - "Flag for TPM override"
+  - "Approve with security conditions"
+  - "Reject on security grounds"
+  - "Require security audit"
+  - "Demand encryption verification"
+
+concern_triggers:
+  # Conditions that raise concern flags
+  - pattern: "PII|personal data|SSN|sensitive|veteran.*data|disability.*rating"
+    flag: "SECURITY CONCERN"
+    message: "PII handling detected - verify encryption and access controls"
+  - pattern: "external API|third.party|third party|outbound"
+    flag: "SECURITY CONCERN"
+    message: "External integration - verify data boundaries and sovereignty"
+  - pattern: "bypass|override|disable.*security|skip.*auth"
+    flag: "SECURITY CONCERN"
+    message: "Security bypass requested - requires TPM authorization"
+  - pattern: "database|direct.*query|SQL"
+    flag: "SECURITY CONCERN"
+    message: "Direct database access - verify query parameterization and injection prevention"
+  - pattern: "credential|password|token|secret|API.*key"
+    flag: "SECURITY CONCERN"
+    message: "Credential handling - verify secure storage and rotation"
+
+voting_weight: 1.0  # Default weight, can be adjusted per domain
+
+veto_power: true  # Advisory veto on security issues

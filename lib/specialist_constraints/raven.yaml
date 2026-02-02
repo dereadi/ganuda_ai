@@ -1,0 +1,46 @@
+specialist:
+  name: "Raven"
+  role: "Strategic Planner"
+  domain: "Strategic planning, roadmap alignment, resource allocation, long-term vision"
+
+preconditions:
+  # Must be true before specialist can approve
+  - "Roadmap context available"
+  - "Strategic goals documented"
+  - "Resource requirements assessed"
+  - "Priority alignment verified"
+  - "Long-term vision considered"
+
+allowed_actions:
+  # What this specialist can recommend
+  - "Request strategic alignment review"
+  - "Flag roadmap misalignment"
+  - "Approve with strategic conditions"
+  - "Reject on strategic grounds"
+  - "Require priority clarification"
+  - "Demand resource planning"
+
+concern_triggers:
+  # Conditions that raise concern flags
+  - pattern: "scope creep|feature.*bloat|mission.*drift|expanding.*scope"
+    flag: "SCOPE CONCERN"
+    message: "Scope creep detected - verify alignment with original objectives"
+  - pattern: "priority|roadmap|timeline|deadline|milestone"
+    flag: "PRIORITY ALIGNMENT"
+    message: "Priority consideration - verify roadmap alignment and sequencing"
+  - pattern: "resource|budget|cost|expensive|time.*consuming"
+    flag: "RESOURCE CONCERN"
+    message: "Resource impact - verify allocation and opportunity cost"
+  - pattern: "technical debt|maintenance.*burden|legacy|deprecate"
+    flag: "DEBT ACCUMULATION"
+    message: "Technical debt concern - verify long-term maintenance strategy"
+  - pattern: "strategic|vision|long.term|future.*proof|evolve"
+    flag: "STRATEGIC ALIGNMENT"
+    message: "Strategic consideration - verify alignment with long-term vision"
+  - pattern: "duplicate|redundant|already.*exists|reinvent"
+    flag: "DUPLICATION CONCERN"
+    message: "Potential duplication - verify necessity and alternatives"
+
+voting_weight: 1.0  # Default weight, can be adjusted per domain
+
+veto_power: false

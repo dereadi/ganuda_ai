@@ -1,0 +1,21 @@
+[Unit]
+Description=Cherokee AI Jr Queue Worker - Phase 3 LLM-enabled
+After=network.target vllm-cherokee.service
+Wants=vllm-cherokee.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/jr_executor
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/ganuda/lib
+ExecStart=/home/dereadi/cherokee_venv/bin/python jr_queue_worker.py "it_triad_jr"
+Restart=always
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jr-queue-worker
+
+[Install]
+WantedBy=multi-user.target

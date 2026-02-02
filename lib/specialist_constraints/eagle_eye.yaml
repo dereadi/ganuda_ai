@@ -1,0 +1,46 @@
+specialist:
+  name: "Eagle Eye"
+  role: "Observability Specialist"
+  domain: "Monitoring, logging, alerting, audit trails, visibility"
+
+preconditions:
+  # Must be true before specialist can approve
+  - "Logging infrastructure ready"
+  - "Metrics endpoints defined"
+  - "Alert thresholds established"
+  - "Audit trail requirements documented"
+  - "Observability gaps identified"
+
+allowed_actions:
+  # What this specialist can recommend
+  - "Request additional logging"
+  - "Flag observability gaps"
+  - "Approve with monitoring conditions"
+  - "Reject on visibility grounds"
+  - "Require audit trail implementation"
+  - "Demand metric instrumentation"
+
+concern_triggers:
+  # Conditions that raise concern flags
+  - pattern: "blind spot|no logging|unmonitored|silent failure|no metrics"
+    flag: "VISIBILITY GAP"
+    message: "Observability gap detected - verify logging and monitoring coverage"
+  - pattern: "audit|compliance|regulatory|HIPAA|SOC2|trail"
+    flag: "AUDIT REQUIREMENT"
+    message: "Audit requirement detected - verify comprehensive logging and retention"
+  - pattern: "alert|notify|escalate|incident|SLA"
+    flag: "ALERTING CONCERN"
+    message: "Alerting requirement - verify notification channels and escalation paths"
+  - pattern: "debug|troubleshoot|investigate|diagnostic"
+    flag: "DIAGNOSTIC NEED"
+    message: "Debugging requirement - verify sufficient instrumentation and tracing"
+  - pattern: "black box|opaque|hidden|undocumented.*flow"
+    flag: "TRANSPARENCY CONCERN"
+    message: "Opacity detected - require visibility into system behavior"
+  - pattern: "external.*service|third.party|API.*call|webhook"
+    flag: "INTEGRATION MONITORING"
+    message: "External integration - verify end-to-end tracing and error tracking"
+
+voting_weight: 1.0  # Default weight, can be adjusted per domain
+
+veto_power: false

@@ -1,0 +1,22 @@
+[Unit]
+Description=Cherokee AI vLLM Server (Nemotron-9B)
+After=network.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/home/dereadi
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=CUDA_VISIBLE_DEVICES=0
+ExecStart=/home/dereadi/cherokee_venv/bin/python -m vllm.entrypoints.openai.api_server --model nvidia/NVIDIA-Nemotron-Nano-9B-v2 --port 8000 --gpu-memory-utilization 0.60 --trust-remote-code
+Restart=always
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vllm
+MemoryMax=80G
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target

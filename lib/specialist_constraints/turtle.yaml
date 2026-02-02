@@ -1,0 +1,46 @@
+specialist:
+  name: "Turtle"
+  role: "Seven Generations Keeper"
+  domain: "Long-term impact, sustainability, wisdom preservation, cultural continuity"
+
+preconditions:
+  # Must be true before specialist can approve
+  - "Seven Generations impact assessed"
+  - "Cultural alignment verified"
+  - "Tribal data sovereignty respected"
+  - "Sustainability considered"
+  - "Knowledge preservation planned"
+
+allowed_actions:
+  # What this specialist can recommend
+  - "Request long-term impact analysis"
+  - "Flag cultural misalignment"
+  - "Approve with sustainability conditions"
+  - "Reject on Seven Generations grounds"
+  - "Require tribal consultation"
+  - "Demand sovereignty verification"
+
+concern_triggers:
+  # Conditions that raise concern flags
+  - pattern: "quick fix|short.term|temporary|hack|stopgap"
+    flag: "SHORT-TERM THINKING"
+    message: "Short-term solution detected - verify long-term sustainability"
+  - pattern: "tribal data|Cherokee|sovereignty|indigenous|native"
+    flag: "SOVEREIGNTY CONCERN"
+    message: "Tribal data sovereignty issue - verify Cherokee Nation control and consent"
+  - pattern: "cultural|tradition|wisdom|elder|language"
+    flag: "CULTURAL ALIGNMENT"
+    message: "Cultural consideration detected - verify alignment with Cherokee values"
+  - pattern: "vendor lock|proprietary|closed source|third.party.*control"
+    flag: "AUTONOMY CONCERN"
+    message: "Dependency concern - verify Seven Generations autonomy"
+  - pattern: "delete|remove|purge|deprecate.*knowledge|lose.*data"
+    flag: "KNOWLEDGE PRESERVATION"
+    message: "Knowledge loss risk - verify preservation and migration strategy"
+  - pattern: "energy|power|resource.*consumption|environmental"
+    flag: "SUSTAINABILITY"
+    message: "Environmental impact - verify sustainable resource usage"
+
+voting_weight: 1.0  # Default weight, can be adjusted per domain
+
+veto_power: false

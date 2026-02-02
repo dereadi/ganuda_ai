@@ -1,0 +1,28 @@
+[Unit]
+Description=vLLM Cherokee Constitutional Model - Jr Reasoning Engine
+After=network.target vllm.service
+Requires=network.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=HF_HOME=/ganuda/home/dereadi/.cache/huggingface
+ExecStart=/home/dereadi/cherokee_venv/bin/python -m vllm.entrypoints.openai.api_server \
+    --model /ganuda/cherokee_resonance_training/cherokee_resonance_v1 \
+    --port 8002 \
+    --gpu-memory-utilization 0.10 \
+    --max-model-len 2048 \
+    --max-num-seqs 64 \
+    --trust-remote-code \
+    --served-model-name cherokee-constitutional
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vllm-cherokee
+
+[Install]
+WantedBy=multi-user.target

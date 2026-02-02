@@ -1,0 +1,27 @@
+[Unit]
+Description=Visual Kanban Board - Cherokee AI
+After=network.target postgresql.service
+
+[Service]
+Type=forking
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/pathfinder/qdad-apps/visual-kanban
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+
+# Start all three components
+ExecStart=/bin/bash -c '\
+    cd /ganuda/pathfinder/qdad-apps/visual-kanban/backend && \
+    nohup python3 api.py > /ganuda/logs/kanban-api.log 2>&1 & \
+    nohup python3 websocket.py > /ganuda/logs/kanban-ws.log 2>&1 & \
+    cd /ganuda/pathfinder/qdad-apps/visual-kanban/frontend && \
+    nohup python3 -m http.server 8002 > /ganuda/logs/kanban-frontend.log 2>&1 &'
+
+ExecStop=/bin/bash -c 'pkill -f "visual-kanban.*api.py"; pkill -f "visual-kanban.*websocket.py"; pkill -f "http.server 8002"'
+
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

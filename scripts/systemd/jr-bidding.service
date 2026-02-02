@@ -1,0 +1,20 @@
+[Unit]
+Description=Cherokee AI Jr Bidding Daemon
+After=network.target llm-gateway.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/jr_executor
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/ganuda/lib
+ExecStart=/home/dereadi/cherokee_venv/bin/python jr_bidding_daemon.py jr-redfin-gecko redfin
+Restart=always
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jr-bidding
+
+[Install]
+WantedBy=multi-user.target

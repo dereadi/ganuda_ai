@@ -1,0 +1,22 @@
+[Unit]
+Description=Cherokee Research File Watcher
+After=network.target research-worker.service postgresql.service
+Wants=research-worker.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/services
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/ganuda/lib
+Environment=LLM_GATEWAY_URL=http://localhost:8080
+ExecStart=/home/dereadi/cherokee_venv/bin/python -u /ganuda/services/research_file_watcher.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=research-file-watcher
+
+[Install]
+WantedBy=multi-user.target

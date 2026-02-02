@@ -1,0 +1,29 @@
+[Unit]
+Description=Cherokee Email Intelligence Daemon
+Documentation=https://github.com/cherokee-ai/ganuda
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/email_daemon
+Environment=PYTHONPATH=/ganuda
+Environment=CHEROKEE_DB_HOST=192.168.132.222
+Environment=CHEROKEE_DB_NAME=zammad_production
+Environment=CHEROKEE_DB_USER=claude
+Environment=CHEROKEE_DB_PASS=jawaseatlasers2
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 /ganuda/email_daemon/email_daemon.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/ganuda/logs /ganuda/data
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

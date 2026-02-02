@@ -1,0 +1,10 @@
+
+# Ganuda.us - Company Landing Page
+ganuda.us {
+	root * /ganuda/www/ganuda.us
+	file_server
+}
+
+www.ganuda.us {
+	redir https://ganuda.us{uri} permanent
+}
