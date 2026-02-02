@@ -49,12 +49,18 @@ class JrQueueClient:
     def _execute(self, query: str, params: tuple = None, fetch: bool = True) -> Any:
         """Execute a query and optionally fetch results."""
         conn = self._get_connection()
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(query, params)
-            if fetch:
-                return cur.fetchall()
-            conn.commit()
-            return cur.rowcount
+        try:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, params)
+                if fetch:
+                    result = cur.fetchall()
+                    conn.commit()  # P0 FIX: Commit after SELECT to close transaction (Jan 27, 2026)
+                    return result
+                conn.commit()
+                return cur.rowcount
+        except Exception as e:
+            conn.rollback()  # Rollback on error to release locks
+            raise
 
     def heartbeat(self) -> bool:
         """

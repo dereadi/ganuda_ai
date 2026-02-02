@@ -25,7 +25,16 @@ import re
 from typing import Optional, Dict, List, Any
 
 # Configuration
-# Using Qwen 32B on port 8000 for reliable JSON extraction (Cherokee model too small)
+# Dual-model architecture: PM (small) for planning, Coder (large) for code generation
+# PM Model - Ollama executive_jr for fast planning/decomposition
+PM_MODEL_URL = "http://localhost:11434/api/generate"
+PM_MODEL_NAME = "executive_jr"
+
+# Coder Model - Qwen 32B for high-quality code generation
+CODER_MODEL_URL = "http://localhost:8000/v1/chat/completions"
+CODER_MODEL_NAME = "/ganuda/models/qwen2.5-coder-32b-awq"
+
+# Legacy single-model config (used by existing methods)
 LLM_URL = "http://localhost:8000/v1/chat/completions"
 GATEWAY_URL = "http://localhost:8080"
 API_KEY = "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
@@ -427,6 +436,202 @@ def get_reasoner() -> JrLLMReasoner:
 def get_reasoner_sync() -> JrLLMReasonerSync:
     """Get synchronous reasoner instance."""
     return JrLLMReasonerSync()
+
+
+# =============================================================================
+# DUAL-MODEL ARCHITECTURE FUNCTIONS
+# PM (small model) handles planning, Coder (large model) handles code generation
+# Added: January 28, 2026
+# =============================================================================
+
+import requests
+
+def get_pm_plan(instruction_content: str) -> dict:
+    """
+    Use PM model (executive_jr) to parse instructions and create execution plan.
+
+    This small model is fast and good at structured output.
+    Returns a JSON plan that the Coder model can execute step-by-step.
+    """
+    prompt = f"""You are a Project Manager. Parse this JR instruction and create a structured execution plan.
+
+INSTRUCTION:
+{instruction_content[:3000]}
+
+OUTPUT FORMAT (JSON):
+{{
+  "title": "task title",
+  "summary": "one sentence summary",
+  "steps": [
+    {{
+      "step_number": 1,
+      "action": "create_file" | "edit_file" | "run_command",
+      "target": "/path/to/file.py",
+      "description": "what to do",
+      "code_needed": true | false
+    }}
+  ],
+  "files_to_create": ["/path/to/new/file.py"],
+  "files_to_modify": ["/path/to/existing/file.py"]
+}}
+
+Return ONLY valid JSON, no explanation."""
+
+    try:
+        response = requests.post(
+            PM_MODEL_URL,
+            json={"model": PM_MODEL_NAME, "prompt": prompt, "stream": False},
+            timeout=60
+        )
+
+        if response.status_code != 200:
+            # Fallback to Qwen if Ollama unavailable
+            return _fallback_pm_plan(instruction_content)
+
+        result = response.json()
+        text = result.get("response", "")
+
+        # Extract JSON from response
+        json_match = re.search(r'\{[\s\S]*\}', text)
+        if json_match:
+            try:
+                parsed = json.loads(json_match.group(0))
+                # Validate it has required structure
+                if parsed.get('steps') or parsed.get('title'):
+                    return parsed
+            except json.JSONDecodeError:
+                pass
+
+        # PM model didn't return valid JSON - fallback to Qwen
+        print(f"[PM] executive_jr didn't return JSON, falling back to Qwen")
+        return _fallback_pm_plan(instruction_content)
+
+    except requests.exceptions.RequestException as e:
+        # Fallback to Qwen if Ollama unavailable
+        return _fallback_pm_plan(instruction_content)
+
+
+def _fallback_pm_plan(instruction_content: str) -> dict:
+    """Fallback to Qwen 32B if PM model unavailable."""
+    prompt = f"""Parse this JR instruction and create a structured execution plan as JSON.
+
+INSTRUCTION:
+{instruction_content[:3000]}
+
+Return JSON with: title, summary, steps (each with step_number, action, target, description, code_needed), files_to_create, files_to_modify.
+Return ONLY valid JSON:"""
+
+    try:
+        response = requests.post(
+            CODER_MODEL_URL,
+            json={
+                "model": CODER_MODEL_NAME,
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": 1500
+            },
+            timeout=90
+        )
+
+        if response.status_code == 200:
+            text = response.json()["choices"][0]["message"]["content"]
+            json_match = re.search(r'\{[\s\S]*\}', text)
+            if json_match:
+                try:
+                    return json.loads(json_match.group(0))
+                except json.JSONDecodeError:
+                    pass
+
+        return {"error": "Fallback also failed", "steps": []}
+
+    except Exception as e:
+        return {"error": str(e), "steps": []}
+
+
+def get_code_for_step(step: dict, context: str) -> str:
+    """
+    Use Coder model (Qwen 32B) to generate code for a plan step.
+
+    CRITICAL: Output includes '# filepath:' marker for rlm_executor to parse.
+    """
+    target = step.get("target", "/ganuda/lib/output.py")
+    description = step.get("description", "implement the step")
+
+    prompt = f"""Generate production-ready code for this step.
+
+STEP: {description}
+TARGET FILE: {target}
+CONTEXT: {context[:1500]}
+
+CRITICAL: Your response MUST start with a code block containing a filepath comment.
+
+Format your response EXACTLY like this:
+```python
+# filepath: {target}
+# Your implementation here
+```
+
+Generate the complete implementation:"""
+
+    try:
+        response = requests.post(
+            CODER_MODEL_URL,
+            json={
+                "model": CODER_MODEL_NAME,
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": 4000
+            },
+            timeout=120
+        )
+
+        if response.status_code == 200:
+            content = response.json()["choices"][0]["message"]["content"]
+            return content
+        else:
+            return f"# Error: API returned {response.status_code}"
+
+    except Exception as e:
+        return f"# Error generating code: {e}"
+
+
+def execute_with_dual_model(instruction_content: str) -> dict:
+    """
+    Execute task using PM + Coder dual-model approach.
+
+    Phase 1: PM model parses instruction into structured plan
+    Phase 2: Coder model generates code for each step with filepath markers
+
+    Returns dict with plan, code_outputs, and success status.
+    """
+    # Phase 1: PM creates plan
+    plan = get_pm_plan(instruction_content)
+
+    if plan.get("error"):
+        return {
+            "success": False,
+            "error": plan.get("error"),
+            "plan": plan,
+            "code_outputs": []
+        }
+
+    code_outputs = []
+
+    # Phase 2: Coder generates code for each step
+    for step in plan.get("steps", []):
+        if step.get("code_needed", True):
+            code_response = get_code_for_step(step, instruction_content[:1000])
+            code_outputs.append({
+                "step_number": step.get("step_number"),
+                "target": step.get("target"),
+                "code": code_response
+            })
+
+    return {
+        "success": len(code_outputs) > 0,
+        "plan": plan,
+        "code_outputs": code_outputs,
+        "files_to_create": plan.get("files_to_create", []),
+        "files_to_modify": plan.get("files_to_modify", [])
+    }
 
 
 # CLI test mode

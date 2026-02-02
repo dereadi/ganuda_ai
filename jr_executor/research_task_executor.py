@@ -15,6 +15,39 @@ import re
 import hashlib
 from typing import Dict, List, Optional
 from datetime import datetime
+import time
+
+# Phase 10: LLM Reasoner for content synthesis
+# Council vote 6428bcda34efc7f9 — approved with conditions
+import sys
+sys.path.insert(0, '/ganuda/lib')
+try:
+    from jr_llm_reasoner import get_reasoner_sync
+    LLM_REASONER_AVAILABLE = True
+except ImportError:
+    LLM_REASONER_AVAILABLE = False
+    print("[ResearchTaskExecutor] LLM Reasoner not available — synthesis disabled")
+
+# VetAssist authoritative source URLs
+# Maps source names from instructions to actual URLs for fetching
+VETASSIST_SOURCE_URLS = {
+    'va.gov': [
+        'https://www.va.gov/disability/eligibility/',
+        'https://www.va.gov/disability/how-to-file-claim/',
+    ],
+    '38cfr': [
+        'https://www.ecfr.gov/current/title-38/chapter-I/part-3',
+    ],
+    'bva_decisions': [
+        'https://www.va.gov/vetapp/',
+    ],
+    'cck-law.com': [
+        'https://cck-law.com/blog/',
+    ],
+    'vaclaimsinsider.com': [
+        'https://vaclaimsinsider.com/va-disability-ratings/',
+    ],
+}
 
 from web_research import sync_fetch_url, sync_research_topic
 
@@ -47,7 +80,11 @@ class ResearchTaskExecutor:
         topics = self._extract_topics(instructions)
         arxiv_ids = self._extract_arxiv_ids(instructions)
 
-        print(f"[ResearchTaskExecutor] Found {len(urls)} URLs, {len(topics)} topics, {len(arxiv_ids)} ArXiv IDs")
+        # Extract VetAssist source URLs (maps source names to actual URLs)
+        vetassist_urls = self._extract_vetassist_urls(instructions)
+        urls.extend(vetassist_urls)
+
+        print(f"[ResearchTaskExecutor] Found {len(urls)} URLs, {len(topics)} topics, {len(arxiv_ids)} ArXiv IDs, {len(vetassist_urls)} VetAssist sources")
 
         results = []
         artifacts = []
@@ -80,6 +117,7 @@ class ResearchTaskExecutor:
                 print(f"[ResearchTaskExecutor] Fetch error: {e}")
                 result = {'success': False, 'error': str(e), 'length': 0, 'content': None}
 
+            result['url'] = url  # Ensure URL available for summary generation
             results.append(result)
 
             step = {
@@ -157,6 +195,50 @@ class ResearchTaskExecutor:
         successful_fetches = sum(1 for r in results if r.get('success'))
         total_fetches = len(results)
 
+        # Council fallback when no sources fetched
+        if successful_fetches == 0 and len(results) == 0:
+            print("[ResearchTaskExecutor] No sources fetched, attempting Council fallback")
+            try:
+                import requests
+                council_response = requests.post(
+                    'http://192.168.132.223:8080/v1/council/vote',
+                    headers={
+                        'Authorization': 'Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5',
+                        'Content-Type': 'application/json'
+                    },
+                    json={
+                        'topic': title,
+                        'question': instructions[:1000],
+                        'context': 'VetAssist research request'
+                    },
+                    timeout=60
+                )
+                if council_response.status_code == 200:
+                    council_data = council_response.json()
+                    council_synthesis = council_data.get('synthesis', council_data.get('final_answer', 'Council consulted'))
+
+                    # Update summary with council response
+                    summary_content += f"\n\n## Council Consultation\n\n{council_synthesis}\n"
+                    with open(summary_file, 'w') as f:
+                        f.write(summary_content)
+
+                    artifacts.append({
+                        'type': 'council_consultation',
+                        'synthesis': council_synthesis[:500]
+                    })
+                    steps_executed.append({'type': 'council_fallback', 'success': True})
+
+                    return {
+                        'success': True,
+                        'artifacts': artifacts,
+                        'steps_executed': steps_executed,
+                        'summary': f"Council consulted (no web sources). Report: {summary_file}",
+                        'sources_fetched': 0,
+                        'council_consulted': True
+                    }
+            except Exception as council_error:
+                print(f"[ResearchTaskExecutor] Council fallback failed: {council_error}")
+
         return {
             'success': successful_fetches > 0 or len(topics) > 0,
             'artifacts': artifacts,
@@ -192,6 +274,28 @@ class ResearchTaskExecutor:
         arxiv_pattern = r'\b(\d{4}\.\d{4,5})\b'
         return list(set(re.findall(arxiv_pattern, text)))
 
+    def _extract_vetassist_urls(self, instructions: str) -> List[str]:
+        """
+        Extract URLs for VetAssist research tasks based on source names.
+
+        VetAssist instructions reference sources by name (e.g., "VA.gov", "38 CFR")
+        rather than URLs. This method maps source names to actual URLs.
+        """
+        urls = []
+        instructions_lower = instructions.lower()
+
+        # Check if this is a VetAssist research task
+        if 'veteran research task' not in instructions_lower:
+            return urls
+
+        # Map source names to URLs
+        for source_name, source_urls in VETASSIST_SOURCE_URLS.items():
+            if source_name.lower() in instructions_lower:
+                urls.extend(source_urls)
+                print(f"[ResearchTaskExecutor] Added {len(source_urls)} URLs for source: {source_name}")
+
+        return urls
+
     def _extract_topics(self, text: str) -> List[str]:
         """Extract research topics from instruction text."""
         patterns = [
@@ -199,6 +303,8 @@ class ResearchTaskExecutor:
             r'Research:\s*([^\n]+)',
             r'Topic:\s*([^\n]+)',
             r'Analyze:\s*([^\n]+)',
+            r'QUESTION:\s*([^\n]+)',  # VetAssist format
+            r'Question:\s*([^\n]+)',  # Case variation
         ]
         topics = []
         for pattern in patterns:
@@ -230,7 +336,7 @@ class ResearchTaskExecutor:
         return filename
 
     def _generate_summary(self, title: str, results: List[Dict], instructions: str) -> str:
-        """Generate a markdown summary of research results."""
+        """Generate a markdown summary of research results with LLM synthesis."""
         successful = sum(1 for r in results if r.get('success'))
         total = len(results)
 
@@ -257,19 +363,105 @@ class ResearchTaskExecutor:
                 total_topic = result.get('sources_fetched', 0)
                 summary += f"{i}. [Topic] {result['topic']} ({fetched}/{total_topic} sources)\n"
 
+        # Phase 10: LLM Synthesis of fetched content
+        synthesis = self._synthesize_results(results, instructions)
+        if synthesis:
+            summary += f"\n## Key Findings\n\n{synthesis}\n"
+
+        source_summaries = self._summarize_sources(results)
+        if source_summaries:
+            summary += f"\n## Source Summaries\n\n{source_summaries}\n"
+
         summary += """
-## Next Steps
-
-- Analyze fetched content for key insights
-- Extract relevant findings for Cherokee AI architecture
-- Update KB articles with discoveries
-
 ## For Seven Generations
 
 This research contributes to the Cherokee AI Federation's knowledge base,
 building wisdom that will guide future generations of AI development.
 """
         return summary
+
+    def _synthesize_results(self, results: List[Dict], instructions: str) -> str:
+        """
+        Phase 10: Synthesize fetched content using LLM reasoner.
+        Council vote 6428bcda34efc7f9 — Crawdad: public content only, local LLM.
+        Returns empty string on failure (graceful fallback).
+        """
+        if not LLM_REASONER_AVAILABLE:
+            print("[SYNTHESIS] LLM not available — skipping synthesis")
+            return ""
+
+        successful_content = []
+        for r in results:
+            if r.get('success') and r.get('content'):
+                truncated = r['content'][:6000]
+                source_label = r.get('url', r.get('topic', 'Unknown source'))
+                successful_content.append((source_label, truncated))
+
+        if not successful_content:
+            print("[SYNTHESIS] No content to synthesize")
+            return ""
+
+        try:
+            start_time = time.time()
+            reasoner = get_reasoner_sync()
+
+            sources_text = ""
+            for source, content in successful_content[:3]:
+                sources_text += f"\n--- Source: {source} ---\n{content}\n"
+
+            prompt = f"""You are a research analyst. Synthesize the following source content into key findings relevant to this research task.
+
+RESEARCH TASK: {instructions[:500]}
+
+SOURCES:
+{sources_text}
+
+Provide 3-5 key findings as bullet points. Be specific and cite which source each finding comes from. Focus on actionable insights."""
+
+            synthesis = reasoner.simple_completion(prompt, max_tokens=2000)
+            elapsed = time.time() - start_time
+            print(f"[SYNTHESIS] Complete in {elapsed:.1f}s — {len(synthesis)} chars")
+            return synthesis
+        except Exception as e:
+            print(f"[SYNTHESIS] Failed: {e}")
+            return ""
+
+    def _summarize_sources(self, results: List[Dict]) -> str:
+        """
+        Phase 10: Generate brief summaries of each fetched source.
+        Returns empty string on failure (graceful fallback).
+        """
+        if not LLM_REASONER_AVAILABLE:
+            return ""
+
+        summaries = []
+        try:
+            reasoner = get_reasoner_sync()
+            for r in results:
+                if r.get('success') and r.get('content'):
+                    source = r.get('url', r.get('topic', 'Unknown'))
+                    content_preview = r['content'][:3000]
+
+                    prompt = f"""Summarize this web content in 2-3 sentences. Focus on the main topic and key facts.
+
+SOURCE: {source}
+CONTENT:
+{content_preview}
+
+Summary:"""
+                    try:
+                        start_time = time.time()
+                        summary = reasoner.simple_completion(prompt, max_tokens=300)
+                        elapsed = time.time() - start_time
+                        summaries.append(f"**{source}**: {summary.strip()}")
+                        print(f"[SYNTHESIS] Source summary for {source} in {elapsed:.1f}s")
+                    except Exception:
+                        summaries.append(f"**{source}**: Content fetched ({r.get('length', 0):,} chars) — summary unavailable")
+        except Exception as e:
+            print(f"[SYNTHESIS] Source summarization failed: {e}")
+            return ""
+
+        return "\n\n".join(summaries)
 
 
 def is_research_task(task: Dict, instructions: str) -> bool:

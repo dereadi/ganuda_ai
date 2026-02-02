@@ -21,6 +21,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
+# Staging manager for protected paths (Jan 29, 2026)
+try:
+    from staging_manager import stage_file, create_task_staging
+    STAGING_AVAILABLE = True
+except ImportError:
+    STAGING_AVAILABLE = False
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -211,12 +218,13 @@ class RLMExecutor:
             artifacts.extend(self._extract_artifacts(response))
 
             # P0 FIX Jan 27, 2026: Accurate success detection
-            # Only report success if actual files were created
+            # Count both created and staged files as success (Updated Jan 29, 2026)
             files_created = len([a for a in artifacts if a.get('type') == 'file_created'])
+            files_staged = len([a for a in artifacts if a.get('type') == 'file_staged'])
             actual_subtasks = getattr(response, 'recursion_count', 0) if hasattr(response, 'recursion_count') else 0
 
-            # Success requires actual work - not just an LLM response
-            actual_success = files_created > 0 or actual_subtasks > 0
+            # Success requires actual work - files created OR staged for review
+            actual_success = (files_created + files_staged) > 0 or actual_subtasks > 0
 
             result = {
                 "success": actual_success,
@@ -224,6 +232,7 @@ class RLMExecutor:
                 "subtasks_completed": actual_subtasks,
                 "artifacts": artifacts,
                 "files_created": files_created,
+                "files_staged": files_staged,
                 "execution_tree": {}
             }
 
@@ -231,7 +240,7 @@ class RLMExecutor:
                 result["error"] = f"RLM generated response but created 0 files (no matching file patterns in output)"
                 self.logger.warning(f"[RLM] Task generated text but no files - marking as failed")
             else:
-                self.logger.info(f"[RLM] Task completed: {files_created} files created")
+                self.logger.info(f"[RLM] Task completed: {files_created} files created, {files_staged} files staged")
 
             return result
 
@@ -434,7 +443,28 @@ Generate the files now:
                     continue
 
                 # P0 SAFEGUARD: Check protected paths FIRST (Jan 27, 2026)
+                # Updated Jan 29, 2026: Use staging instead of blocking
                 if is_path_protected(file_path):
+                    if STAGING_AVAILABLE:
+                        # Stage the file instead of blocking
+                        task_id = task.get('id') or task.get('task_id') or 'unknown'
+                        relative_path = file_path.replace('/ganuda/', '')
+                        try:
+                            staged_path = stage_file(task_id, relative_path, code)
+                            self.logger.info(f"[RLM] STAGED protected file: {file_path} -> {staged_path}")
+                            artifacts.append({
+                                'type': 'file_staged',
+                                'path': file_path,
+                                'staged_path': str(staged_path),
+                                'task_id': task_id,
+                                'message': 'Staged for TPM review - use /staging to merge'
+                            })
+                            found_files.add(file_path)
+                            continue
+                        except Exception as e:
+                            self.logger.error(f"[RLM] Staging failed for {file_path}: {e}")
+
+                    # Fallback: block if staging unavailable or failed
                     self.logger.error(f"[RLM] BLOCKED modification of PROTECTED file: {file_path}")
                     artifacts.append({
                         'type': 'file_blocked',
@@ -446,7 +476,7 @@ Generate the files now:
 
                 # Skip placeholder code (too short or just a comment)
                 code_stripped = code.strip()
-                if len(code_stripped) < 50:
+                if len(code_stripped) < 20:
                     self.logger.warning(f"[RLM] Skipping placeholder code for: {file_path} ({len(code_stripped)} bytes)")
                     continue
 
@@ -509,7 +539,8 @@ Generate the files now:
         # Pattern 7: # filepath: or # file: inside code block (fallback)
         if not artifacts:
             self.logger.info("[RLM] Primary patterns failed, trying filepath comment extraction...")
-            filepath_pattern = r'```(\w*)\n#\s*(?:filepath|file):\s*(/ganuda/[\w/\.\-_]+\.\w+)\s*\n(.*?)```'
+            # Match /ganuda/ or /tmp/ paths
+            filepath_pattern = r'```(\w*)\n#\s*(?:filepath|file):\s*(/(?:ganuda|tmp)/[\w/\.\-_]+\.\w+)\s*\n(.*?)```'
             for match in re.finditer(filepath_pattern, clean_text, re.DOTALL | re.IGNORECASE):
                 language = match.group(1) or 'python'
                 file_path = match.group(2).strip()
@@ -526,12 +557,30 @@ Generate the files now:
                     continue
 
                 # P0 SAFEGUARD: Check protected paths (Jan 27, 2026)
+                # Updated Jan 29, 2026: Use staging instead of blocking
                 if is_path_protected(file_path):
+                    if STAGING_AVAILABLE:
+                        task_id = task.get('id') or task.get('task_id') or 'unknown'
+                        relative_path = file_path.replace('/ganuda/', '')
+                        try:
+                            staged_path = stage_file(task_id, relative_path, code)
+                            self.logger.info(f"[RLM] STAGED protected file: {file_path} -> {staged_path}")
+                            artifacts.append({
+                                'type': 'file_staged',
+                                'path': file_path,
+                                'staged_path': str(staged_path),
+                                'task_id': task_id,
+                                'message': 'Staged for TPM review'
+                            })
+                            found_files.add(file_path)
+                            continue
+                        except Exception as e:
+                            self.logger.error(f"[RLM] Staging failed: {e}")
                     self.logger.error(f"[RLM] BLOCKED modification of PROTECTED file: {file_path}")
                     continue
 
                 code_stripped = code.strip()
-                if len(code_stripped) < 50:
+                if len(code_stripped) < 20:
                     continue
 
                 found_files.add(file_path)
@@ -652,6 +701,187 @@ def decompose_task(description: str) -> List[str]:
     """Decompose a task description into subtasks."""
     executor = RLMExecutor()
     return executor.decompose_only(description)
+
+
+# =============================================================================
+# DUAL-MODEL EXECUTION (Added Jan 28, 2026)
+# PM model handles planning, Coder model generates code with filepath markers
+# =============================================================================
+
+def execute_with_dual_model(task: Dict) -> Dict:
+    """
+    Execute task using PM + Coder dual-model approach.
+
+    This fixes the "0 files created" problem by:
+    1. Using small PM model (executive_jr) to create structured plan
+    2. Using large Coder model (Qwen 32B) with explicit filepath instructions
+    3. Parsing and writing files from properly formatted output
+
+    Args:
+        task: {
+            "task_id": str,
+            "title": str,
+            "instructions": str,
+            "files_to_create": list,
+            "files_to_modify": list
+        }
+
+    Returns:
+        Same format as execute_task() but with dual-model execution path
+    """
+    from jr_llm_reasoner import get_pm_plan, get_code_for_step
+
+    logger.info(f"[DUAL-MODEL] Starting execution for: {task.get('title', 'unknown')}")
+
+    instruction_content = task.get('instructions', '')
+    if not instruction_content:
+        instruction_content = task.get('title', '')
+
+    # Phase 1: PM creates plan
+    logger.info("[DUAL-MODEL] Phase 1: PM model creating plan...")
+    plan = get_pm_plan(instruction_content)
+
+    if plan.get("error"):
+        logger.error(f"[DUAL-MODEL] PM planning failed: {plan.get('error')}")
+        return {
+            "success": False,
+            "error": f"PM planning failed: {plan.get('error')}",
+            "plan": plan,
+            "subtasks_completed": 0,
+            "artifacts": [],
+            "execution_tree": {}
+        }
+
+    logger.info(f"[DUAL-MODEL] Plan created with {len(plan.get('steps', []))} steps")
+
+    # Phase 2: Coder generates code for each step
+    logger.info("[DUAL-MODEL] Phase 2: Coder model generating code...")
+    all_code_output = []
+
+    for step in plan.get("steps", []):
+        if step.get("code_needed", True):
+            step_num = step.get("step_number", "?")
+            target = step.get("target", "unknown")
+            logger.info(f"[DUAL-MODEL] Generating code for step {step_num}: {target}")
+
+            code_response = get_code_for_step(step, instruction_content[:1000])
+            all_code_output.append(code_response)
+
+    # Combine all code outputs
+    combined_output = "\n\n".join(all_code_output)
+
+    # Phase 3: Write files using existing parser
+    logger.info("[DUAL-MODEL] Phase 3: Writing files from code output...")
+
+    # Create a temporary executor instance just for file writing
+    try:
+        executor = RLMExecutor()
+        artifacts = executor._write_files_from_response(combined_output, task)
+    except Exception as e:
+        # Fallback: manual file extraction if RLM not available
+        logger.warning(f"[DUAL-MODEL] RLM executor unavailable, using fallback: {e}")
+        fallback_task_id = task.get('task_id') or task.get('id')
+        artifacts = _fallback_write_files(combined_output, task_id=fallback_task_id)
+
+    # Count both created and staged files as success (Jan 29, 2026)
+    files_created = len([a for a in artifacts if a.get('type') in ('file_created', 'file_staged')])
+
+    result = {
+        "success": files_created > 0,
+        "plan": plan,
+        "subtasks_completed": len(plan.get("steps", [])),
+        "artifacts": artifacts,
+        "files_created": files_created,
+        "execution_mode": "dual-model",
+        "execution_tree": {}
+    }
+
+    if files_created > 0:
+        logger.info(f"[DUAL-MODEL] Success! Created {files_created} files")
+    else:
+        result["error"] = "Dual-model generated code but no files were created"
+        logger.warning("[DUAL-MODEL] No files created from code output")
+        # Debug: log preview of what we tried to parse
+        logger.debug(f"[DUAL-MODEL] Code output preview: {combined_output[:500]}")
+
+    return result
+
+
+def _fallback_write_files(code_output: str, task_id: str = None) -> List[Dict]:
+    """Fallback file writer when RLM library is not available."""
+    import re
+    import os
+
+    artifacts = []
+    ALLOWED_PATHS = ['/ganuda/', '/tmp/']
+
+    # Pattern: # filepath: /path/to/file.py
+    pattern = r'#\s*filepath:\s*(/[\w/\.\-_]+\.\w+)\s*\n(.*?)(?=\n#\s*filepath:|$)'
+
+    for match in re.finditer(pattern, code_output, re.DOTALL):
+        file_path = match.group(1).strip()
+        code = match.group(2).strip()
+
+        # Strip markdown code block markers if present
+        if code.startswith('```'):
+            code = re.sub(r'^```\w*\n', '', code)
+            code = re.sub(r'\n```$', '', code)
+
+        if not any(file_path.startswith(p) for p in ALLOWED_PATHS):
+            continue
+
+        if len(code) < 20:
+            continue
+
+        # Validate path
+        is_valid, error = validate_path(file_path)
+        if not is_valid:
+            continue
+
+        # Check protected paths - use staging if available (Jan 29, 2026)
+        if is_path_protected(file_path):
+            if STAGING_AVAILABLE:
+                fallback_task_id = task_id or f"fallback-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+                relative_path = file_path.replace('/ganuda/', '')
+                try:
+                    staged_path = stage_file(fallback_task_id, relative_path, code)
+                    artifacts.append({
+                        'type': 'file_staged',
+                        'path': file_path,
+                        'staged_path': str(staged_path),
+                        'task_id': fallback_task_id,
+                        'pattern': 'fallback_filepath',
+                        'message': 'Staged for TPM review'
+                    })
+                    logger.info(f"[FALLBACK] STAGED protected file: {file_path} -> {staged_path}")
+                    continue
+                except Exception as e:
+                    logger.error(f"[FALLBACK] Staging failed: {e}")
+            continue
+
+        # Backup existing file
+        if os.path.exists(file_path):
+            backup_file_before_write(file_path)
+
+        # Create directory and write
+        dir_path = os.path.dirname(file_path)
+        if dir_path:
+            os.makedirs(dir_path, exist_ok=True)
+
+        try:
+            with open(file_path, 'w') as f:
+                f.write(code)
+            artifacts.append({
+                'type': 'file_created',
+                'path': file_path,
+                'size': len(code),
+                'pattern': 'fallback_filepath'
+            })
+            logger.info(f"[FALLBACK] Created file: {file_path} ({len(code)} bytes)")
+        except Exception as e:
+            logger.error(f"[FALLBACK] Failed to write {file_path}: {e}")
+
+    return artifacts
 
 
 # CLI test mode

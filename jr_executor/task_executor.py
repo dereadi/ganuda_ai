@@ -19,6 +19,7 @@ import psycopg2
 import os
 import sys
 import shutil
+from search_replace_editor import SearchReplaceEditor
 import re
 from datetime import datetime
 from typing import Dict, Any, List, Optional
@@ -165,6 +166,10 @@ class TaskExecutor:
         '.cron',     # cron jobs
         '.sudoers',  # sudo config
     ]
+
+    # Phase 11: Self-Healing Retry Configuration
+    # Council vote 6428bcda34efc7f9 — Turtle: bounded retry for sustainability
+    MAX_RETRIES = 2
 
     def __init__(self, jr_type: str = "it_triad_jr"):
         self.jr_type = jr_type
@@ -353,8 +358,29 @@ class TaskExecutor:
             result['verb'] = 'create'
             return result
 
-        # Pattern: "Add this method after X" or "Add new method"
-        add_match = re.search(r'add\s+(?:this\s+)?(?:new\s+)?(?:method|function|class)',
+        # Pattern: "Add X to the list/array/scopes" or "Add `something` to"
+        add_to_match = re.search(r'add\s+[`\'"]?[\w._]+[`\'"]?\s+to\s+', text)
+        if add_to_match:
+            result['mode'] = 'insert_after'
+            result['verb'] = 'add_to'
+            return result
+
+        # Pattern: "Find X and replace/change/update"
+        find_and_match = re.search(r'(?:find|locate|look\s+for)\s+.*?\s+(?:and|then)\s+(?:replace|change|update|add|modify)', text)
+        if find_and_match:
+            result['mode'] = 'insert_after'
+            result['verb'] = 'find_and_modify'
+            return result
+
+        # Pattern: "Change X to Y" or "Replace X with Y" or "Update X to Y"
+        change_match = re.search(r'(?:change|replace|update|swap|switch)\s+.*?\s+(?:to|with|from)', text)
+        if change_match:
+            result['mode'] = 'insert_after'
+            result['verb'] = 'replace'
+            return result
+
+        # Pattern: "Add this method after X" or "Add new method/endpoint/route/etc"
+        add_match = re.search(r'add\s+(?:this\s+)?(?:new\s+)?(?:method|function|class|endpoint|route|import|scope|button|component)',
                               text)
         if add_match:
             result['mode'] = 'append'
@@ -452,12 +478,19 @@ class TaskExecutor:
         # Idempotency check: skip if content already present in file
         # Only for insert/append modes (not replace - the point of replace is to change existing code)
         if mode in ('insert_top', 'append', 'insert_after'):
-            # Use a unique multi-line fingerprint (first 3 non-blank non-comment lines)
-            fingerprint_lines = [l.strip() for l in new_lines
-                                 if l.strip() and not l.strip().startswith('#')][:3]
+            # Use a unique multi-line fingerprint — require 5+ significant lines
+            # Exclude common boilerplate that appears in many files
+            boilerplate_prefixes = ('import ', 'from ', 'logger', 'logging', 'return', 'pass', 'def __init__')
+            fingerprint_lines = [
+                l.strip() for l in new_lines
+                if l.strip()
+                and not l.strip().startswith('#')
+                and not any(l.strip().startswith(bp) for bp in boilerplate_prefixes)
+            ][:5]
             existing_stripped = [l.strip() for l in existing_lines]
-            if fingerprint_lines and all(fp in existing_stripped for fp in fingerprint_lines):
-                print(f"[PartialEdit] SKIP: Content already present ({mode})")
+            # Require ALL 5 lines to match (not just 3) to reduce false positives
+            if len(fingerprint_lines) >= 5 and all(fp in existing_stripped for fp in fingerprint_lines):
+                print(f"[PartialEdit] SKIP: Content already present ({mode}) — 5-line fingerprint matched")
                 return {
                     'success': True,
                     'written': len(existing_content),
@@ -465,8 +498,10 @@ class TaskExecutor:
                     'mode': f'partial_edit:{mode}:skipped',
                     'old_lines': original_line_count,
                     'new_lines': original_line_count,
-                    'note': 'Content already present, skipped'
+                    'note': 'Content already present, skipped (5-line fingerprint)'
                 }
+            elif len(fingerprint_lines) < 5:
+                print(f"[PartialEdit] Skipping idempotency check — only {len(fingerprint_lines)} significant lines (need 5)")
 
         if mode == 'insert_top':
             # Insert after imports section
@@ -777,6 +812,7 @@ class TaskExecutor:
                 failed = [s for s in step_results if not s.get('success')]
                 error_msg = f'{len(failed)} step(s) failed'
                 result['error'] = error_msg
+                result['retry_attempts'] = []
 
                 # Phase 3: Use MAR Reflexion to analyze failure
                 if LLM_REASONER_AVAILABLE:
@@ -791,11 +827,49 @@ class TaskExecutor:
                     if reflection.get('improvements'):
                         print(f"[REFLECT] Improvements suggested: {reflection['improvements']}")
 
-                    # Phase 7: Record execution outcome for learning
+                    # Phase 11: Self-Healing Retry with Reflection
+                    # Council vote 6428bcda34efc7f9 — bounded at MAX_RETRIES
+                    if reflection.get('should_retry'):
+                        current_result = result
+                        current_reflection = reflection
+                        for attempt in range(1, self.MAX_RETRIES + 1):
+                            retry_result = self._retry_with_reflection(
+                                task, instructions, current_result,
+                                current_reflection, attempt,
+                                previous_result=current_result
+                            )
+                            result['retry_attempts'].append({
+                                'attempt': attempt,
+                                'success': retry_result.get('success'),
+                                'error': retry_result.get('error')
+                            })
+
+                            if retry_result.get('success'):
+                                result['success'] = True
+                                result['steps_executed'] = retry_result.get('steps_executed', [])
+                                result['error'] = None
+                                result['recovered_via_retry'] = attempt
+                                print(f"[RETRY] Task recovered after {attempt} retry(s)")
+                                break
+                            else:
+                                # Re-reflect before next attempt
+                                print(f"[RETRY] Attempt {attempt} failed, re-reflecting...")
+                                retry_error = retry_result.get('error', 'Unknown')
+                                current_reflection = self.reflect_on_failure(
+                                    task, retry_error,
+                                    str(retry_result.get('steps_executed', []))
+                                )
+                                current_result = retry_result
+                                if not current_reflection.get('should_retry'):
+                                    print(f"[RETRY] Reflection says stop after attempt {attempt}")
+                                    break
+
+                    # Phase 7: Record execution outcome for learning (after retries)
                     if self.learning_store:
                         try:
                             self.learning_store.record_execution(task, result, reflection)
-                            print(f"[LEARNING] Recorded outcome: success={result.get('success')}")
+                            retries = len(result.get('retry_attempts', []))
+                            print(f"[LEARNING] Recorded outcome: success={result.get('success')}, retries={retries}")
                         except Exception as le:
                             print(f"[LEARNING] Failed to record: {le}")
 
@@ -1108,6 +1182,124 @@ class TaskExecutor:
             print(f"[REFLECT] Reflection error: {e}")
             return {"should_retry": False, "analysis": f"Reflection failed: {e}"}
 
+    def _retry_with_reflection(self, task: Dict, instructions: str, failed_result: Dict,
+                               reflection: Dict, attempt: int, previous_result: Dict = None) -> Dict:
+        """
+        Phase 11: Self-healing retry — retry failed task using reflection insights.
+        Council vote 6428bcda34efc7f9 — bounded at MAX_RETRIES, same security pipeline.
+
+        Uses Reflexion pattern (NeurIPS 2023): append reflection to context,
+        re-extract steps, re-execute. POPE RL insight: verification issues from
+        Phase 17 serve as privileged traces for guided retry.
+        """
+        print(f"[RETRY] Attempt {attempt}/{self.MAX_RETRIES} for: {task.get('title')}")
+
+        # Build augmented instructions with reflection context
+        failed_details = []
+        for s in failed_result.get('steps_executed', []):
+            if not s.get('success'):
+                failed_details.append(f"- Step '{s.get('type')}' failed: {s.get('error', 'unknown')}")
+            # Include verification issues as privileged traces (POPE RL)
+            verification = s.get('verification', {})
+            if verification.get('issues'):
+                for issue in verification['issues']:
+                    failed_details.append(f"- Verification: {issue}")
+
+        reflection_context = f"""
+
+## RETRY CONTEXT (Attempt {attempt})
+
+### Previous Attempt Failed
+{chr(10).join(failed_details) if failed_details else 'No details available'}
+
+### Reflection Analysis
+{reflection.get('analysis', 'No analysis available')}
+
+### Modified Approach
+{reflection.get('modified_approach', 'No modified approach suggested')}
+
+### Improvements to Apply
+{chr(10).join('- ' + imp for imp in reflection.get('improvements', []))}
+
+## IMPORTANT: Apply the improvements above when generating code for this retry.
+"""
+
+        augmented_instructions = instructions + reflection_context
+
+        # Re-extract steps with augmented context
+        steps = self._extract_steps_from_instructions(augmented_instructions)
+
+        if not steps:
+            print(f"[RETRY] No steps extracted from augmented instructions")
+            return {
+                'success': False,
+                'error': f'Retry {attempt}: No executable steps from augmented instructions',
+                'steps_executed': [],
+                'retry_attempt': attempt
+            }
+
+        # Filter out already-completed steps from previous attempt
+        prev = previous_result or failed_result
+        completed_paths = set()
+        if prev and prev.get('steps_executed'):
+            for prev_step in prev['steps_executed']:
+                if prev_step.get('success') and prev_step.get('path'):
+                    completed_paths.add(prev_step['path'])
+                    print(f"[RETRY] Skipping already-completed: {prev_step['path']}")
+
+        if completed_paths:
+            steps_to_run = []
+            for s in steps:
+                step_path = s.get('args', {}).get('path', '')
+                if step_path and step_path in completed_paths:
+                    continue
+                steps_to_run.append(s)
+            print(f"[RETRY] Running {len(steps_to_run)} of {len(steps)} steps (skipping {len(steps) - len(steps_to_run)} completed)")
+            steps = steps_to_run
+
+        if not steps:
+            print(f"[RETRY] All steps already completed, nothing to retry")
+            return {
+                'success': True,
+                'steps_executed': prev.get('steps_executed', []),
+                'retry_attempt': attempt
+            }
+
+        # Execute retry through same security pipeline
+        try:
+            step_results = self.execute_steps(steps)
+
+            if not step_results:
+                return {
+                    'success': False,
+                    'error': f'Retry {attempt}: 0 steps executed',
+                    'steps_executed': [],
+                    'retry_attempt': attempt
+                }
+
+            all_success = all(s.get('success') for s in step_results)
+
+            if all_success:
+                print(f"[RETRY] SUCCESS on attempt {attempt}")
+            else:
+                failed_count = sum(1 for s in step_results if not s.get('success'))
+                print(f"[RETRY] Attempt {attempt} failed: {failed_count} step(s)")
+
+            return {
+                'success': all_success,
+                'steps_executed': step_results,
+                'error': None if all_success else f'Retry {attempt}: {sum(1 for s in step_results if not s.get("success"))} step(s) failed',
+                'retry_attempt': attempt
+            }
+        except Exception as e:
+            print(f"[RETRY] Attempt {attempt} exception: {e}")
+            return {
+                'success': False,
+                'error': f'Retry {attempt} exception: {str(e)}',
+                'steps_executed': [],
+                'retry_attempt': attempt
+            }
+
     def _should_use_rlm(self, task: Dict, instructions: str) -> bool:
         """
         Determine if a task should use RLM recursive execution.
@@ -1150,6 +1342,9 @@ class TaskExecutor:
         """
         Execute a task using RLM recursive decomposition.
         Phase 4 enhancement for complex multi-step tasks.
+
+        UPDATED Jan 28, 2026: Now tries dual-model (PM + Coder) first,
+        falls back to standard RLM if dual-model fails.
         """
         result = {
             'task_id': task.get('task_id'),
@@ -1160,32 +1355,59 @@ class TaskExecutor:
             'execution_mode': 'rlm'
         }
 
+        # Build task dict for RLM/dual-model
+        rlm_task = {
+            "task_id": task.get('task_id', 'unknown'),
+            "title": task.get('title', 'Unknown task'),
+            "instructions": instructions,
+            "files_to_create": [],
+            "files_to_modify": []
+        }
+
+        # Extract files from instructions if LLM reasoner is available
+        if LLM_REASONER_AVAILABLE:
+            try:
+                reasoner = get_reasoner_sync()
+                understanding = reasoner.understand_instruction(instructions)
+                rlm_task["files_to_create"] = understanding.get('files_to_create', [])
+                rlm_task["files_to_modify"] = understanding.get('files_to_modify', [])
+                print(f"[RLM] Files to create: {rlm_task['files_to_create']}")
+                print(f"[RLM] Files to modify: {rlm_task['files_to_modify']}")
+            except Exception as e:
+                print(f"[RLM] Could not extract files via LLM: {e}")
+
+        # DUAL-MODEL APPROACH (Jan 28, 2026)
+        # Try PM + Coder dual-model first - better at generating filepath markers
+        try:
+            from rlm_executor import execute_with_dual_model
+
+            print(f"[DUAL-MODEL] Trying PM + Coder dual-model execution...")
+            dual_result = execute_with_dual_model(rlm_task)
+
+            # Debug logging
+            print(f"[DUAL-MODEL] Result: success={dual_result.get('success')}, files_created={dual_result.get('files_created', 0)}")
+
+            if dual_result.get('success') and dual_result.get('files_created', 0) > 0:
+                print(f"[DUAL-MODEL] Success! Created {dual_result.get('files_created')} files")
+                result['success'] = True
+                result['execution_mode'] = 'dual-model'
+                result['plan'] = dual_result.get('plan', {})
+                result['artifacts'] = dual_result.get('artifacts', [])
+                result['files_created'] = dual_result.get('files_created', 0)
+                result['subtasks_completed'] = dual_result.get('subtasks_completed', 0)
+                return result
+            else:
+                print(f"[DUAL-MODEL] Did not create files, falling back to standard RLM")
+
+        except Exception as e:
+            print(f"[DUAL-MODEL] Failed: {e}, falling back to standard RLM")
+
+        # STANDARD RLM FALLBACK
         try:
             from rlm_executor import RLMExecutor
 
             print(f"[RLM] Initializing recursive executor...")
             executor = RLMExecutor(sandbox="local")
-
-            # Build task dict for RLM
-            rlm_task = {
-                "task_id": task.get('task_id', 'unknown'),
-                "title": task.get('title', 'Unknown task'),
-                "instructions": instructions,
-                "files_to_create": [],
-                "files_to_modify": []
-            }
-
-            # Extract files from instructions if LLM reasoner is available
-            if LLM_REASONER_AVAILABLE:
-                try:
-                    reasoner = get_reasoner_sync()
-                    understanding = reasoner.understand_instruction(instructions)
-                    rlm_task["files_to_create"] = understanding.get('files_to_create', [])
-                    rlm_task["files_to_modify"] = understanding.get('files_to_modify', [])
-                    print(f"[RLM] Files to create: {rlm_task['files_to_create']}")
-                    print(f"[RLM] Files to modify: {rlm_task['files_to_modify']}")
-                except Exception as e:
-                    print(f"[RLM] Could not extract files via LLM: {e}")
 
             # Execute with RLM
             print(f"[RLM] Executing task with recursive decomposition...")
@@ -1349,6 +1571,47 @@ class TaskExecutor:
                 else:
                     print(f"[SmartExtract] Skipping {lang} block - no file path found")
 
+
+        # Parse SEARCH/REPLACE blocks (Council Vote: search-replace architecture)
+        sr_pattern = r'<<<<<<< SEARCH\n(.*?)\n=======\n(.*?)\n>>>>>>> REPLACE'
+        for sr_match in re.finditer(sr_pattern, instructions, re.DOTALL):
+            sr_search = sr_match.group(1)
+            sr_replace = sr_match.group(2)
+            sr_start = sr_match.start()
+            
+            # Find filepath from preceding text
+            sr_preceding = instructions[max(0, sr_start-500):sr_start]
+            sr_filepath = None
+            sr_file_patterns = [
+                r'\*\*File:\*\*\s*`([^`]+)`',
+                r'File:\s*`([^`]+)`',
+                r'Modify:\s*`([^`]+)`',
+                r'Edit:\s*`([^`]+)`',
+                r'In\s+`([^`]+)`',
+            ]
+            for fp_pattern in sr_file_patterns:
+                fp_match = re.search(fp_pattern, sr_preceding)
+                if fp_match:
+                    sr_filepath = fp_match.group(1).strip('`').strip()
+                    break
+            
+            if sr_filepath:
+                is_valid, error = self._validate_path(sr_filepath)
+                if is_valid:
+                    steps.append({
+                        'type': 'search_replace',
+                        'args': {
+                            'path': sr_filepath,
+                            'search': sr_search,
+                            'replace': sr_replace
+                        }
+                    })
+                    print(f"[SmartExtract] Search-replace step: {sr_filepath} ({len(sr_search)} -> {len(sr_replace)} chars)")
+                else:
+                    print(f"[SmartExtract] Rejected SR path: {sr_filepath} - {error}")
+            else:
+                print(f"[SmartExtract] WARNING: SEARCH/REPLACE block found but no filepath")
+
         print(f"[SmartExtract] Total steps extracted: {len(steps)}")
         return steps
 
@@ -1366,17 +1629,200 @@ class TaskExecutor:
 
         try:
             if step_type == 'sql':
-                return self._execute_sql(step)
+                exec_result = self._execute_sql(step)
             elif step_type == 'bash':
-                return self._execute_bash(step)
+                exec_result = self._execute_bash(step)
             elif step_type == 'file':
-                return self._execute_file(step)
+                exec_result = self._execute_file(step)
             elif step_type == 'rsync':
-                return self._execute_rsync(step)
+                exec_result = self._execute_rsync(step)
+            elif step_type == 'search_replace':
+                exec_result = self._execute_search_replace(step)
             else:
                 return {'success': False, 'error': f'Unknown step type: {step_type}'}
+
+            # Phase 17: Post-execution verification
+            # Council vote 6428bcda34efc7f9 — informational only
+            if exec_result.get('success'):
+                verification = self._verify_step_result(step, exec_result)
+                exec_result['verification'] = verification
+                if verification.get('issues'):
+                    print(f"[VERIFY] {step_type} issues: {verification['issues']}")
+                else:
+                    checks = verification.get('checks_run', [])
+                    if checks:
+                        print(f"[VERIFY] {step_type} OK: {', '.join(checks)}")
+
+            return exec_result
         except Exception as e:
             return {'success': False, 'error': str(e), 'step': step}
+
+
+    def _execute_search_replace(self, step: dict) -> dict:
+        """
+        Execute a search-and-replace file edit using the SearchReplaceEditor module.
+        
+        Council Vote: ULTRATHINK-EXECUTOR-SEARCH-REPLACE-ARCHITECTURE-JAN31-2026
+        
+        Step format:
+            {type: "search_replace", args: {path: str, search: str, replace: str}}
+        """
+        args = step.get("args", {})
+        filepath = args.get("path", "")
+        search_text = args.get("search", "")
+        replace_text = args.get("replace", "")
+        
+        if not filepath or not search_text:
+            return {"success": False, "error": "Missing path or search text in search_replace step"}
+        
+        try:
+            editor = SearchReplaceEditor(
+                allowed_paths=getattr(self, "ALLOWED_FILE_PATHS", ["/ganuda/"]),
+                forbidden_paths=getattr(self, "FORBIDDEN_FILE_PATHS", ["/etc/", "/usr/"])
+            )
+            result = editor.apply_search_replace(filepath, search_text, replace_text)
+            
+            # Audit the operation (wrapped in try/except — audit failure must not mask edit success)
+            try:
+                if hasattr(self, "_audit_file_operation"):
+                    self._audit_file_operation(
+                        "search_replace", filepath,
+                        result.get('lines_changed', 0), result.get('backup_path', '')
+                    )
+            except Exception:
+                pass
+            
+            return result
+        except Exception as e:
+            return {"success": False, "error": f"SearchReplace error: {e}"}
+
+    def _verify_step_result(self, step: Dict, result: Dict) -> Dict:
+        """
+        Phase 17: Verify that a step's side effects actually occurred.
+        Lightweight checks only — no LLM calls.
+        Council vote 6428bcda34efc7f9 — Eagle Eye: log prefixes [VERIFY]
+
+        Returns: {verified, checks_run, issues, severity}
+        """
+        verification = {
+            'verified': True,
+            'checks_run': [],
+            'issues': [],
+            'severity': 'info'
+        }
+
+        step_type = step.get('type', 'unknown')
+
+        if step_type == 'sql':
+            self._verify_sql_result(step, result, verification)
+        elif step_type == 'file':
+            self._verify_file_result(step, result, verification)
+        elif step_type == 'bash':
+            self._verify_bash_result(step, result, verification)
+
+        if verification['issues']:
+            verification['verified'] = False
+            verification['severity'] = 'warning'
+
+        return verification
+
+    def _verify_sql_result(self, step: Dict, result: Dict, verification: Dict):
+        """Verify SQL execution side effects."""
+        command = step.get('command', '').strip().upper()
+
+        if command.startswith('INSERT'):
+            verification['checks_run'].append('insert_rowcount')
+            rowcount = result.get('result', 0)
+            if isinstance(rowcount, int) and rowcount == 0:
+                verification['issues'].append(
+                    'INSERT returned 0 rows affected (possible ON CONFLICT DO NOTHING)'
+                )
+
+        elif command.startswith('CREATE TABLE') or command.startswith('CREATE'):
+            verification['checks_run'].append('table_existence')
+            import re as verify_re
+            table_match = verify_re.match(
+                r'CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(\S+)',
+                command, verify_re.IGNORECASE
+            )
+            if table_match:
+                table_name = table_match.group(1).strip('"').strip("'")
+                try:
+                    import psycopg2
+                    conn = psycopg2.connect(**self.db_config)
+                    cur = conn.cursor()
+                    cur.execute(
+                        "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = %s",
+                        (table_name.lower(),)
+                    )
+                    count = cur.fetchone()[0]
+                    cur.close()
+                    conn.close()
+                    if count == 0:
+                        verification['issues'].append(
+                            f'Table {table_name} not found after CREATE TABLE'
+                        )
+                except Exception as e:
+                    verification['issues'].append(f'Table verification failed: {e}')
+
+        elif command.startswith('UPDATE') or command.startswith('DELETE'):
+            verification['checks_run'].append('dml_rowcount')
+            rowcount = result.get('result', 0)
+            if isinstance(rowcount, int) and rowcount == 0:
+                verification['issues'].append(
+                    f'{command.split()[0]} affected 0 rows'
+                )
+
+        elif command.startswith('SELECT'):
+            verification['checks_run'].append('select_returned')
+
+    def _verify_file_result(self, step: Dict, result: Dict, verification: Dict):
+        """Verify file operation side effects."""
+        args = step.get('args', {})
+        operation = args.get('operation', 'read')
+        path = args.get('path', '')
+
+        if operation in ('write', 'partial_edit', 'append'):
+            verification['checks_run'].append('file_exists')
+            if not os.path.exists(path):
+                verification['issues'].append(f'File not found after write: {path}')
+                return
+
+            verification['checks_run'].append('file_nonzero')
+            file_size = os.path.getsize(path)
+            if file_size == 0:
+                verification['issues'].append(f'File empty after write: {path}')
+                return
+
+            if path.endswith('.py'):
+                verification['checks_run'].append('python_syntax')
+                try:
+                    with open(path, 'r') as f:
+                        compile(f.read(), path, 'exec')
+                except SyntaxError as e:
+                    verification['issues'].append(
+                        f'Python syntax error: {path} line {e.lineno}: {e.msg}'
+                    )
+
+    def _verify_bash_result(self, step: Dict, result: Dict, verification: Dict):
+        """Verify bash command even when exit code is 0."""
+        stdout = result.get('stdout', '')
+        stderr = result.get('stderr', '')
+        combined = (stdout + stderr).lower()
+
+        error_patterns = [
+            'error:', 'fatal:', 'permission denied',
+            'no such file or directory', 'command not found',
+            'traceback (most recent call last)', 'panic:',
+            'segmentation fault'
+        ]
+
+        verification['checks_run'].append('output_error_patterns')
+        for pattern in error_patterns:
+            if pattern in combined:
+                verification['issues'].append(
+                    f'Error pattern in output: {pattern}'
+                )
 
     def _is_forbidden(self, step: Dict) -> bool:
         """Check if step is forbidden using intent-based classification (orthogonal approach)"""
@@ -1799,6 +2245,48 @@ class TaskExecutor:
         backup_path = f"{path}.backup_{timestamp}"
         shutil.copy2(path, backup_path)
         return backup_path
+
+    def _record_step_result(self, task_id, step_number, step_type, target_file, result, execution_time_ms):
+        """Record step-level execution result for reward tracking."""
+        try:
+            import hashlib
+            step_hash = hashlib.sha256(
+                f"{task_id}:{step_number}:{step_type}:{target_file}".encode()
+            ).hexdigest()
+            conn = psycopg2.connect(**self.db_config)
+            cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO jr_step_rewards (task_id, step_number, step_type, target_file, "
+                "step_content_hash, execution_result, execution_time_ms, error_detail) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) "
+                "ON CONFLICT (task_id, step_number) DO UPDATE SET "
+                "execution_result = EXCLUDED.execution_result, "
+                "execution_time_ms = EXCLUDED.execution_time_ms, "
+                "error_detail = EXCLUDED.error_detail, updated_at = NOW()",
+                (task_id, step_number, step_type, target_file, step_hash,
+                 'success' if result.get('success') else 'failed',
+                 execution_time_ms, result.get('error', None))
+            )
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            logging.getLogger(__name__).warning(f"Step recording failed: {e}")
+
+    def _step_already_succeeded(self, task_id, step_number):
+        """Check if step already succeeded for retry idempotency."""
+        try:
+            conn = psycopg2.connect(**self.db_config)
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT execution_result FROM jr_step_rewards "
+                "WHERE task_id = %s AND step_number = %s AND execution_result = 'success'",
+                (task_id, step_number)
+            )
+            found = cur.fetchone()
+            conn.close()
+            return found is not None
+        except Exception:
+            return False
 
     def _audit_file_operation(self, operation: str, path: str, size: int, backup_path: str):
         """SECURITY: Log file operation to thermal memory for audit trail"""

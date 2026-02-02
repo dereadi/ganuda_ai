@@ -184,73 +184,70 @@ class JrExecutor:
         Returns:
             True if task completed successfully
         """
-        task_id = task.get('task_id')
+        # Use integer 'id' for database operations, varchar 'task_id' for logging
+        db_id = task.get('id')  # Integer primary key for queue_client methods
+        task_id = task.get('task_id')  # Varchar for logging/display
         title = task.get('title', 'Untitled')
         instruction_file = task.get('instruction_file')
 
         self._log(f"Processing queue task {task_id}: {title}")
 
-        # Claim the task
-        if not self.queue_client.claim_task(task_id):
-            self._log(f"Failed to claim task {task_id}")
+        # Claim the task (using integer id)
+        if not self.queue_client.claim_task(db_id):
+            self._log(f"Failed to claim task {db_id}")
             return False
 
         try:
             # Update progress: started
-            self.queue_client.update_progress(task_id, 10, "Task claimed, reading instructions")
+            self.queue_client.update_progress(db_id, 10, "Task claimed, delegating to TaskExecutor")
 
-            # Read instruction file if specified
-            if instruction_file and os.path.exists(instruction_file):
-                with open(instruction_file, 'r') as f:
-                    instruction_content = f.read()
+            # REFACTORED Jan 26, 2026: Use TaskExecutor.process_queue_task()
+            # which has LLM-based instruction understanding (Qwen 32B)
+            # instead of regex-only parsing that missed prose instructions
+            self._log(f"Delegating to TaskExecutor with LLM understanding...")
+            self.queue_client.update_progress(db_id, 20, "Processing with LLM reasoner")
 
-                self._log(f"Read instructions from {instruction_file}")
-                self.queue_client.update_progress(task_id, 20, "Instructions loaded")
+            # TaskExecutor handles: reading instructions, LLM extraction, execution
+            result = self.executor.process_queue_task(task)
 
-                # Parse instructions if parser available
-                if HAS_INSTRUCTION_PARSER:
-                    steps = parse_instructions(instruction_content)
-                    self._log(f"Parsed {len(steps)} steps from instructions")
+            if result.get('success'):
+                # Generate meaningful summary from actual work done
+                steps_executed = result.get('steps_executed', [])
+                artifacts = result.get('artifacts', [])
 
-                    # Execute steps
-                    total_steps = len(steps) if steps else 1
-                    for i, step in enumerate(steps):
-                        if not self.running:
-                            break
+                summary_parts = [f"Task '{title}' completed"]
+                if steps_executed:
+                    successful = sum(1 for s in steps_executed if s.get('success'))
+                    summary_parts.append(f"{successful}/{len(steps_executed)} steps succeeded")
+                if artifacts:
+                    summary_parts.append(f"{len(artifacts)} files created/modified")
 
-                        progress = 20 + int((i / total_steps) * 70)
-                        step_desc = step.get('description', f'Step {i+1}')
-                        self.queue_client.update_progress(task_id, progress, f"Executing: {step_desc}")
+                summary = ". ".join(summary_parts)
+                self._log(summary)
 
-                        # Execute the step
-                        result = self.executor.execute(step)
-                        if not result.get('success') and step.get('critical', True):
-                            raise Exception(f"Critical step failed: {step_desc} - {result.get('error')}")
-
-                        self._log(f"Completed step {i+1}/{total_steps}: {step_desc}")
-
-                else:
-                    self._log("No instruction parser - storing for review")
-                    self.queue_client.update_progress(task_id, 50, "Instructions stored")
-
+                self.queue_client.update_progress(db_id, 95, "Finalizing")
+                self.queue_client.complete_task(
+                    db_id,
+                    result={
+                        'summary': summary,
+                        'steps_executed': steps_executed,
+                        'artifacts': artifacts,
+                        'completed_at': datetime.now().isoformat()
+                    },
+                    artifacts=artifacts
+                )
+                self._log(f"Queue task {db_id} ({task_id}) completed")
+                self.missions_processed += 1
+                return True
             else:
-                self._log(f"No instruction file - task is: {title}")
-                self.queue_client.update_progress(task_id, 50, "Processing task")
-
-            # Complete the task
-            self.queue_client.update_progress(task_id, 95, "Finalizing")
-            self.queue_client.complete_task(
-                task_id,
-                result={'summary': f"Task completed: {title}", 'completed_at': datetime.now().isoformat()}
-            )
-            self._log(f"Queue task {task_id} completed")
-            self.missions_processed += 1
-            return True
+                # Task execution failed
+                error_msg = result.get('error', 'Unknown error during execution')
+                raise Exception(error_msg)
 
         except Exception as e:
             error_msg = str(e)
-            self._log(f"Queue task {task_id} failed: {error_msg}")
-            self.queue_client.fail_task(task_id, error_msg)
+            self._log(f"Queue task {db_id} ({task_id}) failed: {error_msg}")
+            self.queue_client.fail_task(db_id, error_msg)
             return False
 
     def _detect_task_type(self, mission_title: str) -> str:
