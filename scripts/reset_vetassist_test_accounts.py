@@ -14,7 +14,7 @@ def reset_test_accounts():
 
     conn = psycopg2.connect(
         host='192.168.132.222',
-        dbname='triad_federation',
+        dbname='zammad_production',  # Fixed Jan 29, 2026 - was triad_federation
         user='claude',
         password='jawaseatlasers2'
     )

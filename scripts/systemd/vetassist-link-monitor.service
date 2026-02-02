@@ -1,0 +1,13 @@
+[Unit]
+Description=VetAssist Resource Link Monitor
+After=network.target postgresql.service
+
+[Service]
+Type=oneshot
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/vetassist/backend
+Environment="PATH=/ganuda/vetassist/backend/venv/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/ganuda/vetassist/backend/venv/bin/python /ganuda/vetassist/backend/scripts/link_monitor.py
+StandardOutput=append:/ganuda/logs/link_monitor.log
+StandardError=append:/ganuda/logs/link_monitor.log

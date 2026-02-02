@@ -1,725 +1,587 @@
 #!/usr/bin/env python3
 """
-Cherokee Chief Telegram Bot v2.1
-Tribe Interface Edition with Persistent Sessions
+Governance Agent — Drift Detection Phase 3B
+Council Vote #8367
 
-This bot is a thin interface to the 7-Specialist Council.
-All decisions go through the Council. TPM has oversight.
-Now with conversation context through session management.
+Always-on monitoring daemon that runs every 30 minutes:
+- Collects metrics from Council votes, Jr executor, thermal memory, circuit breakers
+- Evaluates anomaly detection rules
+- Fires severity-graded Telegram alerts
+- Stores all metrics in drift_metrics for trend analysis
+
+Cherokee AI Federation — For the Seven Generations
 """
 
 import os
 import sys
-import asyncio
+import json
+import time
 import logging
+import hashlib
 import requests
-from datetime import datetime
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
-
-# Add lib path for session manager
-sys.path.insert(0, '/ganuda/lib')
-from telegram_session_manager import get_or_create_session, TelegramSessionManager
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Configuration
-BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
-GATEWAY_URL = "http://localhost:8080"
-API_KEY = "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
-
-# Pending votes waiting for TPM
-pending_votes = {}
-
-
-class TribeInterface:
-    """Interface to the 7-Specialist Council"""
-
-    def __init__(self):
-        self.headers = {
-            "Authorization": f"Bearer {API_KEY}",
-            "Content-Type": "application/json"
-        }
-
-    def get_db(self):
-        """Get database connection."""
-        import psycopg2
-        if not hasattr(self, "_db_conn") or self._db_conn.closed:
-            self._db_conn = psycopg2.connect(
-                host="192.168.132.222",
-                database="zammad_production",
-                user="claude",
-                password="jawaseatlasers2"
-            )
-        return self._db_conn
-
-    def query_council(self, question: str, include_responses: bool = False) -> dict:
-        """Submit question to Council for vote"""
-        try:
-            response = requests.post(
-                f"{GATEWAY_URL}/v1/council/vote",
-                headers=self.headers,
-                json={
-                    "question": question,
-                    "max_tokens": 1500,
-                    "include_responses": include_responses
-                },
-                timeout=120
-            )
-            response.raise_for_status()
-            return response.json()
-        except Exception as e:
-            return {"error": str(e)}
-
-    def get_pending_votes(self) -> list:
-        """Get votes pending TPM decision"""
-        try:
-            response = requests.get(
-                f"{GATEWAY_URL}/v1/council/pending",
-                headers=self.headers,
-                timeout=10
-            )
-            return response.json().get("pending_votes", [])
-        except:
-            return []
-
-    def cast_tpm_vote(self, audit_hash: str, vote: str, comment: str = None) -> dict:
-        """Cast TPM vote on pending council decision"""
-        try:
-            url = f"{GATEWAY_URL}/v1/council/vote/{audit_hash}/tpm"
-            params = {"vote": vote}
-            if comment:
-                params["comment"] = comment
-            response = requests.post(url, headers=self.headers, params=params, timeout=10)
-            return response.json()
-        except Exception as e:
-            return {"error": str(e)}
-
-    def get_vote_details(self, audit_hash: str) -> dict:
-        """Get full details of a council vote"""
-        try:
-            response = requests.get(
-                f"{GATEWAY_URL}/v1/council/vote/{audit_hash}",
-                headers=self.headers,
-                timeout=10
-            )
-            return response.json()
-        except Exception as e:
-            return {"error": str(e)}
-
-    def check_health(self) -> dict:
-        """Quick health check"""
-        try:
-            response = requests.get(f"{GATEWAY_URL}/health", timeout=5)
-            return response.json()
-        except Exception as e:
-            return {"status": "error", "error": str(e)}
-
-    def query_specialist(self, specialist_id: str, question: str) -> dict:
-        """Query a single specialist directly (no full council vote)"""
-        try:
-            response = requests.post(
-                f"{GATEWAY_URL}/v1/specialist/{specialist_id}/query",
-                headers=self.headers,
-                json={"question": question, "max_tokens": 1500},
-                timeout=120
-            )
-            response.raise_for_status()
-            return response.json()
-        except Exception as e:
-            return {"error": str(e)}
-
-
-def classify_request(message: str) -> dict:
-    """Classify user request type"""
-    message_lower = message.lower()
-
-    destructive = ['delete', 'remove', 'drop', 'truncate', 'destroy', 'wipe', 'clear']
-    if any(k in message_lower for k in destructive):
-        return {"type": "destructive", "tpm_wait": True, "timeout": 300, "confirm": True}
-
-    actions = ['restart', 'start', 'stop', 'deploy', 'install', 'update', 'upgrade', 'run', 'execute']
-    if any(k in message_lower for k in actions):
-        return {"type": "action", "tpm_wait": True, "timeout": 300}
-
-    critical = ['urgent', 'emergency', 'critical', 'down', 'crashed', 'failed', 'error']
-    if any(k in message_lower for k in critical):
-        return {"type": "critical", "tpm_wait": True, "timeout": 60}
-
-    # Diagnostic queries - route to Eagle Eye (IT Jr)
-    diagnostic = ['check', 'status', 'health', 'disk', 'memory', 'cpu', 'logs', 'show', 'list',
-                  'nodes', 'ok', 'online', 'running', 'servers', 'cluster', 'alive', 'ping']
-    if any(k in message_lower for k in diagnostic):
-        return {"type": "diagnostic", "tpm_wait": False, "route_to": "eagle_eye"}
-
-    return {"type": "query", "tpm_wait": False}
-
-
-def format_council_response(result: dict, classification: dict) -> str:
-    """Format council response for Telegram"""
-    if "error" in result:
-        return f"Error: {result['error']}"
-
-    # Build response
-    lines = []
-
-    # Recommendation with emoji
-    rec = result.get("recommendation", "")
-    if "PROCEED:" in rec:
-        lines.append(f"[OK] {rec}")
-    elif "CAUTION" in rec:
-        lines.append(f"[WARN] {rec}")
-    elif "REVIEW" in rec:
-        lines.append(f"[STOP] {rec}")
-    else:
-        lines.append(rec)
-
-    # Confidence
-    conf = result.get("confidence", 0)
-    lines.append(f"Confidence: {conf:.0%}")
-
-    # Concerns
-    concerns = result.get("concerns", [])
-    if concerns:
-        lines.append(f"\nConcerns ({len(concerns)}):")
-        for c in concerns[:3]:
-            lines.append(f"  - {c}")
-
-    # Consensus (truncated)
-    consensus = result.get("consensus", "")
-    if consensus:
-        # Clean up thinking tags
-        if "</think>" in consensus:
-            consensus = consensus.split("</think>")[-1].strip()
-        # Strip LLM reasoning - look for common patterns
-        import re
-        # Pattern: reasoning that ends with incomplete sentence or ellipsis
-        # Remove everything before the actual answer
-        reasoning_patterns = [
-            r"^Okay,.*?(?=\n\n[A-Z]|$)",  # Okay, ... until paragraph with capital
-            r"^Let me.*?(?=\n\n[A-Z]|$)",
-            r"^First,.*?(?=\n\n[A-Z]|$)",
-            r"^I need to.*?(?=\n\n[A-Z]|$)",
-            r"^The user.*?(?=\n\n[A-Z]|$)",
-            r"^Hmm,.*?(?=\n\n[A-Z]|$)",
-            r"^So,.*?(?=\n\n[A-Z]|$)",
-        ]
-        for pattern in reasoning_patterns:
-            match = re.match(pattern, consensus, re.DOTALL)
-            if match:
-                consensus = consensus[match.end():].strip()
-                break
-        # Also strip if it contains reasoning indicators mid-text
-        if "Hmm," in consensus or "let's see" in consensus.lower():
-            # Find where actual content starts (after reasoning block)
-            lines_list = consensus.split("\n\n")
-            # Keep only paragraphs that don't look like reasoning
-            clean_lines = [l for l in lines_list if not any(
-                l.strip().startswith(p) for p in ["Okay", "Let me", "Hmm", "The user", "I need"]
-            )]
-            if clean_lines:
-                consensus = "\n\n".join(clean_lines)
-        if len(consensus) > 2000:
-            consensus = consensus[:500] + "..."
-        lines.append(f"\n{consensus}")
-
-    # TPM status
-    tpm_vote = result.get("tpm_vote", "")
-    if tpm_vote == "pending":
-        lines.append(f"\n[PENDING] Awaiting TPM approval")
-        lines.append(f"Track: {result.get('audit_hash', 'N/A')}")
-
-    return "\n".join(lines)
-
-
-# Telegram Handlers
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /start command"""
-    user = update.effective_user
-    await update.message.reply_text(
-        f"Welcome to Cherokee AI, {user.first_name}!\n\n"
-        "I'm your interface to the 7-Specialist Council.\n\n"
-        "Commands:\n"
-        "/status - Cluster health\n"
-        "/pending - View pending approvals\n"
-        "/approve <hash> - Approve a vote\n"
-        "/veto <hash> <reason> - Veto a vote\n"
-        "/help - More info\n\n"
-        "Or just ask me anything!"
-    )
-
-
-async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /status command"""
-    tribe = TribeInterface()
-    health = tribe.check_health()
-
-    if health.get("status") == "healthy":
-        components = health.get('components', {})
-        await update.message.reply_text(
-            "Cherokee AI Cluster Status\n\n"
-            f"Gateway: {components.get('vllm', 'unknown')}\n"
-            f"Database: {components.get('database', 'unknown')}\n"
-            f"Council: {components.get('council', 'unknown')}\n"
-            f"TPM Vote: {components.get('tpm_vote', 'unknown')}\n"
-            f"Latency: {health.get('latency_ms', '?')}ms"
-        )
-    else:
-        await update.message.reply_text(f"Cluster status: {health.get('status', 'unknown')}\n{health}")
-
-
-async def pending(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /pending command - show votes awaiting TPM"""
-    tribe = TribeInterface()
-    votes = tribe.get_pending_votes()
-
-    if not votes:
-        await update.message.reply_text("No pending votes awaiting approval.")
-        return
-
-    lines = [f"{len(votes)} Pending Vote(s)\n"]
-    for v in votes[:5]:
-        lines.append(f"Hash: {v['audit_hash']}")
-        lines.append(f"   {v['question'][:60]}...")
-        lines.append(f"   Rec: {v['recommendation']}")
-        lines.append(f"   Conf: {v['confidence']:.0%}\n")
-
-    lines.append("\nUse /approve <hash> or /veto <hash> <reason>")
-    await update.message.reply_text("\n".join(lines))
-
-
-async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /approve command"""
-    if not context.args:
-        await update.message.reply_text("Usage: /approve <audit_hash>")
-        return
-
-    audit_hash = context.args[0]
-    comment = " ".join(context.args[1:]) if len(context.args) > 1 else "Approved via Telegram"
-
-    tribe = TribeInterface()
-    result = tribe.cast_tpm_vote(audit_hash, "approve", comment)
-
-    if result.get("finalized"):
-        await update.message.reply_text(f"Vote {audit_hash} approved!")
-    else:
-        await update.message.reply_text(f"Error: {result.get('error', result)}")
-
-
-async def veto(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /veto command"""
-    if len(context.args) < 2:
-        await update.message.reply_text("Usage: /veto <audit_hash> <reason>")
-        return
-
-    audit_hash = context.args[0]
-    reason = " ".join(context.args[1:])
-
-    tribe = TribeInterface()
-    result = tribe.cast_tpm_vote(audit_hash, "veto", reason)
-
-    if result.get("finalized"):
-        await update.message.reply_text(f"Vote {audit_hash} vetoed.\nReason: {reason}")
-    else:
-        await update.message.reply_text(f"Error: {result.get('error', result)}")
-
-
-def format_specialist_response(result: dict) -> str:
-    """Format single specialist response for Telegram"""
-    if "error" in result:
-        return f"Error: {result['error']}"
-
-    specialist = result.get("specialist", "Unknown")
-    role = result.get("role", "")
-    response = result.get("response", "No response")
-
-    # Clean thinking tags
-    if "</think>" in response:
-        response = response.split("</think>")[-1].strip()
-
-    # Truncate if too long
-    if len(response) > 1000:
-        response = response[:1000] + "..."
-
-    return f"[{specialist} - {role}]\n\n{response}"
-
-
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle regular messages - route appropriately with session context"""
-    user = update.effective_user
-    message = update.message.text
-    chat_id = update.effective_chat.id
-
-    # Get or create session for conversation context
-    session = get_or_create_session(user.id, chat_id, user.username or user.first_name)
-
-    # Store user message in session
-    session.add_message('user', message)
-
-    # Classify request
-    classification = classify_request(message)
-    tribe = TribeInterface()
-
-    # Route diagnostics directly to Eagle Eye (IT Jr) - no Council vote needed
-    if classification["type"] == "diagnostic":
-        thinking_msg = await update.message.reply_text("Asking Eagle Eye (IT Jr)...")
-        result = tribe.query_specialist("eagle_eye", message)
-        response = format_specialist_response(result)
-
-        # Store response in session
-        session.add_message('assistant', response[:500], specialist='Eagle Eye')
-
-        try:
-            await thinking_msg.edit_text(response)
-        except:
-            await update.message.reply_text(response)
-        return
-
-    # For actions/decisions, use full Council
-    thinking_msg = await update.message.reply_text("Consulting the Council... (this may take 30-60 seconds)")
-
-    # Build council question with conversation context
-    session_context = session.build_context_prompt()
-    thermal_context = session.get_thermal_context(limit=2)
-
-    question = f"Telegram user {user.first_name} asks: {message}"
-
-    # Add conversation context if available
-    if session_context:
-        question = f"{session_context}\n\n{question}"
-
-    # Add thermal memory context if available
-    if thermal_context:
-        question = f"{thermal_context}\n\n{question}"
-
-    if classification["type"] == "destructive":
-        question += "\n\n[WARNING] This is a DESTRUCTIVE action request. Evaluate carefully."
-    elif classification["type"] == "critical":
-        question += "\n\n[CRITICAL] This is marked CRITICAL/URGENT."
-
-    result = tribe.query_council(question)
-    response = format_council_response(result, classification)
-
-    # Store Council response in session
-    consensus = result.get('consensus', '')[:500]
-    session.add_message('assistant', consensus, specialist='Council', audit_hash=result.get('audit_hash'))
-
-    try:
-        await thinking_msg.edit_text(response)
-    except:
-        await update.message.reply_text(response)
-
-    # If action needs TPM approval, store for tracking
-    if classification.get("tpm_wait") and result.get("audit_hash"):
-        pending_votes[result["audit_hash"]] = {
-            "user_id": user.id,
-            "chat_id": update.effective_chat.id,
-            "question": message,
-            "timestamp": datetime.now()
-        }
-
-
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /help command"""
-    await update.message.reply_text(
-        "Cherokee AI - Tribe Interface\n\n"
-        "I route your requests to the 7-Specialist Council:\n"
-        "- Crawdad - Security\n"
-        "- Gecko - Technical\n"
-        "- Turtle - Seven Generations\n"
-        "- Eagle Eye - Monitoring\n"
-        "- Spider - Integration\n"
-        "- Peace Chief - Consensus\n"
-        "- Raven - Strategy\n\n"
-        "Commands:\n"
-        "/status - Check cluster health\n"
-        "/pending - View pending approvals\n"
-        "/approve <hash> - Approve a decision\n"
-        "/veto <hash> <reason> - Veto a decision\n\n"
-        "Ask anything:\n"
-        "- 'What's the database status?'\n"
-        "- 'Check disk space on bluefin'\n"
-        "- 'Restart the gateway' (needs approval)\n\n"
-        "The TPM receives notifications for important decisions."
-    )
-
-
-async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle inline button presses"""
-    query = update.callback_query
-    await query.answer()
-
-    data = query.data
-    tribe = TribeInterface()
-
-    if data.startswith("approve_"):
-        audit_hash = data.replace("approve_", "")
-        result = tribe.cast_tpm_vote(audit_hash, "approve", "Approved via Telegram button")
-        await query.edit_message_text(f"Approved: {audit_hash}")
-
-    elif data.startswith("veto_"):
-        audit_hash = data.replace("veto_", "")
-        await query.edit_message_text(f"Reply with veto reason for {audit_hash}:")
-        context.user_data["pending_veto"] = audit_hash
-
-    elif data.startswith("details_"):
-        audit_hash = data.replace("details_", "")
-        details = tribe.get_vote_details(audit_hash)
-        await query.message.reply_text(f"Vote Details:\n{details}")
-
-
-
-# Specialist aliases for /ask command
-SPECIALIST_ALIASES = {
-    "crawdad": "crawdad", "security": "crawdad", "sec": "crawdad",
-    "gecko": "gecko", "tech": "gecko", "performance": "gecko", "perf": "gecko",
-    "turtle": "turtle", "wisdom": "turtle", "7gen": "turtle",
-    "eagle": "eagle_eye", "eagle_eye": "eagle_eye", "monitor": "eagle_eye", "eye": "eagle_eye",
-    "spider": "spider", "integration": "spider", "connect": "spider",
-    "raven": "raven", "strategy": "raven", "plan": "raven",
-    "peace": "peace_chief", "chief": "peace_chief", "consensus": "peace_chief"
+import psycopg2
+from datetime import datetime, timezone, timedelta
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger('governance_agent')
+
+DB_CONFIG = {
+    'host': '192.168.132.222',
+    'database': 'zammad_production',
+    'user': 'claude',
+    'password': 'jawaseatlasers2'
 }
 
+# Telegram alerting config
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+TPM_CHAT_ID = -1003439875431
 
-async def ask_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Ask a specific specialist: /ask <specialist> <question>"""
-    args = context.args
-    if len(args) < 2:
-        specialists = "crawdad, gecko, turtle, eagle, spider, raven, peace"
-        await update.message.reply_text(f"Usage: /ask <specialist> <question>\nSpecialists: {specialists}")
-        return
+CYCLE_INTERVAL_SECONDS = 1800  # 30 minutes
+INTEGRITY_CHECK_INTERVAL = 6   # Run integrity check every 6th cycle (3 hours)
 
-    specialist_input = args[0].lower()
-    specialist = SPECIALIST_ALIASES.get(specialist_input)
+SEVERITY_EMOJI = {
+    'CRITICAL': '\U0001f6a8',  # rotating light
+    'ALERT': '\u26a0\ufe0f',   # warning sign
+    'WARNING': '\U0001f4ca',   # bar chart
+}
 
-    if not specialist:
-        await update.message.reply_text(f"Unknown specialist: {specialist_input}")
-        return
+# ============================================================================
+# Anomaly detection rules
+# ============================================================================
 
-    question = " ".join(args[1:])
-    thinking_msg = await update.message.reply_text(f"Asking {specialist.replace('_', ' ').title()}...")
+ALERT_RULES = {
+    'council_confidence_drop': {
+        'condition': lambda m: m.get('avg_confidence_24h', 1.0) < 0.6,
+        'severity': 'WARNING',
+        'message': 'Council avg confidence below 0.6 in last 24h ({value:.2f})',
+        'value_key': 'avg_confidence_24h',
+    },
+    'specialist_concern_spike': {
+        'condition': lambda m: any(c > 5 for c in m.get('concerns_by_specialist', {}).values()),
+        'severity': 'WARNING',
+        'message': 'Specialist raised >5 concerns in 24h: {details}',
+        'value_key': 'concerns_by_specialist',
+    },
+    'jr_failure_rate': {
+        'condition': lambda m: m.get('jr_success_rate_24h', 1.0) < 0.7,
+        'severity': 'ALERT',
+        'message': 'Jr task failure rate >30% in 24h (success rate: {value:.0%})',
+        'value_key': 'jr_success_rate_24h',
+    },
+    'memory_integrity_violation': {
+        'condition': lambda m: m.get('integrity_violations', 0) > 0,
+        'severity': 'CRITICAL',
+        'message': '{count} thermal memory integrity violations detected!',
+        'value_key': 'integrity_violations',
+    },
+    'sacred_memory_count_change': {
+        'condition': lambda m: (
+            m.get('sacred_count', 0) < m.get('expected_sacred_count', 0)
+        ),
+        'severity': 'CRITICAL',
+        'message': 'Sacred memory count DECREASED: expected {expected}, got {actual}',
+        'value_key': 'sacred_count',
+    },
+    'circuit_breaker_open': {
+        'condition': lambda m: m.get('open_breakers', 0) > 0,
+        'severity': 'ALERT',
+        'message': '{count} specialist circuit breaker(s) OPEN: {specialists}',
+        'value_key': 'open_breakers',
+    },
+    'memory_growth_anomaly': {
+        'condition': lambda m: m.get('memory_count_24h', 0) > 500,
+        'severity': 'WARNING',
+        'message': 'Unusual memory growth: {count} new memories in 24h',
+        'value_key': 'memory_count_24h',
+    },
+}
 
+# Persistent state file for cross-cycle tracking
+STATE_FILE = '/ganuda/daemons/.governance_state.json'
+
+
+def get_conn():
+    return psycopg2.connect(**DB_CONFIG)
+
+
+def load_state():
+    """Load persistent state (expected sacred count, cycle counter, etc.)."""
     try:
-        response = requests.post(
-            f"{GATEWAY_URL}/v1/specialist/{specialist}/query",
-            headers={"X-API-Key": API_KEY, "Content-Type": "application/json"},
-            json={"question": question, "max_tokens": 1500},
-            timeout=120
-        )
-
-        if response.ok:
-            data = response.json()
-            result = f"{specialist.replace('_', ' ').title()}:\n\n{data.get('response', 'No response')}"
-            await thinking_msg.edit_text(result[:2000])
-        else:
-            await thinking_msg.edit_text(f"Error: {response.status_code}")
-    except Exception as e:
-        await thinking_msg.edit_text(f"Error: {e}")
+        with open(STATE_FILE, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
 
 
-async def health_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Quick cluster health: /health"""
-    try:
-        gw_response = requests.get(f"{GATEWAY_URL}/health", timeout=5)
-        gw_status = "OK" if gw_response.ok else "ERROR"
-
-        tribe = TribeInterface()
-        with tribe.get_db() as conn:
-            cur = conn.cursor()
-            cur.execute("""
-                SELECT node_name, service_name, status
-                FROM service_health
-                WHERE last_check > NOW() - INTERVAL '10 minutes'
-                ORDER BY node_name, service_name
-            """)
-            rows = cur.fetchall()
-
-        lines = ["Cluster Health\n"]
-        lines.append(f"Gateway: {gw_status}")
-
-        if rows:
-            current_node = None
-            for node, service, status in rows:
-                if node != current_node:
-                    lines.append(f"\n{node}:")
-                    current_node = node
-                emoji = "OK" if status == "healthy" else "ERR"
-                lines.append(f"  [{emoji}] {service}")
-        else:
-            lines.append("\nNo recent health checks")
-
-        await update.message.reply_text("\n".join(lines))
-    except Exception as e:
-        await update.message.reply_text(f"Health check error: {e}")
+def save_state(state):
+    """Persist state across cycles."""
+    with open(STATE_FILE, 'w') as f:
+        json.dump(state, f, indent=2)
 
 
-async def concerns_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Today's Council concerns: /concerns"""
-    try:
-        tribe = TribeInterface()
-        with tribe.get_db() as conn:
-            cur = conn.cursor()
-            cur.execute("""
-                SELECT recommendation, concern_count, voted_at
-                FROM council_votes
-                WHERE voted_at > NOW() - INTERVAL '24 hours'
-                  AND concern_count > 0
-                ORDER BY voted_at DESC
-                LIMIT 10
-            """)
-            rows = cur.fetchall()
+# ============================================================================
+# Metric collection
+# ============================================================================
 
-        if not rows:
-            await update.message.reply_text("No concerns raised in the last 24 hours")
-            return
+def collect_council_metrics(cur):
+    """Collect Council vote metrics from last 24 hours."""
+    metrics = {}
 
-        lines = ["Today's Council Concerns:\n"]
-        for rec, count, voted in rows:
-            time_str = voted.strftime("%H:%M") if voted else "?"
-            lines.append(f"[{time_str}] {count} concern(s): {rec[:50]}")
+    # Average confidence in last 24h
+    cur.execute("""
+        SELECT AVG(confidence), COUNT(*)
+        FROM council_votes
+        WHERE created_at > NOW() - INTERVAL '24 hours'
+    """)
+    row = cur.fetchone()
+    metrics['avg_confidence_24h'] = float(row[0]) if row[0] is not None else 1.0
+    metrics['total_votes_24h'] = int(row[1]) if row[1] else 0
 
-        await update.message.reply_text("\n".join(lines))
-    except Exception as e:
-        await update.message.reply_text(f"Error: {e}")
+    # Concerns by specialist in last 24h
+    cur.execute("""
+        SELECT specialist_id, COUNT(*)
+        FROM council_votes
+        WHERE created_at > NOW() - INTERVAL '24 hours'
+          AND concerns IS NOT NULL
+          AND concerns != '[]'
+          AND concerns != ''
+        GROUP BY specialist_id
+    """)
+    concerns_by_specialist = {}
+    for spec_row in cur.fetchall():
+        concerns_by_specialist[spec_row[0]] = int(spec_row[1])
+    metrics['concerns_by_specialist'] = concerns_by_specialist
 
-
-async def remember_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Search thermal memory: /remember <query>"""
-    query = " ".join(context.args)
-    if not query:
-        await update.message.reply_text("Usage: /remember <search query>")
-        return
-
-    thinking_msg = await update.message.reply_text("Searching tribal memory...")
-
-    try:
-        tribe = TribeInterface()
-        with tribe.get_db() as conn:
-            cur = conn.cursor()
-            search_pattern = "%" + "%".join(query.split()) + "%"
-            cur.execute("""
-                SELECT LEFT(original_content, 800), temperature_score, created_at
-                FROM thermal_memory_archive
-                WHERE original_content ILIKE %s
-                ORDER BY temperature_score DESC, created_at DESC
-                LIMIT 5
-            """, (search_pattern,))
-            rows = cur.fetchall()
-
-        if not rows:
-            await thinking_msg.edit_text(f"No memories found for: {query}")
-            return
-
-        lines = [f"Memories matching '{query}':\n"]
-        for i, (content, temp, created) in enumerate(rows, 1):
-            temp_label = "HOT" if temp and temp > 80 else "WARM" if temp and temp > 50 else "COOL"
-            date_str = created.strftime("%m/%d") if created else "?"
-            lines.append(f"{i}. [{temp_label}] [{date_str}]")
-            lines.append(f"   {content[:700]}...\n")
-
-        await thinking_msg.edit_text("\n".join(lines))
-    except Exception as e:
-        await thinking_msg.edit_text(f"Memory search error: {e}")
-
-
-
-async def thermal_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Show latest thermal memories: /thermal [count]"""
-    count = 5
-    if context.args and context.args[0].isdigit():
-        count = min(10, int(context.args[0]))
-
-    try:
-        tribe = TribeInterface()
-        with tribe.get_db() as conn:
-            cur = conn.cursor()
-            cur.execute("""
-                SELECT LEFT(original_content, 500), temperature_score, created_at, memory_hash
-                FROM thermal_memory_archive
-                ORDER BY created_at DESC
-                LIMIT %s
-            """, (count,))
-            rows = cur.fetchall()
-
-        if not rows:
-            await update.message.reply_text("No thermal memories found.")
-            return
-
-        lines = [f"Latest {len(rows)} Thermal Memories:\n"]
-        for i, (content, temp, created, mhash) in enumerate(rows, 1):
-            temp_val = temp or 0
-            temp_label = "HOT" if temp_val > 80 else "WARM" if temp_val > 50 else "COOL"
-            date_str = created.strftime("%m/%d %H:%M") if created else "?"
-            lines.append(f"{i}. [{temp_label} {temp_val:.0f}C] [{date_str}]")
-            lines.append(f"   {content[:400]}...\n")
-
-        await update.message.reply_text("\n".join(lines))
-    except Exception as e:
-        await update.message.reply_text(f"Thermal query error: {e}")
-
-
-async def context_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /context command - show conversation context"""
-    user = update.effective_user
-    chat_id = update.effective_chat.id
-
-    session = get_or_create_session(user.id, chat_id, user.username or user.first_name)
-    session_context = session.build_context_prompt()
-
-    if session_context:
-        await update.message.reply_text(f"Your conversation context:\n\n{session_context[:3000]}")
+    # Dissent rate: fraction of votes with >=2 concerns
+    if metrics['total_votes_24h'] > 0:
+        cur.execute("""
+            SELECT COUNT(*)
+            FROM council_votes
+            WHERE created_at > NOW() - INTERVAL '24 hours'
+              AND concerns IS NOT NULL
+              AND jsonb_array_length(
+                  CASE WHEN concerns::text ~ '^\[' THEN concerns::jsonb ELSE '[]'::jsonb END
+              ) >= 2
+        """)
+        dissent_count = cur.fetchone()[0] or 0
+        metrics['dissent_rate_24h'] = dissent_count / metrics['total_votes_24h']
     else:
-        await update.message.reply_text("No conversation context yet. Start chatting!")
+        metrics['dissent_rate_24h'] = 0.0
+
+    return metrics
 
 
-async def forget_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /forget command - clear conversation context"""
-    user = update.effective_user
-    chat_id = update.effective_chat.id
+def collect_jr_metrics(cur):
+    """Collect Jr executor metrics from last 24 hours."""
+    metrics = {}
 
-    session = get_or_create_session(user.id, chat_id, user.username or user.first_name)
-    session.clear_session()
+    cur.execute("""
+        SELECT
+            COUNT(*) FILTER (WHERE status = 'completed') AS success,
+            COUNT(*) FILTER (WHERE status = 'failed') AS failed,
+            COUNT(*) AS total,
+            AVG(
+                EXTRACT(EPOCH FROM (completed_at - created_at))
+            ) FILTER (WHERE completed_at IS NOT NULL) AS avg_duration
+        FROM jr_tasks
+        WHERE created_at > NOW() - INTERVAL '24 hours'
+    """)
+    row = cur.fetchone()
+    success = int(row[0]) if row[0] else 0
+    failed = int(row[1]) if row[1] else 0
+    total = int(row[2]) if row[2] else 0
+    avg_dur = float(row[3]) if row[3] is not None else 0.0
 
-    await update.message.reply_text("Conversation context cleared. Starting fresh!")
+    metrics['jr_success_rate_24h'] = success / max(1, success + failed)
+    metrics['jr_total_24h'] = total
+    metrics['jr_avg_duration_24h'] = avg_dur
+
+    return metrics
+
+
+def collect_memory_metrics(cur, run_integrity_check=False):
+    """Collect thermal memory metrics."""
+    metrics = {}
+
+    # Total memory count
+    cur.execute("SELECT COUNT(*) FROM thermal_memory_archive")
+    metrics['memory_count_total'] = int(cur.fetchone()[0])
+
+    # New memories in last 24h
+    cur.execute("""
+        SELECT COUNT(*) FROM thermal_memory_archive
+        WHERE created_at > NOW() - INTERVAL '24 hours'
+    """)
+    metrics['memory_count_24h'] = int(cur.fetchone()[0])
+
+    # Stale count
+    cur.execute("""
+        SELECT COUNT(*) FROM thermal_memory_archive
+        WHERE staleness_flagged = true
+    """)
+    metrics['stale_count'] = int(cur.fetchone()[0])
+
+    # Sacred count
+    cur.execute("""
+        SELECT COUNT(*) FROM thermal_memory_archive
+        WHERE sacred_pattern = true
+    """)
+    metrics['sacred_count'] = int(cur.fetchone()[0])
+
+    # Integrity violations (expensive — only run periodically)
+    if run_integrity_check:
+        cur.execute("""
+            SELECT COUNT(*) FROM thermal_memory_archive
+            WHERE content_checksum IS NOT NULL
+              AND content_checksum != encode(sha256(original_content::bytea), 'hex')
+        """)
+        metrics['integrity_violations'] = int(cur.fetchone()[0])
+        logger.info(f"Integrity check complete: {metrics['integrity_violations']} violations")
+    else:
+        metrics['integrity_violations'] = 0
+
+    return metrics
+
+
+def collect_circuit_breaker_metrics():
+    """Collect circuit breaker states from drift detection module."""
+    metrics = {
+        'open_breakers': 0,
+        'half_open_breakers': 0,
+        'closed_breakers': 0,
+        'open_specialists': [],
+    }
+
+    try:
+        # Import from drift_detection if available (Phase 2B)
+        sys.path.insert(0, '/ganuda')
+        from lib.drift_detection import get_circuit_breaker_states
+        states = get_circuit_breaker_states()
+
+        for specialist, state in states.items():
+            if state == 'OPEN':
+                metrics['open_breakers'] += 1
+                metrics['open_specialists'].append(specialist)
+            elif state == 'HALF_OPEN':
+                metrics['half_open_breakers'] += 1
+            else:
+                metrics['closed_breakers'] += 1
+    except ImportError:
+        logger.warning("drift_detection module not available — skipping circuit breaker metrics")
+    except Exception as e:
+        logger.error(f"Error collecting circuit breaker metrics: {e}")
+
+    return metrics
+
+
+def collect_metrics():
+    """
+    Master metric collection — runs all collectors.
+    Returns a flat dict of all metrics.
+    """
+    state = load_state()
+    cycle_count = state.get('cycle_count', 0) + 1
+    run_integrity = (cycle_count % INTEGRITY_CHECK_INTERVAL == 0)
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    try:
+        metrics = {}
+
+        # Council metrics
+        try:
+            metrics.update(collect_council_metrics(cur))
+        except Exception as e:
+            logger.error(f"Council metric collection failed: {e}")
+
+        # Jr executor metrics
+        try:
+            metrics.update(collect_jr_metrics(cur))
+        except Exception as e:
+            logger.error(f"Jr metric collection failed: {e}")
+
+        # Thermal memory metrics
+        try:
+            metrics.update(collect_memory_metrics(cur, run_integrity_check=run_integrity))
+        except Exception as e:
+            logger.error(f"Memory metric collection failed: {e}")
+
+        # Circuit breaker metrics (no DB needed)
+        try:
+            metrics.update(collect_circuit_breaker_metrics())
+        except Exception as e:
+            logger.error(f"Circuit breaker metric collection failed: {e}")
+
+        # Expected sacred count tracking
+        # On first run, store current sacred count as baseline.
+        # Only alert if count DECREASES (new sacred memories are fine).
+        if 'expected_sacred_count' not in state:
+            state['expected_sacred_count'] = metrics.get('sacred_count', 0)
+            logger.info(f"Baseline sacred count set: {state['expected_sacred_count']}")
+        else:
+            current_sacred = metrics.get('sacred_count', 0)
+            if current_sacred > state['expected_sacred_count']:
+                # Sacred count increased — update baseline (new sacred memories are fine)
+                logger.info(
+                    f"Sacred count increased: {state['expected_sacred_count']} -> {current_sacred}"
+                )
+                state['expected_sacred_count'] = current_sacred
+
+        metrics['expected_sacred_count'] = state['expected_sacred_count']
+
+        # Update persistent state
+        state['cycle_count'] = cycle_count
+        state['last_run'] = datetime.now(timezone.utc).isoformat()
+        save_state(state)
+
+        return metrics
+
+    finally:
+        cur.close()
+        conn.close()
+
+
+# ============================================================================
+# Anomaly detection
+# ============================================================================
+
+def check_alerts(metrics):
+    """Evaluate all anomaly rules against collected metrics. Returns list of triggered alerts."""
+    triggered = []
+
+    for rule_name, rule in ALERT_RULES.items():
+        try:
+            if rule['condition'](metrics):
+                value = metrics.get(rule.get('value_key', ''), None)
+
+                # Build format context for the message template
+                fmt = {
+                    'value': value if isinstance(value, (int, float)) else 0,
+                    'count': value if isinstance(value, int) else 0,
+                    'details': str(value),
+                    'threshold': 30,
+                    'specialists': ', '.join(metrics.get('open_specialists', [])),
+                    'expected': metrics.get('expected_sacred_count', '?'),
+                    'actual': metrics.get('sacred_count', '?'),
+                }
+
+                try:
+                    message = rule['message'].format(**fmt)
+                except (KeyError, ValueError):
+                    message = rule['message']
+
+                triggered.append({
+                    'rule': rule_name,
+                    'severity': rule['severity'],
+                    'message': message,
+                    'value': value,
+                })
+        except Exception as e:
+            logger.error(f"Error evaluating rule '{rule_name}': {e}")
+
+    return triggered
+
+
+# ============================================================================
+# Alert delivery
+# ============================================================================
+
+def send_telegram_alert(severity, message):
+    """Send alert to TPM via Telegram."""
+    if not TELEGRAM_BOT_TOKEN:
+        logger.warning("No TELEGRAM_BOT_TOKEN set — alert not sent via Telegram")
+        return False
+
+    emoji = SEVERITY_EMOJI.get(severity, '')
+    text = f"{emoji} *DRIFT {severity}*\n\n{message}\n\n_Governance Agent — {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}_"
+
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        resp = requests.post(url, json={
+            'chat_id': TPM_CHAT_ID,
+            'text': text,
+            'parse_mode': 'Markdown',
+        }, timeout=10)
+        resp.raise_for_status()
+        logger.info(f"Telegram alert sent: [{severity}] {message[:80]}")
+        return True
+    except Exception as e:
+        logger.error(f"Telegram alert failed: {e}")
+
+        # Fallback: try alert_manager if available
+        try:
+            sys.path.insert(0, '/ganuda')
+            from lib.alert_manager import send_alert
+            send_alert(f"[DRIFT {severity}] {message}")
+            return True
+        except ImportError:
+            pass
+
+        return False
+
+
+def deliver_alerts(alerts):
+    """Deliver all triggered alerts via Telegram."""
+    for alert in alerts:
+        send_telegram_alert(alert['severity'], alert['message'])
+
+
+# ============================================================================
+# Metric storage
+# ============================================================================
+
+def store_metrics(metrics):
+    """Store all collected metrics in drift_metrics table."""
+    conn = get_conn()
+    cur = conn.cursor()
+
+    try:
+        # Separate serializable scalar metrics from complex ones
+        for metric_name, metric_value in metrics.items():
+            # Skip non-numeric / complex values as top-level metric_value
+            if isinstance(metric_value, (int, float)):
+                details = {
+                    'collected_at': datetime.now(timezone.utc).isoformat(),
+                    'source': 'governance_agent',
+                }
+                cur.execute("""
+                    INSERT INTO drift_metrics (metric_type, metric_value, details, measured_at)
+                    VALUES (%s, %s, %s, NOW())
+                """, (metric_name, float(metric_value), json.dumps(details)))
+            elif isinstance(metric_value, dict):
+                # Store complex metrics with value=0 and content in details
+                cur.execute("""
+                    INSERT INTO drift_metrics (metric_type, metric_value, details, measured_at)
+                    VALUES (%s, %s, %s, NOW())
+                """, (metric_name, 0.0, json.dumps(metric_value)))
+            elif isinstance(metric_value, list):
+                cur.execute("""
+                    INSERT INTO drift_metrics (metric_type, metric_value, details, measured_at)
+                    VALUES (%s, %s, %s, NOW())
+                """, (metric_name, float(len(metric_value)), json.dumps(metric_value)))
+
+        conn.commit()
+        logger.info(f"Stored {len(metrics)} metrics in drift_metrics")
+
+    except Exception as e:
+        logger.error(f"Failed to store metrics: {e}")
+        conn.rollback()
+    finally:
+        cur.close()
+        conn.close()
+
+
+# ============================================================================
+# Main loop
+# ============================================================================
+
+def run_cycle():
+    """Execute one governance monitoring cycle."""
+    logger.info("=== Governance cycle starting ===")
+
+    # 1. Collect metrics
+    metrics = collect_metrics()
+    logger.info(f"Collected {len(metrics)} metrics: {list(metrics.keys())}")
+
+    # 2. Store metrics
+    store_metrics(metrics)
+
+    # 3. Check anomaly rules
+    alerts = check_alerts(metrics)
+    if alerts:
+        logger.warning(f"{len(alerts)} alert(s) triggered")
+        for a in alerts:
+            logger.warning(f"  [{a['severity']}] {a['message']}")
+        deliver_alerts(alerts)
+    else:
+        logger.info("No anomalies detected")
+
+    logger.info("=== Governance cycle complete ===")
+    return metrics, alerts
 
 
 def main():
-    """Start the bot"""
-    if not BOT_TOKEN:
-        print("ERROR: TELEGRAM_BOT_TOKEN not set")
-        return
+    """Run governance agent on 30-minute loop."""
+    logger.info("Governance Agent starting — Phase 3B Drift Detection")
+    logger.info(f"Cycle interval: {CYCLE_INTERVAL_SECONDS}s ({CYCLE_INTERVAL_SECONDS // 60} min)")
+    logger.info(f"Integrity check every {INTEGRITY_CHECK_INTERVAL} cycles")
 
-    print("=" * 50)
-    print("Cherokee Chief Telegram Bot v2.1")
-    print("Tribe Interface Edition with Sessions")
-    print("=" * 50)
+    while True:
+        try:
+            run_cycle()
+        except Exception as e:
+            logger.error(f"Governance cycle failed: {e}", exc_info=True)
 
-    # Create application
-    app = Application.builder().token(BOT_TOKEN).build()
-
-    # Add handlers
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("status", status))
-    app.add_handler(CommandHandler("pending", pending))
-    app.add_handler(CommandHandler("approve", approve))
-    app.add_handler(CommandHandler("veto", veto))
-    app.add_handler(CommandHandler("ask", ask_command))
-    app.add_handler(CommandHandler("health", health_command))
-    app.add_handler(CommandHandler("concerns", concerns_command))
-    app.add_handler(CommandHandler("remember", remember_command))
-    app.add_handler(CommandHandler("thermal", thermal_command))
-    app.add_handler(CommandHandler("context", context_command))  # Show conversation context
-    app.add_handler(CommandHandler("forget", forget_command))    # Clear conversation context
-    app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CallbackQueryHandler(button_callback))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
-    print("Bot starting...")
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+        time.sleep(CYCLE_INTERVAL_SECONDS)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
+async def cmd_drift_status(self, update, context):
+    """Show current drift detection status from governance agent metrics."""
+    try:
+        conn = self.get_db()
+        cur = conn.cursor()
+
+        # Get most recent value for each metric type
+        cur.execute("""
+            SELECT DISTINCT ON (metric_type)
+                metric_type, metric_value, details, measured_at
+            FROM drift_metrics
+            WHERE metric_type IN (
+                'avg_confidence_24h', 'jr_success_rate_24h',
+                'integrity_violations', 'stale_count', 'sacred_count',
+                'open_breakers', 'memory_count_total', 'memory_count_24h'
+            )
+            ORDER BY metric_type, measured_at DESC
+        """)
+        rows = cur.fetchall()
+        cur.close()
+
+        if not rows:
+            await update.message.reply_text(
+                "No drift metrics found. Governance agent may not have run yet."
+            )
+            return
+
+        metrics = {}
+        last_measured = None
+        for row in rows:
+            metrics[row[0]] = row[1]
+            if last_measured is None or row[3] > last_measured:
+                last_measured = row[3]
+
+        timestamp = last_measured.strftime('%Y-%m-%d %H:%M UTC') if last_measured else 'Unknown'
+        confidence = metrics.get('avg_confidence_24h', 0)
+        jr_rate = metrics.get('jr_success_rate_24h', 0) * 100
+        violations = int(metrics.get('integrity_violations', 0))
+        stale = int(metrics.get('stale_count', 0))
+        sacred = int(metrics.get('sacred_count', 0))
+        open_cb = int(metrics.get('open_breakers', 0))
+        mem_total = int(metrics.get('memory_count_total', 0))
+        mem_24h = int(metrics.get('memory_count_24h', 0))
+
+        cb_summary = f"{open_cb} OPEN" if open_cb > 0 else "All CLOSED"
+        integrity_display = f"{violations} violations" if violations > 0 else "Clean"
+
+        status_text = (
+            f"\U0001f4ca *DRIFT STATUS* \u2014 {timestamp}\n\n"
+            f"*Council Confidence (24h):* {confidence:.2f}\n"
+            f"*Jr Success Rate (24h):* {jr_rate:.0f}%\n"
+            f"*Memory Integrity:* {integrity_display}\n"
+            f"*Stale Memories:* {stale}\n"
+            f"*Sacred Memories:* {sacred}\n"
+            f"*Total Memories:* {mem_total} (+{mem_24h} in 24h)\n"
+            f"*Circuit Breakers:* {cb_summary}\n"
+        )
+
+        await update.message.reply_text(status_text, parse_mode='Markdown')
+
+    except Exception as e:
+        logger.error(f"drift-status command failed: {e}")
+        await update.message.reply_text(f"Error fetching drift status: {e}")
 
