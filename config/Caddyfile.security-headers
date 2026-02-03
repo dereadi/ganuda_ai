@@ -1,0 +1,45 @@
+# Caddy security headers snippet
+# Cherokee AI Federation - Security Phase 3
+# Generated: 2026-02-02
+#
+# Usage: Import this snippet in your Caddyfile site blocks:
+#
+#   import /etc/caddy/Caddyfile.security-headers
+#
+#   vetassist.ganuda.org {
+#       import security_headers
+#       reverse_proxy localhost:8000
+#   }
+#
+# REQUIRES ADMIN: Deploy with:
+#   sudo cp /ganuda/config/Caddyfile.security-headers /etc/caddy/Caddyfile.security-headers
+#   sudo caddy validate --config /etc/caddy/Caddyfile
+#   sudo systemctl reload caddy
+
+(security_headers) {
+    header {
+        # HSTS - enforce HTTPS for 1 year including subdomains
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+        # Prevent MIME-type sniffing
+        X-Content-Type-Options "nosniff"
+
+        # Prevent clickjacking
+        X-Frame-Options "DENY"
+
+        # XSS protection (legacy browsers)
+        X-XSS-Protection "1; mode=block"
+
+        # Control referrer information
+        Referrer-Policy "strict-origin-when-cross-origin"
+
+        # Content Security Policy
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws: wss:"
+
+        # Disable browser features we do not use
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
+        # Remove server identification header
+        -Server
+    }
+}

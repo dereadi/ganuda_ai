@@ -1,0 +1,19 @@
+# Phase 7 Supply Chain: Dependency Check Configuration
+# Used by /ganuda/daemons/dependency_checker.py
+# Cherokee AI Federation
+
+scan_schedule: weekly
+virtualenvs:
+  - /ganuda/vetassist/backend/venv
+  - /ganuda/services/llm_gateway/venv
+
+severity_threshold: high
+auto_alert: true
+alert_channel: telegram
+
+# Known false positives or accepted risks (add CVE IDs here)
+ignore:
+  # - CVE-XXXX-XXXXX  # Template: reason for ignoring
+
+results_dir: /ganuda/security/dependency_audit
+previous_scan_dir: /ganuda/security/dependency_audit/previous

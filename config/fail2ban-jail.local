@@ -1,0 +1,76 @@
+# fail2ban jail configuration
+# Cherokee AI Federation - Security Phase 3
+# Generated: 2026-02-02
+#
+# REQUIRES ADMIN: Deploy with:
+#   sudo cp /ganuda/config/fail2ban-jail.local /etc/fail2ban/jail.local
+#   sudo cp /ganuda/config/fail2ban-action-telegram.conf /etc/fail2ban/action.d/telegram.conf
+#   sudo systemctl restart fail2ban
+#   sudo systemctl enable fail2ban
+
+[DEFAULT]
+# Internal network is whitelisted from bans
+ignoreip = 127.0.0.1/8 ::1 192.168.132.0/24
+
+# Default ban action: iptables + telegram notification
+banaction = nftables-multiport
+action = %(action_)s
+         telegram[name=%(__name__)s]
+
+# Default settings
+findtime = 10m
+bantime = 1h
+maxretry = 5
+
+# -------------------------------------------------------------------
+# SSH Jail
+# 3 failures in 10 minutes = ban 1 hour
+# -------------------------------------------------------------------
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+findtime = 10m
+bantime = 1h
+
+# -------------------------------------------------------------------
+# HTTP Auth Jail (Caddy / generic web auth)
+# 5 failures in 5 minutes = ban 30 minutes
+# -------------------------------------------------------------------
+[caddy-auth]
+enabled = true
+port = http,https
+filter = caddy-auth
+logpath = /var/log/caddy/access.log
+maxretry = 5
+findtime = 5m
+bantime = 30m
+
+# -------------------------------------------------------------------
+# PostgreSQL Jail
+# 3 failures in 5 minutes = ban 1 hour
+# -------------------------------------------------------------------
+[postgresql]
+enabled = true
+port = 5432
+filter = postgresql
+logpath = /var/log/postgresql/postgresql-*-main.log
+maxretry = 3
+findtime = 5m
+bantime = 1h
+
+# -------------------------------------------------------------------
+# Recidive Jail (repeat offenders)
+# 3 bans in 24 hours = ban 1 week
+# -------------------------------------------------------------------
+[recidive]
+enabled = true
+filter = recidive
+logpath = /var/log/fail2ban.log
+maxretry = 3
+findtime = 1d
+bantime = 1w
+action = %(action_)s
+         telegram[name=recidive]

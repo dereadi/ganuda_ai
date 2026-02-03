@@ -1,0 +1,29 @@
+[Unit]
+Description=Ganuda Security Monitor Daemon - AI Blue Team
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda
+ExecStart=/ganuda/venv/bin/python /ganuda/daemons/security_monitor.py
+Restart=always
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=security-monitor
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/ganuda/logs/security
+ReadOnlyPaths=/ganuda/security /ganuda/lib /ganuda/daemons
+
+# Environment
+Environment=PYTHONPATH=/ganuda:/ganuda/lib:/ganuda/security/blue_team
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

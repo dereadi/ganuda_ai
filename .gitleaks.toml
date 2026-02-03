@@ -1,0 +1,59 @@
+# Gitleaks configuration for Cherokee AI Federation
+# Created: 2026-02-02 SECURITY-PHASE1
+# Detects hardcoded credentials before they reach the repository.
+
+title = "Cherokee Federation Secret Detection"
+
+[extend]
+# Start from default gitleaks rules, then add federation-specific ones
+
+[[rules]]
+id = "cherokee-db-password"
+description = "Hardcoded database password detected"
+regex = '''(?i)(password|passwd|pwd|db_pass)\s*[=:]\s*['"]?[a-zA-Z0-9!@#$%^&*]{8,}['"]?'''
+tags = ["password", "database"]
+
+[[rules]]
+id = "jawaseatlasers-literal"
+description = "Known legacy password 'jawaseatlasers2' detected"
+regex = '''jawaseatlasers2'''
+tags = ["password", "critical", "legacy"]
+
+[[rules]]
+id = "api-key-pattern"
+description = "API key pattern detected"
+regex = '''(?i)(api[_-]?key|apikey)\s*[=:]\s*['"]?[a-zA-Z0-9_\-]{20,}['"]?'''
+tags = ["api-key"]
+
+[[rules]]
+id = "bearer-token"
+description = "Bearer token detected"
+regex = '''(?i)bearer\s+[a-zA-Z0-9_\-\.]{20,}'''
+tags = ["token", "bearer"]
+
+[[rules]]
+id = "telegram-bot-token"
+description = "Telegram bot token detected"
+regex = '''[0-9]{8,10}:[a-zA-Z0-9_-]{35}'''
+tags = ["token", "telegram"]
+
+[[rules]]
+id = "private-key-header"
+description = "Private key file content detected"
+regex = '''-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----'''
+tags = ["private-key"]
+
+[[rules]]
+id = "generic-secret-assignment"
+description = "Generic secret assignment detected"
+regex = '''(?i)(secret|token|credential)\s*[=:]\s*['"]?[a-zA-Z0-9!@#$%^&*_\-]{12,}['"]?'''
+tags = ["secret", "generic"]
+
+[allowlist]
+description = "Global allowlist"
+paths = [
+    '''\.gitleaks\.toml$''',
+    '''\.gitignore$''',
+    '''docs/jr_instructions/.*\.md$''',
+    '''docs/kb/.*\.md$''',
+]

@@ -1,0 +1,11 @@
+[Unit]
+Description=Weekly Security Check Timer
+Documentation=file:///ganuda/docs/jr_instructions/JR-SECURITY-PHASE7-SUPPLY-CHAIN-CONTINUOUS-FEB02-2026.md
+
+[Timer]
+OnCalendar=Sun *-*-* 03:00:00
+Persistent=true
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target

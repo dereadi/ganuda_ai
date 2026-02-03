@@ -67,3 +67,18 @@ llama.cpp/
 *.jpg
 home/
 data/
+
+# ============================================================
+# Secrets - NEVER commit (added 2026-02-02 SECURITY-PHASE1)
+# ============================================================
+config/secrets.env
+config/*.env
+*.pem
+*.key
+secrets/
+
+# Security scan results
+security/ai_red_team/results/
+security/evidence/
+security/dependency_audit/
+logs/security/

@@ -1,0 +1,23 @@
+[Unit]
+Description=Cherokee AI Federation Weekly Security Check
+Documentation=file:///ganuda/docs/jr_instructions/JR-SECURITY-PHASE7-SUPPLY-CHAIN-CONTINUOUS-FEB02-2026.md
+After=network.target postgresql.service
+
+[Service]
+Type=oneshot
+ExecStart=/ganuda/scripts/security_check.sh
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening for the security checker itself
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/ganuda/logs /ganuda/security /ganuda/config
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
