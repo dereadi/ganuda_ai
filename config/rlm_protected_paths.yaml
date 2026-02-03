@@ -44,7 +44,17 @@ protected_patterns:
 
 # Paths that CAN be modified (override protection)
 # Use sparingly - these are exceptions to protected patterns
-allowed_overrides: []
+# Added: 2026-02-02 (RLM-OVERRIDE-VETASSIST-001)
+# Safety net: command_sanitizer.py validates all writes pre-execution
+# Scope: VetAssist backend Python files ONLY (not frontend, not main.py)
+allowed_overrides:
+  - "/ganuda/vetassist/backend/app/api/v1/endpoints/*.py"
+  - "/ganuda/vetassist/backend/app/services/*.py"
+  - "/ganuda/vetassist/backend/app/schemas/*.py"
+  - "/ganuda/vetassist/backend/app/core/*.py"
+  - "/ganuda/vetassist/backend/app/models/*.py"
+  - "/ganuda/vetassist/backend/app/api/v1/dependencies.py"
+  - "/ganuda/vetassist/backend/app/api/v1/__init__.py"
 
 # Notify on attempted modification of protected files
 notify_on_block: true

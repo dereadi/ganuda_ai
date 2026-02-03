@@ -64,15 +64,17 @@ PROTECTED_PATHS_CONFIG = Path('/ganuda/config/rlm_protected_paths.yaml')
 BACKUP_DIR = Path('/ganuda/.rlm-backups')
 BACKUP_RETENTION_DAYS = 7
 _protected_patterns = []
+_allowed_overrides = []
 
 def load_protected_paths():
-    """Load protected paths from config file."""
-    global _protected_patterns
+    """Load protected paths and scoped overrides from config file."""
+    global _protected_patterns, _allowed_overrides
     if PROTECTED_PATHS_CONFIG.exists():
         with open(PROTECTED_PATHS_CONFIG) as f:
             config = yaml.safe_load(f)
             _protected_patterns = config.get('protected_patterns', [])
-            logger.info(f"[RLM] Loaded {len(_protected_patterns)} protected path patterns")
+            _allowed_overrides = config.get('allowed_overrides', []) or []
+            logger.info(f"[RLM] Loaded {len(_protected_patterns)} protected patterns, {len(_allowed_overrides)} overrides")
     else:
         logger.warning("[RLM] No protected paths config - using defaults")
         _protected_patterns = [
@@ -83,13 +85,31 @@ def load_protected_paths():
             "/ganuda/jr_executor/*.py",
             "/ganuda/config/*.yaml",
         ]
+        _allowed_overrides = []
     return _protected_patterns
 
 def is_path_protected(file_path: str) -> bool:
-    """Check if a path matches any protected pattern."""
-    global _protected_patterns
+    """Check if a path matches any protected pattern.
+
+    Override whitelist is checked FIRST — if a path matches an override,
+    it is allowed even if it also matches a protected pattern.
+    This enables scoped access to specific subdirectories while
+    maintaining protection for everything else.
+
+    Safety net: command_sanitizer.py validates all writes pre-execution.
+    Added: 2026-02-02 (RLM-OVERRIDE-VETASSIST-001)
+    """
+    global _protected_patterns, _allowed_overrides
     if not _protected_patterns:
         load_protected_paths()
+
+    # Check override whitelist first (scoped bypass)
+    for override in _allowed_overrides:
+        if fnmatch.fnmatch(file_path, override):
+            logger.info(f"[RLM] Path ALLOWED by override: {file_path} -> {override}")
+            return False
+
+    # Check protection patterns
     for pattern in _protected_patterns:
         if fnmatch.fnmatch(file_path, pattern):
             logger.warning(f"[RLM] Path matches protected pattern: {file_path} -> {pattern}")
