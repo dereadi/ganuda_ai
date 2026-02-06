@@ -293,7 +293,7 @@ class ResearchTaskExecutor:
                 II_RESEARCHER_URL,
                 params={'question': clean_query, 'max_steps': max_steps},
                 stream=True,
-                timeout=180  # 3 min timeout for deep search
+                timeout=300  # 5 min timeout for deep search (matches ii-researcher default)
             )
 
             if response.status_code != 200:
@@ -312,16 +312,26 @@ class ResearchTaskExecutor:
                         try:
                             event_data = json.loads(line[6:])
                             event_type = event_data.get('type', '')
+                            # ii-researcher nests data in 'data' field
+                            data = event_data.get('data', {})
 
                             if event_type == 'reasoning':
-                                reasoning += event_data.get('reasoning', '')
+                                reasoning += data.get('reasoning', '')
                             elif event_type == 'source':
-                                sources.append(event_data.get('url', ''))
+                                url = data.get('url', '')
+                                if url:
+                                    sources.append(url)
                             elif event_type == 'complete':
-                                answer = event_data.get('answer', event_data.get('result', ''))
+                                # Final answer is in data.final_report
+                                answer = data.get('final_report', '')
+                                print(f"[ResearchTaskExecutor] ii-researcher complete: {len(answer)} chars")
                             elif event_type == 'error':
-                                print(f"[ResearchTaskExecutor] ii-researcher error: {event_data.get('error')}")
-                                return {'success': False, 'error': event_data.get('error')}
+                                error_msg = data.get('message', 'Unknown error')
+                                print(f"[ResearchTaskExecutor] ii-researcher error: {error_msg}")
+                                return {'success': False, 'error': error_msg}
+                            elif event_type == 'stream_closed':
+                                print("[ResearchTaskExecutor] ii-researcher stream closed")
+                                break
                         except json.JSONDecodeError:
                             pass
 
