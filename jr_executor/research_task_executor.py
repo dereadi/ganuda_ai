@@ -141,24 +141,42 @@ class ResearchTaskExecutor:
             else:
                 print(f"[ResearchTaskExecutor] Failed: {url} - {result.get('error', 'Unknown error')}")
 
-        # Research topics (Wikipedia fallback)
+        # Research topics via ii-researcher deep search
         for topic in topics:
-            print(f"[ResearchTaskExecutor] Researching topic: {topic}")
-            # Generate Wikipedia URL from topic
-            wiki_topic = topic.replace(' ', '_').replace('(', '').replace(')', '')
-            wiki_url = f"https://en.wikipedia.org/wiki/{wiki_topic}"
+            print(f"[ResearchTaskExecutor] Deep searching topic: {topic}")
 
             try:
-                topic_results = sync_research_topic(topic, [wiki_url])
-                # sync_research_topic returns a list of results
-                successful = sum(1 for r in topic_results if r is not None)
-                result = {
-                    'topic': topic,
-                    'sources': [wiki_url],
-                    'successful': successful,
-                    'sources_fetched': len(topic_results),
-                    'content': topic_results[0] if topic_results and topic_results[0] else None
-                }
+                # Call ii-researcher for deep web search
+                ii_result = self._call_ii_researcher(topic)
+
+                if ii_result and ii_result.get('success'):
+                    result = {
+                        'topic': topic,
+                        'sources': ii_result.get('sources', []),
+                        'successful': 1,
+                        'sources_fetched': len(ii_result.get('sources', [])),
+                        'content': ii_result.get('answer', ''),
+                        'reasoning': ii_result.get('reasoning', '')
+                    }
+                    # Save the deep search result
+                    if result['content']:
+                        filename = self._save_content(f"ii-search://{topic}", result['content'])
+                        artifacts.append({'type': 'ii_researcher', 'path': filename, 'topic': topic})
+                        print(f"[ResearchTaskExecutor] ii-researcher saved: {filename}")
+                else:
+                    # Fallback to Wikipedia if ii-researcher fails
+                    print(f"[ResearchTaskExecutor] ii-researcher failed, falling back to Wikipedia")
+                    wiki_topic = topic.replace(' ', '_').replace('(', '').replace(')', '').replace('"', '')
+                    wiki_url = f"https://en.wikipedia.org/wiki/{wiki_topic}"
+                    topic_results = sync_research_topic(topic, [wiki_url])
+                    successful = sum(1 for r in topic_results if r is not None)
+                    result = {
+                        'topic': topic,
+                        'sources': [wiki_url],
+                        'successful': successful,
+                        'sources_fetched': len(topic_results),
+                        'content': topic_results[0] if topic_results and topic_results[0] else None
+                    }
             except Exception as e:
                 print(f"[ResearchTaskExecutor] Topic research error: {e}")
                 result = {'topic': topic, 'successful': 0, 'sources_fetched': 0, 'error': str(e)}
@@ -248,6 +266,84 @@ class ResearchTaskExecutor:
             'successful_fetches': successful_fetches
         }
 
+    def _call_ii_researcher(self, query: str, max_steps: int = 10) -> dict:
+        """
+        Call ii-researcher deep search API for thorough web research.
+
+        Args:
+            query: The search query/topic
+            max_steps: Max reasoning steps (default 10)
+
+        Returns:
+            dict with 'success', 'answer', 'sources', 'reasoning' keys
+        """
+        import requests
+        import json
+
+        II_RESEARCHER_URL = "http://localhost:8090/search"
+
+        try:
+            # Clean query - remove quotes used for exact matching in instructions
+            clean_query = query.strip('"\'')
+
+            print(f"[ResearchTaskExecutor] Calling ii-researcher: {clean_query[:60]}...")
+
+            # ii-researcher uses SSE streaming, we need to collect all events
+            response = requests.get(
+                II_RESEARCHER_URL,
+                params={'question': clean_query, 'max_steps': max_steps},
+                stream=True,
+                timeout=180  # 3 min timeout for deep search
+            )
+
+            if response.status_code != 200:
+                print(f"[ResearchTaskExecutor] ii-researcher error: HTTP {response.status_code}")
+                return {'success': False, 'error': f'HTTP {response.status_code}'}
+
+            # Parse SSE events
+            answer = ""
+            sources = []
+            reasoning = ""
+
+            for line in response.iter_lines():
+                if line:
+                    line = line.decode('utf-8')
+                    if line.startswith('data: '):
+                        try:
+                            event_data = json.loads(line[6:])
+                            event_type = event_data.get('type', '')
+
+                            if event_type == 'reasoning':
+                                reasoning += event_data.get('reasoning', '')
+                            elif event_type == 'source':
+                                sources.append(event_data.get('url', ''))
+                            elif event_type == 'complete':
+                                answer = event_data.get('answer', event_data.get('result', ''))
+                            elif event_type == 'error':
+                                print(f"[ResearchTaskExecutor] ii-researcher error: {event_data.get('error')}")
+                                return {'success': False, 'error': event_data.get('error')}
+                        except json.JSONDecodeError:
+                            pass
+
+            if answer:
+                print(f"[ResearchTaskExecutor] ii-researcher success: {len(answer)} chars, {len(sources)} sources")
+                return {
+                    'success': True,
+                    'answer': answer,
+                    'sources': sources,
+                    'reasoning': reasoning
+                }
+            else:
+                print("[ResearchTaskExecutor] ii-researcher returned no answer")
+                return {'success': False, 'error': 'No answer returned'}
+
+        except requests.exceptions.Timeout:
+            print("[ResearchTaskExecutor] ii-researcher timeout (180s)")
+            return {'success': False, 'error': 'Timeout'}
+        except Exception as e:
+            print(f"[ResearchTaskExecutor] ii-researcher exception: {e}")
+            return {'success': False, 'error': str(e)}
+
     def _extract_urls(self, text: str) -> List[str]:
         """Extract URLs from instruction text, filtering out internal IPs."""
         url_pattern = r'https?://[^\s<>"{}|\\^`\[\]\)\,]+'
@@ -305,6 +401,8 @@ class ResearchTaskExecutor:
             r'Analyze:\s*([^\n]+)',
             r'QUESTION:\s*([^\n]+)',  # VetAssist format
             r'Question:\s*([^\n]+)',  # Case variation
+            r'Search:\s*([^\n]+)',    # Web search queries
+            r'Search [^:]+:\s*([^\n]+)',  # "Search IEEE:" format
         ]
         topics = []
         for pattern in patterns:
