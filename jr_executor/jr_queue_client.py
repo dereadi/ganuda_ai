@@ -83,44 +83,62 @@ class JrQueueClient:
 
     def get_pending_tasks(self, limit: int = 10) -> List[Dict]:
         """
-        Get pending tasks assigned to this Jr.
+        Atomically claim pending tasks assigned to this Jr.
+
+        Uses FOR UPDATE SKIP LOCKED to prevent race conditions when
+        multiple workers poll simultaneously. Tasks are moved to
+        'in_progress' status in the same transaction as the SELECT.
+
+        TPM-deployed: Feb 3, 2026 (Ultrathink: 95% Solution Phase A)
 
         Args:
             limit: Maximum number of tasks to return
 
         Returns:
-            List of task dictionaries
+            List of claimed task dictionaries (already in_progress)
         """
         return self._execute("""
-            SELECT id, task_id, title, description, priority, sacred_fire_priority,
-                   instruction_file, instruction_content, parameters,
-                   seven_gen_impact, tags, created_at, use_rlm
-            FROM jr_work_queue
-            WHERE assigned_jr = %s
-              AND status IN ('pending', 'assigned')
-            ORDER BY sacred_fire_priority DESC, priority ASC, created_at ASC
-            LIMIT %s
+            UPDATE jr_work_queue
+            SET status = 'in_progress',
+                started_at = COALESCE(started_at, NOW()),
+                status_message = 'Claimed by worker'
+            WHERE id IN (
+                SELECT id
+                FROM jr_work_queue
+                WHERE assigned_jr = %s
+                  AND status IN ('pending', 'assigned')
+                ORDER BY sacred_fire_priority DESC, priority ASC, created_at ASC
+                LIMIT %s
+                FOR UPDATE SKIP LOCKED
+            )
+            RETURNING id, task_id, title, description, priority, sacred_fire_priority,
+                      instruction_file, instruction_content, parameters,
+                      seven_gen_impact, tags, created_at, use_rlm, assigned_jr
         """, (self.jr_name, limit))
 
     def claim_task(self, task_id: int) -> bool:
         """
-        Claim a task and mark it as in_progress.
+        Verify a task is claimed and in_progress for this Jr.
+
+        Note: As of Feb 2026, get_pending_tasks() atomically claims tasks
+        via FOR UPDATE SKIP LOCKED. This method serves as verification
+        and backward-compatibility for direct claim requests.
 
         Args:
             task_id: The task's database ID
 
         Returns:
-            True if task was successfully claimed
+            True if task is in_progress and assigned to this Jr
         """
         try:
             rows = self._execute("""
                 UPDATE jr_work_queue
                 SET status = 'in_progress',
-                    started_at = NOW(),
+                    started_at = COALESCE(started_at, NOW()),
                     status_message = 'Task claimed by Jr'
                 WHERE id = %s
                   AND assigned_jr = %s
-                  AND status IN ('pending', 'assigned')
+                  AND status IN ('pending', 'assigned', 'in_progress')
                 RETURNING id
             """, (task_id, self.jr_name), fetch=True)
             return len(rows) > 0
