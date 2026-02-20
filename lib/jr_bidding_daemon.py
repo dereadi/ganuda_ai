@@ -47,7 +47,7 @@ DB_CONFIG = {
     'host': os.environ.get('CHEROKEE_DB_HOST', '192.168.132.222'),
     'database': os.environ.get('CHEROKEE_DB_NAME', 'zammad_production'),
     'user': os.environ.get('CHEROKEE_DB_USER', 'claude'),
-    'password': os.environ.get('CHEROKEE_DB_PASS', 'jawaseatlasers2')
+    'password': os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 # Capability definitions by specialization

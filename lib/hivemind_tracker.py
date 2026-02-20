@@ -22,6 +22,7 @@ from itertools import combinations
 from typing import Dict, List, Optional, Set, Tuple
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import os
 
 
 # Specialist configuration
@@ -223,7 +224,7 @@ class HiveMindTracker:
             'port': 5432,
             'database': 'zammad_production',
             'user': 'claude',
-            'password': 'jawaseatlasers2'
+            'password': os.environ.get('CHEROKEE_DB_PASS', '')
         }
         self.shapley_calculator = DAGShapleyCalculator()
 

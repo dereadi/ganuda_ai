@@ -19,6 +19,7 @@ from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from collections import Counter
+import os
 
 
 class ReflectionEngine:
@@ -282,7 +283,7 @@ if __name__ == '__main__':
         'port': 5432,
         'database': 'zammad_production',
         'user': 'claude',
-        'password': 'jawaseatlasers2'
+        'password': os.environ.get('CHEROKEE_DB_PASS', '')
     }
     
     engine = ReflectionEngine(db_config)

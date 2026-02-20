@@ -30,15 +30,16 @@ from typing import Optional, Dict, List, Any
 PM_MODEL_URL = "http://localhost:11434/api/generate"
 PM_MODEL_NAME = "executive_jr"
 
-# Coder Model - Qwen 32B for high-quality code generation
+# Coder Model - vLLM on redfin (env-configured)
+import os
 CODER_MODEL_URL = "http://localhost:8000/v1/chat/completions"
-CODER_MODEL_NAME = "/ganuda/models/qwen2.5-coder-32b-awq"
+CODER_MODEL_NAME = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
 
 # Legacy single-model config (used by existing methods)
 LLM_URL = "http://localhost:8000/v1/chat/completions"
 GATEWAY_URL = "http://localhost:8080"
-API_KEY = "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
-DEFAULT_MODEL = "/ganuda/models/qwen2.5-coder-32b-awq"
+API_KEY = os.environ.get('LLM_GATEWAY_API_KEY', 'ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5')
+DEFAULT_MODEL = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
 
 
 class JrLLMReasoner:

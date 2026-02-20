@@ -12,6 +12,7 @@ For Seven Generations - Cherokee AI Federation
 Created: January 17, 2026
 """
 
+import os
 import json
 import logging
 import shutil
@@ -44,7 +45,7 @@ except ImportError as e:
 
 # Configuration for local vLLM
 VLLM_BASE_URL = "http://localhost:8000/v1"
-MODEL_NAME = "/ganuda/models/qwen2.5-coder-32b-awq"
+MODEL_NAME = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
 MAX_RECURSION_DEPTH = 3  # Prevent runaway recursion
 
 # Phase 9 Path Validation (Jan 23, 2026 - Council Vote 28d18d80e447505f)
@@ -238,13 +239,14 @@ class RLMExecutor:
             artifacts.extend(self._extract_artifacts(response))
 
             # P0 FIX Jan 27, 2026: Accurate success detection
-            # Count both created and staged files as success (Updated Jan 29, 2026)
+            # UPGRADED Feb 3, 2026 (TPM): Staged files are NOT success — they need TPM merge
+            # This was Root Cause 2 in the Ultrathink 95% Solution analysis.
             files_created = len([a for a in artifacts if a.get('type') == 'file_created'])
             files_staged = len([a for a in artifacts if a.get('type') == 'file_staged'])
             actual_subtasks = getattr(response, 'recursion_count', 0) if hasattr(response, 'recursion_count') else 0
 
-            # Success requires actual work - files created OR staged for review
-            actual_success = (files_created + files_staged) > 0 or actual_subtasks > 0
+            # Success requires REAL file creation — staged files need TPM review
+            actual_success = files_created > 0 or actual_subtasks > 0
 
             result = {
                 "success": actual_success,
@@ -256,7 +258,11 @@ class RLMExecutor:
                 "execution_tree": {}
             }
 
-            if not actual_success:
+            if files_staged > 0 and files_created == 0:
+                result["error"] = f"All {files_staged} file(s) went to staging (protected paths) - requires TPM merge via /staging"
+                result["success"] = False
+                self.logger.warning(f"[RLM] All {files_staged} files staged to protected paths - NOT marking as success")
+            elif not actual_success:
                 result["error"] = f"RLM generated response but created 0 files (no matching file patterns in output)"
                 self.logger.warning(f"[RLM] Task generated text but no files - marking as failed")
             else:
@@ -278,9 +284,13 @@ class RLMExecutor:
         """Build the RLM execution prompt for a task.
 
         FIXED Jan 27, 2026: Changed to MARKDOWN OUTPUT format that parser expects.
-        Previous "execution model" prompt created Python code that wasn't executed.
-        Now asks for File: `path` format that _write_files_from_response() parses.
+        UPGRADED Feb 3, 2026 (TPM): Injects existing file contents into prompt so
+        the LLM modifies files accurately instead of hallucinating from scratch.
+        This was Root Cause 1 in the Ultrathink 95% Solution analysis.
         """
+        import os
+        import re
+
         files_create = task.get('files_to_create', [])
         files_modify = task.get('files_to_modify', [])
 
@@ -291,14 +301,87 @@ class RLMExecutor:
         if files_modify:
             file_list += f"FILES TO MODIFY: {json.dumps(files_modify)}\n"
 
+        # NEW: Inject existing file contents so LLM has accurate context
+        # This prevents hallucination (e.g., generating Celery code for a psycopg2 worker)
+        # FIXED Feb 3, 2026: Cap total context to stay within Qwen 32B's 32K token window
+        # Token count varies by content type — code/SQL/regex tokenize heavier than prose.
+        # Use conservative 2.5 chars/token estimate for mixed code+markdown content.
+        # Reserve 6K tokens for output → 26K input budget → ~65K chars at 2.5 ratio.
+        # But we calculate dynamically based on instruction length.
+        CHARS_PER_TOKEN = 2.5  # Conservative for code-heavy content
+        MODEL_CONTEXT_WINDOW = 32000  # Qwen 32B AWQ
+        OUTPUT_RESERVE_TOKENS = 6000
+        PROMPT_BOILERPLATE_TOKENS = 1000  # The template text around the content
+        INPUT_TOKEN_BUDGET = MODEL_CONTEXT_WINDOW - OUTPUT_RESERVE_TOKENS - PROMPT_BOILERPLATE_TOKENS
+
+        # Estimate how many tokens the instructions already consume
+        instruction_token_estimate = int(len(instructions_text) / CHARS_PER_TOKEN)
+        remaining_token_budget = INPUT_TOKEN_BUDGET - instruction_token_estimate
+        MAX_FILE_CONTEXT_CHARS = max(5000, int(remaining_token_budget * CHARS_PER_TOKEN))
+        PER_FILE_LIMIT = min(8000, MAX_FILE_CONTEXT_CHARS // max(len(all_target_files) if all_target_files else 1, 1))
+
+        self.logger.info(
+            f"[RLM] Context budget: instructions ~{instruction_token_estimate} tokens, "
+            f"file context budget ~{remaining_token_budget} tokens ({MAX_FILE_CONTEXT_CHARS} chars), "
+            f"per-file limit {PER_FILE_LIMIT} chars"
+        )
+
+        existing_context = ""
+        all_target_files = list(set((files_modify or []) + (files_create or [])))
+
+        # Also extract file paths mentioned in instructions (regex for /ganuda/...path)
+        instructions_text = task.get('instructions', '')
+        mentioned_paths = re.findall(r'(?:Create|Modify|Update|File):\s*`?(/ganuda/[\w/\.\-_]+\.\w+)`?', instructions_text)
+        # Also catch paths in markdown headers
+        mentioned_paths += re.findall(r'###?\s*(?:Step \d+[:\s]*)?\s*(?:Create|Modify|Update)?\s*`(/ganuda/[\w/\.\-_]+\.\w+)`', instructions_text)
+        all_target_files = list(set(all_target_files + mentioned_paths))
+
+        # Prioritize files_to_modify over files_to_create over mentioned
+        # (modify targets need context most urgently)
+        priority_files = list(files_modify or []) + list(files_create or [])
+        other_files = [f for f in all_target_files if f not in priority_files]
+        ordered_files = priority_files + other_files
+
+        if ordered_files:
+            existing_context = "\n\nEXISTING FILE CONTENTS (use these as the base for modifications):\n"
+            files_read = 0
+            context_chars_used = 0
+
+            for fp in ordered_files:
+                if context_chars_used >= MAX_FILE_CONTEXT_CHARS:
+                    remaining = len(ordered_files) - files_read
+                    existing_context += f"\n[Context budget reached — {remaining} file(s) not loaded]\n"
+                    break
+
+                if os.path.exists(fp):
+                    try:
+                        with open(fp, 'r') as f:
+                            content = f.read()
+                        file_size = len(content)
+                        # Per-file truncation
+                        if file_size > PER_FILE_LIMIT:
+                            content = content[:PER_FILE_LIMIT] + f"\n\n... [TRUNCATED — file continues for {file_size - PER_FILE_LIMIT} more bytes] ...\n"
+                        file_block = f"\n--- EXISTING: `{fp}` ({file_size} bytes, {content.count(chr(10))+1} lines) ---\n```\n{content}\n```\n"
+                        existing_context += file_block
+                        context_chars_used += len(file_block)
+                        files_read += 1
+                    except Exception as e:
+                        existing_context += f"\n--- EXISTING: `{fp}` (READ ERROR: {e}) ---\n"
+                else:
+                    existing_context += f"\n--- `{fp}` does not exist yet (new file) ---\n"
+
+            if files_read > 0:
+                existing_context += f"\n[Loaded {files_read} existing file(s), {context_chars_used} chars of context]\n"
+
         return f"""You are a software engineer. Generate the complete file contents for the requested task.
 
 TASK: {task.get('title', 'Unknown task')}
 
 INSTRUCTIONS:
-{task.get('instructions', '')}
+{instructions_text}
 
 {file_list}
+{existing_context}
 
 OUTPUT FORMAT - For EACH file, output in this EXACT format:
 
@@ -308,29 +391,6 @@ File: `/path/to/file.py`
 <complete file contents here>
 ```
 
-EXAMPLE OUTPUT:
-
-File: `/ganuda/lib/example_module.py`
-
-```python
-#!/usr/bin/env python3
-\"\"\"Example module for demonstration.\"\"\"
-
-def hello():
-    return "world"
-
-if __name__ == "__main__":
-    print(hello())
-```
-
-File: `/ganuda/config/example.yaml`
-
-```yaml
-# Example configuration
-setting: value
-enabled: true
-```
-
 CRITICAL RULES:
 1. Output COMPLETE file contents, not snippets or explanations
 2. Use the EXACT format: File: `/path` followed by code block
@@ -338,6 +398,10 @@ CRITICAL RULES:
 4. Include ALL imports and dependencies in each file
 5. Do NOT include explanatory text between files
 6. Generate ALL files listed in FILES TO CREATE/MODIFY
+7. When MODIFYING existing files, preserve the existing structure, imports, and patterns
+8. Do NOT change the framework or architecture (e.g., do not replace psycopg2 with SQLAlchemy)
+9. Maintain the same class/function signatures unless the instructions explicitly say to change them
+10. Your output must be at least 70% the size of the original file when modifying
 
 Generate the files now:
 """
@@ -503,11 +567,12 @@ Generate the files now:
                 found_files.add(file_path)
 
                 # CRITICAL SAFEGUARD: Prevent destructive overwrites
+                # UPGRADED Feb 3, 2026 (TPM): Added import overlap quality gate
                 if os.path.exists(file_path):
                     existing_size = os.path.getsize(file_path)
                     new_size = len(code)
 
-                    # Block if existing file is >2x the size AND >1000 bytes
+                    # Gate 1: Block if existing file is >2x the size AND >1000 bytes
                     if existing_size > new_size * 2 and existing_size > 1000:
                         self.logger.error(
                             f"[RLM] BLOCKED destructive overwrite of {file_path}: "
@@ -521,6 +586,40 @@ Generate the files now:
                             'new_size': new_size
                         })
                         continue
+
+                    # Gate 2: Import/pattern overlap check (catches framework hallucination)
+                    # If existing file imports certain modules but replacement imports none of them,
+                    # the LLM likely hallucinated a completely different implementation
+                    try:
+                        with open(file_path, 'r') as existing_f:
+                            existing_content = existing_f.read()
+
+                        # Extract import statements from both
+                        existing_imports = set(re.findall(r'^(?:from|import)\s+(\w+)', existing_content, re.MULTILINE))
+                        new_imports = set(re.findall(r'^(?:from|import)\s+(\w+)', code, re.MULTILINE))
+
+                        if existing_imports and new_imports:
+                            overlap = existing_imports & new_imports
+                            overlap_ratio = len(overlap) / len(existing_imports) if existing_imports else 1.0
+
+                            if overlap_ratio < 0.2 and len(existing_imports) >= 3:
+                                self.logger.error(
+                                    f"[RLM] BLOCKED framework mismatch for {file_path}: "
+                                    f"import overlap={overlap_ratio:.0%} "
+                                    f"(existing: {sorted(existing_imports)[:5]}, "
+                                    f"new: {sorted(new_imports)[:5]})"
+                                )
+                                artifacts.append({
+                                    'type': 'file_blocked',
+                                    'path': file_path,
+                                    'reason': f'Import overlap only {overlap_ratio:.0%} - likely hallucinated replacement',
+                                    'existing_imports': sorted(existing_imports)[:10],
+                                    'new_imports': sorted(new_imports)[:10],
+                                    'blocked_by': 'quality_gate'
+                                })
+                                continue
+                    except Exception as qg_err:
+                        self.logger.debug(f"[RLM] Quality gate check failed for {file_path}: {qg_err}")
 
                     self.logger.warning(
                         f"[RLM] Overwriting {file_path} (existing={existing_size}b, new={new_size}b)"
@@ -803,8 +902,9 @@ def execute_with_dual_model(task: Dict) -> Dict:
         fallback_task_id = task.get('task_id') or task.get('id')
         artifacts = _fallback_write_files(combined_output, task_id=fallback_task_id)
 
-    # Count both created and staged files as success (Jan 29, 2026)
-    files_created = len([a for a in artifacts if a.get('type') in ('file_created', 'file_staged')])
+    # FIXED Feb 3, 2026 (TPM): Staged files are NOT success — they need TPM merge
+    files_created = len([a for a in artifacts if a.get('type') == 'file_created'])
+    files_staged = len([a for a in artifacts if a.get('type') == 'file_staged'])
 
     result = {
         "success": files_created > 0,
@@ -812,16 +912,19 @@ def execute_with_dual_model(task: Dict) -> Dict:
         "subtasks_completed": len(plan.get("steps", [])),
         "artifacts": artifacts,
         "files_created": files_created,
+        "files_staged": files_staged,
         "execution_mode": "dual-model",
         "execution_tree": {}
     }
 
     if files_created > 0:
-        logger.info(f"[DUAL-MODEL] Success! Created {files_created} files")
+        logger.info(f"[DUAL-MODEL] Success! Created {files_created} files ({files_staged} staged)")
+    elif files_staged > 0:
+        result["error"] = f"All {files_staged} file(s) went to staging (protected paths) - requires TPM merge"
+        logger.warning(f"[DUAL-MODEL] All {files_staged} files staged to protected paths - NOT marking as success")
     else:
         result["error"] = "Dual-model generated code but no files were created"
         logger.warning("[DUAL-MODEL] No files created from code output")
-        # Debug: log preview of what we tried to parse
         logger.debug(f"[DUAL-MODEL] Code output preview: {combined_output[:500]}")
 
     return result

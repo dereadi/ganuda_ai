@@ -26,6 +26,7 @@ from metacognition.bias_detector import BiasDetector
 from metacognition.uncertainty_calibrator import UncertaintyCalibrator
 from metacognition.coyote import Coyote
 from metacognition.resonance import ResonanceDetector
+import os
 
 
 class MetacognitiveCouncil:
@@ -338,7 +339,7 @@ if __name__ == '__main__':
         'port': 5432,
         'database': 'zammad_production',
         'user': 'claude',
-        'password': 'jawaseatlasers2'
+        'password': os.environ.get('CHEROKEE_DB_PASS', '')
     }
     
     # Simulate council vote

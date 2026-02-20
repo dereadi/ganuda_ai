@@ -9,12 +9,13 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from typing import Dict, Optional
 from metacognition.resonance_fingerprint import generate_fingerprint, ResonanceFingerprint
+import os
 
 DB_CONFIG = {
     "host": "192.168.132.222",
     "database": "zammad_production", 
     "user": "claude",
-    "password": "jawaseatlasers2"
+    "password": os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 

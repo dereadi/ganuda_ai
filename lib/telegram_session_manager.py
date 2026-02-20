@@ -12,12 +12,8 @@ import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 
-DB_CONFIG = {
-    'host': '192.168.132.222',
-    'database': 'zammad_production',
-    'user': 'claude',
-    'password': 'jawaseatlasers2'
-}
+from lib.secrets_loader import get_db_config
+DB_CONFIG = get_db_config()
 
 # Session configuration
 MAX_HISTORY_MESSAGES = 10

@@ -5,12 +5,8 @@ from dataclasses import dataclass
 from datetime import datetime
 import hashlib
 
-DB_CONFIG = {
-    "host": "192.168.132.222",
-    "database": "zammad_production",
-    "user": "claude",
-    "password": "jawaseatlasers2"
-}
+from lib.secrets_loader import get_db_config
+DB_CONFIG = get_db_config()
 
 @dataclass
 class Memory:

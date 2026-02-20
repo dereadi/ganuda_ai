@@ -24,14 +24,21 @@ it raises RuntimeError rather than falling back to a default.
 """
 
 import os
+import sys
 import logging
 import subprocess
 import threading
 
 logger = logging.getLogger(__name__)
 
-_SECRETS_FILE = "/ganuda/config/secrets.env"
-_VAULT_SCRIPT = "/ganuda/scripts/get-vault-secret.sh"
+# Cross-platform root detection
+if sys.platform == 'darwin':
+    _GANUDA_ROOT = '/Users/Shared/ganuda'
+else:
+    _GANUDA_ROOT = '/ganuda'
+
+_SECRETS_FILE = os.path.join(_GANUDA_ROOT, 'config', 'secrets.env')
+_VAULT_SCRIPT = os.path.join(_GANUDA_ROOT, 'scripts', 'get-vault-secret.sh')
 
 _lock = threading.Lock()
 _cache = {}

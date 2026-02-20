@@ -25,6 +25,7 @@ from typing import Dict, List, Optional, Tuple
 import psycopg2
 from psycopg2.extras import Json
 import requests
+import os
 
 
 class DebatePhase(Enum):
@@ -241,16 +242,18 @@ class MAROrchestrator:
 
     def __init__(self,
                  llm_endpoint: str = "http://100.116.27.89:8080/v1/chat/completions",
-                 model: str = "/ganuda/models/qwen2.5-coder-32b-awq",
+                 model: str = None,
                  db_config: dict = None):
+        import os
         self.llm_endpoint = llm_endpoint
+        model = model or os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
         self.model = model
         self.db_config = db_config or {
             'host': '100.112.254.96',
             'port': 5432,
             'database': 'zammad_production',
             'user': 'claude',
-            'password': 'jawaseatlasers2'
+            'password': os.environ.get('CHEROKEE_DB_PASS', '')
         }
         self.personas = DEBATE_PERSONAS
         self.debate_log: List[DebateEntry] = []

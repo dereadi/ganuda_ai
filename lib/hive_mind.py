@@ -15,12 +15,8 @@ import json
 from datetime import datetime
 from typing import Dict, List, Any
 
-DB_CONFIG = {
-    'host': '192.168.132.222',
-    'database': 'zammad_production',
-    'user': 'claude',
-    'password': 'jawaseatlasers2'
-}
+from lib.secrets_loader import get_db_config
+DB_CONFIG = get_db_config()
 
 def get_connection():
     return psycopg2.connect(**DB_CONFIG)

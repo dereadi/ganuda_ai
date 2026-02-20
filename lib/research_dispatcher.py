@@ -12,12 +12,8 @@ import psycopg2
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 
-DB_CONFIG = {
-    'host': os.environ.get('CHEROKEE_DB_HOST', '192.168.132.222'),
-    'database': 'zammad_production',
-    'user': 'claude',
-    'password': 'jawaseatlasers2'
-}
+from lib.secrets_loader import get_db_config
+DB_CONFIG = get_db_config()
 
 RESEARCH_OUTPUT_DIR = "/ganuda/research/completed"
 

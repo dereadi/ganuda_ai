@@ -13,7 +13,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-DB_CONFIG = {"host": "192.168.132.222", "database": "zammad_production", "user": "claude", "password": "jawaseatlasers2"}
+from lib.secrets_loader import get_db_config
+DB_CONFIG = get_db_config()
 GATEWAY_URL = "http://192.168.132.223:8080"
 API_KEY = "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
 

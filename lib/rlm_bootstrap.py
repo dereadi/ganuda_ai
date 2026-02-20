@@ -10,12 +10,8 @@ import psycopg2
 from datetime import datetime
 from typing import List, Dict
 
-DB_CONFIG = {
-    'host': '192.168.132.222',
-    'database': 'zammad_production',
-    'user': 'claude',
-    'password': 'jawaseatlasers2'
-}
+from lib.secrets_loader import get_db_config
+DB_CONFIG = get_db_config()
 
 
 class ThermalBootstrap:

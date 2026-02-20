@@ -22,13 +22,9 @@ from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
-# Database config
-DB_CONFIG = {
-    'host': '192.168.132.222',
-    'database': 'zammad_production',
-    'user': 'claude',
-    'password': 'jawaseatlasers2'
-}
+# Database config - loaded from secrets
+from lib.secrets_loader import get_db_config
+DB_CONFIG = get_db_config()
 
 try:
     import psycopg2

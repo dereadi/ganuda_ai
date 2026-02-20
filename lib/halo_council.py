@@ -43,12 +43,12 @@ DB_CONFIG = {
     'host': os.environ.get('CHEROKEE_DB_HOST', '192.168.132.222'),
     'database': os.environ.get('CHEROKEE_DB_NAME', 'zammad_production'),
     'user': os.environ.get('CHEROKEE_DB_USER', 'claude'),
-    'password': os.environ.get('CHEROKEE_DB_PASS', 'jawaseatlasers2')
+    'password': os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 # vLLM configuration
 VLLM_URL = os.environ.get('VLLM_URL', 'http://localhost:8000/v1/chat/completions')
-VLLM_MODEL = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-coder-32b')
+VLLM_MODEL = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
 
 # MCTS hyperparameters (from HALO paper)
 EXPLORATION_CONSTANT = 1.414  # α in UCT formula

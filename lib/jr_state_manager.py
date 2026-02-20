@@ -12,13 +12,8 @@ import psycopg2
 from datetime import datetime
 from typing import Optional, List, Dict
 
-DB_CONFIG = {
-    "host": "192.168.132.222",
-    "port": 5432,
-    "user": "claude",
-    "password": "jawaseatlasers2",
-    "database": "zammad_production"
-}
+from lib.secrets_loader import get_db_config
+DB_CONFIG = get_db_config()
 
 class JrStateManager:
     """Manages persistent state for Jr agents"""

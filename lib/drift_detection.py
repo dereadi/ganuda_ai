@@ -29,12 +29,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger('drift_detection')
 
-DB_CONFIG = {
-    'host': '192.168.132.222',
-    'database': 'zammad_production',
-    'user': 'claude',
-    'password': 'jawaseatlasers2'
-}
+from lib.secrets_loader import get_db_config
+DB_CONFIG = get_db_config()
 
 # All 7 council specialists
 SPECIALIST_IDS = [

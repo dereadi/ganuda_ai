@@ -23,14 +23,9 @@ class Decision(Enum):
     REQUIRE_APPROVAL = "require_approval"
     REQUIRE_COUNCIL = "require_council"
 
-# Database config
-DB_CONFIG = {
-    "host": "192.168.132.222",
-    "port": 5432,
-    "user": "claude",
-    "password": "jawaseatlasers2",
-    "database": "zammad_production"
-}
+# Database config - loaded from secrets
+from lib.secrets_loader import get_db_config
+DB_CONFIG = get_db_config()
 
 def get_db_connection():
     return psycopg2.connect(**DB_CONFIG)

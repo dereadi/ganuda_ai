@@ -13,6 +13,7 @@ from enum import Enum
 from typing import List, Dict, Optional
 import uuid
 from datetime import datetime
+import os
 
 
 class AccessLevel(Enum):
@@ -28,7 +29,7 @@ class TriadMemoryAPI:
     def __init__(self, db_connection_string: str = None):
         if db_connection_string is None:
             # Default: PostgreSQL on bluefin (192.168.132.222)
-            db_connection_string = "postgresql://claude:jawaseatlasers2@192.168.132.222:5432/triad_federation"
+            db_connection_string = "postgresql://claude:{os.environ.get('CHEROKEE_DB_PASS', '')}@192.168.132.222:5432/triad_federation"
 
         # Use connection pooling to handle connections properly
         self.connection_pool = psycopg2.pool.SimpleConnectionPool(

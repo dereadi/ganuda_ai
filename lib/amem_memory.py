@@ -6,6 +6,8 @@ Based on arXiv:2502.12110 - Agentic Memory for LLM Agents
 Implements Zettelkasten-style memory linking for thermal_memory_archive.
 """
 
+import logging
+import os
 import psycopg2
 import psycopg2.extras
 import hashlib
@@ -13,23 +15,14 @@ import json
 from datetime import datetime
 from typing import List, Dict, Tuple, Optional
 
-DB_CONFIG = {
-    'host': '192.168.132.222',
-    'database': 'zammad_production',
-    'user': 'claude',
-    'password': 'jawaseatlasers2'
-}
+import requests
 
-# Initialize embedding model (lightweight, runs on CPU)
-EMBEDDING_MODEL = None
+from lib.secrets_loader import get_db_config
+DB_CONFIG = get_db_config()
 
-def get_embedding_model():
-    """Lazy load embedding model."""
-    global EMBEDDING_MODEL
-    if EMBEDDING_MODEL is None:
-        from sentence_transformers import SentenceTransformer
-        EMBEDDING_MODEL = SentenceTransformer('all-MiniLM-L6-v2')
-    return EMBEDDING_MODEL
+logger = logging.getLogger(__name__)
+
+EMBEDDING_URL = os.environ.get("EMBEDDING_URL", "http://192.168.132.224:8003/v1/embeddings")
 
 def get_connection():
     return psycopg2.connect(**DB_CONFIG)
@@ -102,43 +95,45 @@ def generate_contextual_description(content: str, keywords: List[str]) -> str:
 
 
 def compute_embedding(text: str) -> List[float]:
-    """Compute embedding vector for text."""
-    model = get_embedding_model()
-    embedding = model.encode(text, normalize_embeddings=True)
-    return embedding.tolist()
+    """Get BGE-large 1024d embedding from greenfin embedding service."""
+    try:
+        resp = requests.post(EMBEDDING_URL, json={"texts": [text]}, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+        if "embedding" in data:
+            return data["embedding"]
+        elif "embeddings" in data:
+            return data["embeddings"][0] if data["embeddings"] else []
+        return []
+    except Exception as e:
+        logger.warning("Embedding service error: %s", e)
+        return []
 
 
 def find_similar_memories(embedding: List[float], limit: int = 5, exclude_hash: str = None) -> List[Tuple[str, float]]:
-    """Find memories with similar embeddings using cosine similarity."""
-    import numpy as np
-    conn = get_connection()
-
-    with conn.cursor() as cur:
-        cur.execute("""
-            SELECT memory_hash, embedding_vector
-            FROM thermal_memory_archive
-            WHERE embedding_vector IS NOT NULL
-            AND array_length(embedding_vector, 1) > 0
-            AND memory_hash != COALESCE(%s, '')
-        """, (exclude_hash,))
-        candidates = cur.fetchall()
-
-    conn.close()
-
-    if not candidates:
+    """Find similar memories using pgvector cosine distance on BGE-large embeddings."""
+    if not embedding:
         return []
 
-    query_vec = np.array(embedding)
-    similarities = []
-    for mem_hash, mem_embedding in candidates:
-        if mem_embedding:
-            candidate_vec = np.array(mem_embedding)
-            sim = np.dot(query_vec, candidate_vec)
-            if sim > 0.5:
-                similarities.append((mem_hash, float(sim)))
-
-    similarities.sort(key=lambda x: x[1], reverse=True)
-    return similarities[:limit]
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT memory_hash,
+                       1 - (embedding <=> %s::vector) as similarity
+                FROM thermal_memory_archive
+                WHERE embedding IS NOT NULL
+                AND memory_hash != COALESCE(%s, '')
+                ORDER BY embedding <=> %s::vector
+                LIMIT %s
+            """, (embedding, exclude_hash, embedding, limit))
+            results = [(row[0], float(row[1])) for row in cur.fetchall() if row[1] > 0.5]
+        return results
+    except Exception as e:
+        logger.error("pgvector similarity search failed: %s", e)
+        return []
+    finally:
+        conn.close()
 
 
 def create_memory_links(source_hash: str, similar_memories: List[Tuple[str, float]], agent_id: str = 'amem_system') -> int:
@@ -198,7 +193,8 @@ def enrich_memory(memory_hash: str, content: str, agent_id: str = 'amem_system')
     with conn.cursor() as cur:
         cur.execute("""
             UPDATE thermal_memory_archive
-            SET keywords = %s, tags = %s, contextual_description = %s, embedding_vector = %s
+            SET keywords = %s, tags = %s, contextual_description = %s,
+                embedding = %s::vector
             WHERE memory_hash = %s
         """, (keywords, tags, context_desc, embedding, memory_hash))
         conn.commit()
@@ -264,8 +260,8 @@ def backfill_existing_memories(batch_size: int = 100, agent_id: str = 'amem_back
         cur.execute("""
             SELECT memory_hash, original_content
             FROM thermal_memory_archive
-            WHERE embedding_vector IS NULL OR array_length(embedding_vector, 1) IS NULL
-            ORDER BY created_at DESC
+            WHERE contextual_description IS NULL
+            ORDER BY temperature_score DESC, created_at DESC
             LIMIT %s
         """, (batch_size,))
         memories = cur.fetchall()

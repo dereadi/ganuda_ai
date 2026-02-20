@@ -257,9 +257,10 @@ class GlobalValidationAgent:
     """
 
     def __init__(self, llm_endpoint: str = "http://100.116.27.89:8080/v1/chat/completions",
-                 model: str = "/ganuda/models/qwen2.5-coder-32b-awq"):
+                 model: str = None):
+        import os
         self.llm_endpoint = llm_endpoint
-        self.model = model
+        self.model = model or os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
 
     def _call_llm(self, system_prompt: str, user_prompt: str) -> str:
         """Call LLM for validation."""
@@ -408,13 +409,11 @@ class SagaTransactionManager:
 
     def __init__(self, db_config: dict = None,
                  llm_endpoint: str = "http://100.116.27.89:8080/v1/chat/completions"):
-        self.db_config = db_config or {
-            'host': '100.112.254.96',
-            'port': 5432,
-            'database': 'zammad_production',
-            'user': 'claude',
-            'password': 'jawaseatlasers2'
-        }
+        if db_config:
+            self.db_config = db_config
+        else:
+            from lib.secrets_loader import get_db_config
+            self.db_config = get_db_config()
         self.validator = GlobalValidationAgent(llm_endpoint)
         self._compensation_handlers: Dict[str, Callable] = {}
 
