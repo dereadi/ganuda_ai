@@ -20,6 +20,7 @@ from datetime import datetime, timedelta
 import sys
 import signal
 import json
+import os
 
 class SacredFireDaemon:
     """
@@ -47,7 +48,7 @@ class SacredFireDaemon:
         "db_port": 5432,
         "db_name": "zammad_production",
         "db_user": "claude",
-        "db_password": "jawaseatlasers2",
+        "db_password": os.environ.get('CHEROKEE_DB_PASS', ''),
 
         # Logging
         "log_all_checks": False,            # Only log interventions by default

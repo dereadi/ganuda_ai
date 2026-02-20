@@ -13,6 +13,7 @@ import psycopg2
 from datetime import datetime, timedelta
 import sys
 import signal
+import os
 
 class MemoryJrAutonomic:
     """
@@ -66,7 +67,7 @@ class MemoryJrAutonomic:
         "db_port": 5432,
         "db_name": "zammad_production",
         "db_user": "claude",
-        "db_password": "jawaseatlasers2"
+        "db_password": os.environ.get('CHEROKEE_DB_PASS', '')
     }
 
     def __init__(self):

@@ -16,6 +16,7 @@ import signal
 import json
 from datetime import datetime, timedelta
 from collections import defaultdict
+import os
 
 class MetaJrAutonomic:
     """
@@ -85,7 +86,7 @@ class MetaJrAutonomic:
         "db_port": 5432,
         "db_name": "zammad_production",
         "db_user": "claude",
-        "db_password": "jawaseatlasers2"
+        "db_password": os.environ.get('CHEROKEE_DB_PASS', '')
     }
 
     def __init__(self):

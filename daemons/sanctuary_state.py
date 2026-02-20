@@ -37,14 +37,11 @@ DB_CONFIG = {
     'host': '192.168.132.222',
     'database': 'zammad_production',
     'user': 'claude',
-    'password': 'jawaseatlasers2'
+    'password': os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 # Telegram config for sending reports
-TELEGRAM_BOT_TOKEN = os.environ.get(
-    'TELEGRAM_BOT_TOKEN',
-    '7913555407:AAGRDrqslkv4GPfPUcEZ9SJkfPHEghpyjq8'
-)
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_CHAT_ID = os.environ.get(
     'TELEGRAM_ALERT_CHAT_ID',
     '-1003439875431'  # TPM group chat

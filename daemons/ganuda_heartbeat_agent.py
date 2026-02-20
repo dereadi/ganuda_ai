@@ -6,12 +6,13 @@ import socket
 import time
 import psycopg2
 from datetime import datetime
+import os
 
 DB_CONFIG = {
     "host": "192.168.132.222",
     "database": "triad_federation",
     "user": "claude",
-    "password": "jawaseatlasers2"
+    "password": os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 AGENT_VERSION = "1.0"

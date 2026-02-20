@@ -22,6 +22,7 @@ import hashlib
 import psycopg2
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
+import os
 
 # === CONFIGURATION ===
 
@@ -30,7 +31,7 @@ DB_CONFIG = {
     "port": 5432,
     "database": "zammad_production",
     "user": "claude",
-    "password": "jawaseatlasers2"
+    "password": os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 # Consciousness memory categories (high-temperature memories by type)
