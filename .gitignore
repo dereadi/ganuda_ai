@@ -15,6 +15,9 @@ ENV/
 *.backup_*
 *.bak
 *.bak.*
+*.pw_backup
+*.sr_backup_*
+*.broken_*
 
 # IDE
 .idea/
@@ -65,8 +68,152 @@ llama.cpp/
 # Temporary/generated
 *.png
 *.jpg
+*.pickle
 home/
 data/
+
+# Virtual environments
+amem_venv/
+cherokee_training_env/
+cherokee_resonance_training/
+icl_research_env/
+
+# Large/generated directories
+.rlm-backups/
+cuda-12.8/
+backups/
+benchmarks/
+archive/
+archive_jr_2025_10_14/
+daily_standups/
+exports
+jr_assignments/
+jr_reports/
+jr_responses/
+jr_tasks/
+jr_training_data/
+legal_jr_2025_10_15/
+pheromones/
+reports/
+dreams/
+pilot_testing/
+
+# Camera secrets (hardcoded passwords)
+scripts/push_camera_secrets_silverfin.sh
+
+# Legacy Oct 2025 files (pre-federation)
+vision_jr_2025_10_14/
+trading_jr_2025_10_14/
+legal_jr_2025_10_15/
+*_morning_oct_15.txt
+*_reactions_*.json
+*_responses_*.json
+*_confirmations_*.json
+*_session.py
+jr_collaboration_ideas_*.json
+jr_harvard_responses_*.json
+sag_project_discussion_*.json
+omarchy_decision_*.json
+darrell_expertise_reactions_*.json
+earth_pulse_kickoff_responses_*.json
+resonance_research_*.json
+ask_jrs_nine_consciousnesses.json
+COUNCIL_*.json
+council_vote_*.json
+linux_news_feed_oct11.py
+
+# One-off scripts (not part of core)
+week1_integration*/
+week2_integration*/
+phase2_specialized_jrs_directive.py
+jr_phase1_executor_directive.py
+iot_firmware_mission_directive.py
+sag_firmware_ui_mission_addendum.py
+earth_pulse_kickoff_facilitator.py
+expand_corpus_with_jrs.py
+notify_jrs_*.py
+collect_daily_standup.py
+mail_jr_*.py
+ask_mail_jr.py
+ask_jrs_about_sag.py
+darrell_linux_expertise_reminder.py
+jr_dedup_fix_directive.py
+omarchy_decision.py
+xlibre_news_feed.py
+patch_it_triad_cli.py
+train_cherokee_council_8b.py
+wake_all_jrs.py
+write_iot_scan_report.py
+tribal_deliberation_vote.py
+query_triad.py
+it_triad_jr_agent_v3.py
+it_triad_chiefs_agent_fixed.py
+fixed_jr_queue_client.py
+jr_cli_executor.py
+
+# Temp/test files
+tmp/
+tmp_*.pdf
+test_*.py
+!security/ai_red_team/test_memory_poisoning.py
+thermal_memory_fokker_planck.py
+tem_phase_coherence_visualization.py
+database_migration_wave2_physics.sql
+cleanup_postgres_connections.sql
+fstab
+Modelfile.cherokee
+
+# Virtual envs (additional)
+venv-django/
+cherokee_admin/
+
+# Large content files
+CONOR_GRENNAN_AI_ADOPTION_TRANSCRIPT.txt
+Darrell_Reading_Systems_Architect_Dossier_v*.pdf
+
+# Dirs managed separately or not core
+www/
+der/
+drjoe/
+dr_joe_docs/
+path/
+tools/
+training/
+example/
+sag_discord_bot/
+sag_resource_ai/
+sag_ui/
+hardware_evaluation/
+scientific_validations/
+document_jr_context/
+cosmic_weather/
+briefing/
+missions/
+projects/
+diagnostics/
+diagrams/
+patches/
+assist/
+cherokee_admin/
+earth_pulse/
+experiments/
+societal_awareness/
+src/
+staging/
+vetassist/
+synthesis_jr_2025_10_14/
+synthesis_jr_2025_10_15/
+
+# Legacy one-offs
+it_jr_work_history_schema.sql
+it_triad_jr_agent_v3.py.backup.*
+mail_jr_response_*.json
+moltbook_feed_analysis.md
+sidebar_api_*.txt
+sync_iot_to_cmdb.py
+
+# Jr instructions (stored in docs/jr_instructions/ instead)
+jr_instructions/
 
 # ============================================================
 # Secrets - NEVER commit (added 2026-02-02 SECURITY-PHASE1)
