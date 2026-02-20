@@ -591,8 +591,8 @@ def is_research_task(task: Dict, instructions: str) -> bool:
     if 'research' in [t.lower() for t in tags]:
         return True
 
-    # Check title
-    if 'research' in title:
+    # Check title (word boundary match — avoid triggering on "researcher", "ii-researcher", etc.)
+    if re.search(r'\bresearch\b', title):
         return True
 
     # Check assigned Jr

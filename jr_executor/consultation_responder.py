@@ -2,7 +2,7 @@
 import os, psycopg2, uuid, re
 from datetime import datetime
 
-DB = {'host': '192.168.132.222', 'database': 'triad_federation', 'user': 'claude', 'password': 'jawaseatlasers2'}
+DB = {'host': '192.168.132.222', 'database': 'triad_federation', 'user': 'claude', 'password': os.environ.get('CHEROKEE_DB_PASS', '')}
 AGENT_ID = 'it_triad_jr_redfin'
 
 def main():

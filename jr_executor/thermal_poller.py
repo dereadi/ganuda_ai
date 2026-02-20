@@ -7,6 +7,7 @@ Polls triad_shared_memories for missions assigned to this Jr
 import psycopg2
 from datetime import datetime, timezone, timedelta
 import json
+import os
 
 class ThermalPoller:
     def __init__(self, jr_name: str, poll_interval: int = 30):
@@ -17,7 +18,7 @@ class ThermalPoller:
             'host': '192.168.132.222',
             'database': 'triad_federation',
             'user': 'claude',
-            'password': 'jawaseatlasers2'
+            'password': os.environ.get('CHEROKEE_DB_PASS', '')
         }
 
     def poll_missions(self) -> list:

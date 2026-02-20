@@ -16,12 +16,10 @@ class JrLearningStore:
 
     def __init__(self, jr_name: str):
         self.jr_name = jr_name
-        self.db_config = {
-            'host': '192.168.132.222',
-            'database': 'zammad_production',
-            'user': 'claude',
-            'password': 'jawaseatlasers2'
-        }
+        import sys
+        sys.path.insert(0, '/ganuda')
+        from lib.secrets_loader import get_db_config
+        self.db_config = get_db_config()
 
     def _get_connection(self):
         return psycopg2.connect(**self.db_config)

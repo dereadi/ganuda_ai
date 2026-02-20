@@ -90,6 +90,15 @@ except ImportError as e:
     RESEARCH_EXECUTOR_AVAILABLE = False
     print(f"[WARN] ResearchTaskExecutor not available: {e}")
 
+# Import Saga Transaction Manager for rollback capability (Phase 10 - Feb 10, 2026)
+try:
+    from saga_transactions import SagaTransactionManager
+    SAGA_AVAILABLE = True
+    print("[INFO] SagaTransactionManager loaded - rollback capability enabled")
+except ImportError as e:
+    SAGA_AVAILABLE = False
+    print(f"[WARN] SagaTransactionManager not available: {e}")
+
 
 class TaskExecutor:
     # Path validation constants (Phase 9 - Jan 23, 2026 - Council Vote 28d18d80e447505f)
@@ -173,12 +182,11 @@ class TaskExecutor:
 
     def __init__(self, jr_type: str = "it_triad_jr"):
         self.jr_type = jr_type
-        self.db_config = {
-            'host': '192.168.132.222',
-            'database': 'zammad_production',
-            'user': 'claude',
-            'password': 'jawaseatlasers2'
-        }
+        # Load db config from secrets
+        import sys
+        sys.path.insert(0, '/ganuda')
+        from lib.secrets_loader import get_db_config
+        self.db_config = get_db_config()
 
         # Phase 5: Initialize M-GRPO momentum learner
         if MGRPO_AVAILABLE:
@@ -194,15 +202,89 @@ class TaskExecutor:
         else:
             self.learning_store = None
 
+        # Phase 10: Initialize saga transaction manager for rollback
+        if SAGA_AVAILABLE:
+            try:
+                self.saga_manager = SagaTransactionManager()
+                print(f"[SAGA] Transaction manager initialized for {jr_type}")
+            except Exception as e:
+                self.saga_manager = None
+                print(f"[SAGA] Init failed (non-fatal): {e}")
+        else:
+            self.saga_manager = None
+
     def execute_steps(self, steps: List[Dict]) -> List[Dict[str, Any]]:
         """Execute a list of steps and return results"""
         results = []
-        for step in steps:
+
+        # Phase 10: Begin saga transaction for rollback tracking
+        saga_tx = None
+        if getattr(self, 'saga_manager', None):
+            try:
+                saga_tx = self.saga_manager.begin_transaction(
+                    query_id=str(getattr(self, '_current_task_id', 'unknown')),
+                    audit_hash='',
+                    query=f"execute_steps: {len(steps)} steps",
+                    domain='engineering'
+                )
+            except Exception as e:
+                print(f"[SAGA] Begin transaction failed (non-fatal): {e}")
+
+        for step_index, step in enumerate(steps):
+            # Phase 11: Check if step already succeeded (retry idempotency)
+            task_id = getattr(self, '_current_task_id', None)
+            if task_id and self._step_already_succeeded(task_id, step_index):
+                print(f"[CHECKPOINT] Step {step_index} already succeeded, skipping")
+                results.append({'success': True, 'skipped': True, 'checkpoint_hit': True})
+                continue
+
+            import time as _time
+            _step_start = _time.time()
             result = self.execute(step)
+            _step_elapsed_ms = int((_time.time() - _step_start) * 1000)
             results.append(result)
+
+            # Phase 11: Record step result for checkpoint tracking
+            if task_id:
+                self._record_step_result(
+                    task_id=task_id,
+                    step_number=step_index,
+                    step_type=step.get('type', 'unknown'),
+                    target_file=step.get('path', step.get('filepath', '')),
+                    result=result,
+                    execution_time_ms=_step_elapsed_ms,
+                )
+
+            # Phase 10: Register completed step for potential rollback
+            if result.get('success') and saga_tx and self.saga_manager:
+                try:
+                    self.saga_manager.execute_operation(
+                        saga_tx,
+                        operation_type=step.get('type', 'unknown'),
+                        specialist='task_executor',
+                        execute_fn=lambda: result,
+                        compensation_data={'step_index': len(results) - 1, 'step_type': step.get('type')}
+                    )
+                except Exception:
+                    pass
+
             # Stop on critical failure
             if not result.get('success') and step.get('critical', True):
                 break
+
+        # Phase 10: Commit or rollback saga
+        if saga_tx and self.saga_manager:
+            try:
+                all_success = all(r.get('success') for r in results)
+                if all_success:
+                    self.saga_manager.commit(saga_tx)
+                    print(f"[SAGA] Transaction committed: {saga_tx.transaction_id}")
+                else:
+                    self.saga_manager.rollback(saga_tx)
+                    print(f"[SAGA] Transaction rolled back: {saga_tx.transaction_id}")
+            except Exception as e:
+                print(f"[SAGA] Finalization error (non-fatal): {e}")
+
         return results
 
     def _validate_path(self, path: str) -> tuple:
@@ -226,9 +308,16 @@ class TaskExecutor:
             if re.search(pattern, path, re.IGNORECASE):
                 return False, f"Placeholder pattern detected: {pattern}"
 
-        # Require absolute path
+        # Phase 12: Resolve relative paths to /ganuda/ (Feb 12, 2026)
+        # Jr instructions often use relative paths like "jr_executor/file.py"
+        # instead of "/ganuda/jr_executor/file.py". Resolve safely.
         if not path.startswith('/'):
-            return False, "Path must be absolute (start with /)"
+            resolved = f"/ganuda/{path}"
+            if os.path.exists(resolved) or os.path.exists(os.path.dirname(resolved)):
+                print(f"[PathResolve] Relative path '{path}' -> '{resolved}'")
+                path = resolved
+            else:
+                return False, f"Path must be absolute (start with /), relative resolve to {resolved} failed"
 
         # Check allowed directories
         if not any(path.startswith(prefix) for prefix in self.ALLOWED_PATH_PREFIXES):
@@ -864,6 +953,47 @@ class TaskExecutor:
                                     print(f"[RETRY] Reflection says stop after attempt {attempt}")
                                     break
 
+                    # Phase 13: Recursive Task Decomposition (Council vote 2adc1366)
+                    # If retries didn't fix it, decompose remaining steps into sub-tasks
+                    if not result.get('success'):
+                        try:
+                            from jr_executor.recursive_decomposer import (
+                                decompose_unexecuted_steps, MAX_RECURSION_DEPTH
+                            )
+                            params = task.get('parameters') or {}
+                            if isinstance(params, str):
+                                import json as _json
+                                try:
+                                    params = _json.loads(params)
+                                except (json.JSONDecodeError, TypeError):
+                                    params = {}
+                            rec_depth = (params or {}).get('recursion_depth', 0)
+
+                            if rec_depth < MAX_RECURSION_DEPTH:
+                                sub_tasks = decompose_unexecuted_steps(
+                                    task, instructions, step_results
+                                )
+                                if sub_tasks:
+                                    result['recursive_subtasks'] = len(sub_tasks)
+                                    result['recursive_subtask_ids'] = [
+                                        s['id'] for s in sub_tasks
+                                    ]
+                                    print(f"[RECURSIVE] Created {len(sub_tasks)} sub-tasks")
+                            else:
+                                print(f"[RECURSIVE] Max depth {rec_depth} reached — DLQ escalation")
+                                try:
+                                    from jr_executor.dlq_manager import send_to_dlq
+                                    send_to_dlq(
+                                        task_id=task.get('id'),
+                                        failure_reason=f"Max recursion depth {rec_depth} reached",
+                                    )
+                                except Exception as dlq_e:
+                                    print(f"[RECURSIVE] DLQ send failed: {dlq_e}")
+                        except ImportError:
+                            print("[RECURSIVE] recursive_decomposer not available — skipping")
+                        except Exception as rec_err:
+                            print(f"[RECURSIVE] Decomposition error (non-fatal): {rec_err}")
+
                     # Phase 7: Record execution outcome for learning (after retries)
                     if self.learning_store:
                         try:
@@ -1320,10 +1450,6 @@ class TaskExecutor:
             return bool(task['use_rlm'])
 
         # Auto-detection only applies if use_rlm was not explicitly set
-        # Check instruction length
-        if len(instructions) > 3000:
-            return True
-
         # Check for complex task keywords in title
         title = task.get('title', '').lower()
         complex_keywords = ['implement', 'build system', 'create api', 'authentication',
@@ -1331,9 +1457,13 @@ class TaskExecutor:
         if any(kw in title for kw in complex_keywords):
             return True
 
-        # Count files mentioned in instructions
-        file_patterns = re.findall(r'(?:Create|Modify|Update):\s*[`/][^\s`]+', instructions)
-        if len(file_patterns) > 3:
+        # Count files mentioned in instructions (space-delimited, per KB format)
+        file_patterns = re.findall(r'(?:Create|Modify|Update)\s+`[^`]+`', instructions)
+        if len(file_patterns) > 5:
+            return True
+
+        # Only use RLM for very long instructions with many files
+        if len(instructions) > 8000 and len(file_patterns) > 3:
             return True
 
         return False
@@ -1456,11 +1586,13 @@ class TaskExecutor:
         Enhanced regex-based extraction with smart file detection.
 
         Phase 1 of Hybrid Smart Extraction (Council Vote 8f3a1e9f4b86ded5).
+        Phase 3: SR-FIRST extraction (KB-JR-EXECUTOR-SR-LARGE-FILE-FAILURE-PATTERN-FEB11-2026)
 
         Enhancements:
         1. Extract target file from instruction header
         2. Look for file paths in prose before code blocks
         3. Attribute unmatched Python blocks to target file if unambiguous
+        4. SEARCH/REPLACE blocks extracted FIRST — code blocks containing SR are skipped
 
         Returns list of step dicts ready for execute_steps()
         """
@@ -1469,10 +1601,69 @@ class TaskExecutor:
         # Phase 1: Extract target file from header (for single-file instructions)
         target_file = self._extract_target_file_from_header(instructions)
 
+        # Phase 3 (SR-FIRST): Extract SEARCH/REPLACE blocks BEFORE code blocks.
+        # This prevents code blocks containing SR blocks from being treated as file writes.
+        # Track character ranges of SR blocks so we can skip code blocks that contain them.
+        sr_ranges = set()  # Character positions covered by SR blocks
+        sr_pattern = r'<<<<<<< SEARCH\n(.*?)\n=======\n(.*?)\n>>>>>>> REPLACE'
+        for sr_match in re.finditer(sr_pattern, instructions, re.DOTALL):
+            sr_search = sr_match.group(1)
+            sr_replace = sr_match.group(2)
+            sr_start = sr_match.start()
+
+            # Mark the range so code block scanner skips it
+            sr_ranges.add((sr_match.start(), sr_match.end()))
+
+            # Find filepath from preceding text
+            sr_preceding = instructions[max(0, sr_start-500):sr_start]
+            sr_filepath = None
+            sr_file_patterns = [
+                r'\*\*File:\*\*\s*`([^`]+)`',
+                r'File:\s*`([^`]+)`',
+                r'Modify:\s*`([^`]+)`',
+                r'Edit:\s*`([^`]+)`',
+                r'In\s+`([^`]+)`',
+            ]
+            for fp_pattern in sr_file_patterns:
+                fp_match = re.search(fp_pattern, sr_preceding)
+                if fp_match:
+                    sr_filepath = fp_match.group(1).strip('`').strip()
+                    break
+
+            if sr_filepath:
+                # Phase 12: Resolve relative paths to /ganuda/ (Feb 12, 2026)
+                if not sr_filepath.startswith('/'):
+                    sr_filepath = f"/ganuda/{sr_filepath}"
+                is_valid, error = self._validate_path(sr_filepath)
+                if is_valid:
+                    steps.append({
+                        'type': 'search_replace',
+                        'args': {
+                            'path': sr_filepath,
+                            'search': sr_search,
+                            'replace': sr_replace
+                        }
+                    })
+                    print(f"[SmartExtract] SR-FIRST: {sr_filepath} ({len(sr_search)} -> {len(sr_replace)} chars)")
+                else:
+                    print(f"[SmartExtract] Rejected SR path: {sr_filepath} - {error}")
+            else:
+                print(f"[SmartExtract] WARNING: SEARCH/REPLACE block found but no filepath")
+
         # Pattern to match code blocks with language hint - use finditer for positions
         code_block_pattern = r'```(\w+)\n(.*?)```'
 
         for match in re.finditer(code_block_pattern, instructions, re.DOTALL):
+            # Phase 3: Skip code blocks that overlap with already-extracted SR blocks
+            block_start_pos = match.start()
+            block_end_pos = match.end()
+            overlaps_sr = any(
+                sr_s < block_end_pos and sr_e > block_start_pos
+                for sr_s, sr_e in sr_ranges
+            )
+            if overlaps_sr:
+                print(f"[SmartExtract] Skipping code block at {block_start_pos} — contains SR blocks (already extracted)")
+                continue
             lang = match.group(1)
             raw_content = match.group(2)
             content = raw_content.strip()
@@ -1488,7 +1679,8 @@ class TaskExecutor:
                     'type': 'bash',
                     'command': content
                 })
-            elif lang.lower() in ('python', 'typescript', 'javascript', 'yaml', 'json'):
+            elif lang.lower() in ('python', 'typescript', 'javascript', 'yaml', 'json',
+                                   'ini', 'toml', 'conf', 'cfg', 'text', 'env', 'properties'):
                 filepath = None
 
                 if block_start > 0:
@@ -1529,6 +1721,9 @@ class TaskExecutor:
                         print(f"[SmartExtract] Attributing {lang} block to target: {filepath}")
 
                 if filepath:
+                    # Phase 12: Resolve relative paths to /ganuda/ (Feb 12, 2026)
+                    if not filepath.startswith('/'):
+                        filepath = f"/ganuda/{filepath}"
                     # Validate path before adding
                     is_valid, error = self._validate_path(filepath)
                     if is_valid:
@@ -1572,47 +1767,10 @@ class TaskExecutor:
                     print(f"[SmartExtract] Skipping {lang} block - no file path found")
 
 
-        # Parse SEARCH/REPLACE blocks (Council Vote: search-replace architecture)
-        sr_pattern = r'<<<<<<< SEARCH\n(.*?)\n=======\n(.*?)\n>>>>>>> REPLACE'
-        for sr_match in re.finditer(sr_pattern, instructions, re.DOTALL):
-            sr_search = sr_match.group(1)
-            sr_replace = sr_match.group(2)
-            sr_start = sr_match.start()
-            
-            # Find filepath from preceding text
-            sr_preceding = instructions[max(0, sr_start-500):sr_start]
-            sr_filepath = None
-            sr_file_patterns = [
-                r'\*\*File:\*\*\s*`([^`]+)`',
-                r'File:\s*`([^`]+)`',
-                r'Modify:\s*`([^`]+)`',
-                r'Edit:\s*`([^`]+)`',
-                r'In\s+`([^`]+)`',
-            ]
-            for fp_pattern in sr_file_patterns:
-                fp_match = re.search(fp_pattern, sr_preceding)
-                if fp_match:
-                    sr_filepath = fp_match.group(1).strip('`').strip()
-                    break
-            
-            if sr_filepath:
-                is_valid, error = self._validate_path(sr_filepath)
-                if is_valid:
-                    steps.append({
-                        'type': 'search_replace',
-                        'args': {
-                            'path': sr_filepath,
-                            'search': sr_search,
-                            'replace': sr_replace
-                        }
-                    })
-                    print(f"[SmartExtract] Search-replace step: {sr_filepath} ({len(sr_search)} -> {len(sr_replace)} chars)")
-                else:
-                    print(f"[SmartExtract] Rejected SR path: {sr_filepath} - {error}")
-            else:
-                print(f"[SmartExtract] WARNING: SEARCH/REPLACE block found but no filepath")
+        # NOTE: SEARCH/REPLACE blocks are now extracted FIRST (Phase 3 SR-FIRST above).
+        # The old duplicate extraction here has been removed to prevent double-processing.
 
-        print(f"[SmartExtract] Total steps extracted: {len(steps)}")
+        print(f"[SmartExtract] Total steps extracted: {len(steps)} (SR-FIRST: {len(sr_ranges)} SR blocks)")
         return steps
 
     def execute(self, step: Dict) -> Dict[str, Any]:

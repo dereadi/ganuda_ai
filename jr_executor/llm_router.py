@@ -60,7 +60,7 @@ def call_local(prompt: str) -> str:
     response = requests.post(
         "http://localhost:8000/v1/chat/completions",
         json={
-            "model": "/ganuda/models/qwen2.5-coder-32b-awq",
+            "model": os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq'),
             "messages": [{"role": "user", "content": prompt}],
             "max_tokens": 4096
         },

@@ -21,6 +21,7 @@ from task_executor import TaskExecutor
 # Configuration
 POLL_INTERVAL = 30  # seconds between queue checks
 HEARTBEAT_INTERVAL = 60  # seconds between heartbeats
+MAX_TASKS_PER_WORKER = 50  # Restart after N tasks for code freshness (TPM Feb 3, 2026)
 
 
 class JrQueueWorker:
@@ -33,6 +34,7 @@ class JrQueueWorker:
         self.running = True
         self.last_heartbeat = 0
         self.current_task = None
+        self.tasks_processed = 0  # Counter for max-tasks-per-child (TPM Feb 3, 2026)
 
         # Setup signal handlers
         signal.signal(signal.SIGINT, self._shutdown)
@@ -119,16 +121,29 @@ class JrQueueWorker:
 
                         # P0 FIX Jan 27, 2026: Defense in depth - validate work was done
                         # Don't trust success flag alone if no actual work evidence
+                        # UPGRADED Feb 3, 2026: Staged files are NOT completion evidence
                         steps = result.get('steps_executed', [])
                         artifacts = result.get('artifacts', [])
                         files_created = result.get('files_created', 0)
+                        files_staged = result.get('files_staged', 0)
+
+                        # Count real vs staged artifacts
+                        real_artifacts = [a for a in artifacts if isinstance(a, dict) and a.get('type') == 'file_created']
+                        staged_artifacts = [a for a in artifacts if isinstance(a, dict) and a.get('type') == 'file_staged']
 
                         if result.get('success'):
-                            # Secondary validation: require evidence of work
-                            if not steps and not artifacts and files_created == 0:
-                                print(f"[{self.jr_name}] WARNING: success=True but no work evidence")
-                                result['success'] = False
-                                result['error'] = 'No work performed (0 steps, 0 artifacts, 0 files)'
+                            # Secondary validation: require evidence of REAL work
+                            # Staged files mean protected paths - needs TPM review, not completion
+                            real_file_count = len(real_artifacts) if real_artifacts else (files_created - files_staged)
+                            if not steps and not real_artifacts and real_file_count <= 0:
+                                print(f"[{self.jr_name}] WARNING: success=True but no real work evidence")
+                                if staged_artifacts:
+                                    print(f"[{self.jr_name}] INFO: {len(staged_artifacts)} files were STAGED (protected paths) - needs TPM merge")
+                                    result['success'] = False
+                                    result['error'] = f'All {len(staged_artifacts)} files staged to protected paths - requires TPM merge via /staging'
+                                else:
+                                    result['success'] = False
+                                    result['error'] = 'No work performed (0 steps, 0 artifacts, 0 real files)'
 
                         if result.get('success'):
                             print(f"[{self.jr_name}] Task completed successfully")
@@ -154,17 +169,45 @@ class JrQueueWorker:
                         else:
                             error_msg = result.get('error', 'Unknown error')
                             print(f"[{self.jr_name}] Task failed: {error_msg}")
-                            # Mark as failed explicitly
-                            self.client.fail_task(task['id'], error_msg, result)  # Use integer id
+                            # DLQ integration: route failures for retry + escalation
+                            try:
+                                sys.path.insert(0, '/ganuda')
+                                from jr_executor.dlq_manager import send_to_dlq
+                                dlq_id = send_to_dlq(
+                                    task_id=task['id'],
+                                    failure_reason=error_msg,
+                                    failure_traceback=result.get('traceback'),
+                                )
+                                print(f"[{self.jr_name}] Task {task['id']} routed to DLQ (entry {dlq_id})")
+                            except Exception as dlq_err:
+                                print(f"[{self.jr_name}] DLQ routing failed ({dlq_err}), falling back to fail_task")
+                                self.client.fail_task(task['id'], error_msg, result)
                     except Exception as task_error:
-                        # Task execution error - mark as FAILED, not skip
+                        # Task execution error - route through DLQ for retry
                         error_msg = f"Task execution error: {task_error}"
                         print(f"[{self.jr_name}] {error_msg}")
                         traceback.print_exc()
                         try:
-                            self.client.fail_task(task['id'], error_msg)  # Use integer id
-                        except Exception as mark_error:
-                            print(f"[{self.jr_name}] Could not mark task as failed: {mark_error}")
+                            sys.path.insert(0, '/ganuda')
+                            from jr_executor.dlq_manager import send_to_dlq
+                            send_to_dlq(
+                                task_id=task['id'],
+                                failure_reason=error_msg,
+                                failure_traceback=traceback.format_exc(),
+                            )
+                        except Exception as dlq_err:
+                            print(f"[{self.jr_name}] DLQ routing failed ({dlq_err}), falling back to fail_task")
+                            try:
+                                self.client.fail_task(task['id'], error_msg)
+                            except Exception as mark_error:
+                                print(f"[{self.jr_name}] Could not mark task as failed: {mark_error}")
+
+                # Max-tasks-per-child: restart for code freshness (TPM Feb 3, 2026)
+                if tasks:
+                    self.tasks_processed += 1
+                    if self.tasks_processed >= MAX_TASKS_PER_WORKER:
+                        print(f"[{self.jr_name}] Processed {self.tasks_processed} tasks, exiting for code freshness (systemd will restart)")
+                        break
 
                 # Sleep before next poll
                 time.sleep(POLL_INTERVAL)

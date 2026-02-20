@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple, Any
 import psycopg2
 from psycopg2.extras import Json
+import os
 
 logger = logging.getLogger('AwarenessService')
 
@@ -64,7 +65,7 @@ class AwarenessConfig:
         self.db_host = '192.168.132.222'
         self.db_name = 'triad_federation'
         self.db_user = 'claude'
-        self.db_password = 'jawaseatlasers2'
+        self.db_password=os.environ.get('CHEROKEE_DB_PASS', '')
 
 
 class EnvironmentalContext:

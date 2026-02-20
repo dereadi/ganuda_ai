@@ -33,7 +33,7 @@ def get_db_connection():
         host=os.environ.get('CHEROKEE_SPOKE_HOST', '192.168.132.222'),
         database=os.environ.get('CHEROKEE_SPOKE_DB', 'triad_federation'),
         user=os.environ.get('CHEROKEE_SPOKE_USER', 'claude'),
-        password=os.environ.get('CHEROKEE_SPOKE_PASSWORD', 'jawaseatlasers2')
+        password=os.environ.get('CHEROKEE_SPOKE_PASSWORD', '')
     )
 
 

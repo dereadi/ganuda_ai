@@ -67,10 +67,11 @@ DB_CONFIG = {
     'host': os.environ.get('CHEROKEE_DB_HOST', '192.168.132.222'),
     'database': os.environ.get('CHEROKEE_DB_NAME', 'zammad_production'),
     'user': os.environ.get('CHEROKEE_DB_USER', 'claude'),
-    'password': os.environ.get('CHEROKEE_DB_PASS', 'jawaseatlasers2')
+    'password': os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 GATEWAY_URL = os.environ.get('CHEROKEE_GATEWAY_URL', 'http://192.168.132.223:8080')
+EMBEDDING_SERVICE_URL = os.environ.get('EMBEDDING_SERVICE_URL', 'http://192.168.132.224:8003')
 API_KEY = os.environ.get('CHEROKEE_API_KEY', 'ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5')
 
 # Security whitelists
@@ -416,13 +417,41 @@ class JrTaskExecutor:
             return False, f"Execution error: {str(e)}"
 
     def _query_thermal_memory(self, query: str, limit: int = 5) -> str:
-        """Query thermal memory for context."""
+        """Query thermal memory using semantic search with keyword fallback."""
+        # Try semantic search first via embedding service
+        try:
+            resp = requests.post(
+                f"{EMBEDDING_SERVICE_URL}/v1/search",
+                json={
+                    "query": query[:500],
+                    "table": "thermal_memory_archive",
+                    "column": "original_content",
+                    "embedding_column": "embedding",
+                    "limit": limit,
+                    "threshold": 0.5
+                },
+                timeout=10
+            )
+            if resp.status_code == 200:
+                results = resp.json()
+                if results:
+                    context = ""
+                    for r in results:
+                        content = r.get("content", "")[:600]
+                        sim = r.get("similarity", 0)
+                        context += f"[sim={sim:.2f}] {content}\n\n"
+                    return context
+        except Exception as e:
+            print(f"[{self.agent_id}] Semantic search failed, using keyword fallback: {e}")
+
+        # Keyword fallback (ILIKE)
         try:
             conn = self._get_connection()
             with conn.cursor() as cur:
-                search_pattern = '%' + '%'.join(query.split()[:5]) + '%'
+                words = query.split()[:5]
+                search_pattern = '%' + '%'.join(words) + '%'
                 cur.execute("""
-                    SELECT LEFT(original_content, 300), temperature_score
+                    SELECT LEFT(original_content, 600), temperature_score
                     FROM thermal_memory_archive
                     WHERE original_content ILIKE %s
                     ORDER BY temperature_score DESC, created_at DESC
@@ -436,7 +465,7 @@ class JrTaskExecutor:
                         context += f"[{temp:.0f}C] {content}\n\n"
                     return context
         except Exception as e:
-            print(f"[{self.agent_id}] Thermal query error: {e}")
+            print(f"[{self.agent_id}] Keyword thermal query error: {e}")
         return "No relevant memories found."
 
     def _call_llm(self, prompt: str, max_tokens: int = 1000) -> str:

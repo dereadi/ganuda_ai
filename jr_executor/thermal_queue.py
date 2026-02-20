@@ -8,12 +8,13 @@ import psycopg2
 import uuid
 from datetime import datetime
 from typing import List, Dict, Optional
+import os
 
 DB_CONFIG = {
     'host': '192.168.132.222',
     'database': 'triad_federation',
     'user': 'claude',
-    'password': 'jawaseatlasers2'
+    'password': os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 

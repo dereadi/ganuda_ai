@@ -28,7 +28,7 @@ DB_CONFIG = {
     'host': '192.168.132.222',
     'database': 'zammad_production',
     'user': 'claude',
-    'password': os.environ.get('VETASSIST_DB_PASSWORD', 'jawaseatlasers2')
+    'password': os.environ.get('VETASSIST_DB_PASSWORD', '')
 }
 
 EXECUTOR_HOST = socket.gethostname()

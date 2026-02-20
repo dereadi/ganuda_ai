@@ -18,13 +18,11 @@ from psycopg2.extras import RealDictCursor
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 
-# Database configuration
-DB_CONFIG = {
-    'host': os.environ.get('CHEROKEE_DB_HOST', '192.168.132.222'),
-    'database': os.environ.get('CHEROKEE_DB_NAME', 'zammad_production'),
-    'user': os.environ.get('CHEROKEE_DB_USER', 'claude'),
-    'password': os.environ.get('CHEROKEE_DB_PASS', 'jawaseatlasers2')
-}
+# Database configuration - loaded from secrets
+import sys
+sys.path.insert(0, '/ganuda')
+from lib.secrets_loader import get_db_config
+DB_CONFIG = get_db_config()
 
 
 class JrQueueClient:
@@ -294,6 +292,87 @@ class JrQueueClient:
             WHERE assigned_jr = %s
         """, (self.jr_name,))
         return dict(result[0]) if result else {}
+
+    def get_dlq_summary(self) -> Dict:
+        """Get Dead Letter Queue summary for monitoring."""
+        result = self._execute("""
+            SELECT
+                COUNT(*) FILTER (WHERE d.resolution_status = 'unresolved') as unresolved,
+                COUNT(*) FILTER (WHERE d.resolution_status = 'retrying') as retrying,
+                COUNT(*) FILTER (WHERE d.escalation_level = 2) as escalated_tpm,
+                COUNT(*) FILTER (WHERE d.escalation_level = 3) as escalated_council,
+                COUNT(*) FILTER (WHERE d.resolution_status = 'resolved') as resolved
+            FROM jr_failed_tasks_dlq d
+        """)
+        return dict(result[0]) if result else {}
+
+    def requeue_from_dlq(self, task_id: int) -> bool:
+        """Re-queue a failed task by resetting its status to pending."""
+        try:
+            self._execute("""
+                UPDATE jr_work_queue
+                SET status = 'pending',
+                    error_message = NULL,
+                    started_at = NULL,
+                    completed_at = NULL,
+                    progress_percent = 0,
+                    status_message = 'Re-queued from DLQ'
+                WHERE id = %s
+            """, (task_id,), fetch=False)
+            return True
+        except Exception as e:
+            print(f"[JrQueue] Failed to requeue task {task_id} from DLQ: {e}")
+            return False
+
+    def save_checkpoint(self, task_id: int, last_completed_step: int,
+                        total_steps: int = None, checkpoint_data: Dict = None) -> bool:
+        """Save a checkpoint for a task so it can resume on retry."""
+        try:
+            self._execute("""
+                INSERT INTO jr_task_checkpoints
+                    (task_id, last_completed_step, total_steps, checkpoint_data)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (task_id) DO UPDATE SET
+                    last_completed_step = EXCLUDED.last_completed_step,
+                    total_steps = COALESCE(EXCLUDED.total_steps, jr_task_checkpoints.total_steps),
+                    checkpoint_data = EXCLUDED.checkpoint_data,
+                    updated_at = NOW()
+            """, (
+                task_id,
+                last_completed_step,
+                total_steps,
+                json.dumps(checkpoint_data) if checkpoint_data else None,
+            ), fetch=False)
+            return True
+        except Exception as e:
+            print(f"[JrQueue] Failed to save checkpoint for task {task_id}: {e}")
+            return False
+
+    def get_last_checkpoint(self, task_id: int) -> Optional[Dict]:
+        """Get the last checkpoint for a task (for resume-from-failure)."""
+        try:
+            rows = self._execute("""
+                SELECT last_completed_step, total_steps, checkpoint_data
+                FROM jr_task_checkpoints
+                WHERE task_id = %s
+            """, (task_id,))
+            if rows:
+                return dict(rows[0])
+            return None
+        except Exception as e:
+            print(f"[JrQueue] Failed to get checkpoint for task {task_id}: {e}")
+            return None
+
+    def cleanup_checkpoints(self, task_id: int) -> bool:
+        """Remove checkpoints after a task completes successfully."""
+        try:
+            self._execute("""
+                DELETE FROM jr_task_checkpoints WHERE task_id = %s
+            """, (task_id,), fetch=False)
+            return True
+        except Exception as e:
+            print(f"[JrQueue] Failed to cleanup checkpoints for task {task_id}: {e}")
+            return False
 
     def close(self):
         """Close database connection."""

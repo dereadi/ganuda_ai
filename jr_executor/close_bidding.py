@@ -10,14 +10,73 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from datetime import datetime
 
-DB_CONFIG = {
-    'host': '192.168.132.222',
-    'database': 'zammad_production',
-    'user': 'claude',
-    'password': 'jawaseatlasers2'
-}
+import sys
+sys.path.insert(0, '/ganuda')
+sys.path.insert(0, '/ganuda/jr_executor')
+from lib.secrets_loader import get_db_config
+from hungarian_bidding import hungarian_assign
+
+DB_CONFIG = get_db_config()
 
 BIDDING_WINDOW_MINUTES = 2  # Close bidding after 2 minutes
+USE_HUNGARIAN = True  # Feature flag: set False to revert to greedy
+
+
+def assign_greedy(cur, tasks):
+    """Original greedy assignment: highest composite_score per task."""
+    for task in tasks:
+        task_id = task['task_id']
+        cur.execute("""
+            SELECT agent_id, node_name, composite_score
+            FROM jr_task_bids
+            WHERE task_id = %s
+            ORDER BY composite_score DESC
+            LIMIT 1
+        """, (task_id,))
+        winner = cur.fetchone()
+        if winner:
+            cur.execute("""
+                UPDATE jr_task_announcements
+                SET status = 'assigned',
+                    assigned_to = %s
+                WHERE task_id = %s
+            """, (winner['agent_id'], task_id))
+            print(f"[{datetime.now()}] [greedy] Assigned {task_id} to {winner['agent_id']} "
+                  f"(score: {winner['composite_score']:.2f})")
+
+
+def assign_hungarian(cur, tasks):
+    """Globally optimal assignment via Hungarian algorithm."""
+    if not tasks:
+        return
+
+    # Collect all bids for all closing tasks at once
+    task_ids = [t['task_id'] for t in tasks]
+    cur.execute("""
+        SELECT task_id, agent_id, node_name, composite_score,
+               capability_score, experience_score, load_score
+        FROM jr_task_bids
+        WHERE task_id = ANY(%s)
+    """, (task_ids,))
+    all_bids = cur.fetchall()
+
+    if not all_bids:
+        return
+
+    assignments, unassigned = hungarian_assign(tasks, all_bids)
+
+    for a in assignments:
+        cur.execute("""
+            UPDATE jr_task_announcements
+            SET status = 'assigned',
+                assigned_to = %s
+            WHERE task_id = %s
+        """, (a['agent_id'], a['task_id']))
+        print(f"[{datetime.now()}] [hungarian] Assigned {a['task_id']} to {a['agent_id']} "
+              f"(score: {a['composite_score']:.2f}, margin: {a['margin']:.2f})")
+
+    for tid in unassigned:
+        print(f"[{datetime.now()}] [hungarian] No valid bids for {tid}")
 
 
 def main():
@@ -37,31 +96,10 @@ def main():
 
         tasks = cur.fetchall()
 
-        for task in tasks:
-            task_id = task['task_id']
-
-            # Get winning bid
-            cur.execute("""
-                SELECT agent_id, node_name, composite_score
-                FROM jr_task_bids
-                WHERE task_id = %s
-                ORDER BY composite_score DESC
-                LIMIT 1
-            """, (task_id,))
-
-            winner = cur.fetchone()
-
-            if winner:
-                # Assign task to winner
-                cur.execute("""
-                    UPDATE jr_task_announcements
-                    SET status = 'assigned',
-                        assigned_to = %s
-                    WHERE task_id = %s
-                """, (winner['agent_id'], task_id))
-
-                print(f"[{datetime.now()}] Assigned {task_id} to {winner['agent_id']} "
-                      f"(score: {winner['composite_score']:.2f})")
+        if USE_HUNGARIAN:
+            assign_hungarian(cur, tasks)
+        else:
+            assign_greedy(cur, tasks)
 
     conn.commit()
     conn.close()
