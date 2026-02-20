@@ -107,8 +107,19 @@ pilot_testing/
 # Camera secrets (hardcoded passwords)
 scripts/push_camera_secrets_silverfin.sh
 
-# Password sweep tool (contains old passwords as search patterns)
+# Security tools with password detection patterns (hook flags itself)
 scripts/sweep_hardcoded_passwords.py
+scripts/security_health_check.sh
+scripts/pre-commit-gitleaks.sh
+scripts/queue_security_hardening_sprint.py
+
+# Old copies / modified backups of production files
+lib/specialist_council.py.backup-*
+lib/specialist_council.py.broken-*
+lib/specialist_council.py.original
+lib/specialist_council_backup.py
+lib/specialist_council_modified.py
+lib/jr_momentum_learner_modified.py
 
 # Docs with embedded credentials (historical context/system prompts)
 docs/CLAUDE-REDFIN-CONTEXT-JAN14-2026.md
