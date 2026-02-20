@@ -1,0 +1,30 @@
+[Unit]
+Description=Moltbook Proxy Daemon — Cherokee AI Federation
+Documentation=file:///ganuda/docs/kb/KB-MOLTBOOK-DEPLOYMENT-LESSONS-FEB03-2026.md
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/services/moltbook_proxy
+EnvironmentFile=/ganuda/services/moltbook_proxy/.env
+ExecStart=/home/dereadi/cherokee_venv/bin/python -u proxy_daemon.py
+Restart=on-failure
+RestartSec=60
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+ReadWritePaths=/ganuda/services/moltbook_proxy /ganuda/logs
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=moltbook-proxy
+
+[Install]
+WantedBy=multi-user.target

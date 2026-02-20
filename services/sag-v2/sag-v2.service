@@ -1,0 +1,22 @@
+[Unit]
+Description=SAG v2 Resource Allocation Assistant
+After=network.target vllm.service
+Wants=vllm.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/services/sag-v2
+EnvironmentFile=/ganuda/config/secrets.env
+Environment=LLM_PROVIDER=vllm
+Environment=LLM_BASE_URL=http://localhost:8000/v1
+Environment=SAG_V2_PORT=4100
+ExecStart=/ganuda/home/dereadi/cherokee_venv/bin/python app.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

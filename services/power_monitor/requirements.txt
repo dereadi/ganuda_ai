@@ -1,0 +1,25 @@
+# Solix Power Monitor Configuration
+# Copy to .env and fill in values
+
+# Smart plug type: "kasa" or "shelly"
+POWER_PLUG_TYPE=kasa
+
+# Smart plug IP address on local network
+POWER_PLUG_IP=
+
+# Poll interval in seconds
+POWER_POLL_INTERVAL=60
+
+# Wattage thresholds (adjust based on observed Solix output)
+POWER_WARNING_WATTS=150
+POWER_ALERT_WATTS=80
+POWER_CRITICAL_WATTS=30
+POWER_ZERO_WATTS=5
+
+# Telegram alerts
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+
+# Safety controls
+SHUTDOWN_ENABLED=false
+DRY_RUN=true

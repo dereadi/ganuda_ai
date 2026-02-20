@@ -9,12 +9,13 @@ import uuid
 import json
 from datetime import datetime
 from typing import Dict, Optional, List
+import os
 
 DB_CONFIG = {
     'host': '192.168.132.222',
     'database': 'triad_federation',
     'user': 'claude',
-    'password': 'jawaseatlasers2'
+    'password': os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 # Task types that can be auto-assigned without human confirmation

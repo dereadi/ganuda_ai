@@ -1,0 +1,18 @@
+[Unit]
+Description=Cherokee AI Optic Nerve Pipeline (VLM Processing)
+After=network.target
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda/lib
+Environment="PATH=/home/dereadi/cherokee_venv/bin:/usr/bin"
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 vlm_optic_nerve.py --serve
+Restart=on-failure
+RestartSec=10
+
+StandardOutput=append:/ganuda/logs/optic_nerve.log
+StandardError=append:/ganuda/logs/optic_nerve.log
+
+[Install]
+WantedBy=multi-user.target

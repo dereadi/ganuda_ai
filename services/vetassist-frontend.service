@@ -1,0 +1,20 @@
+[Unit]
+Description=Ganuda VetAssist Frontend (Next.js)
+After=network.target
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda/vetassist/frontend/.next/standalone
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=10
+Environment=NODE_ENV=production
+Environment=PORT=3000
+
+# Logging
+StandardOutput=append:/ganuda/logs/vetassist-frontend.log
+StandardError=append:/ganuda/logs/vetassist-frontend.log
+
+[Install]
+WantedBy=multi-user.target

@@ -5,7 +5,7 @@ Allows Jr to send status updates to the owner
 """
 import requests
 
-BOT_TOKEN = "7913555407:AAGRDrqslkv4GPfPUcEZ9SJkfPHEghpyjq8"
+BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 OWNER_CHAT_ID = 8025375307
 
 def send_notification(message: str) -> bool:

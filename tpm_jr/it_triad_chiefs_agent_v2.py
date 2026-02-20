@@ -371,7 +371,7 @@ def write_to_thermal_memory(content: str, source_triad: str, temp: float) -> str
     conn = psycopg2.connect(
         host="192.168.132.222",
         user="claude",
-        password="jawaseatlasers2",
+        password=os.environ.get('CHEROKEE_DB_PASS', ''),
         database="triad_federation"
     )
 

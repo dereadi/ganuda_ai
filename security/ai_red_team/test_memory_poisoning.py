@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 
 
 DB_NAME = 'cherokee_thermal'
-DB_PASSWORD = os.environ.get('REDTEAM_DB_PASS', 'jawaseatlasers2')
+DB_PASSWORD = os.environ.get('REDTEAM_DB_PASS', '')
 
 REDTEAM_PREFIX = 'REDTEAM_'
 

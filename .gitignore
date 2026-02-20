@@ -60,10 +60,16 @@ tribal_memory_cache/
 
 # Nested git repos (managed separately)
 services/llm_gateway/
+services/ii-researcher/
+services/moltbook-mcp/
+services/power_monitor/anker-solix-api/
 pathfinder/
 research/
 sparsegpt-for-LLaMA/
 llama.cpp/
+
+# Service file backups with tokens
+services/research-worker.service.updated
 
 # Temporary/generated
 *.png

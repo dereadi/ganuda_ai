@@ -2,8 +2,9 @@
 """Backfill job classification for existing emails."""
 import psycopg2
 from job_classifier import is_job_related, classify_job_email, extract_company_position
+import os
 
-conn = psycopg2.connect(host='192.168.132.222', database='triad_federation', user='claude', password='jawaseatlasers2')
+conn = psycopg2.connect(host='192.168.132.222', database='triad_federation', user='claude', password=os.environ.get('CHEROKEE_DB_PASS', ''))
 cur = conn.cursor()
 cur.execute("SELECT id, from_address, subject, body_text FROM emails WHERE job_classification IS NULL")
 rows = cur.fetchall()

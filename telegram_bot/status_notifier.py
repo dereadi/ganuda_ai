@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 from telegram import Bot
 from telegram.error import TelegramError
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -18,11 +19,11 @@ DB_CONFIG = {
     'host': '192.168.132.222',
     'database': 'triad_federation',
     'user': 'claude',
-    'password': 'jawaseatlasers2'
+    'password': os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 # Telegram bot token - replace with actual
-BOT_TOKEN = '7913555407:AAGRDrqslkv4GPfPUcEZ9SJkfPHEghpyjq8'
+BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
 # Chat IDs to notify (add your chat ID)
 NOTIFY_CHAT_IDS = [

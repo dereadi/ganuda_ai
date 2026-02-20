@@ -1,0 +1,28 @@
+[Unit]
+Description=Solix F3800 Plus Battery Monitor (Council Vote #8525)
+Documentation=file:///ganuda/docs/ultrathink/ULTRATHINK-SOLIX-F3800-MONITORING-DESIGN-FEB11-2026.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/services/power_monitor
+ExecStart=/ganuda/services/power_monitor/venv/bin/python /ganuda/services/power_monitor/solix_monitor_daemon.py
+EnvironmentFile=/ganuda/config/secrets.env
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=solix-monitor
+
+# Security hardening (Crawdad approved)
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/ganuda/services/power_monitor
+ProtectHome=read-only
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

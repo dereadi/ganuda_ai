@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.cherokee.longman-assistant</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/Shared/ganuda/services/mlx-server/venv/bin/python3</string>
+        <string>-m</string>
+        <string>mlx_lm.server</string>
+        <string>--model</string>
+        <string>/Users/Shared/ganuda/models/Qwen2.5-1.5B-Instruct-4bit</string>
+        <string>--host</string>
+        <string>0.0.0.0</string>
+        <string>--port</string>
+        <string>8801</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/Shared/ganuda/logs/longman-assistant.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/Shared/ganuda/logs/longman-assistant.log</string>
+    <key>WorkingDirectory</key>
+    <string>/Users/Shared/ganuda/services/longman-assistant</string>
+</dict>
+</plist>

@@ -1,0 +1,184 @@
+<!-- Spatial Awareness Section -->
+<div class="card">
+    <h3>Physical Layout</h3>
+    <div class="spatial-summary" id="spatial-summary">
+        <!-- Summary stats populated by JS -->
+    </div>
+    <div class="spatial-grid" id="spatial-zones">
+        <!-- Zone cards populated by JS -->
+    </div>
+    <div class="ecosystem-legend">
+        <span class="legend-item amazon">Amazon</span>
+        <span class="legend-item google">Google</span>
+        <span class="legend-item sonos">Sonos</span>
+        <span class="legend-item network">Network</span>
+    </div>
+</div>
+
+<style>
+.spatial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+.zone-card {
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 10px;
+    background: #1a1a1a;
+}
+.zone-card.has-nodes {
+    border-color: #4CAF50;
+    background: #1a2a1a;
+}
+.zone-card.has-security {
+    border-left: 3px solid #f44336;
+}
+.zone-card.has-voice {
+    border-right: 3px solid #2196F3;
+}
+.zone-card .zone-name {
+    font-weight: bold;
+    color: #fff;
+}
+.zone-card .zone-type {
+    font-size: 0.8em;
+    color: #888;
+}
+.zone-card .device-count {
+    margin-top: 5px;
+}
+.badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.75em;
+    margin-right: 4px;
+}
+.badge.nodes { background: #4CAF50; }
+.badge.iot { background: #2196F3; }
+.badge.offline { background: #f44336; }
+.ecosystem-legend {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #333;
+}
+.legend-item {
+    display: inline-block;
+    padding: 2px 8px;
+    margin-right: 8px;
+    border-radius: 3px;
+    font-size: 0.8em;
+}
+.legend-item.amazon { background: #ff9900; color: #000; }
+.legend-item.google { background: #4285f4; color: #fff; }
+.legend-item.sonos { background: #000; color: #fff; border: 1px solid #666; }
+.legend-item.network { background: #666; color: #fff; }
+.spatial-summary {
+    display: flex;
+    gap: 20px;
+    padding: 10px;
+    background: #0a0a0a;
+    border-radius: 4px;
+}
+.summary-stat {
+    text-align: center;
+}
+.summary-stat .value {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.summary-stat .label {
+    font-size: 0.8em;
+    color: #888;
+}
+</style>
+
+<script>
+async function loadSpatialZones() {
+    try {
+        const response = await fetch('/api/spatial/zones');
+        const data = await response.json();
+
+        // Summary stats
+        const totalNodes = data.zones.reduce((sum, z) => sum + z.nodes, 0);
+        const totalIoT = data.zones.reduce((sum, z) => sum + z.iot_devices, 0);
+        const securityZones = data.zones.filter(z => z.capabilities.security).length;
+        const voiceZones = data.zones.filter(z => z.capabilities.voice).length;
+
+        document.getElementById('spatial-summary').innerHTML = `
+            <div class="summary-stat">
+                <div class="value">${data.zones.length}</div>
+                <div class="label">Zones</div>
+            </div>
+            <div class="summary-stat">
+                <div class="value">${totalNodes}</div>
+                <div class="label">Nodes</div>
+            </div>
+            <div class="summary-stat">
+                <div class="value">${totalIoT}</div>
+                <div class="label">IoT Devices</div>
+            </div>
+            <div class="summary-stat">
+                <div class="value">${securityZones}</div>
+                <div class="label">Security Points</div>
+            </div>
+            <div class="summary-stat">
+                <div class="value">${voiceZones}</div>
+                <div class="label">Voice Zones</div>
+            </div>
+        `;
+
+        // Zone cards
+        const container = document.getElementById('spatial-zones');
+        container.innerHTML = data.zones.map(zone => {
+            const classes = ['zone-card'];
+            if (zone.nodes > 0) classes.push('has-nodes');
+            if (zone.capabilities.security) classes.push('has-security');
+            if (zone.capabilities.voice) classes.push('has-voice');
+
+            const ecosystemBadges = (zone.ecosystems || [])
+                .filter(e => e)
+                .map(e => `<span class="badge" style="background:${getEcosystemColor(e)}">${e}</span>`)
+                .join('');
+
+            return `
+                <div class="${classes.join(' ')}" onclick="showZoneDetail('${zone.name}')">
+                    <div class="zone-name">${zone.name.replace(/_/g, ' ')}</div>
+                    <div class="zone-type">${zone.type}</div>
+                    <div class="device-count">
+                        ${zone.nodes > 0 ? `<span class="badge nodes">${zone.nodes} nodes</span>` : ''}
+                        ${zone.iot_devices > 0 ? `<span class="badge iot">${zone.iot_devices} IoT</span>` : ''}
+                    </div>
+                    <div class="ecosystems">${ecosystemBadges}</div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (error) {
+        console.error('Failed to load spatial zones:', error);
+    }
+}
+
+function getEcosystemColor(ecosystem) {
+    const colors = {
+        'amazon': '#ff9900',
+        'google': '#4285f4',
+        'sonos': '#000',
+        'network': '#666',
+        'federation': '#4CAF50'
+    };
+    return colors[ecosystem] || '#888';
+}
+
+async function showZoneDetail(zoneName) {
+    // Could open modal with detailed zone view
+    console.log('Zone clicked:', zoneName);
+}
+
+// Load on page init
+loadSpatialZones();
+// Refresh every 60 seconds
+setInterval(loadSpatialZones, 60000);
+</script>

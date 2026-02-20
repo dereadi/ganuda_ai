@@ -1,0 +1,12 @@
+[Unit]
+Description=Cherokee AI Power Reporter Timer
+Documentation=file:///ganuda/docs/jr_instructions/JR_BUILD_INSTRUCTIONS_POWER_MONITORING.md
+
+[Timer]
+# Run every 5 minutes
+OnCalendar=*:0/5
+RandomizedDelaySec=30
+Persistent=false
+
+[Install]
+WantedBy=timers.target

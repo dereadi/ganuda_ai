@@ -1,0 +1,33 @@
+[Unit]
+Description=Cherokee AI Embedding Service (BGE-large-en-v1.5, 1024 dims)
+Documentation=file:///ganuda/docs/kb/KB-JR-EXECUTOR-SR-LARGE-FILE-FAILURE-PATTERN-FEB11-2026.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/services/embedding_service
+ExecStart=/ganuda/venv/bin/python embedding_server.py
+EnvironmentFile=/ganuda/config/secrets.env
+Environment=CHEROKEE_DB_PASS=TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=cherokee-embedding-server
+
+# Memory: BGE-large model uses ~1.5GB at rest
+MemoryMax=4G
+Nice=5
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/ganuda/services/embedding_service /ganuda/logs
+ProtectHome=read-only
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

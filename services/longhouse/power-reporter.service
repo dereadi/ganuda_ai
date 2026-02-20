@@ -1,0 +1,15 @@
+[Unit]
+Description=Cherokee AI Power Reporter
+Documentation=file:///ganuda/docs/jr_instructions/JR_BUILD_INSTRUCTIONS_POWER_MONITORING.md
+After=network.target
+
+[Service]
+Type=oneshot
+User=dereadi
+WorkingDirectory=/ganuda/services/longhouse
+ExecStart=/usr/bin/python3 /ganuda/services/longhouse/power_reporter.py
+Nice=15
+CPUQuota=5%
+
+[Install]
+WantedBy=multi-user.target

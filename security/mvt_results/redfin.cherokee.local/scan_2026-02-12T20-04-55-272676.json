@@ -1,0 +1,151 @@
+{
+  "hostname": "redfin.cherokee.local",
+  "scan_time": "2026-02-12T20:04:55.272676",
+  "findings": [
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096                 100.116.27.89:47956      0.0.0.0:*",
+      "port": 47956
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      100                        0.0.0.0:5556       0.0.0.0:*    users:((\"python\",pid=1993,fd=19))",
+      "port": 5556
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      128                        0.0.0.0:5555       0.0.0.0:*    users:((\"python3\",pid=3824,fd=3))",
+      "port": 5555
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      200                        0.0.0.0:5432       0.0.0.0:*",
+      "port": 5432
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      2048                       0.0.0.0:8090       0.0.0.0:*    users:((\"python\",pid=1941448,fd=13))",
+      "port": 8090
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      2048                       0.0.0.0:8080       0.0.0.0:*    users:((\"python\",pid=512318,fd=6))",
+      "port": 8080
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      2048                       0.0.0.0:8081       0.0.0.0:*    users:((\"python\",pid=1993,fd=20))",
+      "port": 8081
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      2048                       0.0.0.0:8000       0.0.0.0:*    users:((\"python\",pid=1992,fd=25))",
+      "port": 8000
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      2048                       0.0.0.0:8001       0.0.0.0:*    users:((\"python\",pid=2496,fd=33))",
+      "port": 8001
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      5                          0.0.0.0:8002       0.0.0.0:*    users:((\"python3\",pid=2501,fd=3))",
+      "port": 8002
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      2048                       0.0.0.0:8003       0.0.0.0:*    users:((\"python\",pid=1963,fd=52))",
+      "port": 8003
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096               192.168.132.223:46729      0.0.0.0:*    users:((\"VLLM::EngineCor\",pid=3110,fd=72))",
+      "port": 46729
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096               192.168.132.223:43997      0.0.0.0:*    users:((\"VLLM::EngineCor\",pid=3110,fd=76))",
+      "port": 43997
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      128                        0.0.0.0:4000       0.0.0.0:*    users:((\"python3\",pid=130164,fd=5))",
+      "port": 4000
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      511                        0.0.0.0:3000       0.0.0.0:*    users:((\"next-server\",pid=1991,fd=24))",
+      "port": 3000
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096               192.168.132.223:39563      0.0.0.0:*    users:((\"VLLM::EngineCor\",pid=3110,fd=68))",
+      "port": 39563
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096                     127.0.0.1:2019       0.0.0.0:*",
+      "port": 2019
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096               192.168.132.223:39025      0.0.0.0:*    users:((\"VLLM::EngineCor\",pid=3110,fd=88))",
+      "port": 39025
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096               192.168.132.223:34125      0.0.0.0:*    users:((\"VLLM::EngineCor\",pid=3110,fd=84))",
+      "port": 34125
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096               192.168.132.223:34265      0.0.0.0:*    users:((\"VLLM::EngineCor\",pid=3110,fd=80))",
+      "port": 34265
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096                             *:51313            *:*    users:((\"VLLM::EngineCor\",pid=3110,fd=60))",
+      "port": 51313
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096   [fd7a:115c:a1e0::1001:1b6b]:49263         [::]:*",
+      "port": 49263
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      200                           [::]:5432          [::]:*",
+      "port": 5432
+    },
+    {
+      "type": "suspicious_cron_file",
+      "severity": "HIGH",
+      "detail": "/etc/cron.daily/apt-compat: contains 'eval $('"
+    }
+  ],
+  "total_findings": 24,
+  "status": "REVIEW_NEEDED"
+}

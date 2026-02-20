@@ -1,0 +1,17 @@
+[Unit]
+Description=YOLO-World Zero-Shot Detection Service - Cherokee AI
+After=network.target
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda/services/vision
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 -u yolo_world_service.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/ganuda/yolo-world.log
+StandardError=append:/var/log/ganuda/yolo-world.log
+
+[Install]
+WantedBy=multi-user.target

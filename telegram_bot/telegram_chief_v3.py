@@ -15,6 +15,7 @@ Capabilities:
 """
 
 import os
+import sys
 import asyncio
 import logging
 import requests
@@ -25,6 +26,13 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 
 from tribal_knowledge import lookup_tribal_knowledge
+from tribe_memory_search import semantic_search, format_for_telegram, format_for_llm
+
+# Deep query infrastructure (Duplo persona switching)
+sys.path.insert(0, '/ganuda')
+sys.path.insert(0, '/ganuda/lib')
+from research_dispatcher import ResearchDispatcher
+from research_personas import build_research_query, PERSONAS
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -40,7 +48,7 @@ DB_CONFIG = {
     'host': os.environ.get('CHEROKEE_DB_HOST', '192.168.132.222'),
     'database': os.environ.get('CHEROKEE_DB_NAME', 'zammad_production'),
     'user': os.environ.get('CHEROKEE_DB_USER', 'claude'),
-    'password': os.environ.get('CHEROKEE_DB_PASS', 'jawaseatlasers2')
+    'password': os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 # Pending votes waiting for TPM
@@ -193,13 +201,59 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Cherokee Chief Bot v3.0\n\n"
         "Commands:\n"
         "/ask <question> - Ask the Council\n"
+        "/search <query> - Search tribe memory (semantic)\n"
         "/health - Cluster status\n"
         "/memory - Recent thermal memories\n"
         "/seed <content> - Write to memory\n"
         "/ticket <title> - Create Jr ticket\n"
         "/jrs [name] - Jr work queue\n"
         "/tribal <topic> - Tribal knowledge\n"
+        "/kanban - View open kanban tickets\n"
     )
+
+
+async def search_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Semantic search across tribe thermal memory"""
+    if not context.args:
+        await update.message.reply_text("Usage: /search <query>\nExample: /search power outage recovery")
+        return
+
+    query = " ".join(context.args)
+    await update.message.reply_text(f"Searching tribe memory for: {query}...")
+
+    results = semantic_search(query, limit=5)
+    response = format_for_telegram(results)
+    await update.message.reply_text(response)
+
+
+async def kanban_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Show open kanban tickets by priority"""
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, title, status, sacred_fire_priority, story_points
+            FROM duyuktv_tickets
+            WHERE status IN ('open', 'in_progress', 'blocked')
+            ORDER BY sacred_fire_priority DESC NULLS LAST, id
+            LIMIT 15
+        """)
+        rows = cur.fetchall()
+        conn.close()
+
+        if not rows:
+            await update.message.reply_text("No open tickets.")
+            return
+
+        lines = ["Open Kanban Tickets:\n"]
+        for r in rows:
+            sf = f"SF={r[3]}" if r[3] else ""
+            sp = f"{r[4]}SP" if r[4] else ""
+            lines.append(f"#{r[0]} [{r[2]}] {r[1][:60]} {sf} {sp}")
+
+        await update.message.reply_text("\n".join(lines))
+    except Exception as e:
+        await update.message.reply_text(f"Error: {e}")
 
 
 async def ask_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -319,6 +373,222 @@ async def tribal_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(knowledge or f"No knowledge found for '{topic}'")
 
 
+async def research_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /research command — deep query with Duplo persona switching"""
+    if not context.args:
+        persona_list = "\n".join(f"  `{k}` — {v.split(chr(10))[0][:60]}" for k, v in PERSONAS.items() if k != "default")
+        await update.message.reply_text(
+            "Usage: /research [persona] <question>\n\n"
+            "Personas (Duplo blocks):\n"
+            f"{persona_list}\n\n"
+            "Examples:\n"
+            "  /research How do I debug PostgreSQL timeouts?\n"
+            "  /research vetassist What is the nexus letter requirement?\n"
+            "  /research pharmassist Interaction between metformin and lisinopril?\n"
+            "  /research legal Can an LLC be pierced for AI liability?\n\n"
+            "Default persona: `telegram` (technical generalist)"
+        )
+        return
+
+    # Check if first arg is a persona name
+    first_arg = context.args[0].lower()
+    if first_arg in PERSONAS:
+        persona = first_arg
+        question = " ".join(context.args[1:])
+        if not question:
+            await update.message.reply_text(f"Usage: /research {persona} <your question>")
+            return
+    else:
+        persona = "telegram"
+        question = " ".join(context.args)
+
+    user = update.effective_user
+    chat_id = str(update.effective_chat.id)
+
+    await update.message.reply_text(
+        f"🔍 Starting deep research...\n\n"
+        f"Q: {question[:100]}{'...' if len(question) > 100 else ''}\n"
+        f"Persona: {persona}\n\n"
+        f"Results in 3-5 minutes."
+    )
+
+    try:
+        dispatcher = ResearchDispatcher()
+        full_query = build_research_query(question, persona)
+
+        job_id = dispatcher.queue_research(
+            query=full_query,
+            requester_type="telegram",
+            requester_id=str(user.id),
+            callback_type="telegram",
+            callback_target=chat_id,
+            max_steps=5
+        )
+
+        await update.message.reply_text(
+            f"✅ Research queued: {job_id}\n\n"
+            f"I'll notify you when complete."
+        )
+
+    except Exception as e:
+        logger.error(f"Research error: {e}")
+        await update.message.reply_text(f"❌ Research error: {str(e)}")
+
+
+async def results_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /results command — check latest research results"""
+    user = update.effective_user
+
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT job_id, LEFT(query, 80), status, result_summary, created_at
+            FROM research_jobs
+            WHERE requester_type = 'telegram' AND requester_id = %s
+            ORDER BY created_at DESC LIMIT 3
+        """, (str(user.id),))
+        rows = cur.fetchall()
+        conn.close()
+
+        if not rows:
+            await update.message.reply_text("No research results found. Try /research <question>")
+            return
+
+        for job_id, query_preview, status, summary, created in rows:
+            status_icon = "✅" if status == "completed" else "⏳" if status == "processing" else "📋"
+            text = f"{status_icon} {job_id[:12]}\n{query_preview}\n"
+            if summary:
+                text += f"\n{summary[:500]}"
+            await update.message.reply_text(text)
+
+    except Exception as e:
+        logger.error(f"Results error: {e}")
+        await update.message.reply_text(f"❌ Error fetching results: {str(e)}")
+
+
+async def remember_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /remember command — capture a thought to thermal memory from anywhere.
+    If the thought is unclear, asks a follow-up question before persisting."""
+    user = update.effective_user
+    if not context.args:
+        await update.message.reply_text(
+            "Usage: /remember <your thought>\n\n"
+            "Example: /remember we should try Redis for the Layer2 hot cache before the LoRA work\n\n"
+            "I'll save it to thermal memory. If anything's unclear, I'll ask before saving."
+        )
+        return
+
+    thought = " ".join(context.args)
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    # Ask the LLM if the thought is clear enough to be useful later
+    try:
+        clarify_response = requests.post(
+            f"{GATEWAY_URL}/v1/chat/completions",
+            headers={"Authorization": f"Bearer {API_KEY}"},
+            json={
+                "model": os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq'),
+                "messages": [
+                    {"role": "system", "content": (
+                        "You are a thought-capture assistant for the Cherokee AI Federation. "
+                        "The user is capturing a thought on the go (walking, driving, away from computer). "
+                        "Your job: determine if this thought has enough context to be useful when revisited later. "
+                        "If it IS clear enough, respond with exactly: CLEAR\n"
+                        "If it is NOT clear enough, respond with exactly: CLARIFY: <one short follow-up question>\n"
+                        "Examples of unclear thoughts that need clarification:\n"
+                        "- 'try the other approach' → CLARIFY: Which approach, and for which project?\n"
+                        "- 'fix the thing on bluefin' → CLARIFY: Which service or config on bluefin?\n"
+                        "Examples of clear thoughts:\n"
+                        "- 'use Redis for Layer2 hot cache before starting LoRA work' → CLEAR\n"
+                        "- 'speed detection should use optical flow instead of frame diff for the garage cam' → CLEAR\n"
+                        "Be generous — if it's mostly clear, say CLEAR. Only ask if truly ambiguous."
+                    )},
+                    {"role": "user", "content": thought}
+                ],
+                "max_tokens": 100,
+                "temperature": 0.3
+            },
+            timeout=30
+        )
+        llm_reply = clarify_response.json()["choices"][0]["message"]["content"].strip()
+    except Exception as e:
+        logger.warning(f"Clarity check failed, saving anyway: {e}")
+        llm_reply = "CLEAR"
+
+    if llm_reply.startswith("CLARIFY:"):
+        # Store the pending thought in context for follow-up
+        context.user_data['pending_remember'] = thought
+        follow_up = llm_reply.replace("CLARIFY:", "").strip()
+        await update.message.reply_text(
+            f"Before I save that — {follow_up}\n\n"
+            f"Reply with the clarification and I'll save the full thought. "
+            f"Or say /save to save it as-is."
+        )
+        return
+
+    # CLEAR — persist to thermal memory
+    await _persist_thought(update, user, thought, timestamp)
+
+
+async def save_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /save — force-save a pending thought without clarification"""
+    user = update.effective_user
+    thought = context.user_data.get('pending_remember')
+    if not thought:
+        await update.message.reply_text("No pending thought to save. Use /remember <thought> first.")
+        return
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    del context.user_data['pending_remember']
+    await _persist_thought(update, user, thought, timestamp)
+
+
+async def _handle_remember_followup(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle text replies that clarify a pending /remember thought"""
+    if 'pending_remember' not in context.user_data:
+        return False  # Not a remember follow-up
+
+    original = context.user_data.pop('pending_remember')
+    clarification = update.message.text
+    combined = f"{original} — CLARIFICATION: {clarification}"
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    await _persist_thought(update, update.effective_user, combined, timestamp)
+    return True
+
+
+async def _persist_thought(update, user, thought, timestamp):
+    """Save a thought to thermal memory at 90 degrees"""
+    import hashlib
+    memory_content = (
+        f"FLYING SQUIRREL THOUGHT CAPTURE ({timestamp})\n"
+        f"Source: Telegram /remember (mobile)\n"
+        f"User: {user.first_name} ({user.id})\n\n"
+        f"{thought}"
+    )
+    memory_hash = hashlib.md5(f"remember-{user.id}-{timestamp}".encode()).hexdigest()
+
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO thermal_memory_archive
+            (memory_hash, memory_type, original_content, temperature_score, tags)
+            VALUES (%s, 'thought_capture', %s, 90, ARRAY['mobile','thought-capture','flying-squirrel'])
+            RETURNING id
+        """, (memory_hash, memory_content))
+        row = cur.fetchone()
+        conn.commit()
+        cur.close()
+        conn.close()
+        await update.message.reply_text(
+            f"Saved to thermal memory (#{row[0]}, 90 deg).\n"
+            f"It'll be there when you get back to the terminal."
+        )
+    except Exception as e:
+        logger.error(f"Remember persist error: {e}")
+        await update.message.reply_text(f"Failed to save: {e}")
+
+
 def main():
     """Start the bot"""
     if not BOT_TOKEN:
@@ -331,14 +601,29 @@ def main():
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", start_command))
     app.add_handler(CommandHandler("ask", ask_command))
+    app.add_handler(CommandHandler("search", search_command))
+    app.add_handler(CommandHandler("kanban", kanban_command))
     app.add_handler(CommandHandler("health", health_command))
     app.add_handler(CommandHandler("memory", memory_command))
     app.add_handler(CommandHandler("seed", seed_command))
     app.add_handler(CommandHandler("ticket", ticket_command))
     app.add_handler(CommandHandler("jrs", jrs_command))
     app.add_handler(CommandHandler("tribal", tribal_command))
+    app.add_handler(CommandHandler("research", research_command))
+    app.add_handler(CommandHandler("results", results_command))
+    app.add_handler(CommandHandler("remember", remember_command))
+    app.add_handler(CommandHandler("save", save_command))
 
-    print("Cherokee Chief Bot v3.0 starting...")
+    # Message handler for /remember follow-up clarifications (must be after command handlers)
+    async def text_message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Route text messages — check for pending /remember follow-up first"""
+        if await _handle_remember_followup(update, context):
+            return
+        # Fall through to existing message handling if any
+
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_message_handler))
+
+    print("Cherokee Chief Bot v3.1 starting — deep query personas + /remember active...")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 

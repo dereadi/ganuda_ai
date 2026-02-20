@@ -5,7 +5,7 @@ import os
 import re
 import requests
 
-TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '7913555407:AAGRDrqslkv4GPfPUcEZ9SJkfPHEghpyjq8')
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '8025375307')
 
 CLASS_EMOJI = {'offer': '💰', 'interview': '📅', 'next_steps': '➡️', 'recruiter': '👤', 'application': '📝', 'rejection': '❌'}

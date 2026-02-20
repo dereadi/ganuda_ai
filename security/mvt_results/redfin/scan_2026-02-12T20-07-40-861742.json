@@ -1,0 +1,67 @@
+{
+  "hostname": "redfin",
+  "scan_time": "2026-02-12T20:07:40.861742",
+  "findings": [
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096                 100.116.27.89:47956      0.0.0.0:*",
+      "port": 47956
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096               192.168.132.223:46729      0.0.0.0:*    users:((\"VLLM::EngineCor\",pid=3110,fd=72))",
+      "port": 46729
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096               192.168.132.223:43997      0.0.0.0:*    users:((\"VLLM::EngineCor\",pid=3110,fd=76))",
+      "port": 43997
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096               192.168.132.223:39563      0.0.0.0:*    users:((\"VLLM::EngineCor\",pid=3110,fd=68))",
+      "port": 39563
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096               192.168.132.223:39025      0.0.0.0:*    users:((\"VLLM::EngineCor\",pid=3110,fd=88))",
+      "port": 39025
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096               192.168.132.223:34125      0.0.0.0:*    users:((\"VLLM::EngineCor\",pid=3110,fd=84))",
+      "port": 34125
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096               192.168.132.223:34265      0.0.0.0:*    users:((\"VLLM::EngineCor\",pid=3110,fd=80))",
+      "port": 34265
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096                             *:51313            *:*    users:((\"VLLM::EngineCor\",pid=3110,fd=60))",
+      "port": 51313
+    },
+    {
+      "type": "unknown_listener",
+      "severity": "HIGH",
+      "detail": "tcp   LISTEN 0      4096   [fd7a:115c:a1e0::1001:1b6b]:49263         [::]:*",
+      "port": 49263
+    },
+    {
+      "type": "suspicious_cron_file",
+      "severity": "HIGH",
+      "detail": "/etc/cron.daily/apt-compat: contains 'eval $('"
+    }
+  ],
+  "total_findings": 10,
+  "status": "REVIEW_NEEDED"
+}

@@ -1,0 +1,37 @@
+[Unit]
+Description=Jr Task Executor Daemon - Cherokee AI Federation
+After=network.target postgresql.service
+Wants=network.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/jr_executor
+Environment="CHEROKEE_DB_HOST=192.168.132.222"
+Environment="CHEROKEE_DB_NAME=zammad_production"
+Environment="CHEROKEE_DB_USER=claude"
+EnvironmentFile=/ganuda/config/secrets.env
+Environment="CHEROKEE_GATEWAY_URL=http://192.168.132.223:8080"
+Environment="CHEROKEE_API_KEY=ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+Environment="PYTHONUNBUFFERED=1"
+
+# Configure these for your node
+Environment="AGENT_ID=Infrastructure Jr."
+Environment="NODE_NAME=bluefin"
+
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 -u /ganuda/jr_executor/jr_task_executor.py "${AGENT_ID}" "${NODE_NAME}"
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+# Logging
+StandardOutput=append:/var/log/ganuda/jr-executor.log
+StandardError=append:/var/log/ganuda/jr-executor.log
+
+[Install]
+WantedBy=multi-user.target

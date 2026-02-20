@@ -29,7 +29,7 @@ class JobEmailDaemon:
             'db_host': '192.168.132.222',
             'db_name': 'triad_federation', 
             'db_user': 'claude',
-            'db_password': 'jawaseatlasers2',
+            'db_password': os.environ.get('CHEROKEE_DB_PASS', ''),
             'poll_interval': 300
         }
         self.running = True
