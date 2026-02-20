@@ -212,8 +212,8 @@ moltbook_feed_analysis.md
 sidebar_api_*.txt
 sync_iot_to_cmdb.py
 
-# Jr instructions (stored in docs/jr_instructions/ instead)
-jr_instructions/
+# Jr instructions (root-level legacy copy, not docs/jr_instructions/)
+/jr_instructions/
 
 # ============================================================
 # Secrets - NEVER commit (added 2026-02-02 SECURITY-PHASE1)
