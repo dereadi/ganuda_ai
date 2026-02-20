@@ -1,9 +1,10 @@
 #!/bin/bash
+source /ganuda/config/secrets.env
 # Pheromone Decay v2.0 - More Aggressive Cooling
 # Council Vote: PROCEED WITH CAUTION - Seven Generations Impact
 # For Seven Generations - Cherokee AI Federation
 
-PGPASSWORD='jawaseatlasers2'
+PGPASSWORD="$CHEROKEE_DB_PASS"
 export PGPASSWORD
 
 PSQL="/usr/bin/psql -h 192.168.132.222 -U claude -d zammad_production"

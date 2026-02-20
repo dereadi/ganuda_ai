@@ -1,0 +1,10 @@
+[Unit]
+Description=Cherokee AI Federation — Ritual Engine Weekly Timer (Sunday 4 AM)
+
+[Timer]
+OnCalendar=Sun *-*-* 04:00:00
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

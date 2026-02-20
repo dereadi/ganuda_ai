@@ -1,0 +1,88 @@
+# Cherokee AI Federation — Camera Fleet Registry
+# Updated: February 9, 2026
+# Passwords rotated: February 9, 2026 — stored in /ganuda/config/secrets.env
+# Next rotation: May 2026
+
+cameras:
+  office_pii:
+    type: amcrest
+    model: IP5M-T1179EW-AI-V3
+    ip: 192.168.132.181
+    port: 554
+    username: admin
+    password_env: CAMERA_OFFICE_PII_PASSWORD
+    password_fallback: null  # Rotated Feb 9, 2026 — use env var
+    rtsp_main: "rtsp://admin:{password}@192.168.132.181:554/cam/realmonitor?channel=1&subtype=0"
+    rtsp_sub: "rtsp://admin:{password}@192.168.132.181:554/cam/realmonitor?channel=1&subtype=1"
+    resolution_main: "2960x1668"
+    resolution_sub: "704x480"
+    fps: 20
+    location: "Indoor office"
+    purpose: security
+    specialist: crawdad
+    has_microphone: true
+    stereo_role: null
+
+  traffic:
+    type: amcrest
+    model: IP5M-T1179EW-AI-V3
+    ip: 192.168.132.182
+    port: 554
+    username: admin
+    password_env: CAMERA_TRAFFIC_PASSWORD
+    password_fallback: null  # Rotated Feb 9, 2026 — use env var
+    rtsp_main: "rtsp://admin:{password}@192.168.132.182:554/cam/realmonitor?channel=1&subtype=0"
+    rtsp_sub: "rtsp://admin:{password}@192.168.132.182:554/cam/realmonitor?channel=1&subtype=1"
+    resolution_main: "2960x1668"
+    resolution_sub: "704x480"
+    fps: 20
+    location: "Front of house, outdoor"
+    mount_height_ft: 4.5
+    lens_mm: 2.8
+    hfov_deg: 110
+    purpose: vehicle_identification
+    specialist: eagle_eye
+    has_microphone: true
+    stereo_role: stereo_right
+
+  garage:
+    type: amcrest
+    model: IP5M-T1179EW-AI-V3
+    ip: 10.0.0.123
+    port: 554
+    username: admin
+    password_env: CAMERA_GARAGE_PASSWORD
+    password_fallback: null  # Rotated Feb 9, 2026 — use env var
+    tunnel_host: 192.168.132.224
+    tunnel_rtsp_port: 10554
+    tunnel_http_port: 18080
+    rtsp_main: "rtsp://admin:{password}@192.168.132.224:10554/cam/realmonitor?channel=1&subtype=0"
+    rtsp_sub: "rtsp://admin:{password}@192.168.132.224:10554/cam/realmonitor?channel=1&subtype=1"
+    resolution_main: "2960x1668"
+    resolution_sub: "704x480"
+    fps: 20
+    location: "Over garage, outdoor"
+    mount_height_ft: 8.0
+    lens_mm: 2.8
+    hfov_deg: 110
+    purpose: speed_detection
+    specialist: eagle_eye
+    has_microphone: true
+    stereo_role: stereo_left
+
+# Stereo pairs (Phase 2)
+stereo_pairs:
+  driveway_street:
+    left: garage
+    right: traffic
+    baseline_ft: 110  # Estimated 100-120', using midpoint
+    baseline_meters: 33.5  # ~110 feet
+    height_delta_ft: 3.5  # garage(8') - traffic(4.5') = 3.5' vertical offset
+    calibration_target: "stop sign + street name sign combo, visible from both cameras"
+    calibration_reference_dims:
+      stop_sign_width_in: 30  # Standard US stop sign, across flats
+      street_sign_height_in: 6
+      street_sign_width_in: 24  # Typical, verify on site
+      post_width_in: 2  # Standard U-channel
+      post_mount_height_ft: 7  # Standard mounting height
+    status: calibration_pending

@@ -1,4 +1,5 @@
 #!/bin/bash
+source /ganuda/config/secrets.env
 # Deploy Infrastructure Jr. on SASASS - The Guardian
 # Monitors Four Mountains health and system status
 
@@ -108,7 +109,7 @@ def get_system_health():
     # PostgreSQL status
     try:
         pg_check = subprocess.check_output(
-            "PGPASSWORD=jawaseatlasers2 psql -h localhost -U claude -d zammad_production -c 'SELECT 1' >/dev/null 2>&1 && echo 'healthy' || echo 'down'",
+            "PGPASSWORD="$CHEROKEE_DB_PASS" psql -h localhost -U claude -d zammad_production -c 'SELECT 1' >/dev/null 2>&1 && echo 'healthy' || echo 'down'",
             shell=True
         ).decode().strip()
         health['postgresql'] = pg_check

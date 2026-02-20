@@ -28,7 +28,7 @@ database:
   port: 5432
   database: zammad_production
   user: claude
-  password: jawaseatlasers2
+  password: TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE
   pool_size: 10
 
 # Logging

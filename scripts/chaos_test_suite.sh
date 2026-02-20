@@ -1,4 +1,5 @@
 #!/bin/bash
+source /ganuda/config/secrets.env
 # Cherokee AI Federation - Chaos Test Suite
 # Usage: ./chaos_test_suite.sh [test_name]
 # Tests: gateway, connections, memory, services, baseline
@@ -37,7 +38,7 @@ test_baseline() {
     fi
     
     # PostgreSQL
-    if PGPASSWORD=jawaseatlasers2 psql -h $POSTGRES_HOST -U claude -d zammad_production -c "SELECT 1" > /dev/null 2>&1; then
+    if PGPASSWORD="$CHEROKEE_DB_PASS" psql -h $POSTGRES_HOST -U claude -d zammad_production -c "SELECT 1" > /dev/null 2>&1; then
         pass "PostgreSQL connected"
     else
         fail "PostgreSQL not responding"
@@ -88,8 +89,8 @@ test_gateway_recovery() {
 test_db_connections() {
     log "=== TEST: Database Connection Handling ==="
     
-    INITIAL=$(PGPASSWORD=jawaseatlasers2 psql -h $POSTGRES_HOST -U claude -d zammad_production -t -c "SELECT count(*) FROM pg_stat_activity;" | tr -d ' ')
-    MAX=$(PGPASSWORD=jawaseatlasers2 psql -h $POSTGRES_HOST -U claude -d zammad_production -t -c "SHOW max_connections;" | tr -d ' ')
+    INITIAL=$(PGPASSWORD="$CHEROKEE_DB_PASS" psql -h $POSTGRES_HOST -U claude -d zammad_production -t -c "SELECT count(*) FROM pg_stat_activity;" | tr -d ' ')
+    MAX=$(PGPASSWORD="$CHEROKEE_DB_PASS" psql -h $POSTGRES_HOST -U claude -d zammad_production -t -c "SHOW max_connections;" | tr -d ' ')
     
     log "Current connections: $INITIAL / $MAX max"
     
@@ -130,7 +131,7 @@ test_thermal_memory() {
     TEST_HASH="CHAOS-VERIFY-$(date +%s)"
     
     # Write
-    PGPASSWORD=jawaseatlasers2 psql -h $POSTGRES_HOST -U claude -d zammad_production -c "
+    PGPASSWORD="$CHEROKEE_DB_PASS" psql -h $POSTGRES_HOST -U claude -d zammad_production -c "
     INSERT INTO thermal_memory_archive (memory_hash, original_content, current_stage, temperature_score)
     VALUES ('$TEST_HASH', 'Chaos test verification entry', 'FRESH', 50.0);" > /dev/null 2>&1
     
@@ -142,7 +143,7 @@ test_thermal_memory() {
     fi
     
     # Read back
-    RESULT=$(PGPASSWORD=jawaseatlasers2 psql -h $POSTGRES_HOST -U claude -d zammad_production -t -c "
+    RESULT=$(PGPASSWORD="$CHEROKEE_DB_PASS" psql -h $POSTGRES_HOST -U claude -d zammad_production -t -c "
     SELECT memory_hash FROM thermal_memory_archive WHERE memory_hash = '$TEST_HASH';" | tr -d ' ')
     
     if [ "$RESULT" = "$TEST_HASH" ]; then
@@ -152,7 +153,7 @@ test_thermal_memory() {
     fi
     
     # Cleanup
-    PGPASSWORD=jawaseatlasers2 psql -h $POSTGRES_HOST -U claude -d zammad_production -c "
+    PGPASSWORD="$CHEROKEE_DB_PASS" psql -h $POSTGRES_HOST -U claude -d zammad_production -c "
     DELETE FROM thermal_memory_archive WHERE memory_hash = '$TEST_HASH';" > /dev/null 2>&1
 }
 

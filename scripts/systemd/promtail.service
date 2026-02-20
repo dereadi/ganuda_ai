@@ -1,0 +1,14 @@
+[Unit]
+Description=Promtail Log Forwarder to OpenObserve
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+ExecStart=/ganuda/home/dereadi/promtail/bin/promtail -config.file=/ganuda/home/dereadi/promtail/config/promtail.yaml
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,4 +1,5 @@
 #!/bin/bash
+source /ganuda/config/secrets.env
 # Cherokee AI PostgreSQL Backup Script
 # Deploy to: /ganuda/scripts/backup_postgres.sh
 # Cron: 0 2 * * * /ganuda/scripts/backup_postgres.sh
@@ -11,7 +12,7 @@ RETENTION_DAYS=30
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 DB_HOST="192.168.132.222"
 DB_USER="claude"
-DB_PASS="jawaseatlasers2"
+DB_PASSWORD="$CHEROKEE_DB_PASS"
 LOG_FILE="/ganuda/logs/backup.log"
 
 log() {

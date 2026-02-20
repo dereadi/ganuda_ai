@@ -1,0 +1,32 @@
+[Unit]
+Description=Moltbook MCP Server (Cherokee AI Federation)
+After=network.target
+Documentation=https://github.com/terminalcraft/moltbook-mcp
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/services/moltbook-mcp
+
+# SECURITY: Restricted environment
+Environment=MOLTBOOK_API_KEY=moltbook_sk_tpZyAhg0oZZhPv5C0PfkvO1JM7r8MwdM
+Environment=NODE_ENV=production
+
+# SECURITY: No wallet features
+Environment=DISABLE_CRYPTO_WALLETS=true
+
+ExecStart=/usr/bin/node index.js
+Restart=on-failure
+RestartSec=10
+
+# SECURITY: Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/ganuda/services/moltbook-mcp
+ReadWritePaths=/home/dereadi/.config/moltbook
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

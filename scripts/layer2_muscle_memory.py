@@ -18,6 +18,7 @@ import json
 import time
 from datetime import datetime
 from typing import Dict, Any, Optional, List
+import os
 
 # Sacred Patterns (LOCKED at 90°C+, NEVER decay)
 SACRED_PATTERNS = {
@@ -87,7 +88,7 @@ class MuscleMemoryLayer:
                  thermal_db_port=5432,
                  thermal_db_name='zammad_production',
                  thermal_db_user='claude',
-                 thermal_db_password='jawaseatlasers2'):
+                 thermal_db_password=os.environ.get('CHEROKEE_DB_PASS', '')):
         """Initialize muscle memory cache with thermal database connection"""
 
         # Redis for sacred patterns (fastest tier - sub-millisecond)

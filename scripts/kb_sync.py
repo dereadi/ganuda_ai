@@ -15,7 +15,7 @@ DB_CONFIG = {
     'host': '192.168.132.222',
     'database': 'zammad_production',
     'user': 'claude',
-    'password': 'jawaseatlasers2'
+    'password': os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 KB_DIRS = [

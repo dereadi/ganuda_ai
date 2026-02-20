@@ -9,12 +9,13 @@ import subprocess
 import json
 import psycopg2
 from datetime import datetime
+import os
 
 DB_CONFIG = {
     'host': '192.168.132.222',
     'database': 'triad_federation',
     'user': 'claude',
-    'password': 'jawaseatlasers2'
+    'password': os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 def run_command(cmd):
@@ -74,7 +75,8 @@ def check_databases():
         db_info.append(f"PostgreSQL Client: {psql_version}")
 
     # Check connectivity to bluefin
-    pg_connect = run_command("PGPASSWORD='jawaseatlasers2' psql -U claude -d triad_federation -h 192.168.132.222 -c 'SELECT version();' 2>&1 | head -1")
+    db_pass = os.environ.get('CHEROKEE_DB_PASS', '')
+    pg_connect = run_command(f"PGPASSWORD='{db_pass}' psql -U claude -d zammad_production -h 192.168.132.222 -c 'SELECT version();' 2>&1 | head -1")
     if "PostgreSQL" in pg_connect:
         db_info.append(f"Bluefin DB Connectivity: OK - {pg_connect}")
     else:

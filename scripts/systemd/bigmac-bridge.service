@@ -1,0 +1,18 @@
+[Unit]
+Description=BigMac A2A Bridge - Dr. Joe API Gateway
+After=network.target llm-gateway.service
+Wants=llm-gateway.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/drjoe
+ExecStart=/ganuda/home/dereadi/cherokee_venv/bin/python3 /ganuda/drjoe/cherokee_a2a_bridge.py
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/ganuda/drjoe/cherokee_bridge.log
+StandardError=append:/ganuda/drjoe/cherokee_bridge.log
+
+[Install]
+WantedBy=multi-user.target

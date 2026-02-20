@@ -11,7 +11,7 @@ ExecStart=/usr/bin/python3 /ganuda/daemons/sanctuary_state.py
 Restart=always
 RestartSec=60
 Environment=PYTHONPATH=/ganuda
-Environment=TELEGRAM_BOT_TOKEN=7913555407:AAGRDrqslkv4GPfPUcEZ9SJkfPHEghpyjq8
+EnvironmentFile=/ganuda/config/secrets.env
 
 # Logging
 StandardOutput=journal

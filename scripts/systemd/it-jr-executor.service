@@ -1,0 +1,21 @@
+[Unit]
+Description=Cherokee IT Jr Mission Executor
+After=network.target llm-gateway.service
+Wants=llm-gateway.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/jr_executor
+EnvironmentFile=/ganuda/config/secrets.env
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/ganuda:/ganuda/lib
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 -u /ganuda/jr_executor/jr_cli.py --daemon --poll-interval 30
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

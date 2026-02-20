@@ -1,0 +1,24 @@
+[Unit]
+Description=Cherokee AI Telegram Bot (@ganudabot) — Claude-Powered Agent
+Documentation=file:///ganuda/telegram_bot/derpatobot_claude.py
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda/telegram_bot
+EnvironmentFile=/ganuda/config/secrets.env
+ExecStart=/home/dereadi/cherokee_venv/bin/python derpatobot_claude.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ganudabot
+
+# Resource limits
+MemoryMax=512M
+CPUQuota=25%
+
+[Install]
+WantedBy=multi-user.target

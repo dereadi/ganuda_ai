@@ -1,0 +1,17 @@
+[Unit]
+Description=Cherokee AI Interactive Telegram Bot (@derpatobot)
+After=network.target llm-gateway.service
+Wants=llm-gateway.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/telegram_bot
+EnvironmentFile=/ganuda/config/secrets.env
+ExecStart=/home/dereadi/cherokee_venv/bin/python telegram_chief_v3.py
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

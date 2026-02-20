@@ -1,4 +1,5 @@
 #!/bin/bash
+source /ganuda/config/secrets.env
 # Trigger IT Triad ITSM Evaluation
 # Run this on redfin to start the evaluation
 
@@ -28,7 +29,7 @@ fi
 # Read task from thermal memory
 echo ""
 echo "2. Reading task assignment from thermal memory..."
-TASK=$(PGPASSWORD='jawaseatlasers2' psql -h 192.168.132.222 -U claude -d triad_federation -t -A -c "
+TASK=$(PGPASSWORD="$CHEROKEE_DB_PASS" psql -h 192.168.132.222 -U claude -d triad_federation -t -A -c "
 SELECT content
 FROM triad_shared_memories
 WHERE content ILIKE '%HIGH PRIORITY TASK ASSIGNMENT - IT MANAGEMENT TRIAD%'

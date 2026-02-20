@@ -28,9 +28,9 @@ def fara_prediction():
     try:
         conn = psycopg2.connect(
             host='192.168.132.222',
-            database='triad_federation',
+            database='zammad_production',
             user='claude',
-            password='jawaseatlasers2'
+            password=os.environ.get('CHEROKEE_DB_PASS', '')
         )
         cur = conn.cursor()
         cur.execute("""

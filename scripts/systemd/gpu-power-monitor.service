@@ -1,0 +1,20 @@
+[Unit]
+Description=Cherokee AI GPU Power Monitor (Adaptive)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/scripts
+ExecStart=/ganuda/venv/bin/python gpu_power_monitor.py
+EnvironmentFile=/ganuda/config/secrets.env
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=gpu-power-monitor
+
+[Install]
+WantedBy=multi-user.target

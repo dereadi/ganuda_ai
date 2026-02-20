@@ -12,7 +12,7 @@ WorkingDirectory=/ganuda/services/vision
 Environment="CHEROKEE_DB_HOST=192.168.132.222"
 Environment="CHEROKEE_DB_NAME=zammad_production"
 Environment="CHEROKEE_DB_USER=claude"
-Environment="CHEROKEE_DB_PASS=jawaseatlasers2"
+EnvironmentFile=/ganuda/config/secrets.env
 ExecStart=/home/dereadi/cherokee_venv/bin/python3 /ganuda/services/vision/tribal_vision.py --camera both --interval 60 --model n
 Restart=on-failure
 RestartSec=30

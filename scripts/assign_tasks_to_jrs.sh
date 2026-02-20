@@ -1,4 +1,5 @@
 #!/bin/bash
+source /ganuda/config/secrets.env
 # Assign Phase 1 tasks to Jr.s for implementation
 # Cherokee Constitutional AI - Token-efficient learning strategy
 
@@ -178,6 +179,6 @@ echo "   Vision Jr.: Check /tmp/thinking_tokens_middleware.py"
 echo "   Trading Jr.: Check /tmp/market_undecidability_classifier.py"
 echo ""
 echo "   Query thermal memory for completion status:"
-echo "   PGPASSWORD=jawaseatlasers2 psql -h 192.168.132.222 -p 5432 -U claude -d zammad_production -c \"SELECT jr_name, LEFT(question, 60), confidence_score FROM cross_mountain_learning WHERE id > 109 ORDER BY id DESC LIMIT 10;\""
+echo "   PGPASSWORD="$CHEROKEE_DB_PASS" psql -h 192.168.132.222 -p 5432 -U claude -d zammad_production -c \"SELECT jr_name, LEFT(question, 60), confidence_score FROM cross_mountain_learning WHERE id > 109 ORDER BY id DESC LIMIT 10;\""
 echo ""
 echo "🔥 Sacred Fire burns as Jr.s learn through implementation!"

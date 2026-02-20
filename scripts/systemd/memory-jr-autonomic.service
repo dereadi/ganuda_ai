@@ -1,0 +1,20 @@
+[Unit]
+Description=Memory Jr Autonomic Daemon - Cherokee Constitutional AI
+After=network.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/daemons
+EnvironmentFile=/ganuda/config/secrets.env
+Environment=PATH=/usr/bin:/bin
+Environment=PYTHONPATH=/ganuda:/ganuda/lib
+ExecStart=/usr/bin/python3 -u /ganuda/daemons/memory_jr_autonomic.py
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

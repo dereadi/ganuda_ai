@@ -1,0 +1,24 @@
+[Unit]
+Description=Cherokee AI Speed Detection - Garage Camera
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/services/vision
+EnvironmentFile=/ganuda/config/secrets.env
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/ganuda:/ganuda/lib
+Environment=SPEED_CAMERA=garage
+Environment=SPEED_PPM=35.0
+Environment=SPEED_FPS=10.0
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 -u /ganuda/services/vision/speed_detector.py
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

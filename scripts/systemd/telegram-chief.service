@@ -9,7 +9,7 @@ Group=dereadi
 WorkingDirectory=/ganuda/telegram_bot
 Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
 Environment=PYTHONPATH=/ganuda/lib
-Environment=TELEGRAM_BOT_TOKEN=7913555407:AAGRDrqslkv4GPfPUcEZ9SJkfPHEghpyjq8
+EnvironmentFile=/ganuda/config/secrets.env
 ExecStart=/home/dereadi/cherokee_venv/bin/python telegram_chief.py
 Restart=always
 RestartSec=10

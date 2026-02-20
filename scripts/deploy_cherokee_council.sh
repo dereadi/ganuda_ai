@@ -1,4 +1,5 @@
 #!/bin/bash
+source /ganuda/config/secrets.env
 ################################################################################
 # Cherokee Constitutional AI - Council Deployment Script
 # Fractal Brain Architecture - Production Deployment
@@ -42,7 +43,7 @@ echo ""
 
 # Test thermal memory connection
 echo "[Deployment] Testing thermal memory database connection..."
-PGPASSWORD=jawaseatlasers2 psql -h 192.168.132.222 -p 5432 -U claude -d zammad_production -c "SELECT COUNT(*) FROM thermal_memory_archive;" > /dev/null 2>&1
+PGPASSWORD="$CHEROKEE_DB_PASS" psql -h 192.168.132.222 -p 5432 -U claude -d zammad_production -c "SELECT COUNT(*) FROM thermal_memory_archive;" > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     echo "  ✓ Thermal memory database accessible"
 else

@@ -8,6 +8,7 @@ Usage: python3 reset_vetassist_test_accounts.py
 
 from passlib.context import CryptContext
 import psycopg2
+import os
 
 def reset_test_accounts():
     pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -16,7 +17,7 @@ def reset_test_accounts():
         host='192.168.132.222',
         dbname='zammad_production',  # Fixed Jan 29, 2026 - was triad_federation
         user='claude',
-        password='jawaseatlasers2'
+        password=os.environ.get('CHEROKEE_DB_PASS', '')
     )
     cur = conn.cursor()
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+source /ganuda/config/secrets.env
 # Monitor all active Jr. logs in real-time
 # Cherokee Constitutional AI - Jr. Activity Monitor
 
@@ -62,7 +63,7 @@ tail -20 /tmp/software_engineer_jr.log
 ls -lth /tmp/popperian*.py /tmp/thinking_tokens*.py /tmp/market_undecid*.py 2>/dev/null
 
 # Check thermal memory for Jr. completions:
-PGPASSWORD=jawaseatlasers2 psql -h 192.168.132.222 -p 5432 -U claude -d zammad_production -c "SELECT id, jr_name, LEFT(question, 60) as task, confidence_score, created_at FROM cross_mountain_learning WHERE id > 109 ORDER BY id DESC LIMIT 5;"
+PGPASSWORD="$CHEROKEE_DB_PASS" psql -h 192.168.132.222 -p 5432 -U claude -d zammad_production -c "SELECT id, jr_name, LEFT(question, 60) as task, confidence_score, created_at FROM cross_mountain_learning WHERE id > 109 ORDER BY id DESC LIMIT 5;"
 
 EOF
 

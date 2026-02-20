@@ -1,4 +1,5 @@
 #!/bin/bash
+source /ganuda/config/secrets.env
 # Deploy Legal Jr. on BLUEFIN - The Record Keeper
 # Co-located with PostgreSQL for zero-latency legal queries
 
@@ -66,7 +67,7 @@ with open('/tmp/legal_jr_prompt.txt', 'r') as f:
 def query_database(sql_query):
     """Execute SQL query on local PostgreSQL"""
     try:
-        cmd = f"PGPASSWORD=jawaseatlasers2 psql -h localhost -p 5432 -U claude -d zammad_production -t -A -c \"{sql_query}\""
+        cmd = f"PGPASSWORD="$CHEROKEE_DB_PASS" psql -h localhost -p 5432 -U claude -d zammad_production -t -A -c \"{sql_query}\""
         result = subprocess.check_output(cmd, shell=True, stderr=subprocess.PIPE).decode().strip()
         return result
     except subprocess.CalledProcessError as e:

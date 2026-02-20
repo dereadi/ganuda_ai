@@ -1,0 +1,28 @@
+[Unit]
+Description=Cherokee AI Federation — Ritual Reinforcement Engine (weekly review)
+Documentation=file:///ganuda/docs/jr_instructions/JR-RITUAL-ENGINE-PROTOTYPE-FEB08-2026.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda
+Environment=PYTHONPATH=/ganuda:/ganuda/lib
+EnvironmentFile=/ganuda/config/secrets.env
+ExecStart=/ganuda/home/dereadi/cherokee_venv/bin/python3 /ganuda/scripts/ritual_review.py --mode weekly
+
+StandardOutput=append:/var/log/ganuda/ritual-review.log
+StandardError=append:/var/log/ganuda/ritual-review.log
+SyslogIdentifier=ritual-review
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+ReadWritePaths=/ganuda/docs /var/log/ganuda
+
+[Install]
+WantedBy=multi-user.target

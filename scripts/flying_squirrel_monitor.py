@@ -9,12 +9,13 @@ import psycopg2
 import json
 from datetime import datetime, timedelta
 from collections import Counter
+import os
 
 DB_CONFIG = {
     'host': '192.168.132.222',
     'database': 'triad_federation',
     'user': 'claude',
-    'password': 'jawaseatlasers2'
+    'password': os.environ.get('CHEROKEE_DB_PASS', '')
 }
 
 def get_baseline_profile():

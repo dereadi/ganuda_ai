@@ -1,0 +1,20 @@
+[Unit]
+Description=TPM Autonomic Daemon — Level 5+ Basin-Breaker
+After=network.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda
+EnvironmentFile=/ganuda/config/secrets.env
+ExecStart=/ganuda/home/dereadi/cherokee_venv/bin/python3 /ganuda/daemons/tpm_autonomic.py --interval 300
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=tpm-autonomic
+
+[Install]
+WantedBy=multi-user.target

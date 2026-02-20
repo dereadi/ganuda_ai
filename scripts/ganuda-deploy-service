@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# Load environment variables
+if [[ -z "$TELEGRAM_BOT_TOKEN" || -z "$TELEGRAM_CHIEF_CHAT_ID" ]]; then
+    source /ganuda/config/secrets.env
+fi
+
+# Function to send Telegram notification
+send_telegram_notification() {
+    local message="$1"
+    curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" -d "chat_id=$TELEGRAM_CHIEF_CHAT_ID&text=$message" > /dev/null
+}
+
+# Function to log action
+log_action() {
+    local action="$1"
+    local service="$2"
+    local result="$3"
+    local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+    echo "$timestamp - $action - $service - $result" >> /ganuda/logs/service-deploy.log
+}
+
+# Function to validate service file
+validate_service_file() {
+    local service_file="$1"
+    if [[ ! -f "$service_file" ]]; then
+        echo "Error: Service file not found in staging."
+        exit 2
+    fi
+
+    if ! grep -qE '^\[Unit\]|^\[Service\]' "$service_file"; then
+        echo "Error: Invalid service file."
+        exit 3
+    fi
+}
+
+# Main function
+main() {
+    local service_name="$1"
+    local dry_run="$2"
+
+    if [[ -z "$service_name" ]]; then
+        echo "Usage: $0 <service_name> [--dry-run]"
+        exit 1
+    fi
+
+    if [[ "$service_name" != *.service ]]; then
+        service_name="${service_name}.service"
+    fi
+
+    local service_file="/ganuda/scripts/systemd/$service_name"
+
+    if [[ "$service_name" =~ / ]]; then
+        echo "Error: Path traversal detected."
+        exit 1
+    fi
+
+    validate_service_file "$service_file"
+
+    if [[ "$dry_run" == "--dry-run" ]]; then
+        echo "Dry run: Would copy $service_file to /etc/systemd/system/"
+        echo "Dry run: Would run systemctl daemon-reload"
+        echo "Dry run: Would run systemctl enable --now $service_name"
+        echo "Dry run: Would check service status"
+        echo "Dry run: Would send Telegram notification"
+        echo "Dry run: Would log action"
+        exit 0
+    fi
+
+    cp "$service_file" /etc/systemd/system/ && \
+    systemctl daemon-reload && \
+    systemctl enable --now "$service_name" && \
+    service_status=$(systemctl is-active "$service_name")
+
+    if [[ "$service_status" == "active" ]]; then
+        local message="Service $service_name deployed successfully on $(hostname) at $(date)"
+        send_telegram_notification "$message"
+        log_action "Deployed" "$service_name" "Success"
+        exit 0
+    else
+        local message="Service $service_name failed to start on $(hostname) at $(date)"
+        send_telegram_notification "$message"
+        log_action "Deployed" "$service_name" "Failed"
+        exit 5
+    fi
+}
+
+main "$@"

@@ -101,6 +101,9 @@ pilot_testing/
 # Camera secrets (hardcoded passwords)
 scripts/push_camera_secrets_silverfin.sh
 
+# Password sweep tool (contains old passwords as search patterns)
+scripts/sweep_hardcoded_passwords.py
+
 # Legacy Oct 2025 files (pre-federation)
 vision_jr_2025_10_14/
 trading_jr_2025_10_14/

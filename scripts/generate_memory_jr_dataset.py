@@ -12,13 +12,14 @@ Cherokee Council JRs: Phase 1 POC
 import psycopg2
 import json
 from datetime import datetime
+import os
 
 # Database connection
 DB_CONFIG = {
     'host': '192.168.132.222',
     'port': 5432,
     'user': 'claude',
-    'password': 'jawaseatlasers2',
+    'password': os.environ.get('CHEROKEE_DB_PASS', ''),
     'database': 'zammad_production'
 }
 

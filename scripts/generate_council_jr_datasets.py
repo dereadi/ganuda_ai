@@ -17,13 +17,14 @@ Date: October 20, 2025
 import json
 import psycopg2
 from datetime import datetime
+import os
 
 # Database connection
 DB_CONFIG = {
     'host': '192.168.132.222',
     'port': 5432,
     'user': 'claude',
-    'password': 'jawaseatlasers2',
+    'password': os.environ.get('CHEROKEE_DB_PASS', ''),
     'database': 'zammad_production'
 }
 

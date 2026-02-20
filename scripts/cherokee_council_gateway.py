@@ -14,6 +14,7 @@ import psycopg2
 from flask import Flask, request, jsonify
 import time
 from collections import OrderedDict
+import os
 
 app = Flask(__name__)
 
@@ -22,7 +23,7 @@ DB_CONFIG = {
     'host': '192.168.132.222',
     'port': 5432,
     'user': 'claude',
-    'password': 'jawaseatlasers2',
+    'password': os.environ.get('CHEROKEE_DB_PASS', ''),
     'database': 'zammad_production'
 }
 

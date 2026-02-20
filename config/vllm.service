@@ -1,0 +1,22 @@
+[Unit]
+Description=vLLM OpenAI-Compatible Inference Server
+After=network.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/home/dereadi
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=HF_HOME=/ganuda/home/dereadi/.cache/huggingface
+Environment=VLLM_DISABLED_KERNELS=MarlinLinearKernel
+Environment=TRITON_PTXAS_PATH=/ganuda/home/dereadi/cherokee_venv/lib/python3.12/site-packages/triton/backends/nvidia/bin/ptxas
+ExecStart=/home/dereadi/cherokee_venv/bin/python -m vllm.entrypoints.openai.api_server --model /ganuda/models/qwen2.5-72b-instruct-awq --port 8000 --quantization awq --enforce-eager --dtype float16 --gpu-memory-utilization 0.85 --max-model-len 32768 --max-num-seqs 256 --trust-remote-code --attention-backend TRITON_ATTN
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vllm
+
+[Install]
+WantedBy=multi-user.target

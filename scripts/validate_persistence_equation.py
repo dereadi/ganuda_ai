@@ -11,12 +11,13 @@ import numpy as np
 from scipy.optimize import curve_fit
 import json
 from datetime import datetime
+import os
 
 DB_CONFIG = {
     "host": "192.168.132.222",
     "port": 5432,
     "user": "claude",
-    "password": "jawaseatlasers2",
+    "password": os.environ.get('CHEROKEE_DB_PASS', ''),
     "database": "zammad_production"
 }
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+source /ganuda/config/secrets.env
 # PostgreSQL Port Diagnostic Script
 # Cherokee AI Federation - Phase 3 Troubleshooting
 # Created: 2025-11-20
@@ -88,11 +89,11 @@ echo "=== CONNECTION TESTS ===" | tee -a "$OUTPUT_FILE"
 echo "" | tee -a "$OUTPUT_FILE"
 
 echo "Testing connection to localhost:5432:" | tee -a "$OUTPUT_FILE"
-PGPASSWORD='jawaseatlasers2' psql -U claude -d triad_federation -h localhost -p 5432 -c "SELECT version();" 2>&1 | tee -a "$OUTPUT_FILE" || echo "Connection to port 5432 FAILED" | tee -a "$OUTPUT_FILE"
+PGPASSWORD="$CHEROKEE_DB_PASS" psql -U claude -d triad_federation -h localhost -p 5432 -c "SELECT version();" 2>&1 | tee -a "$OUTPUT_FILE" || echo "Connection to port 5432 FAILED" | tee -a "$OUTPUT_FILE"
 echo "" | tee -a "$OUTPUT_FILE"
 
 echo "Testing connection to localhost:5433:" | tee -a "$OUTPUT_FILE"
-PGPASSWORD='jawaseatlasers2' psql -U claude -d triad_federation -h localhost -p 5433 -c "SELECT version();" 2>&1 | tee -a "$OUTPUT_FILE" || echo "Connection to port 5433 FAILED" | tee -a "$OUTPUT_FILE"
+PGPASSWORD="$CHEROKEE_DB_PASS" psql -U claude -d triad_federation -h localhost -p 5433 -c "SELECT version();" 2>&1 | tee -a "$OUTPUT_FILE" || echo "Connection to port 5433 FAILED" | tee -a "$OUTPUT_FILE"
 echo "" | tee -a "$OUTPUT_FILE"
 
 # Check recovery mode on both ports
@@ -100,17 +101,17 @@ echo "=== RECOVERY MODE CHECK ===" | tee -a "$OUTPUT_FILE"
 echo "" | tee -a "$OUTPUT_FILE"
 
 echo "Recovery mode check on port 5432:" | tee -a "$OUTPUT_FILE"
-PGPASSWORD='jawaseatlasers2' psql -U claude -d triad_federation -h localhost -p 5432 -c "SELECT pg_is_in_recovery();" 2>&1 | tee -a "$OUTPUT_FILE" || echo "Cannot check recovery mode on port 5432" | tee -a "$OUTPUT_FILE"
+PGPASSWORD="$CHEROKEE_DB_PASS" psql -U claude -d triad_federation -h localhost -p 5432 -c "SELECT pg_is_in_recovery();" 2>&1 | tee -a "$OUTPUT_FILE" || echo "Cannot check recovery mode on port 5432" | tee -a "$OUTPUT_FILE"
 echo "" | tee -a "$OUTPUT_FILE"
 
 echo "Recovery mode check on port 5433:" | tee -a "$OUTPUT_FILE"
-PGPASSWORD='jawaseatlasers2' psql -U claude -d triad_federation -h localhost -p 5433 -c "SELECT pg_is_in_recovery();" 2>&1 | tee -a "$OUTPUT_FILE" || echo "Cannot check recovery mode on port 5433" | tee -a "$OUTPUT_FILE"
+PGPASSWORD="$CHEROKEE_DB_PASS" psql -U claude -d triad_federation -h localhost -p 5433 -c "SELECT pg_is_in_recovery();" 2>&1 | tee -a "$OUTPUT_FILE" || echo "Cannot check recovery mode on port 5433" | tee -a "$OUTPUT_FILE"
 echo "" | tee -a "$OUTPUT_FILE"
 
 # Check replication status on port 5433
 echo "=== REPLICATION STATUS (PORT 5433) ===" | tee -a "$OUTPUT_FILE"
 echo "" | tee -a "$OUTPUT_FILE"
-PGPASSWORD='jawaseatlasers2' psql -U claude -d triad_federation -h localhost -p 5433 -c "SELECT pg_last_wal_receive_lsn(), pg_last_wal_replay_lsn(), pg_is_in_recovery();" 2>&1 | tee -a "$OUTPUT_FILE" || echo "Cannot query replication status" | tee -a "$OUTPUT_FILE"
+PGPASSWORD="$CHEROKEE_DB_PASS" psql -U claude -d triad_federation -h localhost -p 5433 -c "SELECT pg_last_wal_receive_lsn(), pg_last_wal_replay_lsn(), pg_is_in_recovery();" 2>&1 | tee -a "$OUTPUT_FILE" || echo "Cannot query replication status" | tee -a "$OUTPUT_FILE"
 echo "" | tee -a "$OUTPUT_FILE"
 
 # Check standby.signal file

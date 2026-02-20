@@ -34,10 +34,6 @@ services:
     version: TBD
     port: 8971
 
-  grafana:
-    version: TBD
-    port: 3000
-
   mosquitto_mqtt:
     version: TBD
     port: 1883

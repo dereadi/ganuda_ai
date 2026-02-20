@@ -42,7 +42,7 @@ services:
     venv: /home/dereadi/cherokee_venv
     systemd_unit: vllm.service
     port: 8000
-    model: /ganuda/models/qwen2.5-coder-32b-awq
+    model: /ganuda/models/qwen2.5-72b-instruct-awq
     quantization: awq_marlin
     max_model_len: 32000
 
