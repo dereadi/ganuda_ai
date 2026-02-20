@@ -1,0 +1,39 @@
+---
+# Cherokee AI Federation — Linux Node Group Variables
+ganuda_base_path: /ganuda
+ganuda_config_path: /ganuda/config
+ganuda_scripts_path: /ganuda/scripts
+ganuda_services_path: /ganuda/scripts/systemd
+ganuda_venv_path: /ganuda/amem_venv
+
+# Package management
+package_manager: apt
+common_packages:
+  - python3
+  - python3-pip
+  - python3-venv
+  - git
+  - curl
+  - jq
+  - htop
+  - nftables
+  - fail2ban
+  - postgresql-client
+  - rsync
+  - tmux
+
+# Service management
+service_manager: systemd
+
+# Security
+ssh_allowed_network: 192.168.132.0/24
+fail2ban_enabled: true
+
+# Database
+db_host: 192.168.132.222
+db_name: zammad_production
+db_user: claude
+
+# Embedding service
+embedding_host: 192.168.132.224
+embedding_port: 8003

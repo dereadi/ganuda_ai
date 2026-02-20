@@ -1,0 +1,54 @@
+---
+# Cherokee AI Federation — Deploy nftables firewall rules to Linux nodes
+# Run: ansible-playbook playbooks/deploy-firewall.yml
+# WARNING: This modifies firewall rules. Test with --check first.
+- name: Deploy nftables firewall configuration
+  hosts: linux
+  become: yes
+
+  tasks:
+    - name: Ensure nftables is installed
+      apt:
+        name: nftables
+        state: present
+
+    - name: Check if nftables config exists for this node
+      stat:
+        path: "{{ ganuda_config_path }}/{{ nftables_config | default('') }}"
+      register: nft_config_check
+      when: nftables_config is defined
+
+    - name: Deploy nftables ruleset
+      copy:
+        src: "{{ ganuda_config_path }}/{{ nftables_config }}"
+        dest: /etc/nftables.conf
+        owner: root
+        group: root
+        mode: "0644"
+        remote_src: yes
+        backup: yes
+      when:
+        - nftables_config is defined
+        - nft_config_check.stat.exists | default(false)
+      notify: restart nftables
+
+    - name: Enable nftables service
+      systemd:
+        name: nftables
+        enabled: yes
+        state: started
+
+    - name: Verify active ruleset
+      command: nft list ruleset
+      register: nft_output
+      changed_when: false
+
+    - name: Show active rules count
+      debug:
+        msg: "{{ inventory_hostname }}: {{ nft_output.stdout_lines | length }} lines in active ruleset"
+
+  handlers:
+    - name: restart nftables
+      systemd:
+        name: nftables
+        state: restarted

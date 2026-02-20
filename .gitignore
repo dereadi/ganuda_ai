@@ -110,6 +110,13 @@ scripts/push_camera_secrets_silverfin.sh
 # Password sweep tool (contains old passwords as search patterns)
 scripts/sweep_hardcoded_passwords.py
 
+# Docs with embedded credentials (historical context/system prompts)
+docs/CLAUDE-REDFIN-CONTEXT-JAN14-2026.md
+docs/CLAUDE_SYSTEM_PROMPT_JAN21_2026.md
+docs/DR_JOE_BIGMA_CONNECTION_GUIDE.md
+docs/juicebox.md
+docs/procurement/
+
 # Legacy Oct 2025 files (pre-federation)
 vision_jr_2025_10_14/
 trading_jr_2025_10_14/

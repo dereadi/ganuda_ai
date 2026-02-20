@@ -1,0 +1,20 @@
+---
+# Cherokee AI Federation — GPU Node Group Variables
+# ABI-sensitive: Pin exact versions from dependency manifests
+
+nvidia_driver_version: "570"
+cuda_version: "12.8"
+
+# Python GPU stack (pinned for ABI compatibility)
+gpu_python_packages:
+  - torch==2.9.1+cu128
+  - vllm>=0.8.0
+  - xformers
+  - triton
+  - flash-attn
+
+# GPU monitoring
+gpu_power_monitor_enabled: true
+gpu_power_monitor_interval_idle: 300
+gpu_power_monitor_interval_active: 15
+gpu_utilization_threshold: 40

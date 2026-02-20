@@ -1,0 +1,15 @@
+---
+# Cherokee AI Federation — sasass2 (Mac Studio, Munki Server)
+# IP: 192.168.132.242
+
+hostname: sasass2
+node_role: package_server
+ansible_become_method: sudo
+
+# Munki server
+munki_server_enabled: true
+munki_repo_path: /Users/Shared/munki_repo
+munki_server_port: 8080
+
+# Services
+managed_launchd_services: []

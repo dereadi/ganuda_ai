@@ -1,0 +1,14 @@
+---
+# Cherokee AI Federation — Master Site Playbook
+# Runs all playbooks in correct order across all nodes
+# Run: ansible-playbook playbooks/site.yml
+# Run dry: ansible-playbook playbooks/site.yml --check
+
+- name: "Phase 1: Sync federation common config"
+  import_playbook: sync-federation.yml
+
+- name: "Phase 2: Deploy firewall rules"
+  import_playbook: deploy-firewall.yml
+
+- name: "Phase 3: Deploy services"
+  import_playbook: deploy-services.yml

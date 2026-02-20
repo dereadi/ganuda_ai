@@ -1,0 +1,4 @@
+# Council Deploy - service management via wrapper scripts
+# FreeIPA sudo rules don't propagate to bluefin (sudo-rs 0.2.8)
+# Kanban #1834, Council Vote #49dd21edbcb19120
+council-deploy ALL=(root) NOPASSWD: /usr/local/bin/ganuda-deploy-service, /usr/local/bin/ganuda-service-ctl

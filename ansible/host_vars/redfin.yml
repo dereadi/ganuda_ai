@@ -1,0 +1,54 @@
+---
+# Cherokee AI Federation — Redfin (GPU Inference Node)
+# IP: 192.168.132.223 | RTX PRO 6000 96GB
+
+hostname: redfin
+node_role: gpu_inference
+
+# vLLM Configuration
+vllm_model: /ganuda/models/qwen2.5-72b-instruct-awq
+vllm_port: 8000
+vllm_gpu_memory_utilization: 0.95
+vllm_quantization: awq_marlin
+
+# LLM Gateway
+gateway_port: 8080
+gateway_version: "1.6.0"
+
+# SAG Unified Interface
+sag_port: 4000
+
+# VetAssist
+vetassist_backend_port: 8001
+vetassist_frontend_port: 3000
+
+# Services managed on this node
+managed_services:
+  - vllm
+  - llm-gateway
+  - sag
+  - vetassist-backend
+  - jr-executor
+  - jr-bidding
+  - jr-orchestrator
+  - jr-queue-worker
+  - jr-se
+  - jr-research
+  - jr-infra
+  - jr-it-triad
+  - ganudabot
+  - research-worker
+  - ritual-review
+
+# Firewall
+nftables_config: nftables-redfin.conf
+firewall_open_ports:
+  public:
+    - { port: 80, proto: tcp }
+    - { port: 443, proto: tcp }
+  internal:
+    - { port: 8080, proto: tcp, comment: "LLM Gateway" }
+    - { port: 8000, proto: tcp, comment: "vLLM" }
+    - { port: 4000, proto: tcp, comment: "SAG" }
+    - { port: 3000, proto: tcp, comment: "Kanban" }
+    - { port: 8001, proto: tcp, comment: "VetAssist Backend" }

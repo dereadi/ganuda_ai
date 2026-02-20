@@ -1,0 +1,37 @@
+---
+# Cherokee AI Federation — Bluefin (Database + Vision Node)
+# IP: 192.168.132.222 | RTX 5070
+
+hostname: bluefin
+node_role: database
+
+# PostgreSQL
+postgresql_version: 17
+postgresql_port: 5432
+postgresql_ssl_enabled: true
+
+# Vision services
+vlm_port: 8090
+vlm_model: "Qwen/Qwen2-VL-7B-Instruct-AWQ"
+vlm_adapter_port: 8092
+yolo_world_port: 8091
+
+# Services managed on this node
+managed_services:
+  - vlm-bluefin
+  - vlm-adapter
+  - yolo-world
+  - optic-nerve
+  - tribal-vision
+  - speed-detector
+  - gpu-power-monitor
+
+# Firewall
+nftables_config: nftables-bluefin.conf
+firewall_open_ports:
+  internal:
+    - { port: 5432, proto: tcp, comment: "PostgreSQL" }
+    - { port: 3000, proto: tcp, comment: "Grafana" }
+    - { port: 8090, proto: tcp, comment: "VLM vLLM" }
+    - { port: 8091, proto: tcp, comment: "YOLO World" }
+    - { port: 8092, proto: tcp, comment: "VLM Adapter" }

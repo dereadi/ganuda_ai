@@ -1,0 +1,40 @@
+---
+# Cherokee AI Federation — Alert Triage
+# Called by EDA rulebook when federation_alerts fires.
+# Classifies the alert and invokes the remediation engine.
+#
+# This playbook runs on localhost (redfin) and calls the
+# Python remediation engine to generate a response playbook.
+- name: Triage federation alert
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - name: Log alert receipt
+      debug:
+        msg: >-
+          ALERT RECEIVED | ID: {{ alert_id }}
+          | Severity: {{ severity }}
+          | Temperature: {{ alert_temperature }}
+          | Sacred: {{ alert_sacred }}
+          | Preview: {{ alert_content | truncate(100) }}
+
+    - name: Invoke remediation engine
+      command: >
+        /ganuda/amem_venv/bin/python
+        /ganuda/ansible/remediation/engine.py
+        --alert-id "{{ alert_id }}"
+        --severity "{{ severity }}"
+        --content "{{ alert_content }}"
+      register: engine_result
+      ignore_errors: yes
+
+    - name: Report engine result
+      debug:
+        msg: "Remediation engine returned: {{ engine_result.stdout | default('no output') }}"
+
+    - name: Log failure if engine errored
+      debug:
+        msg: "ENGINE FAILED: {{ engine_result.stderr }}"
+      when: engine_result.rc != 0

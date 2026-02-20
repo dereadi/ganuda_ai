@@ -1,0 +1,270 @@
+---
+# Cherokee AI Federation — Council Identity Accounts (Level 5 Autonomy)
+# Council Vote #49dd21edbcb19120 (Option C Hybrid, unanimous)
+# Kanban #1834
+#
+# Creates role-based FreeIPA accounts for Council Level 5 operations:
+#   - council           : shared routine ops (file writes, thermal memory, Telegram)
+#   - council-security  : Crawdad escalation (firewall, security scans)
+#   - council-deploy    : service deployment (wrapper scripts)
+#   - council-monitor   : Eagle Eye read-only (logs, metrics, health)
+#   - jr-executor       : Jr task execution (file writes, no sudo)
+#
+# Run: ansible-playbook -i inventory playbooks/council-identity-accounts.yaml -e ipaadmin_password=<PASSWORD>
+
+# ============================================================
+# Play 1: Create FreeIPA users and groups on silverfin
+# ============================================================
+- name: Create Council identity accounts in FreeIPA
+  hosts: freeipa
+  become: no
+  vars:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+  tasks:
+
+    # --- Users ---
+    - name: Create council user (shared routine operations)
+      freeipa.ansible_freeipa.ipauser:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: council
+        first: Cherokee
+        last: Council
+        shell: /bin/bash
+        homedir: /home/council
+        password: "{{ council_password | default('ChangeMe!2026') }}"
+        update_password: on_create
+        state: present
+
+    - name: Create council-security user (Crawdad escalation)
+      freeipa.ansible_freeipa.ipauser:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: council-security
+        first: Crawdad
+        last: Security
+        shell: /bin/bash
+        homedir: /home/council-security
+        password: "{{ council_security_password | default('ChangeMe!2026') }}"
+        update_password: on_create
+        state: present
+
+    - name: Create council-deploy user (service deployment)
+      freeipa.ansible_freeipa.ipauser:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: council-deploy
+        first: Council
+        last: Deploy
+        shell: /bin/bash
+        homedir: /home/council-deploy
+        password: "{{ council_deploy_password | default('ChangeMe!2026') }}"
+        update_password: on_create
+        state: present
+
+    - name: Create council-monitor user (Eagle Eye read-only)
+      freeipa.ansible_freeipa.ipauser:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: council-monitor
+        first: EagleEye
+        last: Monitor
+        shell: /bin/bash
+        homedir: /home/council-monitor
+        password: "{{ council_monitor_password | default('ChangeMe!2026') }}"
+        update_password: on_create
+        state: present
+
+    - name: Create jr-executor user (Jr task execution)
+      freeipa.ansible_freeipa.ipauser:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: jr-executor
+        first: Junior
+        last: Executor
+        shell: /bin/bash
+        homedir: /home/jr-executor
+        password: "{{ jr_executor_password | default('ChangeMe!2026') }}"
+        update_password: on_create
+        state: present
+
+    # --- Groups ---
+    - name: Create council-ops group (all council accounts)
+      freeipa.ansible_freeipa.ipagroup:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: council-ops
+        description: "Cherokee AI Council - all role accounts"
+        user:
+          - council
+          - council-security
+          - council-deploy
+          - council-monitor
+          - jr-executor
+        state: present
+
+    - name: Create council-privileged group (accounts with sudo access)
+      freeipa.ansible_freeipa.ipagroup:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: council-privileged
+        description: "Cherokee AI Council - privileged role accounts"
+        user:
+          - council-security
+          - council-deploy
+        state: present
+
+    # --- Sudo commands for council-deploy ---
+    # (ganuda-deploy-service and ganuda-service-ctl already registered from previous playbook)
+
+    - name: Create sudo rule for council-deploy (service management)
+      freeipa.ansible_freeipa.ipasudorule:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: council-deploy-services
+        description: "Allow council-deploy to manage federation services via wrapper scripts"
+        user:
+          - council-deploy
+        host:
+          - redfin.cherokee.local
+          - bluefin.cherokee.local
+          - greenfin.cherokee.local
+        allow_sudocmdgroup:
+          - ganuda-service-mgmt
+        runasuser:
+          - root
+        sudooption:
+          - "!authenticate"
+        state: present
+
+    # --- Sudo commands for council-security (firewall) ---
+    - name: Register nft command for sudo
+      freeipa.ansible_freeipa.ipasudocmd:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: /usr/sbin/nft
+        state: present
+
+    - name: Create sudo command group for security operations
+      freeipa.ansible_freeipa.ipasudocmdgroup:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: ganuda-security-ops
+        description: "Group for ganuda security/firewall commands"
+        sudocmd:
+          - /usr/sbin/nft
+        state: present
+
+    - name: Create sudo rule for council-security (firewall management)
+      freeipa.ansible_freeipa.ipasudorule:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: council-security-firewall
+        description: "Allow council-security to manage nftables firewall rules"
+        user:
+          - council-security
+        host:
+          - redfin.cherokee.local
+          - bluefin.cherokee.local
+          - greenfin.cherokee.local
+        allow_sudocmdgroup:
+          - ganuda-security-ops
+        runasuser:
+          - root
+        sudooption:
+          - "!authenticate"
+        state: present
+
+# ============================================================
+# Play 2: Prepare Linux nodes for council accounts
+# ============================================================
+- name: Prepare Linux nodes for Council accounts
+  hosts: linux
+  become: yes
+  tasks:
+
+    - name: Create /ganuda/council/ directory for Council workspace
+      file:
+        path: /ganuda/council/
+        state: directory
+        mode: '0770'
+        owner: root
+        group: root
+
+    - name: Create /ganuda/council/logs/ for audit trail
+      file:
+        path: /ganuda/council/logs/
+        state: directory
+        mode: '0770'
+        owner: root
+        group: root
+
+    - name: Create /ganuda/jr-workspace/ for Jr executor writes
+      file:
+        path: /ganuda/jr-workspace/
+        state: directory
+        mode: '0775'
+        owner: root
+        group: root
+
+    - name: Ensure council-ops group can write to /ganuda/council/
+      acl:
+        path: /ganuda/council/
+        entity: council-ops
+        etype: group
+        permissions: rwx
+        default: yes
+        state: present
+      ignore_errors: yes
+
+    - name: Ensure jr-executor can write to /ganuda/ tree
+      acl:
+        path: /ganuda/
+        entity: jr-executor
+        etype: user
+        permissions: rwx
+        default: yes
+        recursive: yes
+        state: present
+      ignore_errors: yes
+
+# ============================================================
+# Play 3: Verify accounts and sudo rules
+# ============================================================
+- name: Verify Council accounts on silverfin
+  hosts: freeipa
+  become: no
+  vars:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+  tasks:
+
+    - name: Verify all council users exist
+      freeipa.ansible_freeipa.ipauser:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: "{{ item }}"
+        state: present
+      loop:
+        - council
+        - council-security
+        - council-deploy
+        - council-monitor
+        - jr-executor
+      check_mode: yes
+      register: user_check
+
+    - name: Report user verification
+      debug:
+        msg: "All 5 Council accounts verified in FreeIPA"
+      when: user_check is not changed
+
+- name: Verify sudo propagation on Linux nodes
+  hosts: linux
+  become: yes
+  tasks:
+
+    - name: Check sudo rules for council-deploy
+      command: sudo -l -U council-deploy
+      register: deploy_sudo
+      ignore_errors: yes
+
+    - name: Check sudo rules for council-security
+      command: sudo -l -U council-security
+      register: security_sudo
+      ignore_errors: yes
+
+    - name: Report council-deploy sudo
+      debug:
+        msg: "{{ deploy_sudo.stdout | default('No rules found') }}"
+
+    - name: Report council-security sudo
+      debug:
+        msg: "{{ security_sudo.stdout | default('No rules found') }}"

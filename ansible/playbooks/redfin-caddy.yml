@@ -1,0 +1,41 @@
+---
+# Ansible playbook: Redfin Caddy default_bind for Tailscale coexistence
+# Run: ansible-playbook -i inventory /ganuda/ansible/playbooks/redfin-caddy.yml
+- name: Configure redfin Caddy with Tailscale coexistence
+  hosts: redfin
+  become: yes
+  tasks:
+    - name: Ensure Caddy is installed
+      apt:
+        name: caddy
+        state: present
+
+    - name: Deploy Caddyfile with default_bind
+      copy:
+        src: /ganuda/ansible/files/redfin-Caddyfile
+        dest: /etc/caddy/Caddyfile
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload caddy
+
+    - name: Ensure Caddy is running
+      systemd:
+        name: caddy
+        enabled: yes
+        state: started
+
+    - name: Validate Caddy config
+      command: caddy validate --config /etc/caddy/Caddyfile
+      register: caddy_validate
+      changed_when: false
+
+    - name: Show validation result
+      debug:
+        var: caddy_validate.stdout
+
+  handlers:
+    - name: reload caddy
+      systemd:
+        name: caddy
+        state: reloaded

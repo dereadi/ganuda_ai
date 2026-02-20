@@ -1,0 +1,90 @@
+---
+- name: Distribute wrapper scripts to all Linux nodes
+  hosts: linux
+  become: yes
+  tasks:
+    - name: Copy ganuda-deploy-service to /usr/local/bin/
+      copy:
+        src: /ganuda/scripts/ganuda-deploy-service
+        dest: /usr/local/bin/ganuda-deploy-service
+        mode: '0755'
+        owner: root
+        group: root
+
+    - name: Copy ganuda-service-ctl to /usr/local/bin/
+      copy:
+        src: /ganuda/scripts/ganuda-service-ctl
+        dest: /usr/local/bin/ganuda-service-ctl
+        mode: '0755'
+        owner: root
+        group: root
+
+    - name: Ensure /ganuda/logs/ directory exists
+      file:
+        path: /ganuda/logs/
+        state: directory
+        mode: '0755'
+        owner: dereadi
+        group: dereadi
+
+- name: Configure FreeIPA sudo rules on silverfin
+  hosts: freeipa
+  become: no
+  vars:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+  tasks:
+    - name: Register sudo commands
+      freeipa.ansible_freeipa.ipasudocmd:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: "{{ item }}"
+        state: present
+      loop:
+        - /usr/local/bin/ganuda-deploy-service
+        - /usr/local/bin/ganuda-service-ctl
+
+    - name: Create sudo command group
+      freeipa.ansible_freeipa.ipasudocmdgroup:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: ganuda-service-mgmt
+        description: "Group for ganuda service management commands"
+        sudocmd:
+          - /usr/local/bin/ganuda-deploy-service
+          - /usr/local/bin/ganuda-service-ctl
+        state: present
+
+    - name: Create sudo rule
+      freeipa.ansible_freeipa.ipasudorule:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: ganuda-service-management
+        description: "Allow dereadi to deploy and manage federation services via validated wrapper scripts"
+        user:
+          - dereadi
+        host:
+          - redfin.cherokee.local
+          - bluefin.cherokee.local
+          - greenfin.cherokee.local
+        allow_sudocmdgroup:
+          - ganuda-service-mgmt
+        runasuser:
+          - root
+        sudooption:
+          - "!authenticate"
+        state: present
+
+- name: Verify sudo rules on Linux nodes
+  hosts: linux
+  become: yes
+  tasks:
+    - name: Check sudo rules for dereadi
+      command: sudo -l -U dereadi
+      register: sudo_rules
+
+    - name: Assert sudo rules contain ganuda-deploy-service and ganuda-service-ctl
+      assert:
+        that:
+          - "'/usr/local/bin/ganuda-deploy-service' in sudo_rules.stdout"
+          - "'/usr/local/bin/ganuda-service-ctl' in sudo_rules.stdout"
+
+    - name: Debug print verified rules
+      debug:
+        msg: "{{ sudo_rules.stdout }}"

@@ -1,0 +1,41 @@
+---
+# Cherokee AI Federation — Smoke Test All Nodes
+# Run: ansible-playbook playbooks/smoke-test.yml
+# Quick validation that all nodes are reachable and configured
+- name: Federation smoke test
+  hosts: all
+  gather_facts: yes
+
+  tasks:
+    - name: Ping check
+      ping:
+
+    - name: Report basic info
+      debug:
+        msg: >-
+          {{ inventory_hostname }} |
+          OS: {{ ansible_distribution | default('unknown') }} {{ ansible_distribution_version | default('') }} |
+          Python: {{ ansible_python_version | default('unknown') }} |
+          RAM: {{ ansible_memtotal_mb | default('unknown') }}MB |
+          Role: {{ node_role | default('unassigned') }}
+
+    - name: Check ganuda directory
+      stat:
+        path: "{{ ganuda_base_path }}"
+      register: ganuda_dir
+
+    - name: Report ganuda status
+      debug:
+        msg: "{{ ganuda_base_path }}: {{ 'EXISTS' if ganuda_dir.stat.exists else 'MISSING' }}"
+
+    - name: Check database connectivity (Linux only)
+      command: "pg_isready -h {{ db_host | default('192.168.132.222') }} -p 5432"
+      register: db_check
+      changed_when: false
+      ignore_errors: yes
+      when: ansible_system == 'Linux'
+
+    - name: Report database status
+      debug:
+        msg: "PostgreSQL: {{ db_check.stdout | default('N/A') }}"
+      when: ansible_system == 'Linux'

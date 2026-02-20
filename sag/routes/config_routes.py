@@ -1,0 +1,70 @@
+"""Configuration management routes for SAG.
+Shows service health and whether env vars are configured (NOT their values)."""
+import os
+import socket
+from flask import Blueprint, jsonify, render_template
+
+config_bp = Blueprint("config", __name__)
+
+SERVICES = [
+    {"name": "LLM Gateway", "node": "redfin", "host": "192.168.132.223", "port": 8080},
+    {"name": "vLLM", "node": "redfin", "host": "192.168.132.223", "port": 8000},
+    {"name": "VLM Adapter", "node": "bluefin", "host": "192.168.132.222", "port": 8092},
+    {"name": "VLM vLLM", "node": "bluefin", "host": "192.168.132.222", "port": 8090},
+    {"name": "Kanban Board", "node": "redfin", "host": "192.168.132.223", "port": 3001},
+    {"name": "SAG Unified", "node": "redfin", "host": "192.168.132.223", "port": 4000},
+]
+
+ENV_VARS = [
+    {"name": "CHEROKEE_DB_PASS", "source": "secrets.env"},
+    {"name": "CAMERA_OFFICE_PII_PASSWORD", "source": "secrets.env"},
+    {"name": "CAMERA_TRAFFIC_PASSWORD", "source": "secrets.env"},
+    {"name": "CAMERA_GARAGE_PASSWORD", "source": "secrets.env"},
+    {"name": "CHEROKEE_API_KEY", "source": "secrets.env"},
+]
+
+
+def check_port(host: str, port: int, timeout: int = 2) -> bool:
+    """Check if a port is open on a given host."""
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.settimeout(timeout)
+            result = sock.connect_ex((host, port))
+            return result == 0
+    except Exception:
+        return False
+
+
+@config_bp.route("/config")
+def config_page() -> str:
+    """Render the configuration management page."""
+    return render_template("config_management.html")
+
+
+@config_bp.route("/api/config/services")
+def api_services() -> dict:
+    """Return the health status of all services."""
+    results = [
+        {
+            "name": svc["name"],
+            "node": svc["node"],
+            "port": svc["port"],
+            "healthy": check_port(svc["host"], svc["port"]),
+        }
+        for svc in SERVICES
+    ]
+    return jsonify({"services": results})
+
+
+@config_bp.route("/api/config/env-status")
+def api_env_status() -> dict:
+    """Return the status of all environment variables."""
+    results = [
+        {
+            "name": var["name"],
+            "is_set": bool(os.environ.get(var["name"])),
+            "source": var["source"],
+        }
+        for var in ENV_VARS
+    ]
+    return jsonify({"variables": results})

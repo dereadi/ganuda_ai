@@ -1,0 +1,33 @@
+# Approved External Packages
+# All packages here have passed security audit per GITHUB-SECURITY-AUDIT-PROTOCOL.md
+# Format: package_name: {audit_date, audit_hash, auditor, tier, notes}
+
+approved:
+  # Example entry (none approved yet - protocol just established)
+  # moltbook-mcp:
+  #   audit_date: 2026-02-XX
+  #   audit_hash: <council_vote_hash>
+  #   auditor: crawdad_jr
+  #   tier: 3
+  #   notes: "Full audit completed, approved for redfin installation"
+
+pending_audit:
+  moltbook-mcp:
+    repository: https://github.com/terminalcraft/moltbook-mcp
+    requested_date: 2026-02-04
+    requested_by: tpm
+    jr_task: 585
+    tier: 3  # >1000 lines, MCP server with API access
+    status: awaiting_audit
+    council_vote_hash: 1fbe7767c0b0babc
+    notes: "Council raised 5 concerns. Full audit required before installation."
+
+reference_only:
+  # These are study materials - algorithms to learn from, NOT code to install
+  stereo-vision-camera:
+    repository: https://github.com/AlexJinlei/Stereo_Vision_Camera
+    added_date: 2026-02-04
+    purpose: "Algorithm reference for stereo calibration and depth calculation"
+    status: approved_for_study
+    notes: "68 stars, mature (2018), no network calls. USB capture code not applicable - we use RTSP. Study their OpenCV stereo math only."
+    jr_task: 589

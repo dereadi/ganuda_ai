@@ -1,0 +1,40 @@
+---
+# Cherokee AI Federation — Greenfin (Edge LB / Monitoring)
+# IP: 192.168.132.224
+
+hostname: greenfin
+node_role: edge_monitoring
+
+# Monitoring stack
+openobserve_port: 5080
+openobserve_grpc_port: 5081
+promtail_port: 9080
+
+# Embedding service
+embedding_service_port: 8003
+embedding_model: "BAAI/bge-large-en-v1.5"
+embedding_dimensions: 1024
+
+# Camera tunnel (garage cam NAT)
+camera_tunnel_enabled: true
+camera_nat_rules:
+  - { external_port: 18080, internal_ip: "10.0.0.123", internal_port: 80, comment: "Garage cam HTTP" }
+  - { external_port: 10554, internal_ip: "10.0.0.123", internal_port: 554, comment: "Garage cam RTSP" }
+
+# Services managed on this node
+managed_services:
+  - cherokee-embedding
+  - cherokee-thermal-purge
+  - promtail
+  - openobserve
+
+# Firewall
+nftables_config: nftables-greenfin.conf
+firewall_open_ports:
+  internal:
+    - { port: 5080, proto: tcp, comment: "OpenObserve UI" }
+    - { port: 5081, proto: tcp, comment: "OpenObserve gRPC" }
+    - { port: 9080, proto: tcp, comment: "Promtail" }
+    - { port: 8003, proto: tcp, comment: "Embedding Server" }
+    - { port: 18080, proto: tcp, comment: "Camera HTTP tunnel" }
+    - { port: 10554, proto: tcp, comment: "Camera RTSP tunnel" }

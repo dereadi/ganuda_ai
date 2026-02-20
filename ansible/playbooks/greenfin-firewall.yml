@@ -1,0 +1,41 @@
+---
+# Ansible playbook: Greenfin nftables firewall persistence
+# Run: ansible-playbook -i inventory /ganuda/ansible/playbooks/greenfin-firewall.yml
+- name: Configure greenfin nftables firewall
+  hosts: greenfin
+  become: yes
+  tasks:
+    - name: Ensure nftables is installed
+      apt:
+        name: nftables
+        state: present
+
+    - name: Deploy nftables ruleset
+      copy:
+        src: /ganuda/ansible/files/greenfin-nftables.conf
+        dest: /etc/nftables.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: restart nftables
+
+    - name: Enable nftables service
+      systemd:
+        name: nftables
+        enabled: yes
+        state: started
+
+    - name: Verify forwarding rules active
+      command: nft list ruleset
+      register: nft_output
+      changed_when: false
+
+    - name: Show active rules
+      debug:
+        var: nft_output.stdout_lines
+
+  handlers:
+    - name: restart nftables
+      systemd:
+        name: nftables
+        state: restarted

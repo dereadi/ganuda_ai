@@ -1,0 +1,4 @@
+# Council Security (Crawdad) - firewall management
+# FreeIPA sudo rules don't propagate to bluefin (sudo-rs 0.2.8)
+# Kanban #1834, Council Vote #49dd21edbcb19120
+council-security ALL=(root) NOPASSWD: /usr/sbin/nft

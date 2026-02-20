@@ -1,0 +1,29 @@
+async function processFrame(framePath, cameraId) {
+    const response = await fetch('http://192.168.132.222:8093/v1/optic/process', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            frame_path: framePath,
+            camera_id: cameraId
+        })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+        displayEntities(result.entities_found, result.entity_memory_ids);
+        displayRelationships(result.relationships_found, result.relationship_ids);
+
+        if (result.anomaly_detected) {
+            showAnomalyAlert(result);
+        }
+
+        if (result.escalated_to_brain) {
+            showEscalationBadge();
+        }
+    } else {
+        showError(result.error);
+    }
+
+    return result;
+}

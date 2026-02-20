@@ -1,0 +1,21 @@
+[linux]
+redfin ansible_host=192.168.132.223 ansible_user=dereadi ansible_ssh_extra_args='-o ProxyCommand=none'
+bluefin ansible_host=192.168.132.222 ansible_user=dereadi ansible_ssh_extra_args='-o ProxyCommand=none'
+greenfin ansible_host=192.168.132.224 ansible_user=dereadi ansible_ssh_extra_args='-o ProxyCommand=none'
+
+[macos]
+sasass ansible_host=192.168.132.241 ansible_user=dereadi
+sasass2 ansible_host=192.168.132.242 ansible_user=dereadi
+bmasass ansible_host=192.168.132.21 ansible_user=dereadi
+thunderduck ansible_host=TBD ansible_user=dereadi
+tpm-macbook ansible_host=127.0.0.1 ansible_user=dereadi ansible_connection=local
+
+[gpu_nodes]
+redfin
+bluefin
+
+[freeipa]
+silverfin ansible_host=silverfin ansible_user=dereadi ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p dereadi@192.168.132.224 -o ProxyCommand=none"'
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3

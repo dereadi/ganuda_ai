@@ -1,0 +1,18 @@
+---
+# Cherokee AI Federation — thunderduck (M4 Max 128GB, 16-core CPU / 40-core GPU / 1TB)
+# IP: TBD (assign on arrival)
+# GOVERNANCE: Council-dedicated hardware. The 7 Specialists control this node.
+
+hostname: thunderduck
+node_role: council_compute
+ansible_become_method: sudo
+
+# MLX Services (to be configured after arrival)
+mlx_deepseek_port: 8800
+mlx_deepseek_model: "mlx-community/DeepSeek-R1-Distill-Qwen-32B-4bit"
+
+# launchd services
+managed_launchd_services: []
+
+# Munki
+munki_client_enabled: true

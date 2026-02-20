@@ -1,0 +1,33 @@
+TO: hussein@arcimus.com
+SUBJECT: Darrell Reading — Systems Architect Dossier + Jane Street Puzzle (Solved)
+ATTACHMENT: /ganuda/docs/Darrell_Reading_Systems_Architect_Dossier_v8.pdf
+
+---
+
+Hussein,
+
+Good to reconnect. Wanted to share two things with you:
+
+1. My latest dossier (attached) — the Systems Architect version covers everything from 30+ years at Walmart through the sovereign AI federation I've been building at home. Six nodes, 7-specialist AI council, 80,000+ thermal memories, 750+ autonomous Jr tasks completed.
+
+2. We solved the Jane Street ML puzzle (Track 2) — this was a permutation recovery problem: reassemble 97 neural network pieces into 48 residual blocks, verified by SHA256 hash. The public benchmark was MSE 0.0145. We hit MSE 0.0000000000 (exact match, SHA256 verified) using a distributed compute fleet across 6 nodes.
+
+The key breakthrough was discovering "DNA tumbler" positions — groups of three blocks that only produce correct output when all three rotate simultaneously. Simulated annealing (single swaps) got stuck at MSE 0.00275. We broke through with 3-opt rotations testing all C(48,3)=17,296 three-way moves. Three rotations later: solved.
+
+Techniques that worked:
+- Trace pairing: trace(W_out @ W_inp) via Hungarian assignment gave 38/48 correct matches as initial seed
+- Distributed SA with PostgreSQL pool sharing across 5 nodes (Apple Silicon 2.4-2.8x faster than Intel/AMD per-thread)
+- Uncertain position enumeration: analyzing disagreement across top-N solutions to break SA basins
+- 3-opt rotations for the endgame
+
+The whole thing was orchestrated by the Cherokee AI Federation — the same council that deliberates on architecture decisions, reviews Jr task instructions, and manages infrastructure. The puzzle was a stress test of the distributed compute and coordination architecture.
+
+Happy to chat more about any of it. Let me know if Arcimus has anything interesting brewing.
+
+Best,
+Darrell
+
+--
+Darrell E Reading II
+Systems Architect | Distributed AI Builder
+dereadi@gmail.com | ganuda.us

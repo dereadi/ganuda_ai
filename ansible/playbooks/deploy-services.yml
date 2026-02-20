@@ -1,0 +1,77 @@
+---
+# Cherokee AI Federation — Deploy systemd services per node
+# Run: ansible-playbook playbooks/deploy-services.yml
+# Run for specific node: ansible-playbook playbooks/deploy-services.yml --limit redfin
+- name: Deploy federation systemd services
+  hosts: linux
+  become: yes
+
+  tasks:
+    - name: Find service files for this node
+      find:
+        paths: "{{ ganuda_services_path }}"
+        patterns: "*.service,*.timer"
+      register: service_files
+
+    - name: Build list of services to deploy
+      set_fact:
+        services_to_deploy: >-
+          {{ service_files.files | selectattr('path', 'search', item + '\\.') | list }}
+      loop: "{{ managed_services | default([]) }}"
+      register: service_matches
+
+    - name: Deploy service files
+      copy:
+        src: "{{ ganuda_services_path }}/{{ item }}.service"
+        dest: "/etc/systemd/system/{{ item }}.service"
+        owner: root
+        group: root
+        mode: "0644"
+        remote_src: yes
+      loop: "{{ managed_services | default([]) }}"
+      register: services_deployed
+      ignore_errors: yes
+      notify: reload systemd
+
+    - name: Deploy timer files (if they exist)
+      copy:
+        src: "{{ ganuda_services_path }}/{{ item }}.timer"
+        dest: "/etc/systemd/system/{{ item }}.timer"
+        owner: root
+        group: root
+        mode: "0644"
+        remote_src: yes
+      loop: "{{ managed_services | default([]) }}"
+      ignore_errors: yes
+      notify: reload systemd
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+      when: services_deployed.changed | default(false)
+
+    - name: Enable and start services
+      systemd:
+        name: "{{ item }}.service"
+        enabled: yes
+        state: started
+      loop: "{{ managed_services | default([]) }}"
+      ignore_errors: yes
+
+    - name: Report service status
+      command: "systemctl is-active {{ item }}.service"
+      loop: "{{ managed_services | default([]) }}"
+      register: service_status
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Show service status summary
+      debug:
+        msg: "{{ item.item }}: {{ item.stdout | default('unknown') }}"
+      loop: "{{ service_status.results }}"
+      when: service_status is defined
+
+  handlers:
+    - name: reload systemd
+      systemd:
+        daemon_reload: yes

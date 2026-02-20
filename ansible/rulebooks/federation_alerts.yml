@@ -1,0 +1,44 @@
+---
+# Cherokee AI Federation — Event-Driven Ansible Rulebook
+# Listens on PostgreSQL NOTIFY channel 'federation_alerts'
+# and dispatches to the remediation engine.
+#
+# Run: ansible-rulebook --rulebook rulebooks/federation_alerts.yml -i rulebooks/inventory.yml
+#
+# Requires: pip install ansible-rulebook psycopg2-binary
+
+- name: Federation Self-Healing Alert Handler
+  hosts: all
+  sources:
+    - ansible.eda.pg_listener:
+        host: 192.168.132.222
+        port: 5432
+        dbname: zammad_production
+        user: claude
+        channels:
+          - federation_alerts
+
+  rules:
+    - name: High-temperature alert — service failure pattern
+      condition: event.payload.temperature >= 0.9
+      action:
+        run_playbook:
+          name: remediation/triage_alert.yml
+          extra_vars:
+            alert_id: "{{ event.payload.id }}"
+            alert_content: "{{ event.payload.content_preview }}"
+            alert_temperature: "{{ event.payload.temperature }}"
+            alert_sacred: "{{ event.payload.sacred }}"
+            severity: critical
+
+    - name: Elevated alert — config drift or degradation
+      condition: event.payload.temperature >= 0.8 and event.payload.temperature < 0.9
+      action:
+        run_playbook:
+          name: remediation/triage_alert.yml
+          extra_vars:
+            alert_id: "{{ event.payload.id }}"
+            alert_content: "{{ event.payload.content_preview }}"
+            alert_temperature: "{{ event.payload.temperature }}"
+            alert_sacred: "{{ event.payload.sacred }}"
+            severity: elevated

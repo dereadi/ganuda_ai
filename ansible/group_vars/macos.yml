@@ -1,0 +1,24 @@
+---
+# Cherokee AI Federation — macOS Node Group Variables
+ganuda_base_path: /Users/Shared/ganuda
+ganuda_config_path: /Users/Shared/ganuda/config
+ganuda_scripts_path: /Users/Shared/ganuda/scripts
+
+# Package management
+package_manager: homebrew
+common_packages:
+  - python3
+  - git
+  - curl
+  - jq
+  - htop
+  - postgresql@16
+  - rsync
+
+# Service management
+service_manager: launchd
+launchd_plist_path: /Library/LaunchDaemons
+
+# Munki
+munki_client_enabled: true
+munki_repo_url: "http://192.168.132.242:8080"

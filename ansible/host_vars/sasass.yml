@@ -1,0 +1,20 @@
+---
+# Cherokee AI Federation — sasass (M4 Max 128GB, bmasass)
+# IP: 192.168.132.241 (also known as bmasass)
+
+hostname: sasass
+node_role: mobile_edge
+ansible_become_method: sudo
+
+# MLX Services
+mlx_deepseek_port: 8800
+mlx_deepseek_model: "mlx-community/DeepSeek-R1-Distill-Qwen-32B-4bit"
+mlx_qwen_port: 8801
+mlx_qwen_model: "mlx-community/Qwen2.5-1.5B-Instruct-4bit"
+
+# launchd services
+managed_launchd_services:
+  - com.cherokee.mlx-deepseek-r1
+
+# Munki
+munki_client_enabled: true

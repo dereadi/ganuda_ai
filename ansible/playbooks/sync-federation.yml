@@ -1,0 +1,66 @@
+---
+# Cherokee AI Federation — Sync common files and packages across Linux nodes
+# Run: ansible-playbook playbooks/sync-federation.yml
+- name: Sync federation common configuration
+  hosts: linux
+  become: yes
+
+  tasks:
+    - name: Ensure common packages installed
+      apt:
+        name: "{{ common_packages }}"
+        state: present
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Ensure ganuda directory exists
+      file:
+        path: "{{ ganuda_base_path }}"
+        state: directory
+        owner: dereadi
+        group: dereadi
+        mode: "0755"
+
+    - name: Ensure log directory exists
+      file:
+        path: /var/log/ganuda
+        state: directory
+        owner: dereadi
+        group: dereadi
+        mode: "0755"
+
+    - name: Sync ganuda config directory
+      synchronize:
+        src: "{{ ganuda_config_path }}/"
+        dest: "{{ ganuda_config_path }}/"
+        rsync_opts:
+          - "--include=*.yml"
+          - "--include=*.yaml"
+          - "--include=*.conf"
+          - "--exclude=*"
+      delegate_to: "{{ inventory_hostname }}"
+      when: inventory_hostname != 'redfin'
+
+    - name: Ensure fail2ban is configured
+      copy:
+        src: "{{ ganuda_config_path }}/fail2ban-action-telegram.conf"
+        dest: /etc/fail2ban/action.d/telegram.conf
+        owner: root
+        group: root
+        mode: "0644"
+        remote_src: yes
+      notify: restart fail2ban
+      when: fail2ban_enabled | default(true)
+
+    - name: Enable fail2ban
+      systemd:
+        name: fail2ban
+        enabled: yes
+        state: started
+      when: fail2ban_enabled | default(true)
+
+  handlers:
+    - name: restart fail2ban
+      systemd:
+        name: fail2ban
+        state: restarted

@@ -1,0 +1,11 @@
+{
+  "audit_hash": "5876ffd6133feec6",
+  "question": "Long Man Development: Diffusion LLMs (Inception Mercury, LLaDA)",
+  "recommendation": "REVIEW REQUIRED: 5 concerns",
+  "confidence": 0.793,
+  "concerns": ["Raven: STRATEGY CONCERN", "Gecko: PERF CONCERN", "Peace Chief: CONSENSUS NEEDED", "Turtle: 7GEN CONCERN", "Crawdad: SECURITY CONCERN"],
+  "consensus": "Diffusion LLMs show promise in reducing per-request latency through non-autoregressive generation. However, early stage and lack of vLLM compatibility make them more suitable for tracking as research rather than immediate implementation.",
+  "coyote": "A circle of agreement may just be walking in circles.",
+  "response_time_ms": 6482,
+  "timestamp": "2026-02-10T15:49:35Z"
+}

@@ -1,0 +1,3340 @@
+MEETING TRANSCRIPT: AI, VetAssist, etc
+Date: February 19, 2026 11:52 CST
+Transcription time: 179s
+================================================================================
+
+[00:00:00] so i can stop recording for that can you dot daisy chain um uh yes so that was one of the
+[00:00:07] things that it mentioned um was that you can do like a ring network topography but yeah well kind
+[00:00:16] of um but basically where i have one connected to two two connected to three three connected to four
+[00:00:22] and four connected to one um which then the only thing that it that adds is the farthest
+[00:00:29] a packet may have to travel is over an additional hop because pretty much everyone has a peer but if
+[00:00:36] four has to talk to two it has to go through either one or three but realistically there's nothing on
+[00:00:44] the mso2 ultra that i need to have high speed low latency network traffic to
+[00:00:50] so i only need the three nodes to talk high speed low latency so that's why i'm going to move the
+[00:00:55] card over and then just get two additional yeah which you saw me i just bought it'll be here in a
+[00:01:02] couple days um i hope i'll look at it later um anyway so but yeah let's see let's talk about the
+[00:01:13] clustering or two blah okay so it wasn't in this conversation so i was talking to him about open
+[00:01:18] source uh voice models because like are you guys aware of nvidia's new voice thing let's see
+[00:01:26] hugging face models where's that it was right here nvidia persona plex have you guys heard about that
+[00:01:34] thing yeah so persona plex is apparent well i watched demo videos and people doing reviews on it so
+[00:01:43] persona plex is one of the first audio models that does multimodal audio so it listens while it's able
+[00:01:55] to talk so you can have an actual real-time conversation with this thing and you it can be
+[00:02:02] talking to you and then you can interrupt it by saying something and it will go oh you know and
+[00:02:06] it'll give natural voice responses like the filler words like um uh you know so if it's thinking it'll
+[00:02:12] it'll actually throw those filler words in there more more like natural language yeah what i would
+[00:02:17] love to be able to do is use that but have it tied into the bigger model so that when i ask it a
+[00:02:25] question that that it might need to actually do some thinking and research on it'll just call the bigger
+[00:02:31] model to do the thinking or research and then get the reply back and then read it to me so it's more of a
+[00:02:37] natural language like i'm just sitting here having a conversation with it and i'm like i wonder what
+[00:02:43] the biggest you know city in denmark is and he'll be like i don't know i'll look it up real quick and
+[00:02:49] send the query to the bigger model which does the online research and then it returns the results back
+[00:02:54] and then it read it back to me kind of thing because stt and tts are so slow that it's kind of a pain in the
+[00:03:03] ass because you have to wait for it to train you know you know speech to text do the query and then
+[00:03:08] text to speech is what really takes the longest but this is fast like it's real time and especially
+[00:03:17] like on a 50 90 like what i have which this can run on so you're running that in lm studio or what
+[00:03:23] are you i'm not yet i haven't started playing with this but i want to
+[00:03:26] because then i can integrate this if i can figure out how to integrate this into other things then i can
+[00:03:34] integrate it into n1 you know n8n to say hey can you execute this workflow for me or whatever and
+[00:03:40] it'll be like all right i've kicked that off you know whatever i don't know i just it seems like a cool
+[00:03:47] opportunity for something but i don't know how to integrate that kind of thing into those things
+[00:03:52] yeah like i like i don't even know if i can run this in lm studio because as far as i know lm studio
+[00:03:59] itself doesn't have audio capabilities
+[00:04:02] yeah you might have to run it through something like open web ui or something
+[00:04:10] well so open web ui has its own built-in uh faster whisper but that's just text to speech speech to text
+[00:04:18] yeah it's not this
+[00:04:21] matter of fact let me go to jill
+[00:04:25] oh i already have open web ui here yep there it is
+[00:04:30] oh come on
+[00:04:36] so if i go in open web ui audio let me share my screen again so you can watch
+[00:04:49] screen one so that's screen one that one okay yeah
+[00:04:56] all right so in open web ui go into settings
+[00:05:03] um so speech it speech to text engine is base
+[00:05:12] um
+[00:05:14] settings saved download
+[00:05:19] oh the model that's the model so text to speech is tts voice but what
+[00:05:26] web api i guess i could do transformers and then that thing
+[00:05:30] yeah so it's speech to text it's going to use its faster whisper
+[00:05:36] open web ui uses faster whisper internally
+[00:05:40] so i don't think i can set up
+[00:05:44] a different engine or model for it
+[00:05:47] i wonder if there's like an extension that might let you do it or you might have to build one i don't know
+[00:05:53] let's see i don't know how to do that
+[00:05:56] like i know it's god assistant
+[00:05:59] i'm working on it like right now i'm trying i want to get the i want quin 3.5
+[00:06:05] because quin 3.5 has an integrated visual language uh library you know model functionality so
+[00:06:12] it's great for coding good for conversation and does visual like i want an all-in-one model i don't want to keep switching between models depending on what i do
+[00:06:20] and so quin 3.5
+[00:06:23] if i go down to a one-bit quant i can fit it on a single node
+[00:06:28] but ultimately i need the four-bit
+[00:06:31] but four-bit isn't officially released yet
+[00:06:34] there is a four-bit gguf version
+[00:06:38] you know so i can run that in lm studio but for vllm there's no four-bit safe tensor version
+[00:06:44] but i also need to finish i need to fix and clean up my image pipeline
+[00:06:52] um so i'm using comfy ui but comfy ui is being wonky right now
+[00:06:56] but i also need to include in the workflow that i'm using here
+[00:07:00] to clear memory and cache so that it unloads the model after it's done
+[00:07:05] because right now um comfy ui when it loads the model it keeps it in memory
+[00:07:10] so i need to include clearing and unloading the model
+[00:07:14] but if i'm conversationally generating images
+[00:07:17] i'd kind of want it to be in memory longer
+[00:07:21] oh yeah
+[00:07:22] right
+[00:07:22] um
+[00:07:24] or i need to figure out how to tell comfy
+[00:07:27] that if a model hasn't been used for x amount of time then unloaded
+[00:07:32] but again
+[00:07:34] so when you're using comfy ui with open web ui
+[00:07:39] um do you like build your workflow
+[00:07:42] in comfy ui and then you tell
+[00:07:45] uh
+[00:07:46] so the way it works is you use it
+[00:07:48] so i have to actually
+[00:07:49] build the workflow in comfy ui
+[00:07:52] and then export it as an api json
+[00:07:55] and then i quite literally upload it here
+[00:07:59] so this is the json format of the workflow
+[00:08:02] and then when
+[00:08:04] when comfy ui or when open web ui sends the request
+[00:08:08] to comfy
+[00:08:09] it includes the workflow it wants to run
+[00:08:12] so i can change all my settings here
+[00:08:15] like how many steps
+[00:08:16] what the cfg is
+[00:08:17] what the sampler type is
+[00:08:19] scheduler
+[00:08:19] um
+[00:08:20] and then you know here
+[00:08:22] this node six is the actual input prompt
+[00:08:26] um
+[00:08:27] like if i want to change
+[00:08:29] uh
+[00:08:30] here's the file name prefix of the output file name
+[00:08:33] um
+[00:08:35] here's you know what the
+[00:08:37] image generating model
+[00:08:40] i use is
+[00:08:41] so i can choose whether it's
+[00:08:42] you know z image
+[00:08:43] i like z image turbo the best
+[00:08:45] like of all the models i've tried
+[00:08:47] and i've got hundreds of models
+[00:08:49] um
+[00:08:50] um
+[00:08:50] z image turbo
+[00:08:51] you can do anything with
+[00:08:53] like everything that i've been doing with stable diffusion
+[00:08:55] or sd1
+[00:08:56] or sd1.5
+[00:08:57] pony illustrious
+[00:08:59] and um
+[00:09:00] even like flux
+[00:09:01] z image turbo blows them out of the water
+[00:09:04] um
+[00:09:06] um
+[00:09:07] but i'm also using a specific vae file
+[00:09:10] so ultra flux just provides more
+[00:09:13] detail
+[00:09:15] in the image
+[00:09:16] versus
+[00:09:17] non-flux
+[00:09:18] um
+[00:09:21] yeah no so it's like
+[00:09:23] so the one thing i'm missing
+[00:09:25] is the the nodes that clear memory and cache
+[00:09:28] and unload the model
+[00:09:29] which i should do
+[00:09:30] but the problem
+[00:09:32] the problem is
+[00:09:33] is when i'm working with this
+[00:09:35] um
+[00:09:35] like old man fishing
+[00:09:37] let's go to the top of this
+[00:09:38] this this was a good example of how i
+[00:09:40] play with images in chat
+[00:09:42] i'm like hey we're going to be building
+[00:09:44] prompts for stable diffusion image
+[00:09:46] using z image turbo
+[00:09:47] he's like cool
+[00:09:48] what do you want to do
+[00:09:48] and i said i think we should describe the image as an oil painting
+[00:09:52] i'd like there to be depth to the colors and textures
+[00:09:54] or i'd like to start with a weathered old man sitting on a dock fishing in a pond
+[00:09:58] right like that's what i told it to start with
+[00:09:59] um
+[00:10:01] and i said i want there to be depth in the colors and textures from the brush strokes
+[00:10:04] like i want to see actual oil painting brush strokes
+[00:10:07] yeah
+[00:10:08] and so he gave me a prompt
+[00:10:11] and
+[00:10:12] he explained it to me
+[00:10:14] and i said cool
+[00:10:15] please respond with the only with the prompt
+[00:10:18] and so it gave me the prompt
+[00:10:20] and then i have a button right here that i click generate
+[00:10:24] and generate
+[00:10:24] sends the request over to comfy ui
+[00:10:27] and returns back
+[00:10:28] with the image
+[00:10:29] so this is the image that it first came up with
+[00:10:31] and it's cool
+[00:10:32] 
+[00:10:32] you can actually see brush strokes and everything else
+[00:10:34] um
+[00:10:36] and i was like well i want it to be a little more dark and gloomy
+[00:10:40] and so it gave me this one
+[00:10:43] and so i'm doing these fairly quickly back to back to back
+[00:10:48] now if i don't clear cache memory
+[00:10:51] then it produces these in like
+[00:10:53] like i think it's less than five seconds
+[00:10:56] um
+[00:10:58] but if i unload the model and reload the model every time
+[00:11:02] then that's going to add
+[00:11:04] 30 seconds to each generation
+[00:11:06] yeah
+[00:11:07] now going back to um
+[00:11:11] can't you uh
+[00:11:13] can't you have those hot though
+[00:11:16] hot swaps
+[00:11:17] well remember so my video card
+[00:11:21] the the the rtx 5090 only has 32
+[00:11:25] because 32 gigs of ram
+[00:11:26] yeah
+[00:11:28] um
+[00:11:29] which is not a small amount
+[00:11:30] but
+[00:11:31] it's still a limiting factor
+[00:11:33] you know
+[00:11:34] unlike on my amd machines
+[00:11:35] where i've got 128 gigs of
+[00:11:37] you know potential vram that i can play with
+[00:11:39] i don't mind having a model loaded there
+[00:11:42] even if it takes a little bit longer to generate
+[00:11:45] because it's not quite as fast as the 5090
+[00:11:47] but i don't mind if i just leave a model in memory there
+[00:11:51] because i have plenty of headroom to do other things
+[00:11:54] um
+[00:11:56] the only time i run out of memory on
+[00:11:59] the s1s is when i'm like running gpt oss 120b
+[00:12:04] which consumes almost the whole box
+[00:12:07] but if i do anything
+[00:12:10] 80b or less
+[00:12:12] i've got plenty of headroom to even do image generation with as well
+[00:12:16] um
+[00:12:18] how fast is 120b on those
+[00:12:21] fast
+[00:12:22] well so
+[00:12:22] uh
+[00:12:24] if i'm using gpt oss 20b
+[00:12:26] i get like 50 plus tokens per second
+[00:12:29] but with the 120b i average
+[00:12:31] 20 to 30
+[00:12:33] which is still
+[00:12:34] more than
+[00:12:36] more than happy with
+[00:12:37] because i find that anything less than 20 tokens per second
+[00:12:43] i'm reading faster than it can write
+[00:12:45] but 20 tokens per second
+[00:12:47] i i can keep as it's writing i'm keeping up with it
+[00:12:52] you know
+[00:12:53] otherwise i gotta walk away
+[00:12:55] just walk away
+[00:12:56] walk away come back and read it
+[00:12:58] just walk away
+[00:13:00] um
+[00:13:02] and so i need to figure out whether or not
+[00:13:05] um
+[00:13:05] i can
+[00:13:08] figure out a way
+[00:13:10] to get open web ui to
+[00:13:13] or comfy ui to just unload the model after 10 minutes of idle or something
+[00:13:18] just just so it cleans up memory
+[00:13:20] because i know with
+[00:13:23] swarm ui
+[00:13:24] 
+[00:13:24] it automatically
+[00:13:26] cleans up behind itself
+[00:13:27] you know like if you don't use it for
+[00:13:29] i think i think it's set to 10 minutes
+[00:13:31] it'll auto
+[00:13:32] it'll unload the model
+[00:13:33] but comfy
+[00:13:35] it loads it
+[00:13:36] it holds it
+[00:13:37] unless you specifically tell it to unload it
+[00:13:39] how's the swarm ui been working
+[00:13:49] have you been playing with it a lot
+[00:13:51] swarm works great
+[00:13:52] oh yeah
+[00:13:53] well so remember
+[00:13:54] so i started my journey
+[00:13:55] uh with ai image generation
+[00:13:58] back in january of last year
+[00:13:59] it wasn't until
+[00:14:02] may
+[00:14:04] when i bought that first 5090
+[00:14:06] that i started with
+[00:14:07] video generation
+[00:14:08] um
+[00:14:10] and that was a
+[00:14:11] and then
+[00:14:13] you and i talked about
+[00:14:14] n8n
+[00:14:15] in september
+[00:14:17] i believe
+[00:14:18] yeah
+[00:14:19] late summer
+[00:14:20] early fall
+[00:14:21] and that's when i started going nuts and buying hardware
+[00:14:24] uh
+[00:14:27] because i was like
+[00:14:30] oh
+[00:14:30] oh
+[00:14:31] the things i could potentially do with this
+[00:14:33] but all in all i think i spent about 20 grand
+[00:14:40] in 2025
+[00:14:42] because i bought the first 5090 for 3400
+[00:14:45] the second one was 2400
+[00:14:47] that's the one that's in my gaming machine right here
+[00:14:49] um
+[00:14:51] and then
+[00:14:53] yeah
+[00:14:54] just went nuts from there
+[00:14:55] buying lots of nvme disks
+[00:14:58] because these machines will come with two terabytes
+[00:15:00] uh
+[00:15:01] primary drive
+[00:15:02] and so i would add a two terabyte storage drive
+[00:15:04] you know
+[00:15:05] kind of thing
+[00:15:05] and i just recently added an eight terabyte
+[00:15:09] drive to jill
+[00:15:11] so i'm using her as my local nas storage
+[00:15:14] on the rack
+[00:15:16] i've got my synology for
+[00:15:18] everything else
+[00:15:19] what are you using for your nvmes
+[00:15:21] like the 960s or whatever
+[00:15:23] uh
+[00:15:24] i think the last one that i had purchased
+[00:15:27] was the 910
+[00:15:28] hold on let me
+[00:15:29] not do it on
+[00:15:30] on screen
+[00:15:31] um
+[00:15:34] so the last nvme
+[00:15:37] it was the
+[00:15:38] samsung 9100 pro
+[00:15:39] that's eight terabyte
+[00:15:40] but otherwise
+[00:15:42] i would buy the
+[00:15:44] uh
+[00:15:44] well wd blues
+[00:15:45] are what i added to all the
+[00:15:47] uh
+[00:15:48] s1s
+[00:15:49] those are the
+[00:15:51] wd blue
+[00:15:52] two terabytes
+[00:15:53] gen 4s
+[00:15:54] but prior to that
+[00:15:56] it's usually
+[00:15:56] like samsung
+[00:15:58] or uh
+[00:15:59] yeah the
+[00:16:02] yeah the samsung's
+[00:16:03] 9100s
+[00:16:04] or the
+[00:16:05] yeah
+[00:16:05] or the nine
+[00:16:06] what the hell
+[00:16:08] i'm gonna have to go further back in the
+[00:16:09] in the list
+[00:16:10] i'm trying
+[00:16:11] oh yeah
+[00:16:12] the samsung 990 pro
+[00:16:13] and
+[00:16:15] some of the older discs i bought were the 980 pros
+[00:16:18] no the last ones i got were crucial
+[00:16:22] i just bought a server so i could make a
+[00:16:27] uh
+[00:16:28] ad hoc
+[00:16:29] sam
+[00:16:29] right
+[00:16:30] but yeah wd blue
+[00:16:36] that's the
+[00:16:36] the nas
+[00:16:37] quality
+[00:16:38] storage
+[00:16:39] but yeah crucials are pretty good i got that as the primary drive on the s1s but that's what it came with so
+[00:16:51] i don't know like i said i'm just trying to find
+[00:16:59] figure out more things to do with my setup
+[00:17:03] mm-hmm
+[00:17:04] but right now
+[00:17:06] your
+[00:17:07] your uh
+[00:17:08] uh
+[00:17:09] drop a box build
+[00:17:10] have you been working on that lately
+[00:17:12] to drop a box build
+[00:17:13] like you take your box and you drop it over at the blue
+[00:17:16] oh
+[00:17:16] no no no no
+[00:17:18] yeah
+[00:17:18] um
+[00:17:19] i haven't necessarily abandoned
+[00:17:21] that idea
+[00:17:22] but it's
+[00:17:23] low priority
+[00:17:25] yeah
+[00:17:26] um
+[00:17:27] because i realized that a lot of
+[00:17:30] the
+[00:17:31] windows settings that i would want
+[00:17:33] to configure
+[00:17:34] aren't
+[00:17:35] super friendly to being powershell manipulated
+[00:17:38] like i know i would want my
+[00:17:42] profile settings like i don't want widgets on my taskbar
+[00:17:46] i don't want the search bar
+[00:17:47] i don't want
+[00:17:48] you know copilot
+[00:17:49] so
+[00:17:50] i would need to find a way to programmatically
+[00:17:52] you know
+[00:17:53] move the taskbar to the left
+[00:17:55] apply a dark theme
+[00:17:56] apply this
+[00:17:57] you know
+[00:17:57] what
+[00:17:57] all the things that i would do to set up my profile
+[00:18:00] i can't do most of it through powershell
+[00:18:02] and even installing
+[00:18:09] certain things
+[00:18:10] like for example
+[00:18:11] visual studio code
+[00:18:13] i can do that through powershell
+[00:18:14] um
+[00:18:15] and it
+[00:18:16] it installs it just fine
+[00:18:18] but what is missing from that installation
+[00:18:20] is the ability to right click and open with code
+[00:18:23] you know
+[00:18:25] because you can open a folder with visual studio code
+[00:18:28] but when you do a winget install of visual studio code through powershell
+[00:18:32] it doesn't include that option
+[00:18:34] or that's not configured
+[00:18:35] so
+[00:18:37] so
+[00:18:37] you have to manually
+[00:18:38] do by hand
+[00:18:40] or
+[00:18:40] figure out how to inject the binary
+[00:18:42] string into the value in the registry
+[00:18:45] or something
+[00:18:45] something
+[00:18:46] something
+[00:18:48] it's just easier to manually do certain things
+[00:18:50] or it's just better to do them manually
+[00:18:52] yeah
+[00:18:53] you could steal code from open claw
+[00:18:55] and do that
+[00:18:57] possibly
+[00:18:57] but i don't have open claw set up yet
+[00:18:59] um
+[00:19:01] because like for instance
+[00:19:03] the first time you set up a power on a computer
+[00:19:05] you know you have to go through the user profile setup
+[00:19:09] which thankfully with windows 11 pro
+[00:19:12] you can do a local account
+[00:19:14] you don't have to do a microsoft account
+[00:19:15] because apparently they're cracking down on all the bypasses that people do on home
+[00:19:20] um
+[00:19:22] there's a new method that just came out
+[00:19:25] recently where you can bypass the
+[00:19:28] microsoft account on home
+[00:19:30] um
+[00:19:33] but it's very
+[00:19:35] you know
+[00:19:35] there
+[00:19:35] it's a constant battle on that
+[00:19:37] well it's not hacky
+[00:19:39] it's just
+[00:19:39] uh
+[00:19:40] basically
+[00:19:41] you use
+[00:19:42] sysprep
+[00:19:43] and
+[00:19:43] it's just
+[00:19:44] a thing
+[00:19:45] i'd rather use pro
+[00:19:46] so
+[00:19:48] which sucks
+[00:19:48] because that means the only hardware that i could buy for
+[00:19:50] you know
+[00:19:50] what you and i were talking about the
+[00:19:52] before
+[00:19:53] is the s1
+[00:19:54] is the s1
+[00:19:55] but
+[00:19:56] getting them is a pain in the ass
+[00:19:59] and at three thousand dollars a piece
+[00:20:01] it's
+[00:20:01] what
+[00:20:06] what
+[00:20:08] i don't have that problem
+[00:20:09] well i don't either
+[00:20:11] but
+[00:20:12] it's still
+[00:20:13] i don't want to pay that much every time
+[00:20:15] well so all right
+[00:20:16] um
+[00:20:17] i don't know if you
+[00:20:18] i told you about the personal assistant idea right
+[00:20:21] personal assistant idea
+[00:20:23] yeah
+[00:20:24] yeah
+[00:20:26] so what joe and i were talking about
+[00:20:27] um
+[00:20:28] is
+[00:20:29] n8n is really good for automation and workflows and stuff like that
+[00:20:32] but
+[00:20:33] my thing that i was thinking of
+[00:20:35] because right now i'm on the bench
+[00:20:36] um
+[00:20:37] i don't have
+[00:20:37] a job
+[00:20:38] well i mean i'm employed
+[00:20:39] i'm getting my paycheck
+[00:20:40] but i don't have anything to do
+[00:20:42] they haven't started that new thing yet
+[00:20:44] no uh
+[00:20:45] apparently that got cancelled
+[00:20:46] because the internal
+[00:20:48] dell switch network team
+[00:20:49] doesn't have the funding to pay
+[00:20:51] managed services
+[00:20:52] to do the work
+[00:20:54] yeah
+[00:20:55] so that got cancelled
+[00:20:56] so i'm back on the bench
+[00:20:57] um
+[00:20:58] so with me being on the bench
+[00:21:01] between projects
+[00:21:01] i'm nervous that they may just let me go at any point
+[00:21:04] so i was trying to come up with an idea of like
+[00:21:06] can i
+[00:21:06] i don't know
+[00:21:07] do something with all this ai learning
+[00:21:09] to actually earn money
+[00:21:10] one of the ideas that i had
+[00:21:12] um
+[00:21:13] because most people start off
+[00:21:15] with n8n
+[00:21:16] building a personal assistant
+[00:21:17] because it's just easy
+[00:21:18] um
+[00:21:19] and i can kind of
+[00:21:21] show you
+[00:21:22] oh i already have it loaded up
+[00:21:23] um
+[00:21:24] there's the button
+[00:21:27] uh
+[00:21:29] screen one
+[00:21:32] hello
+[00:21:33] all right
+[00:21:34] let me know when you can see it
+[00:21:35] yep
+[00:21:36] all right
+[00:21:37] so
+[00:21:38] this is my core assistant right here
+[00:21:40] this guy
+[00:21:40] um
+[00:21:41] he
+[00:21:42] is
+[00:21:43] he's got his prompt
+[00:21:45] but he also has
+[00:21:47] you know
+[00:21:47] research tools
+[00:21:48] and in this research
+[00:21:49] let me go back
+[00:21:50] ah
+[00:21:51] they
+[00:21:52] they change things
+[00:21:53] can't just look forward and back anymore
+[00:21:55] all right
+[00:21:55] and in a core
+[00:21:56] uh
+[00:21:57] okay
+[00:21:58] so within this research tool
+[00:22:01] i have
+[00:22:02] um
+[00:22:02] you know
+[00:22:04] another
+[00:22:05] a specifically prompted
+[00:22:06] research agent
+[00:22:08] which has
+[00:22:09] um
+[00:22:09] wikipedia
+[00:22:10] hacker news
+[00:22:11] search ng
+[00:22:11] or searching
+[00:22:13] um
+[00:22:13] open weather map
+[00:22:14] which i don't like
+[00:22:15] because it doesn't have
+[00:22:16] all the cities that you may want
+[00:22:17] i wish it were a little more
+[00:22:19] whatever
+[00:22:19] um
+[00:22:21] so you can do all your
+[00:22:22] online research here
+[00:22:23] um
+[00:22:25] but it's also got a calculator
+[00:22:27] so it can do
+[00:22:28] any time it needs to do
+[00:22:29] real math
+[00:22:30] here's where it can do the thinking
+[00:22:31] because i don't want it to always think
+[00:22:32] you know
+[00:22:33] back to as a response
+[00:22:35] depending on the model
+[00:22:36] um
+[00:22:37] but this is just the core
+[00:22:40] of the agent
+[00:22:41] but what i have
+[00:22:43] is i have two different
+[00:22:44] entry points
+[00:22:44] i have
+[00:22:45] a telegram
+[00:22:46] entry point
+[00:22:47] so
+[00:22:49] a telegram message
+[00:22:52] comes in
+[00:22:52] and depending on the
+[00:22:54] type of message
+[00:22:55] well this is what
+[00:22:56] this is my gate
+[00:22:57] keeper
+[00:22:57] you know like
+[00:22:58] only messages from
+[00:22:59] a specific person
+[00:23:00] can come in
+[00:23:01] and so depending on the type
+[00:23:03] of messages
+[00:23:04] it is
+[00:23:04] it'll go down
+[00:23:05] different paths
+[00:23:06] so if it's a voice message
+[00:23:09] it'll go down here
+[00:23:10] and it'll download the voice file
+[00:23:12] it'll send it to speech
+[00:23:13] to text
+[00:23:13] it'll
+[00:23:14] it just manipulates the file type
+[00:23:16] and then it calls the core
+[00:23:18] the core
+[00:23:19] brings back
+[00:23:20] text
+[00:23:21] which this guy
+[00:23:22] cleans it up
+[00:23:23] because telegram
+[00:23:24] has a limitation
+[00:23:25] of 4096 characters
+[00:23:27] and if it
+[00:23:28] and if my main model
+[00:23:30] spat out
+[00:23:31] 20,000 characters
+[00:23:32] this guy
+[00:23:33] is specially prompted
+[00:23:34] to
+[00:23:34] clean it up
+[00:23:35] summarize it
+[00:23:36] and make it nice
+[00:23:37] and pretty
+[00:23:38] and then
+[00:23:40] it'll send it back
+[00:23:41] to telegram
+[00:23:43] now what i did have
+[00:23:44] before
+[00:23:44] was i had the
+[00:23:46] TTS
+[00:23:47] which would transmit it
+[00:23:49] you know
+[00:23:50] if it came in as a speech
+[00:23:52] it would reply back
+[00:23:53] with speech
+[00:23:54] but that took
+[00:23:57] way too long
+[00:23:58] way too long
+[00:24:00] so i just
+[00:24:03] send it back
+[00:24:04] as a text response
+[00:24:05] now if it's an image
+[00:24:07] granted i don't know
+[00:24:09] how to do image
+[00:24:09] i don't have a good
+[00:24:10] combo model
+[00:24:11] that i can do
+[00:24:12] with
+[00:24:12] everything
+[00:24:14] so right now
+[00:24:15] it'll just download the file
+[00:24:16] evaluate the image
+[00:24:18] and give a description
+[00:24:19] and then send that description
+[00:24:20] back to you
+[00:24:21] you know
+[00:24:22] because i don't know
+[00:24:23] maybe there's something
+[00:24:23] in the image
+[00:24:24] that you don't
+[00:24:24] know or see
+[00:24:25] or if there's text
+[00:24:27] or whatever the case may be
+[00:24:28] oh i got a call
+[00:24:30] i have to get on
+[00:24:30] so the other entry point
+[00:24:34] is just
+[00:24:35] through chat
+[00:24:37] so
+[00:24:38] like i can either
+[00:24:39] chat here
+[00:24:41] in this ui
+[00:24:42] you know
+[00:24:42] by sending just a chat message
+[00:24:44] or i can do a web hook
+[00:24:46] so the web hook
+[00:24:47] allows me to tie in
+[00:24:49] open web ui
+[00:24:50] to my actual core assistant
+[00:24:52] and the way that looks
+[00:24:55] is through the settings
+[00:24:56] admin panel
+[00:24:58] functions
+[00:25:00] yeah
+[00:25:00] function is
+[00:25:01] i create it
+[00:25:02] i have a function
+[00:25:03] that calls the n8n
+[00:25:05] web hook
+[00:25:06] and so
+[00:25:08] when i'm
+[00:25:09] looking at the models
+[00:25:11] i can actually see
+[00:25:12] oh i got them turned off
+[00:25:15] right now
+[00:25:15] because my
+[00:25:16] whatever
+[00:25:16] but you can actually see it
+[00:25:18] as a model in your drop down
+[00:25:19] yeah
+[00:25:20] and so
+[00:25:21] when you're
+[00:25:21] using open web ui
+[00:25:23] to chat
+[00:25:24] you're actually chatting
+[00:25:25] with your n8n
+[00:25:26] workflow
+[00:25:27] cool
+[00:25:30] yeah so
+[00:25:34] it's interesting
+[00:25:35] that the way
+[00:25:35] you can integrate things
+[00:25:36] into each other
+[00:25:38] yeah
+[00:25:39] yeah
+[00:25:39] i uh
+[00:25:42] i dropped
+[00:25:43] n8n
+[00:25:44] sometime last year
+[00:25:46] because it was
+[00:25:49] the overhead
+[00:25:50] was
+[00:25:50] i was running it all
+[00:25:52] through one
+[00:25:53] uh
+[00:25:53] system
+[00:25:55] and
+[00:25:55] i
+[00:25:56] i didn't want to do that
+[00:25:57] so
+[00:25:57] that's why i like my setup
+[00:26:02] is because i've got jack
+[00:26:03] for image and video generation
+[00:26:05] i've got jill
+[00:26:05] for my automation
+[00:26:07] workflow hosting
+[00:26:08] and there's a bunch of other
+[00:26:09] stuff on there too
+[00:26:10] but
+[00:26:11] where
+[00:26:11] you're running
+[00:26:12] n8n
+[00:26:13] n8n's right here
+[00:26:15] in a docker container
+[00:26:15] on
+[00:26:18] jill
+[00:26:19] okay
+[00:26:20] um
+[00:26:22] so
+[00:26:23] on n8n
+[00:26:24] on jill
+[00:26:25] i've got n8n
+[00:26:26] i've got searching
+[00:26:27] um
+[00:26:28] postgres
+[00:26:29] redis
+[00:26:29] and quadrant
+[00:26:30] which i'm not really using
+[00:26:31] any of those
+[00:26:31] right now
+[00:26:32] but i've also got
+[00:26:33] open web ui here
+[00:26:34] but i've got the
+[00:26:35] chatterbox tts
+[00:26:37] and uh
+[00:26:37] whisper
+[00:26:38] are my
+[00:26:39] speech to text
+[00:26:40] text to speech
+[00:26:41] things
+[00:26:41] so i've also got grafana
+[00:26:43] and influx db
+[00:26:44] but i mainly put those
+[00:26:45] together because i wanted
+[00:26:46] to monitor my network
+[00:26:47] router and have a nice
+[00:26:49] dashboard for it
+[00:26:49] but the
+[00:26:50] that's going to take a
+[00:26:52] whole lot of work
+[00:26:52] um
+[00:26:55] but i have docker on
+[00:26:57] every single one of my
+[00:26:58] boxes
+[00:26:59] like even this box here
+[00:27:00] i have docker running
+[00:27:01] because if i need
+[00:27:02] a mcp server
+[00:27:03] or whatever
+[00:27:04] i can instantly spool up
+[00:27:05] the ncp to do its job
+[00:27:06] and then spool it back
+[00:27:07] down
+[00:27:07] yeah
+[00:27:09] are you using
+[00:27:13] uh
+[00:27:14] like a durable memory
+[00:27:15] within
+[00:27:16] no
+[00:27:16] i haven't
+[00:27:17] i haven't figured
+[00:27:18] that out yet
+[00:27:19] i mean i haven't spent
+[00:27:20] the time to figure it
+[00:27:21] out yet
+[00:27:21] because i've been so
+[00:27:22] focused on the mss ones
+[00:27:23] and hosting
+[00:27:24] all that good stuff
+[00:27:26] yeah
+[00:27:28] well
+[00:27:29] you came up with
+[00:27:30] something daryl right
+[00:27:31] or the tribe did
+[00:27:32] what are they using
+[00:27:33] for the memory
+[00:27:34] now
+[00:27:35] thermal memory
+[00:27:36] yeah
+[00:27:37] yeah
+[00:27:39] yeah
+[00:27:39] they have thermal
+[00:27:41] memory
+[00:27:41] and breadcrumbs
+[00:27:42] with thermal memory
+[00:27:43] and uh
+[00:27:46] it also
+[00:27:46] uh
+[00:27:47] it degrades
+[00:27:48] over time
+[00:27:49] so thermal
+[00:27:50] is like
+[00:27:51] we're talking
+[00:27:52] right now
+[00:27:52] that's
+[00:27:54] 100
+[00:27:55] 100 degrees
+[00:27:55] it's
+[00:27:56] it's hot
+[00:27:56] right
+[00:27:57] and say an hour
+[00:27:59] from now
+[00:28:00] it'll be 95
+[00:28:00] or 90 degrees
+[00:28:02] and then
+[00:28:04] it just
+[00:28:04] starts dropping
+[00:28:05] off from there
+[00:28:06] and then there
+[00:28:07] might be segments
+[00:28:07] of it
+[00:28:08] that might stay
+[00:28:09] hot
+[00:28:09] where
+[00:28:10] the whole
+[00:28:11] conversation
+[00:28:12] itself
+[00:28:13] would go
+[00:28:13] cold
+[00:28:14] you guys
+[00:28:17] may
+[00:28:17] you guys
+[00:28:18] gonna be
+[00:28:18] hanging out
+[00:28:18] here
+[00:28:18] i need
+[00:28:19] to get
+[00:28:19] on that
+[00:28:19] call
+[00:28:19] yeah
+[00:28:21] we can
+[00:28:21] do
+[00:28:21] stuff
+[00:28:21] all right
+[00:28:23] yeah
+[00:28:23] we'll probably
+[00:28:23] be here
+[00:28:24] for an hour
+[00:28:24] all right
+[00:28:25] i'll rejoin
+[00:28:26] as soon
+[00:28:26] as i
+[00:28:26] can
+[00:28:27] all right
+[00:28:27] ciao
+[00:28:29] why isn't
+[00:28:32] it letting
+[00:28:32] me leave
+[00:28:32] i'm clicking
+[00:28:33] does my
+[00:28:38] shredder
+[00:28:38] come through
+[00:28:39] the mic
+[00:28:39] i don't
+[00:28:42] hear your
+[00:28:43] shredder
+[00:28:43] no
+[00:28:43] and you
+[00:28:44] sounded
+[00:28:45] fine
+[00:28:45] earlier
+[00:28:46] whenever
+[00:28:46] you
+[00:28:47] joined
+[00:28:47] whenever
+[00:28:48] you said
+[00:28:49] you were
+[00:28:49] yeah
+[00:28:50] you sounded
+[00:28:52] fine to
+[00:28:52] me
+[00:28:52] okay
+[00:28:55] well
+[00:28:55] this
+[00:28:56] mic
+[00:28:57] on this
+[00:28:58] headset
+[00:28:58] is
+[00:28:58] pretty
+[00:28:59] directional
+[00:28:59] so
+[00:29:00] yeah
+[00:29:03] well right
+[00:29:05] now i'm
+[00:29:06] playing music
+[00:29:06] in the
+[00:29:07] background
+[00:29:07] i'm assuming
+[00:29:08] you're not
+[00:29:08] hearing that
+[00:29:09] uh-uh
+[00:29:10] okay
+[00:29:11] no
+[00:29:12] all right
+[00:29:15] so the
+[00:29:16] tribe said
+[00:29:16] they fixed
+[00:29:17] the uh
+[00:29:18] fixed the
+[00:29:21] vet assist
+[00:29:22] but i'm out
+[00:29:23] there and it
+[00:29:23] looks exactly
+[00:29:24] the same
+[00:29:24] um
+[00:29:26] if you go
+[00:29:27] out there
+[00:29:27] what does it
+[00:29:27] look like
+[00:29:28] right now
+[00:29:28] it depends
+[00:29:30] looks fine
+[00:29:34] there
+[00:29:34] now you're
+[00:29:41] running that
+[00:29:42] internally
+[00:29:42] right
+[00:29:42] yeah
+[00:29:44] but
+[00:29:44] it will
+[00:29:45] jack up
+[00:29:46] internally
+[00:29:47] whenever it
+[00:29:48] actually looks
+[00:29:48] good
+[00:29:49] externally
+[00:29:50] and it's
+[00:29:52] jacked up
+[00:29:53] here like
+[00:29:53] what you're
+[00:29:54] talking about
+[00:29:54] so probably
+[00:29:57] what
+[00:29:57] uh
+[00:29:58] i'm trying
+[00:29:59] to think
+[00:29:59] so right
+[00:30:00] now how
+[00:30:01] does the
+[00:30:02] external
+[00:30:03] front end
+[00:30:04] get presented
+[00:30:05] to your
+[00:30:06] 
+[00:30:06] internal
+[00:30:08] back
+[00:30:08] is that
+[00:30:10] one service
+[00:30:11] running
+[00:30:11] on a
+[00:30:12] front end
+[00:30:13] on a
+[00:30:13] hosted
+[00:30:14] front end
+[00:30:16] and i've
+[00:30:16] got a
+[00:30:16] bed assist
+[00:30:17] back end
+[00:30:17] as it's
+[00:30:19] looking at
+[00:30:19] both right
+[00:30:20] now
+[00:30:20] okay
+[00:30:21] mike's going
+[00:30:35] a different
+[00:30:35] direction
+[00:30:36] than we
+[00:30:36] are
+[00:30:36] yeah
+[00:30:38] yeah
+[00:30:38] yeah
+[00:30:39] so he's
+[00:30:40] he's
+[00:30:40] he's
+[00:30:41] thinking
+[00:30:41] about
+[00:30:41] something
+[00:30:42] like
+[00:30:42] uh
+[00:30:43] like he
+[00:30:44] does
+[00:30:44] it
+[00:30:44] for
+[00:30:45] blue
+[00:30:45] the
+[00:30:46] restaurant
+[00:30:46] in
+[00:30:47] bentonville
+[00:30:47] and the
+[00:30:48] blue
+[00:30:49] dtr
+[00:30:50] and whatever
+[00:30:50] other ones
+[00:30:51] they have
+[00:30:51] he does
+[00:30:52] their it
+[00:30:52] stuff
+[00:30:53] and kind
+[00:30:54] of what
+[00:30:54] he's
+[00:30:55] thinking
+[00:30:55] is a
+[00:30:55] drop-in
+[00:30:56] box
+[00:30:57] to where
+[00:30:58] he can
+[00:30:59] take a
+[00:30:59] box
+[00:31:00] drop it
+[00:31:00] on site
+[00:31:01] and the
+[00:31:02] owners of
+[00:31:03] blue can
+[00:31:03] go hey
+[00:31:04] how are we
+[00:31:04] looking on
+[00:31:05] stock for
+[00:31:06] x y or
+[00:31:06] z
+[00:31:07] things like
+[00:31:07] that
+[00:31:08] which
+[00:31:08] has that
+[00:31:10] kind of
+[00:31:10] just text
+[00:31:13] input or
+[00:31:14] or audio
+[00:31:15] input that
+[00:31:16] type of
+[00:31:16] thing
+[00:31:17] um
+[00:31:18] basically an
+[00:31:19] on-site
+[00:31:19] assistant for
+[00:31:20] a small
+[00:31:20] business type
+[00:31:21] of thing
+[00:31:22] yeah
+[00:31:23] yeah
+[00:31:25] but i mean
+[00:31:26] he's like
+[00:31:27] level two
+[00:31:29] yeah
+[00:31:32] well so
+[00:31:33] yeah
+[00:31:34] whenever he
+[00:31:35] started doing
+[00:31:35] the i got him
+[00:31:37] started it's
+[00:31:38] funny because
+[00:31:38] he's talking
+[00:31:39] about all
+[00:31:39] these things
+[00:31:40] that he's
+[00:31:40] been doing
+[00:31:41] i got him
+[00:31:41] started on
+[00:31:42] doing uh
+[00:31:43] the automatic
+[00:31:44] 11 11
+[00:31:45] image generation
+[00:31:47] the comfy ui
+[00:31:48] image generation
+[00:31:49] way back when
+[00:31:50] and then i got
+[00:31:50] him started on
+[00:31:51] n8n stuff
+[00:31:52] yeah
+[00:31:54] i mean he
+[00:31:56] he takes it
+[00:31:57] and runs with
+[00:31:58] it i i get
+[00:31:59] to about
+[00:31:59] 60 percent
+[00:32:01] proficient and
+[00:32:01] move on to
+[00:32:02] something new
+[00:32:03] i don't even
+[00:32:06] know if i do
+[00:32:07] that
+[00:32:07] but he
+[00:32:14] he seems
+[00:32:15] like well
+[00:32:16] he just
+[00:32:17] not trusting
+[00:32:18] the ai as
+[00:32:19] much as
+[00:32:20] he could
+[00:32:22] yeah
+[00:32:22] yeah
+[00:32:24] well and
+[00:32:25] he he uses
+[00:32:26] i mean his
+[00:32:27] main ai
+[00:32:28] interface
+[00:32:29] now sounds
+[00:32:31] like he's
+[00:32:31] using the
+[00:32:32] online
+[00:32:33] claude
+[00:32:34] um
+[00:32:35] i think
+[00:32:37] if he
+[00:32:38] would
+[00:32:38] start claude
+[00:32:40] kind of like
+[00:32:40] you did
+[00:32:41] into a
+[00:32:42] tribe or
+[00:32:43] something like
+[00:32:43] that and
+[00:32:44] have it
+[00:32:44] generate
+[00:32:44] different
+[00:32:45] members that
+[00:32:46] are running
+[00:32:46] on different
+[00:32:47] models and
+[00:32:48] stuff
+[00:32:48] kind of
+[00:32:49] bent to
+[00:32:50] his will
+[00:32:51] he would
+[00:32:52] have an
+[00:32:52] easier time
+[00:32:53] to things
+[00:32:53] probably
+[00:32:54] yeah
+[00:32:55] i mean
+[00:32:57] that's
+[00:32:58] so i've
+[00:32:58] been playing
+[00:32:59] with uh
+[00:33:00] where's my
+[00:33:00] um i've
+[00:33:03] been playing
+[00:33:03] with uh
+[00:33:04] open claw
+[00:33:05] i think we
+[00:33:06] talked about
+[00:33:07] that last
+[00:33:07] night
+[00:33:07] um and
+[00:33:09] i watched
+[00:33:10] a couple
+[00:33:10] videos today
+[00:33:11] and i think
+[00:33:12] my next
+[00:33:13] iteration is
+[00:33:14] going to be
+[00:33:14] kind of like
+[00:33:15] you did
+[00:33:16] but i'm
+[00:33:16] going to
+[00:33:16] use claude
+[00:33:17] code to
+[00:33:19] build out
+[00:33:19] my uh
+[00:33:21] my assistant
+[00:33:22] or whatever
+[00:33:23] yeah
+[00:33:24] rather than
+[00:33:25] use something
+[00:33:26] like open
+[00:33:27] claw
+[00:33:28] but
+[00:33:29] exactly
+[00:33:32] love the
+[00:33:34] concept
+[00:33:35] don't want
+[00:33:36] to mess
+[00:33:36] with the
+[00:33:37] the bloat
+[00:33:39] and risk
+[00:33:41] and everything
+[00:33:41] else yeah
+[00:33:42] i mean i do
+[00:33:43] like i can just
+[00:33:44] go out to
+[00:33:45] telegram and
+[00:33:45] say hey
+[00:33:46] do this
+[00:33:46] thing um
+[00:33:48] which works
+[00:33:49] pretty much
+[00:33:50] just like the
+[00:33:51] tribe does
+[00:33:51] when you do
+[00:33:52] that right
+[00:33:52] yeah
+[00:33:53] oh i got
+[00:33:56] welcome to
+[00:33:58] the 50s
+[00:33:59] club from
+[00:33:59] the aarp
+[00:34:00] huh
+[00:34:01] that's a
+[00:34:04] couple years
+[00:34:05] late
+[00:34:05] that's a
+[00:34:08] year or two
+[00:34:09] late
+[00:34:09] came in
+[00:34:11] last year
+[00:34:12] i'm going
+[00:34:13] through and
+[00:34:13] shredding and
+[00:34:14] scanning things
+[00:34:16] and trying to
+[00:34:18] get rid of
+[00:34:18] physical paper
+[00:34:19] as much
+[00:34:22] as i can
+[00:34:22] so i saw
+[00:34:28] it just
+[00:34:29] now
+[00:34:29] it's doing
+[00:34:31] its thing
+[00:34:31] and i saw
+[00:34:33] it uh the
+[00:34:33] website go
+[00:34:34] down um
+[00:34:35] here just
+[00:34:36] for a second
+[00:34:38] and then it's
+[00:34:38] come back up
+[00:34:39] and it
+[00:34:44] restarted the
+[00:34:44] front end
+[00:34:45] see let me
+[00:34:51] move this
+[00:34:52] to a
+[00:34:52] different
+[00:34:53] window
+[00:34:54] and i can
+[00:34:57] share that
+[00:34:58] out
+[00:34:59] yeah i'm
+[00:35:10] seeing the
+[00:35:10] same thing
+[00:35:11] on my
+[00:35:11] chrome browser
+[00:35:12] yeah
+[00:35:13] uh is it
+[00:35:18] better if i
+[00:35:18] adjust the
+[00:35:19] width or
+[00:35:20] height to
+[00:35:20] that or
+[00:35:20] does it
+[00:35:21] look okay
+[00:35:21] on your
+[00:35:21] side
+[00:35:22] it looks
+[00:35:22] fine
+[00:35:23] okay
+[00:35:23] cool
+[00:35:25] yeah
+[00:35:26] i need to
+[00:35:28] see if
+[00:35:29] there's a
+[00:35:30] uh
+[00:35:31] i need to
+[00:35:37] see if
+[00:35:37] there's like
+[00:35:38] a google
+[00:35:39] meet app
+[00:35:40] for mac
+[00:35:40] because the
+[00:35:42] the web
+[00:35:43] interface and
+[00:35:44] experience is
+[00:35:46] okay but
+[00:35:46] i'd like to
+[00:35:47] be able to
+[00:35:48] take like
+[00:35:49] the video
+[00:35:50] feeds of
+[00:35:51] us and
+[00:35:51] have that
+[00:35:52] on one
+[00:35:53] screen and
+[00:35:54] then have
+[00:35:54] my uh
+[00:35:56] like browser
+[00:35:57] window on
+[00:35:58] another screen
+[00:35:59] or or
+[00:36:01] just or
+[00:36:02] other people's
+[00:36:03] stuff displayed
+[00:36:03] on another
+[00:36:04] screen type
+[00:36:05] of thing
+[00:36:05] yeah
+[00:36:05] yeah like
+[00:36:06] a meeting
+[00:36:07] yeah
+[00:36:09] yeah
+[00:36:10] i don't
+[00:36:14] know is
+[00:36:14] there a
+[00:36:15] as soon as
+[00:36:20] uh the
+[00:36:20] transcript is
+[00:36:22] downloaded
+[00:36:23] my
+[00:36:24] pride will
+[00:36:26] go looking
+[00:36:27] that's okay
+[00:36:31] are you
+[00:37:00] looking
+[00:37:00] yeah for
+[00:37:05] uh uh
+[00:37:06] google meet
+[00:37:07] yeah for
+[00:37:08] mac yeah
+[00:37:10] i searched
+[00:37:10] google meet
+[00:37:11] and it came
+[00:37:12] up with a
+[00:37:12] bunch of
+[00:37:13] things but
+[00:37:13] i'm not
+[00:37:14] sure who
+[00:37:14] put these
+[00:37:15] out
+[00:37:16] hashgrid
+[00:37:17] llc
+[00:37:18] z shun
+[00:37:23] i never get
+[00:37:23] anything made
+[00:37:24] by individual
+[00:37:25] people usually
+[00:37:26] it's like
+[00:37:26] doesn't google
+[00:37:27] have a
+[00:37:28] freaking
+[00:37:28] app thing
+[00:37:29] maybe i
+[00:37:32] don't know
+[00:37:32] idea nest
+[00:37:35] what the
+[00:37:35] hell
+[00:37:36] although maybe
+[00:37:38] google just
+[00:37:39] doesn't really
+[00:37:39] want to
+[00:37:40] support
+[00:37:40] mac that
+[00:37:42] much or
+[00:37:43] something
+[00:37:43] anyways
+[00:37:48] enough
+[00:37:50] enough of
+[00:37:51] that squirrel
+[00:37:51] for now
+[00:37:52] i see a
+[00:37:54] website the
+[00:37:54] 23 free
+[00:37:55] alternatives to
+[00:37:56] google meet
+[00:37:57] for mac
+[00:37:57] oh yeah
+[00:37:59] yeah is
+[00:38:01] there a
+[00:38:01] highly rated
+[00:38:02] one out
+[00:38:02] there
+[00:38:02] it's got a
+[00:38:03] google meet
+[00:38:04] for mac right
+[00:38:05] here
+[00:38:05] really
+[00:38:06] i might just
+[00:38:08] need the link
+[00:38:09] or something
+[00:38:10] or maybe it's
+[00:38:11] something you
+[00:38:11] gotta
+[00:38:12] google
+[00:38:12] get from
+[00:38:13] google
+[00:38:13] yeah
+[00:38:15] i always go
+[00:38:17] to the
+[00:38:17] app store
+[00:38:18] but i
+[00:38:18] i'm
+[00:38:20] leery about
+[00:38:21] getting things
+[00:38:22] off of
+[00:38:22] a website
+[00:38:23] but i
+[00:38:25] mean if
+[00:38:25] google puts
+[00:38:26] it out
+[00:38:26] that's
+[00:38:27] i'm not
+[00:38:27] that leery
+[00:38:28] of downloading
+[00:38:28] from a
+[00:38:29] website
+[00:38:29] with mac
+[00:38:31] as long
+[00:38:31] as it's
+[00:38:33] signed
+[00:38:34] you know
+[00:38:34] if you
+[00:38:35] if you
+[00:38:35] click on
+[00:38:35] it and
+[00:38:36] it starts
+[00:38:36] up
+[00:38:36] then it's
+[00:38:38] been
+[00:38:38] signed by
+[00:38:39] mac and
+[00:38:40] it's okay
+[00:38:40] yeah
+[00:38:41] if it's
+[00:38:43] not signed
+[00:38:44] it'll give
+[00:38:44] you that
+[00:38:44] message
+[00:38:45] if you
+[00:38:47] know the
+[00:38:47] people then
+[00:38:48] go ahead
+[00:38:48] and say
+[00:38:49] yes but
+[00:38:49] otherwise
+[00:38:50] say no
+[00:38:51] do you
+[00:38:52] find the
+[00:38:53] link for
+[00:38:53] it
+[00:38:54] well
+[00:38:55] i'm
+[00:38:55] on
+[00:38:56] this
+[00:38:59] i'm on
+[00:39:00] softronic
+[00:39:00] softronic
+[00:39:05] yeah i
+[00:39:07] don't
+[00:39:10] there's
+[00:39:15] there's
+[00:39:16] a 4.8
+[00:39:17] star one
+[00:39:18] that just
+[00:39:18] popped up
+[00:39:19] in a
+[00:39:19] search
+[00:39:19] yeah
+[00:39:24] iphone
+[00:39:28] ipad
+[00:39:28] i wonder
+[00:39:31] if it'll
+[00:39:31] work on
+[00:39:32] mac os
+[00:39:32] too
+[00:39:33] that's
+[00:39:42] the problem
+[00:39:42] with some
+[00:39:43] of the
+[00:39:43] things you
+[00:39:43] look for
+[00:39:44] out there
+[00:39:44] is like
+[00:39:44] oh yeah
+[00:39:45] it works
+[00:39:45] great on
+[00:39:46] ipad or
+[00:39:46] ios
+[00:39:47] yeah
+[00:39:48] or on
+[00:39:48] uh
+[00:39:48] on ios
+[00:39:50] ipad or
+[00:39:50] iphone
+[00:39:51] may or
+[00:39:53] may not
+[00:39:54] work on
+[00:39:54] uh you
+[00:39:57] can download
+[00:39:57] uh you
+[00:39:58] can you
+[00:39:58] could
+[00:39:59] emulate
+[00:40:02] uh like
+[00:40:03] chrome
+[00:40:04] virtual
+[00:40:06] and then
+[00:40:07] it's still
+[00:40:08] google there
+[00:40:09] calendar
+[00:40:12] yeah
+[00:40:13] google me
+[00:40:15] yeah
+[00:40:15] i mean it
+[00:40:22] works fine
+[00:40:22] using brave
+[00:40:24] but
+[00:40:24] i keep
+[00:40:26] i keep
+[00:40:27] getting annoyed
+[00:40:28] with the
+[00:40:29] user
+[00:40:29] experience
+[00:40:30] although i
+[00:40:35] don't know
+[00:40:35] that it'll
+[00:40:35] be any
+[00:40:36] better
+[00:40:36] if i get
+[00:40:38] an actual
+[00:40:38] app
+[00:40:39] but
+[00:40:39] oh
+[00:40:42] bed assist
+[00:40:44] isn't just
+[00:40:45] coming right
+[00:40:46] back now
+[00:40:46] it isn't
+[00:40:48] it's sitting
+[00:40:50] there spinning
+[00:40:51] okay
+[00:40:52] well it
+[00:40:54] may be
+[00:40:54] in mid
+[00:40:55] restart
+[00:40:56] of some
+[00:40:56] service
+[00:40:57] somewhere
+[00:40:57] i'm
+[00:40:59] i'm
+[00:40:59] watching it
+[00:41:00] go through
+[00:41:00] uh
+[00:41:01] i gave
+[00:41:02] it
+[00:41:03] oh there
+[00:41:04] yeah
+[00:41:05] i gave
+[00:41:05] it a
+[00:41:06] through
+[00:41:10] uh free
+[00:41:10] ipa i
+[00:41:11] gave it
+[00:41:12] sudo
+[00:41:13] permissions
+[00:41:13] on certain
+[00:41:14] things
+[00:41:15] so it's
+[00:41:16] going through
+[00:41:16] sudoing and
+[00:41:17] creating some
+[00:41:18] services and
+[00:41:19] stuff
+[00:41:19] i haven't
+[00:41:24] given it
+[00:41:24] full control
+[00:41:25] of my
+[00:41:25] system
+[00:41:26] but i
+[00:41:28] have given
+[00:41:28] it a
+[00:41:29] lot of
+[00:41:29] control
+[00:41:30] it has
+[00:41:34] full control
+[00:41:35] of
+[00:41:35] ganuda
+[00:41:36] so i
+[00:41:46] guess id
+[00:41:46] what is
+[00:41:47] it id.me
+[00:41:48] or is
+[00:41:49] it id
+[00:41:49] yeah id.me
+[00:41:51] and id
+[00:41:51] something labs
+[00:41:53] dot me
+[00:41:54] are two
+[00:41:54] different uh
+[00:41:55] things under
+[00:41:56] the same
+[00:41:56] thing that
+[00:41:57] you got to
+[00:41:57] sign up
+[00:41:58] separately
+[00:41:58] what's
+[00:42:00] what the
+[00:42:02] id.me
+[00:42:03] for like
+[00:42:03] for getting
+[00:42:04] to ba.gov
+[00:42:05] and things
+[00:42:05] like that
+[00:42:06] yeah
+[00:42:07] um the
+[00:42:07] one that
+[00:42:08] you're
+[00:42:08] tied into
+[00:42:09] with uh
+[00:42:10] with the
+[00:42:12] uh
+[00:42:12] vet assist
+[00:42:13] uh-huh
+[00:42:14] i think that
+[00:42:15] was different
+[00:42:16] than the
+[00:42:16] standard id.me
+[00:42:17] so i gotta
+[00:42:18] go i think
+[00:42:19] i'm gonna have
+[00:42:19] to go through
+[00:42:20] that process
+[00:42:21] again on
+[00:42:23] the i think
+[00:42:24] it's like
+[00:42:24] id
+[00:42:25] id
+[00:42:26] last me
+[00:42:27] or something
+[00:42:27] but it's
+[00:42:28] set up
+[00:42:29] whenever
+[00:42:30] it's working
+[00:42:31] it's set up
+[00:42:32] that before
+[00:42:32] you have
+[00:42:33] that setup
+[00:42:33] you can
+[00:42:34] still
+[00:42:34] create
+[00:42:35] an account
+[00:42:35] and then
+[00:42:36] it'll link
+[00:42:36] it on the
+[00:42:37] back end
+[00:42:37] if you want
+[00:42:38] yeah
+[00:42:39] okay
+[00:42:39] so the
+[00:42:40] account
+[00:42:41] create
+[00:42:41] should
+[00:42:42] theoretically
+[00:42:43] work
+[00:42:43] right
+[00:42:45] it's trying
+[00:42:50] to figure
+[00:42:50] out right
+[00:42:51] now
+[00:42:51] where the
+[00:42:52] hell
+[00:42:52] it's at
+[00:42:53] so
+[00:42:53] i'm
+[00:43:17] bitching at
+[00:43:17] i think
+[00:43:38] i think
+[00:43:42] i'm working
+[00:43:42] like
+[00:43:43] the new
+[00:43:44] engineers
+[00:43:45] are working
+[00:43:46] will need
+[00:43:47] to work
+[00:43:47] yeah
+[00:43:50] uh
+[00:43:53] an abstraction
+[00:43:53] back
+[00:43:54] if they can
+[00:43:55] they've got
+[00:43:55] to build
+[00:43:56] the system
+[00:43:57] and then
+[00:43:58] an abstraction
+[00:43:59] back
+[00:44:00] where
+[00:44:00] you just
+[00:44:01] tell it
+[00:44:02] to what
+[00:44:03] you want
+[00:44:03] and trust
+[00:44:04] the
+[00:44:05] process
+[00:44:06] hands
+[00:44:09] off
+[00:44:09] step away
+[00:44:10] that's what
+[00:44:11] i'm trying
+[00:44:12] to do
+[00:44:12] that's
+[00:44:15] funny
+[00:44:15] they're
+[00:44:35] saying
+[00:44:35] it
+[00:44:35] should
+[00:44:36] be
+[00:44:36] cool
+[00:44:36] let me
+[00:44:44] try
+[00:44:44] a
+[00:44:44] refresh
+[00:44:44] oh
+[00:44:57] oh
+[00:44:57] that's the
+[00:44:59] worst
+[00:44:59] oh that's
+[00:45:02] the sign-in page
+[00:45:03] that's the
+[00:45:04] i think
+[00:45:05] so
+[00:45:05] calculator
+[00:45:06] no
+[00:45:07] chat
+[00:45:08] no
+[00:45:09] you went
+[00:45:09] with chat
+[00:45:09] yeah
+[00:45:11] says it
+[00:45:13] found the
+[00:45:13] problem
+[00:45:14] let's
+[00:45:18] see if
+[00:45:18] it'll
+[00:45:18] let me
+[00:45:19] sign up
+[00:45:19] see the
+[00:45:27] pro
+[00:45:27] hit enter
+[00:45:29] hit enter
+[00:45:30] right
+[00:45:31] hit enter
+[00:45:32] no
+[00:45:35] like i can
+[00:45:37] click
+[00:45:37] that
+[00:45:38] yeah
+[00:45:41] i think
+[00:45:41] it's still
+[00:45:42] because the
+[00:45:43] it doesn't
+[00:45:44] have all
+[00:45:45] of its
+[00:45:45] css
+[00:45:47] or something
+[00:45:48] it's coming
+[00:45:48] it had to
+[00:45:50] break it
+[00:45:50] five parts
+[00:45:51] feel
+[00:45:54] hard refresh
+[00:45:55] control
+[00:45:56] shift
+[00:45:56] r
+[00:45:57] no
+[00:45:58] is that
+[00:45:59] on a
+[00:45:59] good
+[00:46:02] command
+[00:46:09] shift
+[00:46:09] or
+[00:46:10] command
+[00:46:12] shift
+[00:46:12] delete
+[00:46:12] command
+[00:46:14] shift
+[00:46:16] delete
+[00:46:19] there
+[00:46:20] it
+[00:46:33] knocked
+[00:46:34] me out
+[00:46:34] of me
+[00:46:35] at my
+[00:46:35] va
+[00:46:35] va.gov
+[00:46:37] login
+[00:46:37] at least
+[00:46:39] it didn't
+[00:46:39] knock me
+[00:46:40] out of
+[00:46:40] google meet
+[00:46:41] that's
+[00:46:41] good
+[00:46:42] yeah
+[00:46:43] ouch
+[00:46:44] refresh
+[00:46:45] it see
+[00:46:46] what
+[00:46:46] happens
+[00:46:49] can you
+[00:46:54] go
+[00:46:54] anonymous
+[00:46:55] or are
+[00:46:59] you
+[00:46:59] anonymous
+[00:47:00] let me do
+[00:47:07] that
+[00:47:07] new private
+[00:47:10] window
+[00:47:10] yeah
+[00:47:11] let's see
+[00:47:13] i might
+[00:47:13] have to
+[00:47:13] share
+[00:47:14] that out
+[00:47:14] oh it's
+[00:47:17] that's
+[00:47:17] funny
+[00:47:17] it's
+[00:47:18] okay
+[00:47:20] now where
+[00:47:22] do you
+[00:47:22] go
+[00:47:22] i'm here
+[00:47:24] i can
+[00:47:24] i can
+[00:47:25] see
+[00:47:25] that
+[00:47:26] your
+[00:47:27] screen's
+[00:47:27] not being
+[00:47:28] shared
+[00:47:28] or you're
+[00:47:29] not being
+[00:47:29] shared
+[00:47:29] different
+[00:47:29] you're
+[00:47:30] still
+[00:47:30] there
+[00:47:30] um
+[00:47:40] okay
+[00:47:42] let me
+[00:47:43] share
+[00:47:44] again
+[00:47:44] that's
+[00:47:47] funny
+[00:47:47] yeah
+[00:47:47] stop
+[00:47:48] sharing
+[00:47:49] come on
+[00:47:53] stop
+[00:47:53] sharing
+[00:47:54] present
+[00:47:56] something
+[00:47:56] else
+[00:47:57] what
+[00:48:01] i don't
+[00:48:04] know
+[00:48:04] i think
+[00:48:04] that
+[00:48:05] that
+[00:48:06] uh
+[00:48:06] messing
+[00:48:07] with the
+[00:48:08] cash
+[00:48:08] oh you're
+[00:48:09] there
+[00:48:09] i see
+[00:48:12] you
+[00:48:13] yeah
+[00:48:14] i just
+[00:48:15] don't see
+[00:48:16] the screen
+[00:48:16] over there
+[00:48:17] you
+[00:48:18] you
+[00:48:22] you
+[00:48:24] you
+[00:48:26] you
+[00:48:27] are
+[00:48:33] 
+[00:48:33] still
+[00:48:33] there
+[00:48:34] you
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:43] 
+[00:48:57] That's red hot chili peppers wrapping it up.
+[00:49:21] Next, a glass from your 2023 listening tax sound guard.
+[00:49:28] Yeah.
+[00:49:35] Yeah.
+[00:49:37] Yeah.
+[00:49:40] Yeah.
+[00:49:47] Yeah.
+[00:49:52] Yeah.
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] 
+[00:50:08] there you are
+[00:50:32] hold on a sec let me fix my audio
+[00:50:38] i i think that that browser reset just took like 30 seconds to run and by the time it got to the end
+[00:50:51] it cleared everything so i had to re-log into my google and everything else oh are we still recording
+[00:50:59] um let me double check
+[00:51:03] and it's recording it's still recording okay okay
+[00:51:10] did it kick you out nope okay good i was here yeah i got back into meet and i was like join and it
+[00:51:22] had me all by myself and i was like what the hell so i had to go back into my calendar and click on the
+[00:51:28] join from my calendar
+[00:51:29] that's funny okay let's do this
+[00:51:35] okay so now
+[00:51:38] i think it's gonna be bad
+[00:51:42] i think it located another bug but we'll see
+[00:51:52] all that for that
+[00:51:57] yeah
+[00:51:57] yep
+[00:52:01] funny
+[00:52:02] hold on
+[00:52:10] is there a way to not i don't want to
+[00:52:20] see i'm gonna
+[00:52:22] stop presenting
+[00:52:24] i'm gonna it's probably gonna
+[00:52:25] yeah stop presenting
+[00:52:30] yeah their their interfaces wonky it's like you share your screen it's like
+[00:52:34] oh you you you're you're sharing your screen do you want to stop presenting or
+[00:52:40] no it's like uh no i don't want to and then it's like
+[00:52:44] it works but it still shows me my screen so it's like what the hell
+[00:52:55] show my screen anyway so i have to watch my own screen even though i'm presenting
+[00:53:02] yeah zoom is much better it's just
+[00:53:04] yeah if you go over 30 minutes you gotta pay for it
+[00:53:10] yeah
+[00:53:12] and
+[00:53:13] go ahead we kind of set it up so that uh the tribe can grab the transcripts
+[00:53:22] from the google meetings yeah and it seems like google meetings are are at least
+[00:53:28] reliable from that perspective oh looky there oh hey there we go
+[00:53:36] all right so if i click sign in
+[00:53:42] um
+[00:53:45] i think oh yeah that's sandbox.api
+[00:53:49] yeah yeah yeah i guess we're not an official
+[00:53:54] app yet well yeah we have to test it
+[00:54:00] and i have tested it and i did some regression testing and so forth but i've also changed
+[00:54:05] shit yeah but yeah you can sign in without going through that you can create your own account
+[00:54:14] and you can do real work on this right now okay so i go to sign in yeah look up at the top
+[00:54:28] creating account okay
+[00:54:35] oh
+[00:54:35] oh
+[00:54:39] oh
+[00:54:40] that's because it's on my damn it's on the
+[00:54:46] and
+[00:54:47] see should i be able to switch back to regular window now
+[00:54:52] yeah okay let me do that on a regular window now um stop presenting
+[00:55:01] i'm gonna close that one
+[00:55:05] put that one
+[00:55:07] put that one
+[00:55:15] okay now i'm going to share that one
+[00:55:28] okay
+[00:55:35] it's like i don't want to view my own damn screen
+[00:55:40] alexa do you have any notifications
+[00:55:46] alexa do you have any notifications
+[00:55:51] okay why did you dean
+[00:56:05] there we go okay there we go come on let me in creating account
+[00:56:14] i see uh some work back here going on
+[00:56:17] i don't know
+[00:56:19] things are happening
+[00:56:23] i don't know why it's taking so long
+[00:56:24] well it's
+[00:56:32] gonna do that i'm gonna see if you can hear me i'm going
+[00:56:38] okay
+[00:56:44] oh there it went i can pee without you hearing me
+[00:56:47] yeah
+[00:56:52] there you go yeah and i'm gonna go pee
+[00:56:55] so
+[00:57:02] 
+[00:57:02] 
+[00:57:02] 
+[00:57:02] 
+[00:57:02] 
+[00:57:02] 
+[00:57:02] 
+[00:57:02] 
+[00:57:02] 
+[00:57:02] 
+[00:57:02] 
+[00:57:02] 
+[00:57:02] 
+[00:57:02] 
+[00:57:02] All right.
+[00:57:32] I'm stepping away, Joe.
+[00:57:35] All right.
+[00:58:02] All right.
+[00:58:32] All right.
+[00:59:02] All right.
+[00:59:32] All right.
+[01:00:02] All right.
+[01:00:04] All right.
+[01:00:08] All right.
+[01:00:20] All right.
+[01:00:22] All right.
+[01:00:24] All right.
+[01:00:32] That doesn't look like my website.
+[01:00:34] Oh, wait.
+[01:00:38] I hate the VA website.
+[01:00:40] Because I went there.
+[01:00:42] Last week, I went there.
+[01:00:44] I followed the link that said, go here to get your medical records.
+[01:00:50] And I'm still waiting for them to physically get here.
+[01:00:54] But where do I go to find out if they process it or anything else?
+[01:00:59] It's like, what the heck?
+[01:01:00] what site did I go to last week
+[01:01:03] because I got here and I'm like oh I want to upload evidence
+[01:01:07] I wonder if there's a digital copy yet
+[01:01:10] you were there
+[01:01:14] manage
+[01:01:16] all claims and appeals is that
+[01:01:24] what you're talking about have you done anything yet
+[01:01:26] I submitted my intent to file is all I've done there
+[01:01:31] and then like
+[01:01:33] last week or the week before I came out here
+[01:01:38] and looked it's like okay I need to get my medical records
+[01:01:41] so I followed a link and I don't
+[01:01:44] think it was the va.gov site but it's like here go here
+[01:01:47] to get your medical records it's like where the heck
+[01:01:50] do I go to find where I logged into am I going to have to
+[01:01:53] dig through my history from last week
+[01:01:56] that might be fine
+[01:02:01] yeah
+[01:02:02] let's see can I search my history
+[01:02:07] in the words of General MacArthur
+[01:02:09] I have returned
+[01:02:10] hot
+[01:02:12] what you doing
+[01:02:16] I'm trying to find
+[01:02:19] where I submitted to get my medical records
+[01:02:22] last week
+[01:02:22] what
+[01:02:25] I said I don't want to see your search history
+[01:02:27] who knows what's in there
+[01:02:28] yeah I do that on private tabs so
+[01:02:32] there
+[01:02:33] see I don't I don't give a shit anymore
+[01:02:35] all right
+[01:02:38] so let me try and find it again
+[01:02:41] get
+[01:02:42] medical records
+[01:02:45] okay so the the tribe actually fixed it so you can get out there now
+[01:02:52] what is good I had two things run on the same port
+[01:02:56] uh
+[01:02:59] ganuda is the ai tribe that daryl uses
+[01:03:03] um it has a online presence
+[01:03:06] um
+[01:03:07] I am not a fan of this mirror all of a sudden
+[01:03:11] this thing right here
+[01:03:12] is it showing
+[01:03:15] is it reflecting whatever's
+[01:03:17] on your screen or something
+[01:03:19] no it's reflecting
+[01:03:19] this section of wall
+[01:03:21] so
+[01:03:23] right there
+[01:03:25] oh so that's the wall above the uh
+[01:03:29] window there
+[01:03:29] yeah
+[01:03:30] gotcha
+[01:03:31] yeah it's reflecting
+[01:03:34] the window
+[01:03:36] but now that I'm sitting here
+[01:03:43] and I've got the camera facing me here
+[01:03:44] and I'm just like
+[01:03:45] I need to change my camera angle
+[01:03:47] but I don't want that camera
+[01:03:49] pointing at work
+[01:03:50] are these recordings going anywhere
+[01:03:53] no
+[01:03:55] the
+[01:03:56] basically the
+[01:03:58] ganuda tribe
+[01:03:59] will go and
+[01:04:01] uh
+[01:04:02] review the transcript of it
+[01:04:05] and pull out like to do's for
+[01:04:08] daryl and me to do
+[01:04:10] and that type of thing
+[01:04:11] and summarize the meeting basically
+[01:04:13] yeah okay so
+[01:04:15] so all of the stuff that I was talking about
+[01:04:17] we don't necessarily need it to
+[01:04:18] listen to that do we
+[01:04:19] well it'll ignore it
+[01:04:22] hmm
+[01:04:23] it will ignore it
+[01:04:25] whatever you
+[01:04:26] I mean I can specify
+[01:04:28] hey ignore the stuff
+[01:04:29] Mike was talking about
+[01:04:30] blah blah blah
+[01:04:32] it'll do that
+[01:04:34] okay
+[01:04:35] it knows who's who
+[01:04:36] as soon as it starts processing
+[01:04:38] and I've got it set up
+[01:04:39] to where it recognizes
+[01:04:40] different voices
+[01:04:41] and so forth
+[01:04:42] see I'm logged in
+[01:04:56] sign in to review print
+[01:04:58] and download your VA medical records online
+[01:05:01] refresh your page
+[01:05:02] because you had to go to a sign in
+[01:05:03] so just hit refresh and it should
+[01:05:05] there you go
+[01:05:09] now it's changed already
+[01:05:10] so there's
+[01:05:15] oh
+[01:05:16] see there was
+[01:05:19] like the other day when I went
+[01:05:21] there was a link that said
+[01:05:22] go here to get your
+[01:05:23] to order your medical records
+[01:05:26] oh yeah
+[01:05:27] go back up real quick
+[01:05:29] there's the VA form you have to submit
+[01:05:33] well that's in person
+[01:05:37] yeah
+[01:05:37] so I did it online
+[01:05:39] and I followed the link that said
+[01:05:41] hey do it online
+[01:05:42] see that's the problem
+[01:05:44] is it gives like a dozen different things
+[01:05:46] that you could do
+[01:05:47] I think I tried to do that
+[01:05:55] before myself
+[01:05:56] and
+[01:05:59] they haven't
+[01:06:01] if I recall correctly
+[01:06:03] they hadn't built that feature in yet
+[01:06:05] so you can do it all online
+[01:06:07] but you still have to go pick it up
+[01:06:08] in person
+[01:06:09] and sign for it
+[01:06:10] well have you looked at my healthy vet yet
+[01:06:12] I haven't really
+[01:06:16] played with it yet
+[01:06:18] so they've migrated
+[01:06:21] yeah
+[01:06:21] they've migrated
+[01:06:22] to a lot of that stuff
+[01:06:24] yeah
+[01:06:25] yeah because a lot of your
+[01:06:26] VA related specific stuff
+[01:06:29] isn't going to be on
+[01:06:30] VA.gov
+[01:06:31] it's going to probably
+[01:06:32] be on my healthy vet
+[01:06:34] right
+[01:06:35] which I don't really have any
+[01:06:36] VA stuff yet
+[01:06:38] here I can log into mine
+[01:06:39] and take a look
+[01:06:40] because I'm waiting for my actual
+[01:06:43] medical records
+[01:06:44] to be sent to me
+[01:06:45] because I
+[01:06:46] followed one of these
+[01:06:47] links last year
+[01:06:48] or last week
+[01:06:50] or the week before
+[01:06:51] and I thought it was
+[01:06:53] one of these
+[01:06:54] but it said
+[01:06:54] hey go here
+[01:06:55] and
+[01:06:56] and
+[01:06:57] find your VA
+[01:06:59] medical records
+[01:07:00] or have them sent to you
+[01:07:02] online through secure message
+[01:07:05] see that's VA
+[01:07:08] medical records
+[01:07:09] I want my military
+[01:07:12] medical records
+[01:07:13] I think
+[01:07:14] yeah
+[01:07:19] that should be in a
+[01:07:20] different place
+[01:07:21] I would say
+[01:07:22] wouldn't that be out of
+[01:07:24] St. Louis
+[01:07:24] it depends on where you
+[01:07:27] got out
+[01:07:27] I don't think it's just
+[01:07:29] one single place
+[01:07:31] I thought it all
+[01:07:32] needed there eventually
+[01:07:33] yeah
+[01:07:39] my VA
+[01:07:45] oh I guess I should pay this bill
+[01:08:06] resolve this bill
+[01:08:07] I don't want to do that right now
+[01:08:25] no
+[01:08:26] I won't do that
+[01:08:27] there it is
+[01:08:28] request your records
+[01:08:30] using EVETREX
+[01:08:31] on the National Archives
+[01:08:33] register
+[01:08:33] that was the one
+[01:08:35] so I need to
+[01:08:35] bookmark that one
+[01:08:36] uh
+[01:08:40] well
+[01:08:52] shoot
+[01:09:02] do I have that
+[01:09:03] your service request
+[01:09:06] was included in the
+[01:09:07] confirmation page
+[01:09:08] after submitting your
+[01:09:09] request
+[01:09:09] I thought you just
+[01:09:12] clicked on
+[01:09:12] how to submit
+[01:09:13] well so
+[01:09:15] that
+[01:09:15] this is the one
+[01:09:16] I went to
+[01:09:17] last week
+[01:09:18] or whatever
+[01:09:18] right
+[01:09:20] let's see
+[01:09:23] pretty sure
+[01:09:27] I saved
+[01:09:28] the
+[01:09:28] or printed
+[01:09:30] the page
+[01:09:31] your disability
+[01:09:37] rating
+[01:09:37] 30%
+[01:09:38] service
+[01:09:38] connected
+[01:09:39] 10%
+[01:09:46] for lower
+[01:09:47] left
+[01:09:47] 10%
+[01:09:48] for
+[01:09:49] degenerative
+[01:09:49] disc
+[01:09:50] 10%
+[01:09:54] for left
+[01:09:55] shoulder
+[01:09:55] internal
+[01:09:58] derangement
+[01:09:59] or internal
+[01:10:03] derangement
+[01:10:04] what
+[01:10:04] yeah
+[01:10:04] wait a minute
+[01:10:07] what the heck
+[01:10:08] it says
+[01:10:12] 
+[01:10:12] I have
+[01:10:12] 30%
+[01:10:13] but it's
+[01:10:13] showing
+[01:10:14] service
+[01:10:15] connected
+[01:10:15] ratings
+[01:10:16] 10%
+[01:10:17] for
+[01:10:17] left
+[01:10:21] lower
+[01:10:21] extremity
+[01:10:21] 10%
+[01:10:22] for lumbar
+[01:10:23] strain
+[01:10:23] with
+[01:10:24] degenerative
+[01:10:24] disc
+[01:10:25] 10%
+[01:10:26] for left
+[01:10:26] shoulder
+[01:10:27] internal
+[01:10:27] derangement
+[01:10:28] and 10%
+[01:10:29] rating
+[01:10:29] for left
+[01:10:30] knee
+[01:10:30] internal
+[01:10:30] derangement
+[01:10:31] oh yeah
+[01:10:33] the percentages
+[01:10:35] don't add up
+[01:10:36] it adds up
+[01:10:37] to 40%
+[01:10:38] what the hell
+[01:10:38] yeah
+[01:10:39] did you do it
+[01:10:40] on my website
+[01:10:41] no
+[01:10:43] I'm looking
+[01:10:45] at my
+[01:10:45] I'm looking
+[01:10:46] at my
+[01:10:46] actual
+[01:10:47] VA
+[01:10:47] rating
+[01:10:49] I think
+[01:10:50] it would
+[01:10:50] explain it
+[01:10:57] how the
+[01:10:58] percentages
+[01:10:58] were
+[01:10:59] yeah but
+[01:11:01] that would
+[01:11:01] mean I'd
+[01:11:02] have to
+[01:11:02] log into
+[01:11:03] your
+[01:11:03] website
+[01:11:03] and then
+[01:11:04] no you
+[01:11:04] don't have
+[01:11:04] to log
+[01:11:04] and you
+[01:11:05] can use
+[01:11:05] the calculator
+[01:11:06] without
+[01:11:06] logging
+[01:11:06] yeah
+[01:11:07] combined
+[01:11:24] conditions
+[01:11:28] VA
+[01:11:29] determined
+[01:11:29] aren't
+[01:11:30] service
+[01:11:30] connected
+[01:11:31] bilateral
+[01:11:31] hearing
+[01:11:32] lost
+[01:11:32] even
+[01:11:32] though
+[01:11:32] I
+[01:11:33] was
+[01:11:33] an
+[01:11:33] aviation
+[01:11:33] mechanic
+[01:11:34] are
+[01:11:37] bilateral
+[01:11:38] wrists
+[01:11:38] even
+[01:11:39] though
+[01:11:39] I
+[01:11:39] was
+[01:11:39] turning
+[01:11:39] wrenches
+[01:11:40] left
+[01:11:42] ankle
+[01:11:42] condition
+[01:11:42] even
+[01:11:43] though
+[01:11:43] I
+[01:11:43] fell
+[01:11:43] off
+[01:11:43] an
+[01:11:43] aircraft
+[01:11:44] stupid
+[01:11:49] but you
+[01:11:52] know why
+[01:11:52] they're
+[01:11:52] you know
+[01:11:53] why they
+[01:11:53] didn't
+[01:11:53] connect
+[01:11:54] my wrists
+[01:11:55] while I
+[01:11:57] was in
+[01:11:57] service
+[01:11:58] I had
+[01:11:58] a
+[01:11:59] I
+[01:11:59] was
+[01:12:00] riding
+[01:12:00] rollerblades
+[01:12:01] and I
+[01:12:02] fell down
+[01:12:02] at one
+[01:12:02] point
+[01:12:03] and you
+[01:12:03] know
+[01:12:03] landed
+[01:12:04] on my
+[01:12:04] hands
+[01:12:05] to brace
+[01:12:06] myself
+[01:12:06] and they're
+[01:12:08] like oh
+[01:12:08] because that's
+[01:12:09] documented in your
+[01:12:09] record it's not
+[01:12:10] service connected
+[01:12:10] I'm like
+[01:12:11] but my wrists
+[01:12:14] wouldn't have been so
+[01:12:15] messed up from that
+[01:12:16] fall if it had
+[01:12:17] not already had
+[01:12:17] damage from
+[01:12:18] off
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:34] 
+[01:12:48] see how much zoom pro is
+[01:12:54] 150 bucks annually
+[01:13:02] for one user
+[01:13:06] uh yeah one user what do you need zoom pro for
+[01:13:14] uh well joe and i were just talking while you were gone
+[01:13:18] he was presenting and he has to stare at his screen while he's presenting
+[01:13:23] like i can't hide the presentation
+[01:13:29] from my group oh from your own screen right
+[01:13:35] that's why i'm probably on this web but i mean i have multiple monitors too i've got three going but
+[01:13:44] it's like i'm either looking at you guys with my presentation mixed in with the mix
+[01:13:51] or i'm not looking at you guys
+[01:13:53] yeah i just keep the web browser over here where the where it's all happening
+[01:13:59] well you can always pin
+[01:14:01] people i don't know i'd have to present again to play with it
+[01:14:05] let's look at settings
+[01:14:13] send additional diagnostic info to google no thank you
+[01:14:19] guys whenever i start bobbing like this sometimes you know
+[01:14:25] because i'm listening to music monkeys are playing right i mean i'm sorry
+[01:14:32] the gorillas are playing right now
+[01:14:34] on melancholy hill and i was just kind of feeling it but it looked like i
+[01:14:40] like your adhd is like i want to be doing something oh no i i get that one
+[01:14:46] i am doing something now while joe's doing something i'm
+[01:14:53] doing stuff too so
+[01:14:55] and i'm looking at the zoom thing thinking about buying it
+[01:15:00] all my money is tied up in paying off
+[01:15:09] if i bought stuff i've already bought
+[01:15:12] well well if i bought it and i set up the meeting then
+[01:15:17] you guys would have to extend your time
+[01:15:21] theoretically yeah you started a meeting and i joined it then it would still be the
+[01:15:25] short
+[01:15:25] see how much it is
+[01:15:32] and they broke comfy why
+[01:15:38] it's 543 dollars for more licenses
+[01:15:45] eww
+[01:15:54] why are those notes not found
+[01:16:01] so joe are you trying to log in
+[01:16:07] and get your documents
+[01:16:11] okay
+[01:16:15] why are those notes not found
+[01:16:17] so joe are you trying to log in
+[01:16:20] and get your documents
+[01:16:23] so i can get logged in
+[01:16:27] 
+[01:16:27] but in order to
+[01:16:29] see the status of my request i need to know the number of my request
+[01:16:35] was it not emailed to you
+[01:16:37] i don't think so
+[01:16:39] i don't think so
+[01:16:40] i would think that the ba would have
+[01:16:43] or i mean the veteran whatever
+[01:16:45] veteran whatever whoever they are
+[01:16:48] whoever they are
+[01:16:49] e-vech
+[01:16:55] 
+[01:16:55] 
+[01:16:55] e-vech bricks
+[01:16:56] okay
+[01:17:02] your request for military military personal file information has been processed
+[01:17:12] not held in the service digital ompf register database
+[01:17:19] now
+[01:17:20] well that's what's going on
+[01:17:22] i know that was
+[01:17:25] that was
+[01:17:26] that was last year
+[01:17:28] that was when i
+[01:17:29] had to request my
+[01:17:32] bd 214
+[01:17:33] or something
+[01:17:34] or not last year
+[01:17:35] ten years ago
+[01:17:36] i may just have to wait until it physically gets here
+[01:17:49] pain in the ass
+[01:17:51] there's a confirmation that i logged in
+[01:18:03] you're verified
+[01:18:05] yeah
+[01:18:06] but there's nothing talking about the archives
+[01:18:10] the actual response or anything like that
+[01:18:17] there's no phone number
+[01:18:30] last ditch effort
+[01:18:32] i think comfy ui is gonna
+[01:18:43] i think me fixing comfy ui in my workload work nodes or workflows that's gonna take me
+[01:18:51] a bit to fix
+[01:18:53] i may have to call them anyways
+[01:19:08] anyways
+[01:19:09] i can't access property store what
+[01:19:12] i want to create a new workflow
+[01:19:15] what the fuck
+[01:19:16] all right new workflow no
+[01:19:19] no
+[01:19:20] ah
+[01:19:22] it sucks
+[01:19:24] that sucks
+[01:19:35] as your
+[01:19:36] comfy ui i got some weird problems under the covers
+[01:19:40] yeah
+[01:19:41] 
+[01:19:41] weird
+[01:19:42] weird
+[01:19:43] who still you who still looks at nine gag
+[01:19:49] looks at what nine gag do you remember that website
+[01:19:55] yeah
+[01:19:56] what about ebombs
+[01:20:01] ebombs world yeah
+[01:20:03] but i got a friend on discord that always sends me links to nine gag images and i'm like i haven't used that since like early 2000s
+[01:20:13] early 2000s
+[01:20:18] like the idea of even going to it makes me want a nine gag
+[01:20:22] i have been
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] 
+[01:20:38] Yeah, to be fair, that's a good one.
+[01:20:56] Looking for something else to put in there, Joe?
+[01:21:00] Yeah, I'm seeing if...
+[01:21:02] I'm browsing through my email now.
+[01:21:04] So, trying to see if there's something interesting.
+[01:21:13] At least something related to that freaking...
+[01:21:16] So, when I looked here, it's like, oh yeah, don't even bother contacting us for 10 days.
+[01:21:21] So, they may not even start it on it.
+[01:21:28] Well, about 10 days for us to receive and initiate processing.
+[01:21:37] Then you may check the status of your request.
+[01:21:43] So, I may not have that number because they haven't really received and started the process yet.
+[01:21:49] That's kind of what I'm thinking, yeah.
+[01:21:50] Yeah, yeah.
+[01:21:52] Well, so, theoretically though, even if I don't upload evidence, I should be able to talk to the AI, right?
+[01:22:00] Yeah.
+[01:22:01] So, start a new chat.
+[01:22:03] 
+[01:22:16] 
+[01:22:20] Am I spinning them up over there?
+[01:22:24] It was already spun up.
+[01:22:25] Now, it's double spun.
+[01:22:29] At least the button actually works to start a chat now.
+[01:22:33] Yeah.
+[01:22:41] Did it pop that up or...
+[01:22:43] No.
+[01:22:44] No.
+[01:22:44] Okay.
+[01:22:45] I'm bookmarking all these pages so I can come back to them later.
+[01:22:58] I think it's now hitting it.
+[01:23:00] Okay.
+[01:23:13] It spit something out at you?
+[01:23:25] Yeah.
+[01:23:26] Yeah.
+[01:23:29] To provide an accurate and actionable and new details such as narrative and any relevant medical diagnoses and how those conditions affect their daily life and ability to function.
+[01:23:43] Oh, so, I guess that deliberation is the thinking.
+[01:23:52] Maybe.
+[01:23:54] Yeah.
+[01:23:54] Yeah.
+[01:23:55] So, it's the deliberation and then the response of the veteran.
+[01:23:57] Then there...
+[01:24:09] Well, yeah.
+[01:24:10] And it's saved up there on the left-hand side so you can revisit any chat that you start.
+[01:24:15] 
+[01:24:15] 
+[01:24:15] 
+[01:24:15] 
+[01:24:27] Okay.
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] 
+[01:24:44] Okay
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] 
+[01:25:00] Did you search for something else?
+[01:25:27] Joe?
+[01:25:32] Not yet.
+[01:25:34] Okay.
+[01:25:35] All right.
+[01:25:38] Chloro, fluoro, ethylene.
+[01:25:43] Okay.
+[01:25:51] Okay.
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] 
+[01:26:07] Tina
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] 
+[01:26:23] I see it churning.
+[01:26:42] That's not.
+[01:26:51] These detailed medical records.
+[01:26:53] Theyayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayedayed
+[01:27:23] anything that's entered in chat that hasn't been filled out in your forms or in the calculator
+[01:27:31] or auto-fill. I was going to grind on that for a little bit.
+[01:27:44] Well, it's still, I think I've responded to you that way.
+[01:27:53] It's doing the thing on that.
+[01:28:01] So if I step away from the chat, will the chat continue and be there when I come back to it?
+[01:28:09] Yeah.
+[01:28:10] Okay.
+[01:28:23] It's grinding away on things, doing some updates.
+[01:28:42] We'll see.
+[01:28:43] Yeah.
+[01:28:45] I'll step away for a minute while it's doing its thing.
+[01:28:48] All right.
+[01:28:49] Mike, do you have your medical records in digital form?
+[01:28:54] No.
+[01:28:54] I've got them all physical.
+[01:28:56] Okay.
+[01:28:57] I have a feeling I'm probably going to have to scan all my records when they're actually physically get here,
+[01:29:03] whenever that may be.
+[01:29:04] No, I walked into their office and I went kerchunk.
+[01:29:08] Oh, yeah?
+[01:29:08] Oh, yeah.
+[01:29:09] I feel like I should digitize them at some point.
+[01:29:16] That way I can better organize.
+[01:29:18] Is that what I think it is?
+[01:29:20] Hmm?
+[01:29:26] I thought you were taking a break from...
+[01:29:30] Oh, yeah.
+[01:29:31] I'm getting ready to.
+[01:29:35] Actually, yeah.
+[01:29:36] It's not tobacco, is it?
+[01:29:36] I picked up a pack.
+[01:29:41] I've been at about a pack every time.
+[01:29:43] Shame on you, friend.
+[01:29:44] Shame on you.
+[01:29:45] Since Matt went into the hospital, so...
+[01:29:48] Yeah.
+[01:29:48] You've now had two family members die from lung cancer and here you are smoking.
+[01:29:53] Mm-hmm.
+[01:29:54] Mm-hmm.
+[01:29:58] I figure after the first one, you would have learned your lesson.
+[01:30:00] I know that's cruel of me to say it that way, but come on, dude.
+[01:30:04] I want you to stick around for a bit.
+[01:30:06] I had been quit for a few months, and then when Matt went into the hospital, I picked up a pack.
+[01:30:16] I'm not smoking horribly, but I have one or two a day.
+[01:30:21] Mm-hmm.
+[01:30:22] I mean, I'm vaping, but it's better than smoking.
+[01:30:28] Yeah.
+[01:30:29] See, when I started doing the vape, I started coughing more.
+[01:30:35] That's because you...
+[01:30:36] So you either had too high a milligram, taking too big a hits, or, you know, whatever.
+[01:30:43] There it goes.
+[01:30:44] I mean, just in general.
+[01:30:47] Just jump like that.
+[01:30:53] Did it finally pop something up on the screen, or...?
+[01:30:57] Yeah.
+[01:30:58] Yeah.
+[01:30:59] Okay.
+[01:31:00] I'll look at it here in a couple minutes.
+[01:31:02] Man, it's windy out here today.
+[01:31:19] Yeah.
+[01:31:19] Yeah.
+[01:31:19] Oh, so I didn't hear last night when Jerry was asking the question.
+[01:31:32] How high are you on mileage since your service, or over your service?
+[01:31:38] A thousand.
+[01:31:39] A thousand?
+[01:31:40] Oh, that's nothing.
+[01:31:42] Yeah.
+[01:31:42] Is that for the first service, or the second?
+[01:31:47] Well, since it's got 10,000 miles on it, and it's for every 10,000 miles, I probably had
+[01:31:55] break-in service, and then this kind of a regular service after that.
+[01:31:59] Now it's time.
+[01:32:01] Yeah.
+[01:32:02] Okay.
+[01:32:03] That's not awful.
+[01:32:05] Yeah.
+[01:32:05] I was thinking of going riding today, but it's too windy to be enjoyable, I think.
+[01:32:12] Yeah.
+[01:32:12] Oh, you can take me over there, or follow me over to Indians sometime.
+[01:32:22] Yeah.
+[01:32:22] You have to drop it off for a while?
+[01:32:25] Well, just to get serviced.
+[01:32:26] Okay.
+[01:32:27] Yeah.
+[01:32:29] Maybe we'll do a work day next week, and I'll swing over there, and then we can go drop it
+[01:32:36] off and hang out at your house doing some work.
+[01:32:39] Okay.
+[01:32:40] Okay.
+[01:32:45] Planning for Tuesday?
+[01:32:50] Yeah.
+[01:32:50] Yeah.
+[01:32:50] Actually, I think the weather improves on Tuesday, so it'll be a delight to drive it, ride it
+[01:32:56] over there.
+[01:32:57] We're supposed to have a massive cold front come in soon.
+[01:33:01] Yeah.
+[01:33:02] Oh, yeah.
+[01:33:03] Tomorrow, it's going to be in the 50s.
+[01:33:05] Tonight, it's going to be in the 20s.
+[01:33:08] The weekend, it's going to be colder.
+[01:33:10] Yeah, Saturday, it's going to be Sunday, it has a low of 17.
+[01:33:16] Yeah.
+[01:33:17] So, it's going to be high of 44, low of 17 on Sunday.
+[01:33:21] I guess it's not awful, but it's cold.
+[01:33:25] Cold enough to not want to ride.
+[01:33:27] Enjoy a little ride.
+[01:33:27] Yeah.
+[01:33:28] All right.
+[01:33:36] So, the dashboard came back.
+[01:33:38] Let's see.
+[01:33:38] So, I've got to set up my web servers to make that faster.
+[01:33:41] There's your chats.
+[01:33:42] Oh, well.
+[01:33:42] Hey.
+[01:33:44] We're still recording, aren't we?
+[01:33:47] Yeah.
+[01:33:48] Yeah.
+[01:33:48] I want to tell you about stuff, but not on recording.
+[01:33:54] I can stop the recording for a little bit.
+[01:34:00] Now, where's my recording thing?
+[01:34:04] There's the recording thing.
+[01:34:08] Maybe.
+[01:34:18] Yeah.
+[01:34:19] I'm not a huge fan of this interface.
+[01:34:24] How do I stop recording now?
+[01:34:26] It's on the three-button menu.
+[01:34:31] It's not showing me the recording options now on the three-button menu.
+[01:34:36] Unless it's on one of the other windows.
+[01:34:39] Maybe.
+[01:34:43] Well, either way.
+[01:34:44] Whatever.
+[01:34:44] I don't care.
+[01:34:45] I don't really care.
+[01:34:46] So, I told you about Little Princess, right?
+[01:34:53] Joe, you wouldn't know anything about this.
+[01:34:55] It's ringing a bell.
+[01:34:57] I need a refresher.
+[01:34:59] She finally sent me, like, a video with her face on it.
+[01:35:03] Oh, yeah?
+[01:35:09] That's just her complaining about the fact that she had a lunch date today that stood her up.
+[01:35:13] But she got Chipotle anyways.
+[01:35:16] Oh, yeah.
+[01:35:21] But, yeah.
+[01:35:22] No, she's back in touch with me.
+[01:35:25] And then she's mad at me because I'm not responding in a timely manner.
+[01:35:29] And I'm like, but I'm busy.
+[01:35:33] And my ADH brain, you know, I read the message and I think,
+[01:35:37] how am I going to reply to this?
+[01:35:39] And I think about that for a moment.

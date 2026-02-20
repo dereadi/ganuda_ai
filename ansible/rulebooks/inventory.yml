@@ -1,0 +1,17 @@
+---
+# EDA-specific inventory — points to the same federation nodes
+# but used by ansible-rulebook context
+all:
+  children:
+    linux:
+      hosts:
+        redfin:
+          ansible_host: 192.168.132.223
+        bluefin:
+          ansible_host: 192.168.132.222
+        greenfin:
+          ansible_host: 192.168.132.224
+    macos:
+      hosts:
+        sasass:
+          ansible_host: 192.168.132.21
