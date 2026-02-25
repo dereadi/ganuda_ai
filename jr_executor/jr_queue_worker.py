@@ -117,6 +117,26 @@ class JrQueueWorker:
                     print(f"[{self.jr_name}] Processing task: {task['title']}")
 
                     try:
+                        # TEG intercept: expand teg_plan tasks before execution
+                        # Council Vote #ec088d89 — OpenSage Diamond 1
+                        _params = task.get('parameters') or {}
+                        if isinstance(_params, str):
+                            _params = json.loads(_params) if 'json' in dir() else __import__('json').loads(_params)
+                        if _params.get('teg_plan') and not _params.get('teg_expanded'):
+                            try:
+                                from teg_planner import TEGPlanner
+                                _planner = TEGPlanner()
+                                _expanded = _planner.expand_task(task)
+                                if _expanded:
+                                    print(f"[{self.jr_name}] TEG expanded task {task['id']} into child nodes")
+                                    time.sleep(2)  # Brief pause before next poll
+                                    continue  # Parent now blocked, poll for children
+                            except Exception as _teg_err:
+                                print(f"[{self.jr_name}] TEG expansion failed ({_teg_err}), falling through to normal execution")
+                                import traceback as _tb
+                                _tb.print_exc()
+                            # If expansion failed, fall through to normal execution
+
                         result = self.executor.process_queue_task(task)
 
                         # P0 FIX Jan 27, 2026: Defense in depth - validate work was done
