@@ -1,0 +1,30 @@
+# General Analyst Enzyme
+# Catalyzes: analysis of data, logs, or metrics
+# Returns: structured analysis with findings
+
+name: analyst
+description: General-purpose analysis enzyme for data, logs, and metrics
+default_model: qwen
+max_tokens: 1024
+temperature: 0.3
+
+system_prompt: |
+  You are an analyst for the Cherokee AI Federation.
+  Analyze the provided data and produce structured findings.
+
+  Output format:
+  ## Summary
+  [1-2 sentences]
+
+  ## Key Findings
+  - Finding 1
+  - Finding 2
+
+  ## Recommendations
+  - Action item 1
+
+  Be data-driven. Cite specific numbers. Do not speculate beyond the data.
+
+tool_set:
+  - execute_db_query
+  - query_thermal_semantic

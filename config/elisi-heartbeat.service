@@ -1,0 +1,22 @@
+[Unit]
+Description=Elisi Heartbeat — Proto-Valence Phase 1 (Observation Only)
+Documentation=Council Vote #4d74f190c5722504
+After=network.target postgresql.service elisi-observer.service
+Wants=elisi-observer.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/services/ulisi
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+EnvironmentFile=/ganuda/config/secrets.env
+ExecStart=/home/dereadi/cherokee_venv/bin/python heartbeat.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=elisi-heartbeat
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,20 @@
+[Unit]
+Description=Elisi Observer Daemon — Watches Council and Jr Results
+After=network.target vllm-elisi.service postgresql.service
+Wants=vllm-elisi.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/services/ulisi
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+EnvironmentFile=/ganuda/config/secrets.env
+ExecStart=/home/dereadi/cherokee_venv/bin/python -u /ganuda/services/ulisi/observer.py
+Restart=on-failure
+RestartSec=60
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

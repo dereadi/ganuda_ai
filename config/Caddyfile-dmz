@@ -1,0 +1,30 @@
+# Caddyfile — DMZ Web Servers (owlfin/eaglefin)
+# Cherokee AI Federation
+# Offloads web traffic from redfin (GPU inference only)
+
+# Ganuda.us - Static Landing Page
+ganuda.us {
+	root * /home/dereadi/www/ganuda.us
+	file_server
+}
+
+www.ganuda.us {
+	redir https://ganuda.us{uri} permanent
+}
+
+# VetAssist - Reverse proxy to redfin backend
+vetassist.ganuda.us {
+	# API routes - proxy to redfin backend
+	handle /api/* {
+		reverse_proxy 192.168.132.223:8001 {
+			header_up Host {upstream_hostport}
+		}
+	}
+
+	# Frontend (Next.js) - proxy to redfin
+	handle {
+		reverse_proxy 192.168.132.223:3000 {
+			header_up Host {upstream_hostport}
+		}
+	}
+}

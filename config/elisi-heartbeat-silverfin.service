@@ -1,0 +1,16 @@
+[Unit]
+Description=Elisi Heartbeat Check — Silverfin SPOF Monitor
+Documentation=Council Vote #35dfc9184aabe1e6
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=dereadi
+Group=dereadi
+WorkingDirectory=/opt/ganuda
+EnvironmentFile=/opt/ganuda/secrets.env
+ExecStart=/usr/bin/python3 /opt/ganuda/heartbeat.py
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=elisi-heartbeat

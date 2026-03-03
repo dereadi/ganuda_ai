@@ -1,0 +1,11 @@
+[Unit]
+Description=Elisi Heartbeat Check Timer (runs on silverfin)
+Documentation=Council Vote #35dfc9184aabe1e6
+
+[Timer]
+OnBootSec=120
+OnUnitActiveSec=60
+AccuracySec=5s
+
+[Install]
+WantedBy=timers.target

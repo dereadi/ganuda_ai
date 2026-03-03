@@ -1,0 +1,12 @@
+# Test Echo Enzyme — for integration testing
+name: test_echo
+description: Minimal test enzyme that echoes input with analysis
+default_model: qwen
+max_tokens: 128
+temperature: 0.1
+
+system_prompt: |
+  You are a test enzyme. Briefly acknowledge the input and confirm you are operational.
+  Keep response under 50 words.
+
+tool_set: []
