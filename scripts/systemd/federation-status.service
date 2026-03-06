@@ -1,0 +1,10 @@
+[Unit]
+Description=Cherokee AI Federation Status Page Generator
+After=network.target
+
+[Service]
+Type=oneshot
+User=dereadi
+WorkingDirectory=/ganuda
+EnvironmentFile=/ganuda/config/secrets.env
+ExecStart=/usr/bin/python3 /ganuda/scripts/generate_status_page.py

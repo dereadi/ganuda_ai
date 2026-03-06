@@ -46,6 +46,7 @@ class DailyBriefingGenerator:
     Usage:
         generator = DailyBriefingGenerator(config)
         generator.generate_and_send()
+        generator.publish_to_web()  # Also publishes HTML to ganuda.us/briefing.html
 
     The briefing has five sections:
     1. Summary -- LLM-generated "What's on your plate today"

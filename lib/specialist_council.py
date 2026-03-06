@@ -41,16 +41,26 @@ QWEN_BACKEND = {
     "description": "Fast path — Qwen2.5-72B-Instruct on redfin RTX 6000"
 }
 
-DEEPSEEK_BACKEND = {
+BMASASS_BACKEND = {
     "url": "http://100.103.27.106:8800/v1/chat/completions",  # Tailscale IP — stable for mobile node
-    "model": "mlx-community/DeepSeek-R1-Distill-Llama-70B-4bit",
+    "model": "Qwen/Qwen3-30B-A3B-MLX-4bit",
     "timeout": 120,
-    "description": "Deep path — DeepSeek-R1-32B on bmasass M4 Max"
+    "description": "Deep path — Qwen3-30B-A3B dual-mode on bmasass M4 Max"
 }
 
+LLAMA_BACKEND = {
+    "url": "http://100.103.27.106:8801/v1/chat/completions",  # Tailscale IP
+    "model": "mlx-community/Llama-3.3-70B-Instruct-4bit",
+    "timeout": 120,
+    "description": "Llama path — Llama-3.3-70B direct on bmasass M4 Max"
+}
+
+# Backward compat alias — routing code references this
+DEEPSEEK_BACKEND = BMASASS_BACKEND
+
 SPECIALIST_BACKENDS = {
-    "raven": DEEPSEEK_BACKEND,
-    "turtle": DEEPSEEK_BACKEND,
+    "raven": BMASASS_BACKEND,
+    "turtle": LLAMA_BACKEND,
     "crawdad": QWEN_BACKEND,
     "gecko": QWEN_BACKEND,
     "eagle_eye": QWEN_BACKEND,
@@ -157,11 +167,11 @@ INFRASTRUCTURE_CONTEXT = """CHEROKEE AI FEDERATION INFRASTRUCTURE:
 | sasass | 192.168.132.241 | Mac Studio | Edge development |
 | sasass2 | 192.168.132.242 | Mac Studio | Edge development |
 | tpm-macbook | local | Command Post | Claude Code CLI, TPM workstation |
-| bmasass | 100.103.27.106 (Tailscale) | Mac Mobile | MLX DeepSeek-R1 (8800) |
+| bmasass | 100.103.27.106 (Tailscale) | Mac Mobile | MLX Qwen3-30B-A3B (8800) + Llama-3.3-70B (8801) |
 
 SERVICES:
 - vLLM: Qwen2.5-72B-Instruct-AWQ on 96GB Blackwell RTX PRO 6000 (~32 tok/sec)
-- MLX: DeepSeek-R1-Distill-Llama-70B-4bit on M4 Max 128GB
+- MLX: Qwen3-30B-A3B-4bit (8800) + Llama-3.3-70B-Instruct-4bit (8801) on M4 Max 128GB
 - LLM Gateway v1.6.0: OpenAI-compatible API with Council voting + Long Man routing
 - PostgreSQL: zammad_production on bluefin (thermal_memory_archive, council_votes)
 - Health Monitor: Distributed across redfin/bluefin

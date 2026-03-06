@@ -207,6 +207,10 @@ class Tier1Reflex:
         Returns:
             Tuple of (answer_text, success_bool).
         """
+        # Route to Anthropic if provider is set
+        if getattr(endpoint, 'provider', 'openai') == 'anthropic':
+            return self._call_anthropic(endpoint, prompt)
+
         headers = {"Content-Type": "application/json"}
         if endpoint.api_key:
             headers["Authorization"] = "Bearer " + endpoint.api_key
@@ -255,6 +259,72 @@ class Tier1Reflex:
             return ("", False)
         except Exception as e:
             logger.error("Unexpected error calling %s: %s", endpoint.url, e)
+            return ("", False)
+
+    def _call_anthropic(
+        self,
+        endpoint: EndpointConfig,
+        prompt: str,
+    ) -> tuple:
+        """Call Anthropic Claude API using messages format.
+
+        Converts to Anthropic's message format, calls the API, and normalizes
+        the response back to the same (answer_text, success_bool) tuple format.
+        """
+        import os
+        api_key = endpoint.api_key or os.environ.get("ANTHROPIC_API_KEY", "")
+        if not api_key:
+            logger.error("Anthropic API key not configured")
+            return ("", False)
+
+        payload = {
+            "model": endpoint.model,
+            "max_tokens": endpoint.max_tokens,
+            "messages": [
+                {"role": "user", "content": prompt},
+            ],
+        }
+
+        headers = {
+            "x-api-key": api_key,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        }
+
+        try:
+            response = self._session.post(
+                endpoint.url,
+                json=payload,
+                headers=headers,
+                timeout=endpoint.timeout_seconds,
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            # Extract text from Anthropic response format
+            content_blocks = data.get("content", [])
+            if content_blocks:
+                answer = content_blocks[0].get("text", "")
+                if answer:
+                    return (answer.strip(), True)
+
+            logger.warning("Empty response from Anthropic API")
+            return ("", False)
+
+        except requests.exceptions.Timeout:
+            logger.warning(
+                "Timeout calling Anthropic API (limit: %ds)",
+                endpoint.timeout_seconds,
+            )
+            return ("", False)
+        except requests.exceptions.ConnectionError:
+            logger.warning("Connection error calling Anthropic API")
+            return ("", False)
+        except requests.exceptions.HTTPError as e:
+            logger.warning("HTTP error from Anthropic API: %s", e)
+            return ("", False)
+        except Exception as e:
+            logger.error("Unexpected error calling Anthropic API: %s", e)
             return ("", False)
 
     def _estimate_confidence(self, answer: str) -> float:

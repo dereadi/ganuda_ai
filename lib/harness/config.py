@@ -20,13 +20,14 @@ logger = logging.getLogger("harness.config")
 
 @dataclass
 class EndpointConfig:
-    """Configuration for an LLM endpoint (OpenAI-compatible API)."""
+    """Configuration for an LLM endpoint (OpenAI-compatible or Anthropic API)."""
     url: str = "http://localhost:8000/v1/chat/completions"
     model: str = "default"
     api_key: str = ""
     timeout_seconds: int = 30
     max_tokens: int = 2048
     temperature: float = 0.7
+    provider: str = "openai"  # "openai" or "anthropic"
 
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> "EndpointConfig":
@@ -37,6 +38,7 @@ class EndpointConfig:
             timeout_seconds=d.get("timeout_seconds", 30),
             max_tokens=d.get("max_tokens", 2048),
             temperature=d.get("temperature", 0.7),
+            provider=d.get("provider", "openai"),
         )
 
 

@@ -24,6 +24,7 @@ from lib.harness.core import (
     StakesLevel,
 )
 from lib.harness.config import HarnessConfig, load_harness_config
+from lib.harness.valence_evaluator import ValenceQueue, PendingReaction
 
 logger = logging.getLogger("harness.escalation")
 
@@ -64,6 +65,8 @@ class EscalationEngine:
         self._tier_handlers: Dict[int, TierHandler] = {}
         # Rate limiting: {user_id: [timestamp, ...]}
         self._tier3_calls: Dict[str, List[float]] = defaultdict(list)
+        # Valence queue: reactions awaiting retrospective evaluation
+        self._valence_queue = ValenceQueue(max_size=1000)
 
     def register_tier(self, tier_number: int, handler: TierHandler) -> None:
         """Register a handler for a specific tier (1, 2, or 3)."""

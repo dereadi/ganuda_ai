@@ -106,3 +106,17 @@ escalation:
     - "seven generation"
   max_tier3_per_hour: 5
   enable_thermal_audit: true
+
+# --- Claude Backend ---
+# DC-11: External API as REACT enzyme. Governance stays local.
+# SENSE and EVALUATE always run on redfin. Only REACT speciates.
+# Requires ANTHROPIC_API_KEY in secrets.env.
+# NOT a default tier -- used when explicitly routed or as Tier 2 fallback.
+claude_endpoint:
+  url: "https://api.anthropic.com/v1/messages"
+  model: "claude-sonnet-4-6"
+  api_key: "${ANTHROPIC_API_KEY}"
+  timeout_seconds: 30
+  max_tokens: 4096
+  temperature: 0.7
+  provider: "anthropic"

@@ -1,0 +1,15 @@
+[Unit]
+Description=Cherokee AI Federation Gmail Daemon
+After=network.target
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda
+EnvironmentFile=/ganuda/config/secrets.env
+ExecStart=/usr/bin/python3 /ganuda/email_daemon/gmail_api_daemon.py --poll-interval 300
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

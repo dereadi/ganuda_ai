@@ -1,0 +1,15 @@
+# Promtail pipeline stage for agent detection
+# Merge into promtail.yaml scrape_configs[].pipeline_stages
+
+pipeline_stages:
+  - regex:
+      expression: '\[(?P<agent>[A-Za-z_]+)\]'
+  - labels:
+      agent:
+  - regex:
+      expression: 'agent=(?P<agent_alt>[A-Za-z_]+)'
+  - labels:
+      agent_alt:
+  - template:
+      source: agent
+      template: '{{ if .agent }}{{ .agent }}{{ else }}{{ .agent_alt }}{{ end }}'

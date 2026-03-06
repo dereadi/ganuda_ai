@@ -1,0 +1,26 @@
+"""Shared navigation HTML for ganuda.us pages."""
+
+
+def nav_html(active_page=""):
+    """Return nav bar HTML. active_page should match one of the link names."""
+    links = [
+        ("Home", "/index.html"),
+        ("Status", "/status.html"),
+        ("Health", "/health.html"),
+        ("Briefing", "/briefing.html"),
+        ("Blog", "/blog/index.html"),
+    ]
+    items = ""
+    for name, href in links:
+        cls = ' class="active"' if name.lower() == active_page.lower() else ""
+        items += f'<a href="{href}"{cls}>{name}</a> '
+
+    return f"""<nav style="margin-bottom:16px; padding:8px 0; border-bottom:1px solid #1a2030;">
+  <span style="color:#e8b04a; font-weight:600; margin-right:12px;">Cherokee AI</span>
+  {items}
+</nav>
+<style>
+  nav a {{ color:#556; text-decoration:none; margin-right:10px; font-size:0.85em; }}
+  nav a:hover {{ color:#7aafff; }}
+  nav a.active {{ color:#7aafff; font-weight:600; }}
+</style>"""
