@@ -60,7 +60,7 @@ File: `/ganuda/lib/specialist_council.py`
 After deployment, the `memory_co_retrieval` table needs to be created on bluefin:
 
 ```text
-PGPASSWORD='TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE' psql -h 192.168.132.222 -U claude -d zammad_production -c "
+PGPASSWORD='${CHEROKEE_DB_PASS}' psql -h 192.168.132.222 -U claude -d zammad_production -c "
 CREATE TABLE IF NOT EXISTS memory_co_retrieval (
     id SERIAL PRIMARY KEY,
     group_hash VARCHAR(16) NOT NULL,
@@ -76,7 +76,7 @@ CREATE INDEX IF NOT EXISTS idx_co_retrieval_time ON memory_co_retrieval(retrieve
 After a few council queries, verify data is flowing:
 
 ```text
-PGPASSWORD='TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE' psql -h 192.168.132.222 -U claude -d zammad_production -c "SELECT COUNT(*), COUNT(DISTINCT group_hash) as unique_groups FROM memory_co_retrieval;"
+PGPASSWORD='${CHEROKEE_DB_PASS}' psql -h 192.168.132.222 -U claude -d zammad_production -c "SELECT COUNT(*), COUNT(DISTINCT group_hash) as unique_groups FROM memory_co_retrieval;"
 ```
 
 ## Notes

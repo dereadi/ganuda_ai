@@ -175,6 +175,8 @@ class SolixDaemon:
         self.api = None
         self.devices = {}
         self.last_soc = {}          # device_sn -> last SOC reading
+        self.last_grid_power = {}   # device_sn -> last grid power reading (W)
+        self._grid_alert_times = {} # device_sn -> datetime of last grid alert
         self.stable_count = {}      # device_sn -> consecutive stable readings
         self.fast_mode = False
         self.running = True
@@ -204,6 +206,50 @@ class SolixDaemon:
                 self.fast_mode = False
                 log.info("NORMAL MODE: %d consecutive stable readings", count)
 
+    def check_grid_transition(self, device_sn, device_name, current_grid_power):
+        """Detect grid power transitions and send Telegram alerts.
+
+        Fires alert when grid goes from >0W to 0W (outage) or 0W to >0W (restored).
+        Uses a 5-minute debounce per device to avoid alert spam.
+        """
+        GRID_DEBOUNCE_SEC = 300  # 5 minutes
+
+        prev = self.last_grid_power.get(device_sn)
+        self.last_grid_power[device_sn] = current_grid_power
+
+        if prev is None:
+            # First reading — no transition to detect
+            return
+
+        # Check debounce
+        now = datetime.now()
+        last_alert = self._grid_alert_times.get(device_sn)
+        if last_alert and (now - last_alert).total_seconds() < GRID_DEBOUNCE_SEC:
+            return
+
+        current = current_grid_power if current_grid_power is not None else 0
+
+        if prev > 0 and current == 0:
+            msg = (
+                "\u26a1 *GRID POWER DOWN*\n"
+                f"Device: {device_name}\n"
+                f"Solix running on battery.\n"
+                f"Previous grid: {prev}W"
+            )
+            send_telegram(msg)
+            self._grid_alert_times[device_sn] = now
+            log.warning("GRID DOWN detected for %s (was %sW)", device_name, prev)
+
+        elif prev == 0 and current > 0:
+            msg = (
+                "\u2705 *GRID POWER RESTORED*\n"
+                f"Device: {device_name}\n"
+                f"Grid power: {current}W"
+            )
+            send_telegram(msg)
+            self._grid_alert_times[device_sn] = now
+            log.info("GRID RESTORED for %s (%sW)", device_name, current)
+
     def process_device_data(self, device_sn, device_name, mqtt_data):
         """Extract and store telemetry from MQTT device data."""
         # The mqtt_data dict contains decoded fields from the hex payload
@@ -212,6 +258,13 @@ class SolixDaemon:
         watts_out = mqtt_data.get("output_power") or mqtt_data.get("watts_out") or mqtt_data.get("output_watts")
         watts_in = mqtt_data.get("input_power") or mqtt_data.get("watts_in") or mqtt_data.get("input_watts") or mqtt_data.get("charge_power")
         grid = mqtt_data.get("grid_connected") or mqtt_data.get("ac_in_type")
+        grid_power_mqtt = mqtt_data.get("grid_power") or mqtt_data.get("grid_watts")
+
+        if grid_power_mqtt is not None:
+            try:
+                self.check_grid_transition(device_sn, device_name, float(grid_power_mqtt))
+            except (ValueError, TypeError):
+                pass
 
         # Build source name
         source = f"solix_{device_sn}"
@@ -350,7 +403,9 @@ class SolixDaemon:
 
                 if grid_power is not None:
                     try:
-                        write_timeline("solix_grid_power", source, float(grid_power), meta)
+                        gp = float(grid_power)
+                        write_timeline("solix_grid_power", source, gp, meta)
+                        self.check_grid_transition(sn, name, gp)
                     except (ValueError, TypeError):
                         pass
 

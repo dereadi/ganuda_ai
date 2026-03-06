@@ -271,7 +271,7 @@ curl -s -X POST http://localhost:8091/v1/vlm/describe \
 # Test via gateway (with API key)
 curl -s -X POST http://192.168.132.223:8080/v1/vlm/describe \
     -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+    -H "Authorization: Bearer REDACTED_USE_ENV_VAR" \
     -d '{"image_path": "/ganuda/data/vision/test_frame.jpg", "camera_id": "traffic"}' | python3 -m json.tool
 ```
 

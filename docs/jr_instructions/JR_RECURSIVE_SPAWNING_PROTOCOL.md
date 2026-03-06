@@ -153,7 +153,7 @@ from enum import Enum
 # Gateway configuration
 GATEWAY_URL = "http://localhost:8080/v1/chat/completions"
 GATEWAY_MODEL = "qwen3-32b"
-API_KEY = "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+API_KEY = "REDACTED_USE_ENV_VAR"
 
 # Recursion limits
 MAX_RECURSION_DEPTH = 1  # Start conservative, increase after validation

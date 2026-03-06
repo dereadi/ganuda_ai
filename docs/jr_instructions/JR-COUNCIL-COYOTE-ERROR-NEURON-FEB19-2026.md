@@ -124,5 +124,5 @@ After Jr execution:
 1. `rm -rf /ganuda/lib/__pycache__/` on redfin
 2. `rm -rf /ganuda/scripts/__pycache__/` on redfin
 3. `ganuda-service-ctl restart llm-gateway` on redfin
-4. Test with: `curl -s http://192.168.132.223:8080/v1/council/vote -H "Content-Type: application/json" -H "X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" -d '{"question": "Test: Should we add a hello world endpoint?", "priority": "low"}'`
+4. Test with: `curl -s http://192.168.132.223:8080/v1/council/vote -H "Content-Type: application/json" -H "X-API-Key: REDACTED_USE_ENV_VAR" -d '{"question": "Test: Should we add a hello world endpoint?", "priority": "low"}'`
 5. Verify response includes coyote in specialist list and [DISSENT] in concerns

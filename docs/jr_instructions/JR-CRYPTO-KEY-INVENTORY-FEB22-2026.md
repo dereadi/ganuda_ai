@@ -1,0 +1,180 @@
+# Jr Instruction: Cryptographic Key Inventory — All Nodes
+
+**Task ID:** CRYPTO-INV
+**Kanban:** #1875
+**Priority:** 5
+**Assigned:** Software Engineer Jr.
+
+---
+
+## Overview
+
+Create an Ansible playbook that inventories every cryptographic key, certificate, and keytab across all federation nodes. Output: `/ganuda/reports/crypto_inventory_feb2026.md`. Cannot migrate to PQC what you haven't inventoried.
+
+---
+
+## Step 1: Create the crypto inventory playbook
+
+Create `/ganuda/ansible/playbooks/crypto-inventory.yml`
+
+```yaml
+---
+# Cherokee AI Federation — Cryptographic Key Inventory
+# Kanban #1875 | Full crypto asset enumeration
+#
+# Run: ansible-playbook playbooks/crypto-inventory.yml
+# Output: /ganuda/reports/crypto_inventory_feb2026.md
+
+- name: Cryptographic key inventory
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  vars:
+    report_dir: "/ganuda/reports"
+
+  tasks:
+    # === SSH Host Keys ===
+    - name: List SSH host keys
+      shell: |
+        for f in /etc/ssh/ssh_host_*_key.pub; do
+          [ -f "$f" ] && echo "$(ssh-keygen -lf "$f" 2>/dev/null) $f"
+        done
+      register: ssh_host_keys
+      changed_when: false
+
+    # === SSH User Keys ===
+    - name: Find SSH user keys
+      shell: |
+        for home in /home/* /root; do
+          [ -d "$home/.ssh" ] && find "$home/.ssh" -name '*.pub' -exec sh -c 'echo "$(ssh-keygen -lf {} 2>/dev/null) {}"' \;
+        done
+      register: ssh_user_keys
+      changed_when: false
+      ignore_errors: yes
+
+    # === TLS Certificates ===
+    - name: Find TLS certificates
+      shell: |
+        find /etc/ssl /etc/pki /etc/letsencrypt /home -name '*.pem' -o -name '*.crt' -o -name '*.cert' 2>/dev/null | head -50 | while read f; do
+          if openssl x509 -in "$f" -noout -subject -dates 2>/dev/null; then
+            echo "FILE: $f"
+            openssl x509 -in "$f" -noout -subject -dates -issuer -fingerprint 2>/dev/null
+            echo "---"
+          fi
+        done
+      register: tls_certs
+      changed_when: false
+      ignore_errors: yes
+
+    # === FreeIPA Keytabs ===
+    - name: Check FreeIPA keytabs
+      shell: |
+        for kt in /etc/krb5.keytab /etc/httpd/conf/ipa.keytab /var/lib/sss/keytabs/*; do
+          [ -f "$kt" ] && echo "KEYTAB: $kt ($(stat -c%s "$kt" 2>/dev/null || stat -f%z "$kt" 2>/dev/null) bytes)"
+        done
+      register: keytabs
+      changed_when: false
+      ignore_errors: yes
+
+    # === GPG Keys ===
+    - name: List GPG keys
+      shell: gpg --list-keys --keyid-format long 2>/dev/null || echo "No GPG keys"
+      register: gpg_keys
+      changed_when: false
+      ignore_errors: yes
+
+    # === Caddy/ACME certificates ===
+    - name: Find Caddy certificates
+      shell: |
+        find /var/lib/caddy /home/*/caddy -name '*.key' -o -name '*.crt' -o -name '*.pem' 2>/dev/null | head -20
+      register: caddy_certs
+      changed_when: false
+      ignore_errors: yes
+
+    # === PostgreSQL SSL ===
+    - name: Check PostgreSQL SSL config
+      shell: |
+        if [ -f /etc/postgresql/*/main/postgresql.conf ]; then
+          grep -E '^ssl' /etc/postgresql/*/main/postgresql.conf 2>/dev/null
+        elif [ -f /var/lib/pgsql/data/postgresql.conf ]; then
+          grep -E '^ssl' /var/lib/pgsql/data/postgresql.conf 2>/dev/null
+        else
+          echo "No PostgreSQL config found"
+        fi
+      register: pg_ssl
+      changed_when: false
+      ignore_errors: yes
+
+    # === WireGuard Keys ===
+    - name: Check WireGuard keys
+      shell: |
+        for f in /etc/wireguard/*.conf; do
+          [ -f "$f" ] && echo "WG: $f ($(grep -c 'PrivateKey\|PublicKey' "$f") keys)"
+        done
+      register: wg_keys
+      changed_when: false
+      ignore_errors: yes
+
+    # === Aggregate results ===
+    - name: Write per-host inventory
+      copy:
+        dest: "{{ report_dir }}/crypto_inventory_{{ inventory_hostname }}.txt"
+        content: |
+          # Crypto Inventory: {{ inventory_hostname }}
+          # Generated: {{ ansible_date_time.iso8601 }}
+          # OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+
+          ## SSH Host Keys
+          {{ ssh_host_keys.stdout | default('None found') }}
+
+          ## SSH User Keys
+          {{ ssh_user_keys.stdout | default('None found') }}
+
+          ## TLS Certificates
+          {{ tls_certs.stdout | default('None found') }}
+
+          ## FreeIPA Keytabs
+          {{ keytabs.stdout | default('None found') }}
+
+          ## GPG Keys
+          {{ gpg_keys.stdout | default('None found') }}
+
+          ## Caddy/ACME Certs
+          {{ caddy_certs.stdout | default('None found') }}
+
+          ## PostgreSQL SSL
+          {{ pg_ssl.stdout | default('Not configured') }}
+
+          ## WireGuard Keys
+          {{ wg_keys.stdout | default('None found') }}
+      delegate_to: localhost
+
+    - name: Report summary
+      debug:
+        msg: >-
+          {{ inventory_hostname }} |
+          SSH host keys: {{ ssh_host_keys.stdout_lines | default([]) | length }} |
+          TLS certs: {{ tls_certs.stdout | default('') | regex_findall('FILE:') | length }} |
+          Keytabs: {{ keytabs.stdout_lines | default([]) | length }}
+```
+
+---
+
+## Verification
+
+```text
+cd /ganuda/ansible
+ansible-playbook playbooks/crypto-inventory.yml
+ls -la /ganuda/reports/crypto_inventory_*.txt
+```
+
+---
+
+## Notes
+
+- Non-destructive read-only playbook — no keys are modified
+- Per-host .txt files for individual review, then TPM consolidates into single markdown report
+- Finds SSH, TLS, FreeIPA, GPG, Caddy, PostgreSQL SSL, and WireGuard keys
+- Limited to 50 TLS certs per host to avoid scan overload
+- Does NOT dump private key material — only public keys, fingerprints, and cert metadata

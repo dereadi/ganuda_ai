@@ -1,0 +1,44 @@
+---
+- name: VetAssist FreeIPA Access Control
+  hosts: goldfin
+  become: true
+  tasks:
+    - name: Ensure FreeIPA client is installed
+      ansible.builtin.package:
+        name: freeipa-client
+        state: present
+
+    - name: Check FreeIPA enrollment
+      ansible.builtin.command: ipa-client-install --check
+      register: ipa_check
+      changed_when: false
+      failed_when: false
+
+    - name: Create vetassist-admins HBAC rule
+      ansible.builtin.command: >
+        ipa hbacrule-add vetassist_goldfin_access
+        --desc="VetAssist admin access to goldfin"
+      register: hbac_add
+      changed_when: "'Added' in hbac_add.stdout"
+      failed_when: false
+
+    - name: Add vetassist-admins group to HBAC rule
+      ansible.builtin.command: >
+        ipa hbacrule-add-user vetassist_goldfin_access
+        --groups=vetassist-admins
+      failed_when: false
+      changed_when: false
+
+    - name: Add goldfin host to HBAC rule
+      ansible.builtin.command: >
+        ipa hbacrule-add-host vetassist_goldfin_access
+        --hosts=goldfin.cherokee.local
+      failed_when: false
+      changed_when: false
+
+    - name: Create sudo rule for vetassist service management
+      ansible.builtin.command: >
+        ipa sudorule-add vetassist_service_mgmt
+        --desc="Allow vetassist-admins to restart vetassist services"
+      failed_when: false
+      changed_when: false

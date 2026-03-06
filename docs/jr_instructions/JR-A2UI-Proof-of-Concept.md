@@ -860,7 +860,7 @@ from a2ui_generator import A2UIGenerator
 generator = A2UIGenerator()
 
 COUNCIL_URL = "http://100.116.27.89:8080"
-COUNCIL_API_KEY = "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+COUNCIL_API_KEY = "REDACTED_USE_ENV_VAR"
 
 
 @app.route('/a2ui/council/vote', methods=['POST'])

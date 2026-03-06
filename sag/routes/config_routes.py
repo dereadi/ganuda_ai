@@ -3,6 +3,7 @@ Shows service health and whether env vars are configured (NOT their values)."""
 import os
 import socket
 from flask import Blueprint, jsonify, render_template
+from sag.routes.auth import require_api_key
 
 config_bp = Blueprint("config", __name__)
 
@@ -42,6 +43,7 @@ def config_page() -> str:
 
 
 @config_bp.route("/api/config/services")
+@require_api_key
 def api_services() -> dict:
     """Return the health status of all services."""
     results = [
@@ -57,6 +59,7 @@ def api_services() -> dict:
 
 
 @config_bp.route("/api/config/env-status")
+@require_api_key
 def api_env_status() -> dict:
     """Return the status of all environment variables."""
     results = [

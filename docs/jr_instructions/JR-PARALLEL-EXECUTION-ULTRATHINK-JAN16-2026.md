@@ -185,7 +185,7 @@ ipa vault-add cherokee-ai-secrets --type=symmetric
 ipa vault-archive cherokee-ai-secrets \
   --data="$(cat << 'EOF'
 {
-  "llm_gateway_admin": "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5",
+  "llm_gateway_admin": "REDACTED_USE_ENV_VAR",
   "pii_vault_password": "<generate new>",
   "openobserve_admin": "CherokeeLogs2026!"
 }

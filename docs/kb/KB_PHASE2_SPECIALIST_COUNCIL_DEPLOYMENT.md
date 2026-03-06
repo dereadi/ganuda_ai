@@ -99,7 +99,7 @@ crontab -e
 ### Council Vote Test
 ```bash
 curl -X POST http://192.168.132.223:8080/v1/council/vote \
-  -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+  -H "Authorization: Bearer REDACTED_USE_ENV_VAR" \
   -H "Content-Type: application/json" \
   -d '{"question": "Test question"}'
 ```

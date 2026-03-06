@@ -45,7 +45,7 @@ logger = logging.getLogger(__name__)
 # Configuration
 BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 GATEWAY_URL = os.environ.get('GATEWAY_URL', 'http://localhost:8080')
-API_KEY = os.environ.get('CHEROKEE_API_KEY', 'ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5')
+API_KEY = os.environ.get('CHEROKEE_API_KEY', 'REDACTED_USE_ENV_VAR')
 GROUP_CHAT_ID = os.environ.get('TELEGRAM_GROUP_CHAT_ID')
 
 # Database config

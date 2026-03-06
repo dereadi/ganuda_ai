@@ -1,0 +1,121 @@
+---
+# Cherokee AI Federation — Software Repository Inventory
+# Kanban #1799 | Collects installed packages across all nodes
+#
+# Run: ansible-playbook playbooks/software-inventory.yml
+# Output: /ganuda/reports/software_inventory/<hostname>.json
+#
+# Linux: dpkg + pip + systemd services
+# macOS: brew + pip
+
+- name: Software inventory collection
+  hosts: all
+  gather_facts: yes
+
+  vars:
+    inventory_dir: "{{ ganuda_base_path }}/reports/software_inventory"
+    timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
+
+  tasks:
+    - name: Ensure inventory directory exists
+      file:
+        path: "{{ inventory_dir }}"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+      run_once: true
+
+    # === Linux Package Collection ===
+
+    - name: Collect dpkg packages (Linux)
+      shell: dpkg-query -W -f='${Package}\t${Version}\t${Status}\n' | grep 'install ok installed'
+      register: dpkg_list
+      changed_when: false
+      when: ansible_system == 'Linux'
+
+    - name: Collect pip packages (Linux)
+      shell: python3 -m pip list --format=json 2>/dev/null || echo '[]'
+      register: pip_list_linux
+      changed_when: false
+      when: ansible_system == 'Linux'
+
+    - name: Collect systemd services (Linux)
+      shell: systemctl list-units --type=service --state=active --no-pager --plain | tail -n +2 | head -n -1
+      register: systemd_services
+      changed_when: false
+      when: ansible_system == 'Linux'
+
+    - name: Collect kernel version (Linux)
+      command: uname -r
+      register: kernel_version
+      changed_when: false
+      when: ansible_system == 'Linux'
+
+    # === macOS Package Collection ===
+
+    - name: Collect brew packages (macOS)
+      shell: brew list --versions 2>/dev/null || echo ''
+      register: brew_list
+      changed_when: false
+      when: ansible_system == 'Darwin'
+
+    - name: Collect pip packages (macOS)
+      shell: python3 -m pip list --format=json 2>/dev/null || echo '[]'
+      register: pip_list_macos
+      changed_when: false
+      when: ansible_system == 'Darwin'
+
+    # === GPU Information ===
+
+    - name: Collect NVIDIA GPU info (if available)
+      shell: nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader 2>/dev/null || echo 'none'
+      register: gpu_info
+      changed_when: false
+      ignore_errors: yes
+
+    # === Write Inventory File ===
+
+    - name: Write inventory JSON (Linux)
+      copy:
+        dest: "{{ inventory_dir }}/{{ inventory_hostname }}.json"
+        content: |
+          {
+            "hostname": "{{ inventory_hostname }}",
+            "collected_at": "{{ timestamp }}",
+            "os": "{{ ansible_distribution }} {{ ansible_distribution_version }}",
+            "kernel": "{{ kernel_version.stdout | default('N/A') }}",
+            "python": "{{ ansible_python_version }}",
+            "ram_mb": {{ ansible_memtotal_mb }},
+            "dpkg_count": {{ dpkg_list.stdout_lines | default([]) | length }},
+            "pip_count": {{ (pip_list_linux.stdout | default('[]') | from_json) | length }},
+            "active_services": {{ systemd_services.stdout_lines | default([]) | length }},
+            "gpu": "{{ gpu_info.stdout | default('none') }}"
+          }
+      delegate_to: localhost
+      when: ansible_system == 'Linux'
+
+    - name: Write inventory JSON (macOS)
+      copy:
+        dest: "{{ inventory_dir }}/{{ inventory_hostname }}.json"
+        content: |
+          {
+            "hostname": "{{ inventory_hostname }}",
+            "collected_at": "{{ timestamp }}",
+            "os": "{{ ansible_distribution }} {{ ansible_distribution_version }}",
+            "python": "{{ ansible_python_version }}",
+            "ram_mb": {{ ansible_memtotal_mb }},
+            "brew_count": {{ brew_list.stdout_lines | default([]) | length }},
+            "pip_count": {{ (pip_list_macos.stdout | default('[]') | from_json) | length }},
+            "gpu": "{{ gpu_info.stdout | default('Apple Silicon') }}"
+          }
+      delegate_to: localhost
+      when: ansible_system == 'Darwin'
+
+    - name: Report summary
+      debug:
+        msg: >-
+          {{ inventory_hostname }} |
+          OS: {{ ansible_distribution }} {{ ansible_distribution_version }} |
+          Packages: {{ dpkg_list.stdout_lines | default(brew_list.stdout_lines | default([])) | length }} |
+          Pip: {{ (pip_list_linux.stdout | default(pip_list_macos.stdout | default('[]')) | from_json) | length }} |
+          GPU: {{ gpu_info.stdout | default('N/A') | truncate(40) }}

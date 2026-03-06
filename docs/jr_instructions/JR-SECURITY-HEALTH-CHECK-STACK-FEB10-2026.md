@@ -74,7 +74,7 @@ echo "[$(date)] Lynis: Score=$LYNIS_SCORE, Warnings=$LYNIS_WARNINGS"
 
 # --- Store Results in PostgreSQL ---
 echo "[$(date)] Storing results in database..."
-PGPASSWORD=$(cat /ganuda/config/secrets.env 2>/dev/null | grep DB_PASSWORD | cut -d= -f2 || echo "TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE")
+PGPASSWORD=$(cat /ganuda/config/secrets.env 2>/dev/null | grep DB_PASSWORD | cut -d= -f2 || echo "${CHEROKEE_DB_PASS}")
 
 PGPASSWORD="$PGPASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -c "
 INSERT INTO security_health_checks (

@@ -117,36 +117,125 @@ class GmailAPIDaemon:
         return emails
     
     def analyze_email(self, email_data):
-        """Simple priority analysis"""
-        urgent_keywords = ['urgent', 'asap', 'immediately', 'deadline', 'critical', 'important']
-        text = (email_data['subject'] + ' ' + email_data['body_text']).lower()
-        
-        priority = 5
-        action_required = False
-        thermal_temp = 0.5
-        
-        for kw in urgent_keywords:
-            if kw in text:
-                priority = min(priority, 2)
-                action_required = True
-                thermal_temp = 0.8
-                break
-        
-        # Check Gmail labels
-        if 'IMPORTANT' in email_data.get('labels', []):
+        """LLM-backed email triage via federation gateway."""
+        import requests as http_req
+
+        subject = email_data.get('subject', '')
+        body = email_data.get('body_text', '')[:1500]
+        from_addr = email_data.get('from_address', '')
+
+        # Fast keyword pre-filter for obvious spam/noise
+        noise_signals = ['unsubscribe', 'no-reply', 'noreply', 'donotreply',
+                         'marketing', 'newsletter', 'promotional']
+        combined_lower = (subject + ' ' + body + ' ' + from_addr).lower()
+        if any(sig in combined_lower for sig in noise_signals):
+            return {
+                'priority_score': 5,
+                'action_required': False,
+                'thermal_temp': 0.3,
+                'sentiment': 'neutral',
+                'classification': 'noise',
+                'ai_summary': subject[:200],
+                'action_deadline': None,
+            }
+
+        # LLM classification via gateway
+        prompt = f"""Classify this email for triage. Respond in EXACTLY this format:
+CLASSIFICATION: [ACTIONABLE|JEWEL|NOISE]
+PRIORITY: [1-5] (1=respond today, 2=respond within 48h, 3=this week, 4=eventually, 5=ignore)
+ACTION_DEADLINE: [date/time if mentioned, or NONE]
+ACTION_REQUIRED: [one sentence describing what Chief needs to do, or NONE]
+SUMMARY: [one sentence summary]
+
+Email from: {from_addr}
+Subject: {subject}
+Body: {body}
+
+ACTIONABLE means: scheduling a call, interview, meeting, deadline, someone waiting for a reply, calendar invite, payment due, contract to sign.
+JEWEL means: interesting article, industry news, networking opportunity, job posting worth considering — no immediate action needed.
+NOISE means: marketing, automated notifications, newsletters, spam, receipts."""
+
+        try:
+            resp = http_req.post(
+                'http://localhost:8080/v1/chat/completions',
+                json={
+                    'model': 'qwen2.5-72b',
+                    'messages': [{'role': 'user', 'content': prompt}],
+                    'max_tokens': 200,
+                    'temperature': 0.1,
+                },
+                timeout=30,
+            )
+            resp.raise_for_status()
+            llm_text = resp.json()['choices'][0]['message']['content']
+
+            # Parse LLM response
+            classification = 'noise'
+            priority = 5
+            action_required_text = None
+            action_deadline = None
+            summary = subject[:200]
+
+            for line in llm_text.strip().split('\n'):
+                line = line.strip()
+                if line.startswith('CLASSIFICATION:'):
+                    raw = line.split(':', 1)[1].strip().upper()
+                    if raw in ('ACTIONABLE', 'JEWEL', 'NOISE'):
+                        classification = raw.lower()
+                if line.startswith('PRIORITY:'):
+                    try:
+                        priority = int(line.split(':', 1)[1].strip()[0])
+                        priority = max(1, min(5, priority))
+                    except (ValueError, IndexError):
+                        pass
+                if line.startswith('ACTION_DEADLINE:'):
+                    val = line.split(':', 1)[1].strip()
+                    if val.upper() != 'NONE':
+                        action_deadline = val
+                if line.startswith('ACTION_REQUIRED:'):
+                    val = line.split(':', 1)[1].strip()
+                    if val.upper() != 'NONE':
+                        action_required_text = val
+                if line.startswith('SUMMARY:'):
+                    summary = line.split(':', 1)[1].strip()[:200]
+
+        except Exception as e:
+            self.logger.warning(f'LLM triage failed, falling back to keyword: {e}')
+            # Keyword fallback
+            classification = 'noise'
+            priority = 5
+            action_required_text = None
+            action_deadline = None
+            summary = subject[:200]
+            urgent_keywords = ['urgent', 'asap', 'immediately', 'deadline',
+                               'schedule', 'call', 'interview', 'meeting', 'calendar']
+            for kw in urgent_keywords:
+                if kw in combined_lower:
+                    classification = 'actionable'
+                    priority = 2
+                    action_required_text = f'Email contains keyword: {kw}'
+                    break
+
+        # Gmail label boost
+        labels = email_data.get('labels', [])
+        if 'IMPORTANT' in labels:
             priority = min(priority, 3)
-            thermal_temp = max(thermal_temp, 0.7)
-        
-        if 'STARRED' in email_data.get('labels', []):
+        if 'STARRED' in labels:
             priority = min(priority, 2)
-            action_required = True
-            
+            if classification == 'noise':
+                classification = 'jewel'
+
+        thermal_temp = {1: 0.9, 2: 0.8, 3: 0.7, 4: 0.5, 5: 0.3}.get(priority, 0.5)
+
         return {
             'priority_score': priority,
-            'action_required': action_required,
+            'action_required': action_required_text is not None,
+            'action_required_text': action_required_text,
             'thermal_temp': thermal_temp,
             'sentiment': 'neutral',
-            'ai_summary': email_data['subject'][:200]
+            'classification': classification,
+            'ai_summary': summary,
+            'action_deadline': action_deadline,
         }
     
     def store_email(self, email_data, analysis):
@@ -155,7 +244,7 @@ class GmailAPIDaemon:
             host=self.config.get('db_host', 'localhost'),
             database=self.config.get('db_name', 'bmasass_spoke'),
             user=self.config.get('db_user', 'claude'),
-            password=self.config.get('db_password', 'jawaseatlasers2')
+            password=self.config.get('db_password', os.environ.get('CHEROKEE_DB_PASS', ''))
         )
         cur = conn.cursor()
         
@@ -189,8 +278,28 @@ class GmailAPIDaemon:
         conn.commit()
         cur.close()
         conn.close()
-        
-        return result is not None  # True if new email inserted
+
+        is_new = result is not None
+        # Telegram alert for actionable emails
+        if is_new and analysis.get('classification') == 'actionable':
+            try:
+                from telegram_alerts import send_plain_alert
+                action = analysis.get('action_required_text', 'Action needed')
+                deadline = analysis.get('action_deadline', '')
+                deadline_str = f'\nDeadline: {deadline}' if deadline else ''
+                alert_msg = (
+                    f"ACTIONABLE EMAIL\n"
+                    f"From: {email_data.get('from_address', '?')}\n"
+                    f"Subject: {email_data.get('subject', '?')}\n"
+                    f"Action: {action}{deadline_str}\n"
+                    f"Priority: {analysis.get('priority_score', '?')}/5"
+                )
+                send_plain_alert(alert_msg)
+                self.logger.info(f'Telegram alert sent for: {email_data["subject"][:50]}')
+            except Exception as e:
+                self.logger.warning(f'Telegram alert failed: {e}')
+
+        return is_new
     
     def run(self, poll_interval=300):
         """Main daemon loop"""
@@ -228,7 +337,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', default='/ganuda/email_daemon/config.json')
-    parser.add_argument('--poll-interval', type=int, default=300)
+    parser.add_argument('--poll-interval', type=int, default=120)
     parser.add_argument('--once', action='store_true', help='Run once and exit')
     args = parser.parse_args()
     

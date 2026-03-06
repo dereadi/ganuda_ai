@@ -51,7 +51,7 @@ vlm_bp = Blueprint('vlm', __name__, url_prefix='/api/vlm')
 
 # Configuration
 GATEWAY_URL = os.getenv('LLM_GATEWAY_URL', 'http://localhost:8080')
-API_KEY = os.getenv('LLM_GATEWAY_API_KEY', 'ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5')
+API_KEY = os.getenv('LLM_GATEWAY_API_KEY', 'REDACTED_USE_ENV_VAR')
 VLM_TIMEOUT = 120.0  # VLM inference can take ~17 seconds
 
 # Security: Allowed base path for images

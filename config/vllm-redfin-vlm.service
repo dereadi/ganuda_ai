@@ -1,0 +1,30 @@
+[Unit]
+Description=Redfin VLM2 (Qwen2-VL-7B-Instruct-AWQ) — Vision Redundancy
+After=network.target vllm.service
+Requires=vllm.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/home/dereadi
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=HF_HOME=/ganuda/home/dereadi/.cache/huggingface
+Environment=CUDA_HOME=/ganuda/cuda-12.8
+Environment=LD_LIBRARY_PATH=/ganuda/cuda-12.8/lib64:/ganuda/cuda-12.8/lib
+ExecStart=/home/dereadi/cherokee_venv/bin/python -m vllm.entrypoints.openai.api_server \
+  --model Qwen/Qwen2-VL-7B-Instruct-AWQ \
+  --port 9101 \
+  --quantization awq_marlin \
+  --dtype float16 \
+  --gpu-memory-utilization 0.12 \
+  --max-model-len 4096 \
+  --max-num-seqs 4 \
+  --trust-remote-code
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

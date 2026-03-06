@@ -150,7 +150,7 @@ Each of these trust boundaries represents a potential breach point. The audit fo
 
 #### H-003: LLM Gateway API Key Hardcoded
 
-**Finding**: The LLM Gateway API key `ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5` is hardcoded in `lib/jr_llm_reasoner.py`.
+**Finding**: The LLM Gateway API key `REDACTED_USE_ENV_VAR` is hardcoded in `lib/jr_llm_reasoner.py`.
 
 **Impact**: An attacker with this key can make arbitrary inference requests to the LLM Gateway, consuming GPU resources, extracting model capabilities, and potentially probing for prompt injection vulnerabilities at scale without rate limiting.
 

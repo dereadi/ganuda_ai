@@ -1,0 +1,9 @@
+[Unit]
+Description=Council Dawn Mist — Daily at 6:15am CST
+
+[Timer]
+OnCalendar=*-*-* 06:15:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

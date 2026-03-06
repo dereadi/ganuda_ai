@@ -321,13 +321,13 @@ def get_queue(status: str = None, limit: int = 20) -> List[Dict]:
 Run the schema migration on bluefin:
 
 ```text
-PGPASSWORD='TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE' psql -h 192.168.132.222 -U claude -d zammad_production -f /ganuda/scripts/migrations/elder_interview_schema.sql
+PGPASSWORD='${CHEROKEE_DB_PASS}' psql -h 192.168.132.222 -U claude -d zammad_production -f /ganuda/scripts/migrations/elder_interview_schema.sql
 ```
 
 Verify table created:
 
 ```text
-PGPASSWORD='TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE' psql -h 192.168.132.222 -U claude -d zammad_production -c "SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'elder_interviews' ORDER BY ordinal_position;"
+PGPASSWORD='${CHEROKEE_DB_PASS}' psql -h 192.168.132.222 -U claude -d zammad_production -c "SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'elder_interviews' ORDER BY ordinal_position;"
 ```
 
 ## Success Criteria

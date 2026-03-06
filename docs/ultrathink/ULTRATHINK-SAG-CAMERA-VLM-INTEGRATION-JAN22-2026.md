@@ -185,7 +185,7 @@ def vlm_proxy(endpoint):
     import httpx
 
     GATEWAY_URL = "http://localhost:8080"  # Local on redfin
-    API_KEY = "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+    API_KEY = "REDACTED_USE_ENV_VAR"
 
     try:
         response = httpx.post(
@@ -306,7 +306,7 @@ import json
 from pathlib import Path
 
 GATEWAY = "http://192.168.132.223:8080"
-API_KEY = "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+API_KEY = "REDACTED_USE_ENV_VAR"
 TEST_DIR = Path("/ganuda/data/vision/frames/test")
 
 def test_describe(image_path: str):

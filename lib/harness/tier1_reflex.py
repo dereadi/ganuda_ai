@@ -1,0 +1,309 @@
+"""
+Tier 1 Reflex -- Single LLM call with config-driven prompt.
+
+The fastest inference path. One call to an OpenAI-compatible endpoint,
+with fallback if the primary is unreachable. Returns a confidence score
+estimated from the response content.
+
+Spider requirement: self-contained, no federation dependencies.
+Crawdad requirement: input validation before every LLM call.
+Jr requirement: fallback endpoint for resilience.
+Turtle requirement: no vendor lock-in (swap models via config).
+
+Latency target: <50ms p95 (excluding network latency to LLM).
+"""
+
+import logging
+import time
+import re
+import requests
+from typing import Optional, List, Dict, Any
+
+from lib.harness.core import HarnessRequest, TierResult, StakesLevel
+from lib.harness.config import TierConfig, EndpointConfig, load_harness_config
+
+logger = logging.getLogger("harness.tier1")
+
+
+class Tier1Reflex:
+    """Single LLM call tier with automatic fallback.
+
+    Usage:
+        config = load_harness_config()
+        tier1 = Tier1Reflex(config.tier1)
+        result = tier1.handle(request)
+    """
+
+    # Hedging phrases that reduce confidence score
+    UNCERTAINTY_MARKERS = [
+        "i'm not sure",
+        "i am not sure",
+        "i don't know",
+        "i cannot confirm",
+        "it's unclear",
+        "it is unclear",
+        "i'm uncertain",
+        "i am uncertain",
+        "this is speculative",
+        "i may be wrong",
+        "i might be wrong",
+        "i cannot verify",
+        "i'm not confident",
+        "i am not confident",
+        "difficult to say",
+        "hard to say",
+        "it depends",
+        "possibly",
+        "perhaps",
+        "i think",
+        "it seems",
+    ]
+
+    # Strong assertion phrases that increase confidence
+    CONFIDENCE_MARKERS = [
+        "the answer is",
+        "definitely",
+        "certainly",
+        "absolutely",
+        "without a doubt",
+        "clearly",
+        "specifically",
+        "the fact is",
+        "according to",
+        "based on",
+        "as documented",
+    ]
+
+    def __init__(self, tier_config: Optional[TierConfig] = None):
+        if tier_config is None:
+            full_config = load_harness_config()
+            tier_config = full_config.tier1
+        self.config = tier_config
+        self._session = requests.Session()
+        # Set connection pool size for reuse
+        adapter = requests.adapters.HTTPAdapter(
+            pool_connections=2,
+            pool_maxsize=4,
+            max_retries=0,  # We handle retries via fallback, not retry loops
+        )
+        self._session.mount("http://", adapter)
+        self._session.mount("https://", adapter)
+
+    def handle(
+        self,
+        request: HarnessRequest,
+        prior_results: Optional[List[TierResult]] = None,
+    ) -> TierResult:
+        """Process a request with a single LLM call.
+
+        Tries the primary endpoint first. If it fails (timeout, connection
+        error, HTTP error), falls back to the secondary endpoint.
+
+        Args:
+            request: The harness request.
+            prior_results: Ignored for Tier 1 (it's always the first tier).
+
+        Returns:
+            TierResult with answer, confidence, and latency.
+        """
+        start_time = time.time()
+
+        # --- Input validation (Crawdad) ---
+        errors = request.validate()
+        if errors:
+            return TierResult(
+                tier=1,
+                answer="Input validation failed: " + "; ".join(errors),
+                confidence=0.0,
+                latency_ms=0.0,
+                metadata={"validation_errors": errors},
+            )
+
+        # --- Build prompt from template ---
+        prompt = self._build_prompt(request)
+
+        # --- Try primary endpoint ---
+        answer, primary_ok = self._call_endpoint(
+            self.config.primary_endpoint, prompt
+        )
+
+        if not primary_ok and self.config.fallback_endpoint:
+            logger.warning(
+                "Primary endpoint failed for %s, trying fallback",
+                request.request_id,
+            )
+            answer, fallback_ok = self._call_endpoint(
+                self.config.fallback_endpoint, prompt
+            )
+            if not fallback_ok:
+                latency_ms = (time.time() - start_time) * 1000
+                return TierResult(
+                    tier=1,
+                    answer="Both primary and fallback endpoints failed. "
+                           "Please try again later.",
+                    confidence=0.0,
+                    latency_ms=latency_ms,
+                    metadata={"error": "all_endpoints_failed"},
+                )
+
+        elif not primary_ok:
+            latency_ms = (time.time() - start_time) * 1000
+            return TierResult(
+                tier=1,
+                answer="Primary endpoint failed and no fallback configured.",
+                confidence=0.0,
+                latency_ms=latency_ms,
+                metadata={"error": "primary_failed_no_fallback"},
+            )
+
+        # --- Score confidence ---
+        confidence = self._estimate_confidence(answer)
+
+        latency_ms = (time.time() - start_time) * 1000
+        logger.info(
+            "Tier 1 completed: confidence=%.3f, latency=%.1fms [%s]",
+            confidence, latency_ms, request.request_id,
+        )
+
+        return TierResult(
+            tier=1,
+            answer=answer,
+            confidence=confidence,
+            latency_ms=latency_ms,
+            specialist_count=1,
+            metadata={
+                "prompt_template_used": True,
+                "fallback_used": not primary_ok,
+            },
+        )
+
+    def _build_prompt(self, request: HarnessRequest) -> str:
+        """Build the prompt from the config template and request data."""
+        context_str = ""
+        if request.context:
+            # Flatten context dict to readable string
+            parts = []
+            for key, value in request.context.items():
+                parts.append(str(key) + ": " + str(value))
+            context_str = "\n".join(parts)
+
+        prompt = self.config.prompt_template.format(
+            query=request.query,
+            context=context_str if context_str else "No additional context provided.",
+        )
+        return prompt
+
+    def _call_endpoint(
+        self,
+        endpoint: EndpointConfig,
+        prompt: str,
+    ) -> tuple:
+        """Call an OpenAI-compatible chat completion endpoint.
+
+        Args:
+            endpoint: The endpoint configuration.
+            prompt: The formatted prompt string.
+
+        Returns:
+            Tuple of (answer_text, success_bool).
+        """
+        headers = {"Content-Type": "application/json"}
+        if endpoint.api_key:
+            headers["Authorization"] = "Bearer " + endpoint.api_key
+
+        payload = {
+            "model": endpoint.model,
+            "messages": [
+                {"role": "user", "content": prompt},
+            ],
+            "max_tokens": endpoint.max_tokens,
+            "temperature": endpoint.temperature,
+            "stream": False,
+        }
+
+        try:
+            response = self._session.post(
+                endpoint.url,
+                json=payload,
+                headers=headers,
+                timeout=endpoint.timeout_seconds,
+            )
+            response.raise_for_status()
+
+            data = response.json()
+            # Standard OpenAI response format
+            choices = data.get("choices", [])
+            if choices:
+                answer = choices[0].get("message", {}).get("content", "")
+                if answer:
+                    return (answer.strip(), True)
+
+            logger.warning("Empty response from %s", endpoint.url)
+            return ("", False)
+
+        except requests.exceptions.Timeout:
+            logger.warning(
+                "Timeout calling %s (limit: %ds)",
+                endpoint.url, endpoint.timeout_seconds,
+            )
+            return ("", False)
+        except requests.exceptions.ConnectionError:
+            logger.warning("Connection error calling %s", endpoint.url)
+            return ("", False)
+        except requests.exceptions.HTTPError as e:
+            logger.warning("HTTP error from %s: %s", endpoint.url, e)
+            return ("", False)
+        except Exception as e:
+            logger.error("Unexpected error calling %s: %s", endpoint.url, e)
+            return ("", False)
+
+    def _estimate_confidence(self, answer: str) -> float:
+        """Estimate confidence from the response text.
+
+        This is a heuristic-based confidence scorer. It looks for hedging
+        language (reduces confidence) and assertive language (increases
+        confidence). The score starts at 0.7 (neutral) and adjusts.
+
+        Future improvement: fine-tune a small classifier on labeled
+        confidence data from thermal memory audit trails.
+
+        Args:
+            answer: The LLM response text.
+
+        Returns:
+            Float between 0.0 and 1.0.
+        """
+        if not answer:
+            return 0.0
+
+        answer_lower = answer.lower()
+        score = 0.7  # Neutral starting point
+
+        # Count uncertainty markers
+        uncertainty_count = 0
+        for marker in self.UNCERTAINTY_MARKERS:
+            if marker in answer_lower:
+                uncertainty_count += 1
+
+        # Count confidence markers
+        confidence_count = 0
+        for marker in self.CONFIDENCE_MARKERS:
+            if marker in answer_lower:
+                confidence_count += 1
+
+        # Adjust score
+        score -= uncertainty_count * 0.08
+        score += confidence_count * 0.05
+
+        # Very short answers are less confident (likely incomplete)
+        if len(answer) < 50:
+            score -= 0.1
+
+        # Very long answers with lots of hedging are low confidence
+        if uncertainty_count >= 3:
+            score -= 0.15
+
+        # Clamp to [0.0, 1.0]
+        score = max(0.0, min(1.0, score))
+
+        return round(score, 3)

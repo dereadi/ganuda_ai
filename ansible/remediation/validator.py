@@ -33,7 +33,7 @@ from crawdad_review_prompt import build_crawdad_review_prompt
 GATEWAY_URL = "http://192.168.132.223:8080"
 API_KEY = os.environ.get(
     "CHEROKEE_API_KEY",
-    "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5",
+    "REDACTED_USE_ENV_VAR",
 )
 DB_HOST = "192.168.132.222"
 DB_NAME = "zammad_production"

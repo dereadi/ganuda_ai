@@ -375,7 +375,7 @@ Group=dereadi
 WorkingDirectory=/ganuda/scripts
 ExecStart=/ganuda/venv/bin/python gpu_power_monitor.py
 EnvironmentFile=/ganuda/config/secrets.env
-Environment=CHEROKEE_DB_PASS=TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE
+Environment=CHEROKEE_DB_PASS=${CHEROKEE_DB_PASS}
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=gpu-power-monitor
@@ -399,7 +399,7 @@ WantedBy=timers.target
 ## Verification
 
 1. After Step 1: Restart solix-monitor on greenfin, check logs for "REST API:" lines with watt values
-2. After Step 2: Run `CHEROKEE_DB_PASS=TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE python3 /ganuda/scripts/gpu_power_monitor.py` on redfin — should show both GPU power readings
+2. After Step 2: Run `CHEROKEE_DB_PASS=${CHEROKEE_DB_PASS} python3 /ganuda/scripts/gpu_power_monitor.py` on redfin — should show both GPU power readings
 3. After Step 3: Files staged for sudo deployment. Do NOT deploy systemd files — requires Chief approval.
 
 ## Notes

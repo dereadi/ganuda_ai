@@ -217,13 +217,13 @@ After making changes:
 # Test normal vote (should show Raven→DeepSeek, Gecko→Qwen)
 curl -X POST http://localhost:8080/v1/council/vote \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+  -H "X-API-Key: REDACTED_USE_ENV_VAR" \
   -d '{"question": "Test: Should we add a new monitoring endpoint?", "max_tokens": 150}'
 
 # Test high-stakes vote (should show ALL specialists→DeepSeek)
 curl -X POST http://localhost:8080/v1/council/vote \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+  -H "X-API-Key: REDACTED_USE_ENV_VAR" \
   -d '{"question": "Test: Should we delete thermal memory archive?", "max_tokens": 150, "high_stakes": true}'
 ```
 

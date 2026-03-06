@@ -515,7 +515,7 @@ User=dereadi
 WorkingDirectory=/ganuda/services/email_intelligence
 Environment="TELEGRAM_BOT_TOKEN=your_token_here"
 Environment="TELEGRAM_CHAT_ID=your_chat_id_here"
-Environment="CHEROKEE_API_KEY=ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+Environment="CHEROKEE_API_KEY=REDACTED_USE_ENV_VAR"
 ExecStart=/home/dereadi/cherokee_venv/bin/python3 email_monitor.py --interval 300
 Restart=always
 RestartSec=30

@@ -464,7 +464,7 @@ WHERE event_type IN ('failed', 'failed_unknown', 'anomaly');
 ```bash
 # Make a valid request
 curl -s http://192.168.132.223:8080/v1/models \
-  -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+  -H "Authorization: Bearer REDACTED_USE_ENV_VAR"
 
 # Check FSE event was recorded
 PGPASSWORD='jawaseatlasers2' psql -h 192.168.132.222 -U claude -d zammad_production -c \
@@ -488,7 +488,7 @@ PGPASSWORD='jawaseatlasers2' psql -h 192.168.132.222 -U claude -d zammad_product
 ```bash
 KEY_ID="3bdefec843957800efde066dc25fb1356484d20c1089c29bdb084ee9839801e1"
 curl -s "http://192.168.132.223:8080/v1/keys/${KEY_ID}/fse-status" \
-  -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" | jq
+  -H "Authorization: Bearer REDACTED_USE_ENV_VAR" | jq
 ```
 
 ### Test 4: Strength Evolution
@@ -501,7 +501,7 @@ PGPASSWORD='jawaseatlasers2' psql -h 192.168.132.222 -U claude -d zammad_product
 # Make 10 requests
 for i in {1..10}; do
   curl -s http://192.168.132.223:8080/v1/models \
-    -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" > /dev/null
+    -H "Authorization: Bearer REDACTED_USE_ENV_VAR" > /dev/null
 done
 
 # Check strength after (should increase slightly)

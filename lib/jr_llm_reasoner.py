@@ -38,7 +38,7 @@ CODER_MODEL_NAME = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-inst
 # Legacy single-model config (used by existing methods)
 LLM_URL = "http://localhost:8000/v1/chat/completions"
 GATEWAY_URL = "http://localhost:8080"
-API_KEY = os.environ.get('LLM_GATEWAY_API_KEY', 'ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5')
+API_KEY = os.environ.get('LLM_GATEWAY_API_KEY', 'REDACTED_USE_ENV_VAR')
 DEFAULT_MODEL = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
 
 

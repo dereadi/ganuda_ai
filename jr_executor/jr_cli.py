@@ -378,6 +378,7 @@ class JrExecutor:
                     if HAS_WORK_QUEUE and self.queue_client:
                         try:
                             self.queue_client.heartbeat()
+                            self.queue_client.reap_stale_tasks(timeout_minutes=10)
                             pending_tasks = self.queue_client.get_pending_tasks(limit=1)
                             if pending_tasks:
                                 task = pending_tasks[0]

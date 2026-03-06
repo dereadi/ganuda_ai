@@ -1,0 +1,1 @@
+curl -s http://localhost:8095/browse -X POST -H 'Content-Type: application/json' -d '{"url": "https://example.com"}' | python3 -m json.tool | head -20

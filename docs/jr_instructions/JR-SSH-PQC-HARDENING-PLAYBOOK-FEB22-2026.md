@@ -1,0 +1,187 @@
+# Jr Instruction: SSH PQC Hardening Ansible Playbook
+
+**Task ID:** SSH-PQC
+**Kanban:** #1874
+**Priority:** 3
+**Assigned:** Software Engineer Jr.
+
+---
+
+## Overview
+
+Create an Ansible playbook that hardens SSH configuration across all nodes with post-quantum cryptography (PQC) hybrid key exchange (sntrup761x25519-sha512). OpenSSH 9.6+ supports this natively. Ed25519-only host keys. Disable RSA.
+
+---
+
+## Step 1: Create the SSH PQC hardening playbook
+
+Create `/ganuda/ansible/playbooks/ssh-pqc-hardening.yml`
+
+```yaml
+---
+# Cherokee AI Federation — SSH PQC Hardening
+# Kanban #1874 | Post-Quantum Hybrid Key Exchange
+#
+# Run: ansible-playbook playbooks/ssh-pqc-hardening.yml --check --diff
+# Then: ansible-playbook playbooks/ssh-pqc-hardening.yml
+#
+# What this does:
+# 1. Verifies OpenSSH >= 9.0 (sntrup761 support)
+# 2. Sets PQC hybrid KEX as preferred
+# 3. Disables RSA host keys
+# 4. Ed25519-only host key generation
+# 5. Hardens ciphers and MACs
+
+- name: SSH PQC Hardening
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  vars:
+    ssh_config_backup: "/ganuda/reports/ssh_backup/{{ inventory_hostname }}_sshd_config.bak"
+    min_openssh_version: "9.0"
+
+  tasks:
+    - name: Ensure backup directory exists
+      file:
+        path: /ganuda/reports/ssh_backup
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+      run_once: true
+
+    - name: Get OpenSSH version
+      shell: ssh -V 2>&1 | grep -oP 'OpenSSH_\K[0-9]+\.[0-9]+'
+      register: openssh_version
+      changed_when: false
+
+    - name: Display OpenSSH version
+      debug:
+        msg: "{{ inventory_hostname }}: OpenSSH {{ openssh_version.stdout }}"
+
+    - name: Verify minimum OpenSSH version
+      assert:
+        that:
+          - openssh_version.stdout is version(min_openssh_version, '>=')
+        fail_msg: "OpenSSH {{ openssh_version.stdout }} < {{ min_openssh_version }} — PQC KEX not supported"
+        success_msg: "OpenSSH {{ openssh_version.stdout }} supports sntrup761"
+
+    - name: Backup current sshd_config
+      fetch:
+        src: /etc/ssh/sshd_config
+        dest: "{{ ssh_config_backup }}"
+        flat: yes
+
+    - name: Set PQC hybrid KEX algorithms (Linux)
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?KexAlgorithms'
+        line: "KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org"
+        backup: yes
+      when: ansible_system == 'Linux'
+      notify: restart sshd
+
+    - name: Set Ed25519-only host key (Linux)
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?HostKey /etc/ssh/ssh_host_ed25519_key'
+        line: "HostKey /etc/ssh/ssh_host_ed25519_key"
+      when: ansible_system == 'Linux'
+      notify: restart sshd
+
+    - name: Disable RSA host key (Linux)
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^HostKey /etc/ssh/ssh_host_rsa_key'
+        state: absent
+      when: ansible_system == 'Linux'
+      notify: restart sshd
+
+    - name: Disable ECDSA host key (Linux)
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^HostKey /etc/ssh/ssh_host_ecdsa_key'
+        state: absent
+      when: ansible_system == 'Linux'
+      notify: restart sshd
+
+    - name: Set strong ciphers
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?Ciphers'
+        line: "Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com"
+      when: ansible_system == 'Linux'
+      notify: restart sshd
+
+    - name: Set strong MACs
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?MACs'
+        line: "MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com"
+      when: ansible_system == 'Linux'
+      notify: restart sshd
+
+    - name: Set PQC KEX for SSH client config
+      blockinfile:
+        path: /etc/ssh/ssh_config
+        block: |
+          # Cherokee AI Federation — PQC Hybrid KEX
+          KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org
+        marker: "# {mark} CHEROKEE PQC KEX"
+        create: yes
+      when: ansible_system == 'Linux'
+
+    - name: Validate sshd config (Linux)
+      command: sshd -t
+      register: sshd_test
+      changed_when: false
+      when: ansible_system == 'Linux'
+
+    - name: Report validation result
+      debug:
+        msg: "{{ inventory_hostname }}: sshd config validation {{ 'PASSED' if sshd_test.rc == 0 else 'FAILED' }}"
+      when: ansible_system == 'Linux'
+
+    - name: Set PQC KEX (macOS)
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?KexAlgorithms'
+        line: "KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org"
+      when: ansible_system == 'Darwin'
+
+  handlers:
+    - name: restart sshd
+      service:
+        name: "{{ 'ssh' if ansible_distribution == 'Ubuntu' or ansible_distribution == 'Linux Mint' else 'sshd' }}"
+        state: restarted
+```
+
+---
+
+## Verification
+
+Dry-run first:
+```text
+cd /ganuda/ansible
+ansible-playbook playbooks/ssh-pqc-hardening.yml --check --diff
+```
+
+After deployment, verify PQC KEX:
+```text
+ssh -vvv localhost 2>&1 | grep 'kex: algorithm'
+```
+
+Expected:
+```text
+kex: algorithm: sntrup761x25519-sha512@openssh.com
+```
+
+---
+
+## Notes
+
+- sntrup761 is NIST-approved PQC hybrid — protects against harvest-now-decrypt-later
+- Fallback to curve25519-sha256 if client doesn't support sntrup761
+- RSA host keys disabled — Ed25519 only (128-bit security, small keys)
+- macOS handling is minimal (client-only, no service restart)
+- Test on owlfin first (DMZ, expendable) before fleet-wide deployment

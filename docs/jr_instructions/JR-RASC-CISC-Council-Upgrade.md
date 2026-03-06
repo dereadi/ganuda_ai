@@ -792,13 +792,13 @@ python3 test_rasc.py
 # Test RASC endpoint
 curl -X POST 'http://localhost:8080/v1/council/vote-rasc' \
   -H 'Content-Type: application/json' \
-  -H 'X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5' \
+  -H 'X-API-Key: REDACTED_USE_ENV_VAR' \
   -d '{"question": "Should we add input validation to all API endpoints?"}'
 
 # Compare to standard
 curl -X POST 'http://localhost:8080/v1/council/vote-first' \
   -H 'Content-Type: application/json' \
-  -H 'X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5' \
+  -H 'X-API-Key: REDACTED_USE_ENV_VAR' \
   -d '{"question": "Should we add input validation to all API endpoints?"}'
 ```
 

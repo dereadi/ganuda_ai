@@ -97,12 +97,12 @@ Expected: Non-empty answer with actual tinnitus rating content.
 # Queue new test job
 curl -s -X POST http://localhost:8080/v1/research/async \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+  -H "X-API-Key: REDACTED_USE_ENV_VAR" \
   -d '{"query": "VA sleep apnea rating", "max_steps": 3}'
 
 # Wait 2-3 minutes, then check
 curl -s http://localhost:8080/v1/research/status/<job_id> \
-  -H "X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+  -H "X-API-Key: REDACTED_USE_ENV_VAR"
 
 # Should show actual answer, not "No answer generated"
 ```

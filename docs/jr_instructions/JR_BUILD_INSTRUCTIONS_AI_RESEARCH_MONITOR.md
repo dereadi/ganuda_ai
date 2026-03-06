@@ -296,7 +296,7 @@ import psycopg2
 from datetime import datetime
 
 GATEWAY_URL = "http://localhost:8080"
-API_KEY = "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+API_KEY = "REDACTED_USE_ENV_VAR"
 DB_CONFIG = {
     "host": "192.168.132.222",
     "port": 5432,

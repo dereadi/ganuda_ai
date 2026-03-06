@@ -92,16 +92,16 @@ After applying the fix, test both header formats:
 ```bash
 # Test with X-API-Key (should work now)
 curl -s http://192.168.132.223:8080/v1/models \
-  -H "X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+  -H "X-API-Key: REDACTED_USE_ENV_VAR"
 
 # Test with Authorization: Bearer (should still work)
 curl -s http://192.168.132.223:8080/v1/models \
-  -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+  -H "Authorization: Bearer REDACTED_USE_ENV_VAR"
 
 # Test Council vote with X-API-Key
 curl -s -X POST http://192.168.132.223:8080/v1/council/vote \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+  -H "X-API-Key: REDACTED_USE_ENV_VAR" \
   -d '{"question": "Test vote", "options": ["Yes", "No"]}'
 
 # Should NOT get "Insufficient quota" error

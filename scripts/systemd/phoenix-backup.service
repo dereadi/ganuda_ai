@@ -1,0 +1,13 @@
+[Unit]
+Description=Phoenix Backup — Cherokee AI Federation DB
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=oneshot
+User=dereadi
+ExecStart=/ganuda/scripts/phoenix_backup.sh
+TimeoutStartSec=600
+
+[Install]
+WantedBy=multi-user.target

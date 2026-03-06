@@ -962,17 +962,17 @@ cp metrics_exporter.py /ganuda/services/
 ```bash
 # Test pheromone system
 curl -X POST "http://192.168.132.223:8080/v1/trails/leave" \
-  -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+  -H "Authorization: Bearer REDACTED_USE_ENV_VAR" \
   -H "Content-Type: application/json" \
   -d '{"specialist": "crawdad", "content": "Security review complete", "target": "peace_chief"}'
 
 # Check hot trails
 curl "http://192.168.132.223:8080/v1/trails/hot?min_strength=0.5" \
-  -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+  -H "Authorization: Bearer REDACTED_USE_ENV_VAR"
 
 # Council vote with trail
 curl -X POST "http://192.168.132.223:8080/v1/council/vote" \
-  -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+  -H "Authorization: Bearer REDACTED_USE_ENV_VAR" \
   -H "Content-Type: application/json" \
   -d '{"question": "Test trail integration complete?"}'
 ```

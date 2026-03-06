@@ -1,0 +1,11 @@
+[Unit]
+Description=Phoenix Backup — Daily 3AM
+Requires=phoenix-backup.service
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

@@ -67,7 +67,7 @@ COMMIT;
 
 Run on bluefin:
 ```bash
-PGPASSWORD='TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE' psql -h localhost -U claude -d zammad_production -f /ganuda/pathfinder/qdad-apps/visual-kanban/migrations/001_normalize_statuses.sql
+PGPASSWORD='${CHEROKEE_DB_PASS}' psql -h localhost -U claude -d zammad_production -f /ganuda/pathfinder/qdad-apps/visual-kanban/migrations/001_normalize_statuses.sql
 ```
 
 ### Step 1.3: Update backend API

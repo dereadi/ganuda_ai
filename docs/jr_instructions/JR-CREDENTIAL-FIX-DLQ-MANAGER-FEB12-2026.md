@@ -19,7 +19,7 @@ File: `jr_executor/dlq_manager.py`
 def get_db_connection():
     """Get database connection using federation credentials."""
     import os
-    password = os.environ.get('DB_PASSWORD', 'TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE')
+    password = os.environ.get('DB_PASSWORD', '${CHEROKEE_DB_PASS}')
     return psycopg2.connect(
         host='192.168.132.222',
         port=5432,

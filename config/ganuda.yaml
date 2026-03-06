@@ -28,7 +28,7 @@ database:
   port: 5432
   database: zammad_production
   user: claude
-  password: TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE
+  password: ${CHEROKEE_DB_PASS}
   pool_size: 10
 
 # Logging

@@ -11,7 +11,7 @@ Group=dereadi
 WorkingDirectory=/ganuda/services/embedding_service
 ExecStart=/ganuda/venv/bin/python embedding_server.py
 EnvironmentFile=/ganuda/config/secrets.env
-Environment=CHEROKEE_DB_PASS=TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE
+# CHEROKEE_DB_PASS loaded via EnvironmentFile
 Restart=on-failure
 RestartSec=30
 StandardOutput=journal

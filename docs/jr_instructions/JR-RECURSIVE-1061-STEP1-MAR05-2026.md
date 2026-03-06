@@ -1,0 +1,170 @@
+# [RECURSIVE] Deer Email Triage: LLM classification + Telegram alerts (requeue no-TEG) - Step 1
+
+**Parent Task**: #1061
+**Auto-decomposed**: 2026-03-05T09:44:05.196122
+**Original Step Title**: Upgrade analyze_email to use LLM classification
+
+---
+
+### Step 1: Upgrade analyze_email to use LLM classification
+
+File: `/ganuda/email_daemon/gmail_api_daemon.py`
+
+```
+<<<<<<< SEARCH
+    def analyze_email(self, email_data):
+        """Simple priority analysis"""
+        urgent_keywords = ['urgent', 'asap', 'immediately', 'deadline', 'critical', 'important']
+        text = (email_data['subject'] + ' ' + email_data['body_text']).lower()
+
+        priority = 5
+        action_required = False
+        thermal_temp = 0.5
+
+        for kw in urgent_keywords:
+            if kw in text:
+                priority = min(priority, 2)
+                action_required = True
+                thermal_temp = 0.8
+                break
+
+        # Check Gmail labels
+        if 'IMPORTANT' in email_data.get('labels', []):
+            priority = min(priority, 3)
+            thermal_temp = max(thermal_temp, 0.7)
+
+        if 'STARRED' in email_data.get('labels', []):
+            priority = min(priority, 2)
+            action_required = True
+
+        return {
+            'priority_score': priority,
+            'action_required': action_required,
+            'thermal_temp': thermal_temp,
+            'sentiment': 'neutral',
+            'ai_summary': email_data['subject'][:200]
+        }
+=======
+    def analyze_email(self, email_data):
+        """LLM-backed email triage via federation gateway."""
+        import requests as http_req
+
+        subject = email_data.get('subject', '')
+        body = email_data.get('body_text', '')[:1500]
+        from_addr = email_data.get('from_address', '')
+
+        # Fast keyword pre-filter for obvious spam/noise
+        noise_signals = ['unsubscribe', 'no-reply', 'noreply', 'donotreply',
+                         'marketing', 'newsletter', 'promotional']
+        combined_lower = (subject + ' ' + body + ' ' + from_addr).lower()
+        if any(sig in combined_lower for sig in noise_signals):
+            return {
+                'priority_score': 5,
+                'action_required': False,
+                'thermal_temp': 0.3,
+                'sentiment': 'neutral',
+                'classification': 'noise',
+                'ai_summary': subject[:200],
+                'action_deadline': None,
+            }
+
+        # LLM classification via gateway
+        prompt = f"""Classify this email for triage. Respond in EXACTLY this format:
+CLASSIFICATION: [ACTIONABLE|JEWEL|NOISE]
+PRIORITY: [1-5] (1=respond today, 2=respond within 48h, 3=this week, 4=eventually, 5=ignore)
+ACTION_DEADLINE: [date/time if mentioned, or NONE]
+ACTION_REQUIRED: [one sentence describing what Chief needs to do, or NONE]
+SUMMARY: [one sentence summary]
+
+Email from: {from_addr}
+Subject: {subject}
+Body: {body}
+
+ACTIONABLE means: scheduling a call, interview, meeting, deadline, someone waiting for a reply, calendar invite, payment due, contract to sign.
+JEWEL means: interesting article, industry news, networking opportunity, job posting worth considering — no immediate action needed.
+NOISE means: marketing, automated notifications, newsletters, spam, receipts."""
+
+        try:
+            resp = http_req.post(
+                'http://localhost:8080/v1/chat/completions',
+                json={
+                    'model': 'qwen2.5-72b',
+                    'messages': [{'role': 'user', 'content': prompt}],
+                    'max_tokens': 200,
+                    'temperature': 0.1,
+                },
+                timeout=30,
+            )
+            resp.raise_for_status()
+            llm_text = resp.json()['choices'][0]['message']['content']
+
+            # Parse LLM response
+            classification = 'noise'
+            priority = 5
+            action_required_text = None
+            action_deadline = None
+            summary = subject[:200]
+
+            for line in llm_text.strip().split('\n'):
+                line = line.strip()
+                if line.startswith('CLASSIFICATION:'):
+                    raw = line.split(':', 1)[1].strip().upper()
+                    if raw in ('ACTIONABLE', 'JEWEL', 'NOISE'):
+                        classification = raw.lower()
+                if line.startswith('PRIORITY:'):
+                    try:
+                        priority = int(line.split(':', 1)[1].strip()[0])
+                        priority = max(1, min(5, priority))
+                    except (ValueError, IndexError):
+                        pass
+                if line.startswith('ACTION_DEADLINE:'):
+                    val = line.split(':', 1)[1].strip()
+                    if val.upper() != 'NONE':
+                        action_deadline = val
+                if line.startswith('ACTION_REQUIRED:'):
+                    val = line.split(':', 1)[1].strip()
+                    if val.upper() != 'NONE':
+                        action_required_text = val
+                if line.startswith('SUMMARY:'):
+                    summary = line.split(':', 1)[1].strip()[:200]
+
+        except Exception as e:
+            self.logger.warning(f'LLM triage failed, falling back to keyword: {e}')
+            # Keyword fallback
+            classification = 'noise'
+            priority = 5
+            action_required_text = None
+            action_deadline = None
+            summary = subject[:200]
+            urgent_keywords = ['urgent', 'asap', 'immediately', 'deadline',
+                               'schedule', 'call', 'interview', 'meeting', 'calendar']
+            for kw in urgent_keywords:
+                if kw in combined_lower:
+                    classification = 'actionable'
+                    priority = 2
+                    action_required_text = f'Email contains keyword: {kw}'
+                    break
+
+        # Gmail label boost
+        labels = email_data.get('labels', [])
+        if 'IMPORTANT' in labels:
+            priority = min(priority, 3)
+        if 'STARRED' in labels:
+            priority = min(priority, 2)
+            if classification == 'noise':
+                classification = 'jewel'
+
+        thermal_temp = {1: 0.9, 2: 0.8, 3: 0.7, 4: 0.5, 5: 0.3}.get(priority, 0.5)
+
+        return {
+            'priority_score': priority,
+            'action_required': action_required_text is not None,
+            'action_required_text': action_required_text,
+            'thermal_temp': thermal_temp,
+            'sentiment': 'neutral',
+            'classification': classification,
+            'ai_summary': summary,
+            'action_deadline': action_deadline,
+        }
+>>>>>>> REPLACE
+```

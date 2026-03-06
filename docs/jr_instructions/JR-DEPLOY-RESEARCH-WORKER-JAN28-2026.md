@@ -67,7 +67,7 @@ Should show `/v1/research/async` and `/v1/research/status` endpoints available.
 ```bash
 curl -X POST http://localhost:8080/v1/research/async \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+  -H "X-API-Key: REDACTED_USE_ENV_VAR" \
   -d '{"query": "VA tinnitus rating criteria", "max_steps": 5}'
 ```
 
@@ -80,7 +80,7 @@ Expected response:
 
 ```bash
 curl http://localhost:8080/v1/research/status/research-abc123 \
-  -H "X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+  -H "X-API-Key: REDACTED_USE_ENV_VAR"
 ```
 
 ### Verify output file created:

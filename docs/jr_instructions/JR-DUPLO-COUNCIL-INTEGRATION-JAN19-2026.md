@@ -104,7 +104,7 @@ After modifying the function, test via LLM Gateway:
 # Test 1: Research proposal with known conflicts
 curl -s -X POST http://localhost:8080/v1/council/vote \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+  -H "X-API-Key: REDACTED_USE_ENV_VAR" \
   -d '{"question": "Should we integrate branch-merge reasoning from this arXiv paper?", "context": "Test paper proposes multiple forward passes"}' \
   | python3 -m json.tool | grep -A5 "uktena"
 
@@ -113,7 +113,7 @@ curl -s -X POST http://localhost:8080/v1/council/vote \
 # Test 2: Non-research question (should NOT trigger Uktena)
 curl -s -X POST http://localhost:8080/v1/council/vote \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+  -H "X-API-Key: REDACTED_USE_ENV_VAR" \
   -d '{"question": "What is the best color for our logo?", "context": "Marketing question"}' \
   | python3 -m json.tool | grep "uktena"
 

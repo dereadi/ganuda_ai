@@ -58,7 +58,7 @@ File: `/ganuda/lib/specialist_council.py`
 After deployment, create a test vision detection and verify it stores at temp 30:
 
 ```text
-PGPASSWORD='TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE' psql -h 192.168.132.222 -U claude -d zammad_production -c "SELECT id, temperature_score, LEFT(original_content, 80) FROM thermal_memory_archive WHERE original_content LIKE 'VISION DETECTION%' ORDER BY id DESC LIMIT 3;"
+PGPASSWORD='${CHEROKEE_DB_PASS}' psql -h 192.168.132.222 -U claude -d zammad_production -c "SELECT id, temperature_score, LEFT(original_content, 80) FROM thermal_memory_archive WHERE original_content LIKE 'VISION DETECTION%' ORDER BY id DESC LIMIT 3;"
 ```
 
 New routine detections should show temperature_score = 30.

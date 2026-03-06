@@ -60,7 +60,7 @@ The Federation Edition extends Ganuda Gateway to operate across multiple nodes, 
 - `breadcrumb_trails` - Audit logs
 - `api_keys` - Authentication
 
-**Credentials**: claude / jawaseatlasers2
+**Credentials**: claude / $DB_PASS (see secrets.env)
 
 ### greenfin (192.168.132.224) - Daemons
 **Primary Services**:
@@ -87,7 +87,7 @@ GET  /v1/council/history        - Vote history
 GET  /v1/config/current         - Running configuration
 ```
 
-Admin key: `ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5`
+Admin key: `REDACTED_USE_ENV_VAR`
 
 ### vLLM Inference (redfin:8000)
 
@@ -111,7 +111,7 @@ ITSM dashboard integrating:
 
 Query directly:
 ```sql
-PGPASSWORD=jawaseatlasers2 psql -h 192.168.132.222 -U claude -d zammad_production -c "
+PGPASSWORD=$DB_PASS psql -h 192.168.132.222 -U claude -d zammad_production -c "
   SELECT content, pheromone_strength, created_at 
   FROM thermal_memory_archive 
   WHERE pheromone_strength > 0.5 
@@ -180,7 +180,7 @@ systemctl status promtail
 curl http://192.168.132.223:8080/health
 
 # Database connectivity
-PGPASSWORD=jawaseatlasers2 psql -h 192.168.132.222 -U claude -d zammad_production -c "SELECT 1"
+PGPASSWORD=$DB_PASS psql -h 192.168.132.222 -U claude -d zammad_production -c "SELECT 1"
 
 # vLLM status
 curl http://192.168.132.223:8000/health

@@ -71,6 +71,13 @@ class TEGPlanner:
             print(f"[TEG] Only 1 block found — no decomposition needed")
             return False
 
+        # Circuit breaker: soft limit on child task spawning
+        MAX_TEG_CHILDREN = 20
+        if len(blocks) > MAX_TEG_CHILDREN:
+            print(f"[TEG] CIRCUIT BREAKER: {len(blocks)} blocks exceeds MAX_TEG_CHILDREN={MAX_TEG_CHILDREN}")
+            print(f"[TEG] Task #{task.get('id', '?')} too large for TEG — falls through to normal execution")
+            return False
+
         print(f"[TEG] Found {len(blocks)} blocks across "
               f"{len(set(b['filepath'] for b in blocks))} files")
 
@@ -268,13 +275,16 @@ class TEGPlanner:
                 title = (f"[TEG] {parent_title[:80]} - "
                          f"{node['op_type']} {basename}")
 
-                # Build parameters
+                # Build parameters with parent reasoning context
                 node_params = json.dumps({
                     'teg_node_id': node['node_id'],
                     'teg_parent_id': parent_id,
                     'teg_deps': node['deps'],
                     'teg_target_file': node['filepath'],
-                    'teg_op_type': node['op_type']
+                    'teg_op_type': node['op_type'],
+                    'teg_parent_title': parent_title[:200],
+                    'teg_parent_instruction': task.get('instruction_file', ''),
+                    'teg_total_nodes': len(dag)
                 })
 
                 cur.execute("""

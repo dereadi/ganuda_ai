@@ -122,7 +122,7 @@ def analyze_email_with_llm(email_data: dict) -> dict:
     Analyze email using Cherokee LLM Gateway
 
     Endpoint: http://192.168.132.223:8080/v1/chat/completions
-    API Key: ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5
+    API Key: REDACTED_USE_ENV_VAR
     """
     prompt = f"""Analyze this email and respond with JSON only:
 

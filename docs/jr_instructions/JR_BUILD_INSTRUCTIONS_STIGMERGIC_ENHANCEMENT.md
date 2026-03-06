@@ -685,7 +685,7 @@ cd /ganuda/services/llm_gateway && nohup /home/dereadi/cherokee_venv/bin/python 
 ```bash
 # Test categorized trail via API
 curl -X POST "http://192.168.132.223:8080/v1/trails/leave?specialist=crawdad&content=Security+test&category=danger" \
-  -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+  -H "Authorization: Bearer REDACTED_USE_ENV_VAR"
 
 # Check trail health summary
 PGPASSWORD=jawaseatlasers2 psql -h 192.168.132.222 -U claude -d zammad_production -c "SELECT * FROM trail_health_summary;"

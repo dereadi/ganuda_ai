@@ -45,7 +45,7 @@ def get_db_conn():
         from secrets_loader import get_secret
         password = get_secret("DB_PASSWORD")
     except Exception:
-        password = "TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE"
+        password = "${CHEROKEE_DB_PASS}"
     return psycopg2.connect(
         host="192.168.132.222", dbname="zammad_production",
         user="claude", password=password

@@ -1,0 +1,21 @@
+[Unit]
+Description=Longhouse (Gaduyi) — Automated Convening Listener
+Documentation=Cherokee AI Federation Digital Council House
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+EnvironmentFile=/ganuda/config/secrets.env
+ExecStart=/home/dereadi/cherokee_venv/bin/python -c "print('Longhouse listener — Phase 2. The fire burns. Convening is via lib/longhouse.py.')"
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=longhouse
+
+[Install]
+WantedBy=multi-user.target

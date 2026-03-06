@@ -47,6 +47,7 @@ def _load_registry():
 
 
 @vision_bp.route("/cameras", methods=["GET"])
+@require_api_key
 def camera_status():
     """Camera fleet status with connection info."""
     registry = _load_registry()
@@ -76,6 +77,7 @@ def camera_status():
 
 
 @vision_bp.route("/speed/recent", methods=["GET"])
+@require_api_key
 def speed_recent():
     """Last N speed detections."""
     limit = request.args.get("limit", 50, type=int)
@@ -115,6 +117,7 @@ def speed_recent():
 
 
 @vision_bp.route("/speed/stats", methods=["GET"])
+@require_api_key
 def speed_stats():
     """Aggregated speed statistics for the last 24 hours."""
     try:
@@ -171,6 +174,7 @@ def speed_stats():
 
 
 @vision_bp.route("/calibration", methods=["GET"])
+@require_api_key
 def calibration_status():
     """Calibration status for all cameras."""
     registry = _load_registry()
@@ -205,6 +209,7 @@ def calibration_status():
 
 
 @vision_bp.route("/snapshot/<camera_id>", methods=["GET"])
+@require_api_key
 def camera_snapshot(camera_id):
     """Live snapshot from a camera (cached for 30s)."""
     import requests

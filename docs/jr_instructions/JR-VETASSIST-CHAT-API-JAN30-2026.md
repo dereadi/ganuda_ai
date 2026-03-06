@@ -21,7 +21,7 @@ The VetAssist chat connects veterans to the 7-Specialist Council via the LLM Gat
 - citations (jsonb), created_at (timestamptz)
 
 **LLM Gateway:** http://192.168.132.223:8080/v1/chat/completions
-- API Key: `ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5`
+- API Key: `REDACTED_USE_ENV_VAR`
 - Supports system prompts for veteran-specific context
 
 ### Endpoints to Implement
@@ -136,7 +136,7 @@ The VetAssist chat connects veterans to the 7-Specialist Council via the LLM Gat
 import httpx
 
 LLM_GATEWAY_URL = "http://192.168.132.223:8080/v1/chat/completions"
-LLM_API_KEY = "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+LLM_API_KEY = "REDACTED_USE_ENV_VAR"
 
 VETASSIST_SYSTEM_PROMPT = """You are VetAssist, a VA disability claims specialist AI assistant.
 You help veterans understand their benefits, navigate the claims process, and prepare evidence.

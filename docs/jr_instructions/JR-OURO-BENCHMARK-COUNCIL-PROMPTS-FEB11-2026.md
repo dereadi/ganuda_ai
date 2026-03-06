@@ -165,7 +165,7 @@ def query_qwen_72b(prompt: str) -> Dict:
     url = "http://localhost:8080/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
-        "X-API-Key": "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5",
+        "X-API-Key": "REDACTED_USE_ENV_VAR",
     }
     payload = json.dumps({
         "messages": [{"role": "user", "content": prompt}],

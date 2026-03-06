@@ -156,7 +156,7 @@ ALTER TABLE memory_links ADD COLUMN IF NOT EXISTS activation_count INTEGER DEFAU
 After deployment, run a council query and check for ripple output:
 
 ```text
-curl -s http://192.168.132.223:8080/v1/council/vote -H "Content-Type: application/json" -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" -d '{"question": "What happened during the February 13 power outage?", "context": "Phase 1 ripple retrieval test"}'
+curl -s http://192.168.132.223:8080/v1/council/vote -H "Content-Type: application/json" -H "Authorization: Bearer $GATEWAY_API_KEY" -d '{"question": "What happened during the February 13 power outage?", "context": "Phase 1 ripple retrieval test"}'
 ```
 
 Check logs for `[RAG] Ripple:` output showing associated memories were found.
@@ -164,7 +164,7 @@ Check logs for `[RAG] Ripple:` output showing associated memories were found.
 Then verify memory_links schema update:
 
 ```text
-PGPASSWORD='TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE' psql -h 192.168.132.222 -U claude -d zammad_production -c "\d memory_links"
+PGPASSWORD='${CHEROKEE_DB_PASS}' psql -h 192.168.132.222 -U claude -d zammad_production -c "\d memory_links"
 ```
 
 Should show `last_activated` and `activation_count` columns.

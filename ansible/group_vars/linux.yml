@@ -1,39 +1,37 @@
----
-# Cherokee AI Federation — Linux Node Group Variables
-ganuda_base_path: /ganuda
-ganuda_config_path: /ganuda/config
-ganuda_scripts_path: /ganuda/scripts
-ganuda_services_path: /ganuda/scripts/systemd
-ganuda_venv_path: /ganuda/amem_venv
+# SSH Cryptographic Configuration — Cherokee AI Federation
+# Council mandate: Quantum/PQC Hardening Sprint (Feb 21, 2026)
+# Crypto-agile: change these variables to update fleet-wide SSH crypto
+#
+# sntrup761x25519 is a HYBRID post-quantum KEX:
+#   - sntrup761 (Streamlined NTRU Prime, post-quantum)
+#   - x25519 (classical ECDH)
+#   An attacker must break BOTH to compromise the session.
 
-# Package management
-package_manager: apt
-common_packages:
-  - python3
-  - python3-pip
-  - python3-venv
-  - git
-  - curl
-  - jq
-  - htop
-  - nftables
-  - fail2ban
-  - postgresql-client
-  - rsync
-  - tmux
+ssh_kex_algorithms:
+  - "sntrup761x25519-sha512@openssh.com"
+  - "curve25519-sha256"
+  - "curve25519-sha256@libssh.org"
 
-# Service management
-service_manager: systemd
+ssh_ciphers:
+  - "chacha20-poly1305@openssh.com"
+  - "aes256-gcm@openssh.com"
+  - "aes128-gcm@openssh.com"
 
-# Security
-ssh_allowed_network: 192.168.132.0/24
-fail2ban_enabled: true
+ssh_macs:
+  - "hmac-sha2-512-etm@openssh.com"
+  - "hmac-sha2-256-etm@openssh.com"
 
-# Database
-db_host: 192.168.132.222
-db_name: zammad_production
-db_user: claude
+ssh_host_key_algorithms:
+  - "ssh-ed25519"
 
-# Embedding service
-embedding_host: 192.168.132.224
-embedding_port: 8003
+ssh_host_key_files:
+  - "/etc/ssh/ssh_host_ed25519_key"
+
+ssh_permit_root_login: "no"
+ssh_password_authentication: "no"
+ssh_pubkey_authentication: "yes"
+ssh_x11_forwarding: "no"
+ssh_max_auth_tries: 3
+ssh_permit_empty_passwords: "no"
+ssh_client_alive_interval: 300
+ssh_client_alive_count_max: 3

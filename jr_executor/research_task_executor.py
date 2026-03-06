@@ -221,7 +221,7 @@ class ResearchTaskExecutor:
                 council_response = requests.post(
                     'http://192.168.132.223:8080/v1/council/vote',
                     headers={
-                        'Authorization': 'Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5',
+                        'Authorization': 'Bearer REDACTED_USE_ENV_VAR',
                         'Content-Type': 'application/json'
                     },
                     json={

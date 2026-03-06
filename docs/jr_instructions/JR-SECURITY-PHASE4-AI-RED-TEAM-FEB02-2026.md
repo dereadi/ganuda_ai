@@ -1680,7 +1680,7 @@ PYEOF
 cd /ganuda/security/ai_red_team
 python3 test_runner.py \
   --target http://192.168.132.223:8080 \
-  --api-key ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5 \
+  --api-key REDACTED_USE_ENV_VAR \
   --db-host 192.168.132.222 \
   --db-user claude \
   --output /ganuda/security/ai_red_team/results/

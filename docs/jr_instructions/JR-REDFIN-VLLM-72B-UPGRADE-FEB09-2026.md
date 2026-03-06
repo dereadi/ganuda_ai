@@ -115,7 +115,7 @@ curl -s http://localhost:8000/v1/chat/completions \
 # Test through gateway
 curl -s http://localhost:8080/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+  -H "Authorization: Bearer REDACTED_USE_ENV_VAR" \
   -d '{
     "model": "qwen2.5-72b-instruct-awq",
     "messages": [{"role": "user", "content": "Write a Python function that checks if a number is prime."}],

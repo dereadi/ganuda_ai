@@ -3,6 +3,7 @@
 Telegram notification helper for Jr
 Allows Jr to send status updates to the owner
 """
+import os
 import requests
 
 BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')

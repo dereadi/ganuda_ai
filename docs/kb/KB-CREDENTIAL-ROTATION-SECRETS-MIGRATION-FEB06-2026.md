@@ -19,7 +19,7 @@ Legacy codebase grew organically with hardcoded credentials copied between files
 
 ### 1. New Password Generated
 ```
-TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE
+${CHEROKEE_DB_PASS}
 ```
 - 32 characters, cryptographically random
 - Changed on bluefin PostgreSQL: `ALTER USER claude WITH PASSWORD '...'`
@@ -33,7 +33,7 @@ TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE
 CHEROKEE_DB_HOST=192.168.132.222
 CHEROKEE_DB_NAME=zammad_production
 CHEROKEE_DB_USER=claude
-CHEROKEE_DB_PASS=TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE
+CHEROKEE_DB_PASS=${CHEROKEE_DB_PASS}
 CHEROKEE_DB_PORT=5432
 ```
 

@@ -24,6 +24,8 @@ SERVICES = [
     ('vLLM', 'http://localhost:8000/health', 5000),
     ('Gateway', 'http://localhost:8080/health', 2000),
     ('ii-researcher', 'http://localhost:8090/health', 3000),
+    ('VetAssist-Backend', 'http://localhost:8001/health', 3000),
+    ('VetAssist-Frontend', 'http://localhost:3000/', 5000),
 ]
 
 DB_CONFIG = {
@@ -35,18 +37,31 @@ DB_CONFIG = {
 
 CHECK_INTERVAL = 60  # seconds
 QUEUE_DEPTH_THRESHOLD = 10
+CONSECUTIVE_FAILURES_THRESHOLD = 3  # alert only after N consecutive failures
+
+# Track consecutive failures per service
+_failure_counts = {}
 
 
 def check_service(name: str, url: str, latency_threshold_ms: int) -> bool:
-    """Check if a service is healthy."""
+    """Check if a service is healthy. Debounce: alerts only after 3 consecutive failures."""
     try:
         start = time.time()
         response = requests.get(url, timeout=10)
         latency_ms = int((time.time() - start) * 1000)
 
         if response.status_code != 200:
-            alert_service_down(name, f"HTTP {response.status_code}")
+            _failure_counts[name] = _failure_counts.get(name, 0) + 1
+            if _failure_counts[name] >= CONSECUTIVE_FAILURES_THRESHOLD:
+                alert_service_down(name, f"HTTP {response.status_code} ({_failure_counts[name]} consecutive)")
+            else:
+                logging.warning(f"{name}: HTTP {response.status_code} (failure {_failure_counts[name]}/{CONSECUTIVE_FAILURES_THRESHOLD}, suppressing alert)")
             return False
+
+        # Success — reset failure counter
+        if _failure_counts.get(name, 0) > 0:
+            logging.info(f"{name}: recovered after {_failure_counts[name]} failure(s)")
+        _failure_counts[name] = 0
 
         if latency_ms > latency_threshold_ms:
             alert_high_latency(name, latency_ms, latency_threshold_ms)
@@ -55,13 +70,25 @@ def check_service(name: str, url: str, latency_threshold_ms: int) -> bool:
         return True
 
     except requests.exceptions.Timeout:
-        alert_service_down(name, "Request timeout")
+        _failure_counts[name] = _failure_counts.get(name, 0) + 1
+        if _failure_counts[name] >= CONSECUTIVE_FAILURES_THRESHOLD:
+            alert_service_down(name, f"Request timeout ({_failure_counts[name]} consecutive)")
+        else:
+            logging.warning(f"{name}: timeout (failure {_failure_counts[name]}/{CONSECUTIVE_FAILURES_THRESHOLD}, suppressing alert)")
         return False
     except requests.exceptions.ConnectionError:
-        alert_service_down(name, "Connection refused")
+        _failure_counts[name] = _failure_counts.get(name, 0) + 1
+        if _failure_counts[name] >= CONSECUTIVE_FAILURES_THRESHOLD:
+            alert_service_down(name, f"Connection refused ({_failure_counts[name]} consecutive)")
+        else:
+            logging.warning(f"{name}: connection refused (failure {_failure_counts[name]}/{CONSECUTIVE_FAILURES_THRESHOLD}, suppressing alert)")
         return False
     except Exception as e:
-        alert_service_down(name, str(e))
+        _failure_counts[name] = _failure_counts.get(name, 0) + 1
+        if _failure_counts[name] >= CONSECUTIVE_FAILURES_THRESHOLD:
+            alert_service_down(name, f"{str(e)} ({_failure_counts[name]} consecutive)")
+        else:
+            logging.warning(f"{name}: {str(e)} (failure {_failure_counts[name]}/{CONSECUTIVE_FAILURES_THRESHOLD}, suppressing alert)")
         return False
 
 
@@ -122,6 +149,14 @@ def check_jr_queue_depth() -> bool:
         cur = conn.cursor()
         cur.execute("SELECT COUNT(*) FROM jr_work_queue WHERE status = 'pending'")
         pending = cur.fetchone()[0]
+
+        # Also check DLQ depth (failed tasks in last 7 days)
+        cur.execute("""
+            SELECT COUNT(*) FROM jr_work_queue
+            WHERE status IN ('failed', 'error')
+              AND updated_at > NOW() - INTERVAL '7 days'
+        """)
+        dlq_depth = cur.fetchone()[0]
         cur.close()
         conn.close()
 
@@ -134,7 +169,15 @@ def check_jr_queue_depth() -> bool:
             )
             return False
 
-        logging.debug(f"Jr queue: {pending} pending")
+        if dlq_depth > 5:
+            alert_medium(
+                "Jr DLQ Depth High",
+                f"{dlq_depth} failed tasks in last 7 days",
+                source='eagle-eye',
+                context={'dlq_depth': dlq_depth}
+            )
+
+        logging.debug(f"Jr queue: {pending} pending, DLQ: {dlq_depth}")
         return True
 
     except Exception as e:

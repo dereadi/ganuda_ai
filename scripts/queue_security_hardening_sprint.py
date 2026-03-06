@@ -29,7 +29,7 @@ DB_CONFIG = {
     'host': '192.168.132.222',
     'database': 'zammad_production',
     'user': 'claude',
-    'password': os.environ.get('CLAUDE_DB_PASSWORD', 'jawaseatlasers2')
+    'password': os.environ.get('CLAUDE_DB_PASSWORD', '')
 }
 
 INSTRUCTION_BASE = '/ganuda/docs/jr_instructions'
@@ -44,7 +44,7 @@ BATCH_1 = [
         'task_id': 'SECURITY-CRED-ROTATE-001',
         'title': 'Phase 1: Credential Rotation — secrets.env + secrets_loader.py',
         'description': (
-            'CRITICAL: Hardcoded password jawaseatlasers2 found in 1,874 files. '
+            'CRITICAL: Hardcoded password os.environ.get("CHEROKEE_DB_PASS", "") found in 1,874 files. '
             'Create /ganuda/config/secrets.env (chmod 600) with all credentials. '
             'Create /ganuda/lib/secrets_loader.py with three-tier resolution (file/env/vault). '
             'Add .gitignore entries for secrets. Install gitleaks pre-commit hook. '

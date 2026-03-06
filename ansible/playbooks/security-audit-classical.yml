@@ -1,0 +1,173 @@
+---
+# Cherokee AI Federation — Classical Security Audit
+# Kanban #1871 | fail2ban, nftables, PostgreSQL TLS, secret scan
+#
+# Run: ansible-playbook playbooks/security-audit-classical.yml
+# Output: /ganuda/reports/security_audit/
+
+- name: Classical Security Audit
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  vars:
+    audit_dir: "/ganuda/reports/security_audit"
+    timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
+
+  tasks:
+    - name: Ensure audit directory exists
+      file:
+        path: "{{ audit_dir }}"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+      run_once: true
+
+    # === fail2ban ===
+
+    - name: Check fail2ban installed
+      command: which fail2ban-client
+      register: f2b_installed
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Check fail2ban status
+      shell: fail2ban-client status 2>/dev/null || echo "NOT RUNNING"
+      register: f2b_status
+      changed_when: false
+      when: f2b_installed.rc == 0
+
+    - name: List fail2ban jails
+      shell: fail2ban-client status 2>/dev/null | grep 'Jail list' || echo "No jails"
+      register: f2b_jails
+      changed_when: false
+      when: f2b_installed.rc == 0
+
+    - name: Check fail2ban SSH jail
+      shell: fail2ban-client status sshd 2>/dev/null || echo "No sshd jail"
+      register: f2b_sshd
+      changed_when: false
+      when: f2b_installed.rc == 0
+
+    # === nftables ===
+
+    - name: Check nftables active
+      command: nft list ruleset
+      register: nft_rules
+      changed_when: false
+      ignore_errors: yes
+      when: ansible_system == 'Linux'
+
+    - name: Count nftables rules
+      shell: nft list ruleset 2>/dev/null | grep -c 'rule' || echo "0"
+      register: nft_count
+      changed_when: false
+      when: ansible_system == 'Linux'
+
+    # === PostgreSQL TLS ===
+
+    - name: Check PostgreSQL listening
+      shell: ss -tlnp | grep ':5432' || echo "No PostgreSQL listener"
+      register: pg_listen
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Check PostgreSQL SSL mode
+      shell: |
+        if command -v psql >/dev/null 2>&1; then
+          psql -h localhost -U claude -d zammad_production -t -c "SHOW ssl;" 2>/dev/null || echo "Cannot connect"
+        else
+          echo "psql not installed"
+        fi
+      register: pg_ssl_mode
+      changed_when: false
+      ignore_errors: yes
+      environment:
+        PGPASSWORD: "{{ lookup('env', 'CHEROKEE_DB_PASSWORD') | default('skip', true) }}"
+
+    # === Plaintext secret scan ===
+
+    - name: Scan for plaintext passwords in common locations
+      shell: |
+        grep -rl --include='*.py' --include='*.env' --include='*.yml' --include='*.yaml' --include='*.conf' --include='*.ini' \
+          -E '(password|secret|token|api_key)\s*=\s*["\x27][^"\x27]{8,}' \
+          /ganuda /etc/systemd/system 2>/dev/null | head -30 || echo "None found"
+      register: secret_scan
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Count exposed secrets
+      shell: |
+        grep -rl --include='*.py' --include='*.env' --include='*.yml' --include='*.yaml' --include='*.conf' \
+          -E '(password|secret|token|api_key)\s*=\s*["\x27][^"\x27]{8,}' \
+          /ganuda 2>/dev/null | wc -l || echo "0"
+      register: secret_count
+      changed_when: false
+      ignore_errors: yes
+
+    # === Open ports ===
+
+    - name: List listening ports
+      shell: ss -tlnp | grep LISTEN
+      register: open_ports
+      changed_when: false
+      ignore_errors: yes
+
+    # === Unattended upgrades ===
+
+    - name: Check unattended-upgrades
+      shell: |
+        if dpkg -l unattended-upgrades 2>/dev/null | grep -q '^ii'; then
+          echo "INSTALLED"
+          cat /etc/apt/apt.conf.d/20auto-upgrades 2>/dev/null || echo "Not configured"
+        else
+          echo "NOT INSTALLED"
+        fi
+      register: auto_updates
+      changed_when: false
+      when: ansible_system == 'Linux'
+      ignore_errors: yes
+
+    # === Write audit report ===
+
+    - name: Write per-host audit report
+      copy:
+        dest: "{{ audit_dir }}/{{ inventory_hostname }}_{{ timestamp }}.txt"
+        content: |
+          # Classical Security Audit: {{ inventory_hostname }}
+          # Generated: {{ ansible_date_time.iso8601 }}
+          # OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+
+          ## fail2ban
+          Installed: {{ 'YES' if f2b_installed.rc | default(1) == 0 else 'NO' }}
+          Status: {{ f2b_status.stdout | default('N/A') }}
+          Jails: {{ f2b_jails.stdout | default('N/A') }}
+          SSH Jail: {{ f2b_sshd.stdout | default('N/A') }}
+
+          ## nftables
+          Rule Count: {{ nft_count.stdout | default('N/A') }}
+          Full Ruleset: {{ nft_rules.stdout_lines | default([]) | length }} lines
+
+          ## PostgreSQL
+          Listening: {{ pg_listen.stdout | default('N/A') }}
+          SSL Mode: {{ pg_ssl_mode.stdout | default('N/A') }}
+
+          ## Plaintext Secrets
+          Files with exposed secrets: {{ secret_count.stdout | default('0') }}
+          Locations: {{ secret_scan.stdout | default('None') }}
+
+          ## Open Ports
+          {{ open_ports.stdout | default('None') }}
+
+          ## Auto Updates
+          {{ auto_updates.stdout | default('N/A') }}
+      delegate_to: localhost
+
+    - name: Report summary
+      debug:
+        msg: >-
+          {{ inventory_hostname }} |
+          fail2ban: {{ 'OK' if f2b_installed.rc | default(1) == 0 else 'MISSING' }} |
+          nft rules: {{ nft_count.stdout | default('?') }} |
+          PG SSL: {{ pg_ssl_mode.stdout | default('?') | trim }} |
+          Secrets exposed: {{ secret_count.stdout | default('?') }}

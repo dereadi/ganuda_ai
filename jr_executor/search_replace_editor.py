@@ -14,6 +14,7 @@ import os
 import re
 import shutil
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Any
 
 
@@ -46,19 +47,33 @@ class SearchReplaceEditor:
         self.edit_log: List[Dict] = []
 
     def validate_path(self, filepath: str) -> Tuple[bool, str]:
-        """Validate that filepath is allowed for editing."""
+        """Validate that filepath is allowed for editing.
+
+        Uses dual-resolution symlink checking: validates both the literal path
+        AND the resolved path (following symlinks). Both must pass.
+        Inspired by Legion sandbox.py — denied always wins.
+        """
         if not os.path.isabs(filepath):
             return False, f"Path must be absolute, got: {filepath}"
 
-        # Check forbidden paths first
+        # Resolve symlinks to get the real target path
+        resolved = str(Path(filepath).resolve())
+
+        # Check BOTH literal and resolved paths against forbidden areas
         for forbidden in self.forbidden_paths:
             if filepath.startswith(forbidden):
                 return False, f"Path is in forbidden area: {forbidden}"
+            if resolved.startswith(forbidden):
+                return False, f"Symlink resolves to forbidden area: {resolved} -> {forbidden}"
 
-        # Check allowed paths
+        # Check BOTH literal and resolved paths against allowed areas
         path_allowed = any(filepath.startswith(allowed) for allowed in self.allowed_paths)
         if not path_allowed:
             return False, f"Path not in allowed areas: {self.allowed_paths}"
+
+        resolved_allowed = any(resolved.startswith(allowed) for allowed in self.allowed_paths)
+        if not resolved_allowed:
+            return False, f"Symlink resolves outside allowed areas: {resolved}"
 
         return True, ""
 
@@ -135,6 +150,16 @@ class SearchReplaceEditor:
                 f'Provide more surrounding context to make the match unique.'
             )
             self._log_edit(filepath, 'ambiguous', result)
+            return result
+
+        # Idempotency check: if REPLACE text already exists, this edit was already applied
+        # Prevents retry duplication (KB-DLQ-TRIAGE-PATTERNS Root Cause #5)
+        if replace_text in content and replace_text != search_text:
+            result['success'] = True
+            result['error'] = ''
+            result['lines_changed'] = 0
+            print(f"[SR-IDEMPOTENT] Skipping already-applied edit in {filepath}")
+            self._log_edit(filepath, 'idempotent_skip', result)
             return result
 
         # Record match position for logging

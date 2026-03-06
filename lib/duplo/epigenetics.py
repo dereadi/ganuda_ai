@@ -105,6 +105,43 @@ def seed_defaults() -> int:
             "modifier_value": {"factor": 1.5},
             "description": "Increase analyst depth during research phases",
         },
+
+        # DC-1 Lazy Awareness — energy budget enforcement (Design Constraint protein)
+        # A cell doesn't burn ATP it doesn't need. Cap token spend for low-cost enzymes.
+        # Academic: arXiv:2312.00207 (EpiTESTER), arXiv:2108.04546
+        {
+            "condition_name": "dc1_lazy_awareness",
+            "target": "coyote_cam",
+            "modifier_type": "weight",
+            "modifier_value": {"factor": 0.5},
+            "description": "DC-1: Cap Coyote Cam to minimal token budget. Observer runs cheap.",
+        },
+        {
+            "condition_name": "dc1_lazy_awareness",
+            "target": "*",
+            "modifier_type": "inject",
+            "modifier_value": {"text": "ENERGY CONSTRAINT (DC-1): Prefer shorter responses. Only elaborate when severity >= 4. The cell conserves ATP."},
+            "description": "DC-1: Global awareness — all enzymes default to minimal energy spend",
+        },
+
+        # DC-6 Gradient Principle — expertise is gravity, not walls
+        # Weight responses by domain proximity. Crawdad weighs heavy on security,
+        # light on market. Deer weighs heavy on market, light on architecture.
+        # Longhouse ratified: expertise is a gradient, not a boundary.
+        {
+            "condition_name": "dc6_gradient",
+            "target": "coyote_cam",
+            "modifier_type": "inject",
+            "modifier_value": {"text": "GRADIENT (DC-6): Your gravity is OBSERVATION. You can reference any domain but you REST in pattern detection. Weight your signals by how close the anomaly is to your core: system behavior > resource usage > business patterns."},
+            "description": "DC-6: Gradient weighting for Coyote Cam — observation is its gravity",
+        },
+        {
+            "condition_name": "dc6_gradient",
+            "target": "crawdad_scan",
+            "modifier_type": "inject",
+            "modifier_value": {"text": "GRADIENT (DC-6): Your gravity is SECURITY. You can reference any domain but you REST in threat detection. Weight your findings by proximity to security: injection/auth > config drift > performance."},
+            "description": "DC-6: Gradient weighting for Crawdad — security is its gravity",
+        },
     ]
 
     conn = get_connection()

@@ -23,6 +23,7 @@ from search_replace_editor import SearchReplaceEditor
 import re
 from datetime import datetime
 from typing import Dict, Any, List, Optional
+import hashlib as _hashlib
 
 # Add lib to path for reasoner import
 sys.path.insert(0, '/ganuda/lib')
@@ -179,6 +180,114 @@ class TaskExecutor:
     # Phase 11: Self-Healing Retry Configuration
     # Council vote 6428bcda34efc7f9 — Turtle: bounded retry for sustainability
     MAX_RETRIES = 2
+
+    # Hard Blocker Classification (Legion AAR adoption, council vote 7f24c56f)
+    # Structural blockers that no amount of retrying will fix
+    STRUCTURAL_BLOCKER_PATTERNS = {
+        'MISSING_CREDENTIALS': [
+            'authentication failed', 'auth error', 'invalid password',
+            'CHEROKEE_DB_PASS', 'api key', 'token expired', 'credential',
+            'permission denied', 'access denied', '401', '403',
+        ],
+        'PERMISSION_DENIED': [
+            'permission denied', 'operation not permitted', 'read-only',
+            'cannot write', 'ESCALATION_REQUIRED', 'sudo required',
+        ],
+        'AMBIGUOUS_REQUIREMENTS': [
+            'no such file or directory', 'modulenotfounderror',
+            'importerror', 'filenotfounderror', 'no match found',
+        ],
+        'SERVICE_UNAVAILABLE': [
+            'connection refused', 'connection timed out', 'read timed out',
+            'name or service not known', 'no route to host',
+        ],
+    }
+
+    def _classify_blocker(self, failed_steps: list) -> str:
+        """Classify failure as structural blocker or retryable.
+
+        Returns blocker type string or 'RETRYABLE' if retry might help.
+        Legion AAR adoption — council vote 7f24c56f8c97e880.
+        """
+        error_text = " ".join([
+            str(s.get('error', '')).lower() for s in failed_steps
+        ])
+        for blocker_type, patterns in self.STRUCTURAL_BLOCKER_PATTERNS.items():
+            for pattern in patterns:
+                if pattern.lower() in error_text:
+                    return blocker_type
+        return 'RETRYABLE'
+
+    # QW-7: Denied Commands safety net (Legion adoption, kanban #1910)
+    # Case-insensitive substring check before bash block execution
+    DENIED_COMMANDS = [
+        'curl | bash', 'curl |bash', 'wget | python', 'wget |python',
+        'eval(', 'exec(', 'chmod -R 777', 'chown -R',
+        'iptables -F', 'nft flush', 'kill -9 1', 'pkill -9',
+        'wget -O - |', 'curl -s |', 'pip install --',
+        'npm install -g', 'apt remove', 'dnf remove',
+    ]
+
+    # QW-5: Loop Prevention (Legion adoption, kanban #1911)
+    # After this many total failures, mark permanently_failed
+    MAX_ESCALATION_COUNT = 3
+
+    def increment_escalation(self, task_id: int) -> int:
+        """Increment escalation_count and return new value.
+        QW-5: Loop Prevention (kanban #1911).
+        """
+        import psycopg2
+        try:
+            conn = psycopg2.connect(**self.db_config)
+            cur = conn.cursor()
+            cur.execute("""
+                UPDATE jr_work_queue
+                SET escalation_count = COALESCE(escalation_count, 0) + 1
+                WHERE id = %s
+                RETURNING escalation_count
+            """, (task_id,))
+            row = cur.fetchone()
+            conn.commit()
+            conn.close()
+            return row[0] if row else 0
+        except Exception:
+            return 0
+
+    def check_permanently_failed(self, task_id: int) -> bool:
+        """Check if task has exceeded max escalations.
+        If so, mark permanently_failed and return True.
+        QW-5: Loop Prevention (kanban #1911).
+        """
+        import psycopg2
+        try:
+            conn = psycopg2.connect(**self.db_config)
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT escalation_count FROM jr_work_queue WHERE id = %s
+            """, (task_id,))
+            row = cur.fetchone()
+            if row and (row[0] or 0) >= self.MAX_ESCALATION_COUNT:
+                cur.execute("""
+                    UPDATE jr_work_queue
+                    SET status = 'permanently_failed',
+                        error_message = 'Exceeded max escalation count (' || %s || '). Loop prevention triggered.'
+                    WHERE id = %s
+                """, (str(self.MAX_ESCALATION_COUNT), task_id))
+                conn.commit()
+                conn.close()
+                return True
+            conn.close()
+            return False
+        except Exception:
+            return False
+
+    def _check_denied_commands(self, command: str) -> str:
+        """Check command against denied commands list. Returns matched pattern or empty string."""
+        cmd_lower = command.lower()
+        for denied in self.DENIED_COMMANDS:
+            if denied.lower() in cmd_lower:
+                return denied
+        return ""
 
     def __init__(self, jr_type: str = "it_triad_jr"):
         self.jr_type = jr_type
@@ -801,6 +910,53 @@ class TaskExecutor:
 
         return (start, end)
 
+    def _preflight_hash_check(self, steps: List[Dict]) -> List[Dict]:
+        """
+        Constructal Pre-Flight: Hash target files before execution.
+        If a file has been modified since the instruction was written,
+        warn but don't block (the SR editor's uniqueness check is the hard gate).
+
+        Returns list of preflight results for logging.
+        """
+        preflight = []
+        for step in steps:
+            path = None
+            if step.get('type') == 'file':
+                path = step.get('args', {}).get('path', '')
+            elif step.get('type') == 'search_replace':
+                path = step.get('args', {}).get('path', '')
+
+            if not path or not os.path.exists(path):
+                continue
+
+            try:
+                with open(path, 'rb') as f:
+                    content = f.read()
+                file_hash = _hashlib.sha256(content).hexdigest()[:16]
+                file_size = len(content)
+                file_lines = content.count(b'\n')
+
+                preflight.append({
+                    'path': path,
+                    'hash': file_hash,
+                    'size': file_size,
+                    'lines': file_lines,
+                    'exists': True
+                })
+                print(f"[PreFlight] {os.path.basename(path)}: {file_hash} ({file_lines} lines, {file_size} bytes)")
+            except Exception as e:
+                preflight.append({
+                    'path': path,
+                    'hash': None,
+                    'error': str(e),
+                    'exists': True
+                })
+                print(f"[PreFlight] WARNING: Could not hash {path}: {e}")
+
+        if preflight:
+            print(f"[PreFlight] Verified {len(preflight)} target file(s)")
+        return preflight
+
     def process_queue_task(self, task: Dict) -> Dict[str, Any]:
         """
         Process a Jr work queue task by reading and executing instructions.
@@ -880,6 +1036,10 @@ class TaskExecutor:
             result['error'] = 'No executable steps found in instruction file'
             return result
 
+        # Constructal Pre-Flight: Hash target files before execution
+        preflight_results = self._preflight_hash_check(steps)
+        result['preflight'] = preflight_results
+
         # Execute extracted steps
         try:
             step_results = self.execute_steps(steps)
@@ -893,6 +1053,21 @@ class TaskExecutor:
                 print(f"[EXECUTOR] FAIL: 0 steps executed despite {len(steps)} steps extracted")
                 return result
 
+            # Post-flight: compare file hashes to detect unintended changes
+            for pf in preflight_results:
+                path = pf.get('path', '')
+                if path and os.path.exists(path) and pf.get('hash'):
+                    try:
+                        with open(path, 'rb') as f:
+                            post_hash = _hashlib.sha256(f.read()).hexdigest()[:16]
+                        changed = post_hash != pf['hash']
+                        if changed:
+                            print(f"[PostFlight] {os.path.basename(path)}: {pf['hash']} -> {post_hash} (MODIFIED)")
+                        else:
+                            print(f"[PostFlight] {os.path.basename(path)}: unchanged (idempotent or skipped)")
+                    except Exception:
+                        pass
+
             # Check if all steps succeeded
             all_success = all(s.get('success') for s in step_results)
             result['success'] = all_success
@@ -903,55 +1078,63 @@ class TaskExecutor:
                 result['error'] = error_msg
                 result['retry_attempts'] = []
 
-                # Phase 3: Use MAR Reflexion to analyze failure
-                if LLM_REASONER_AVAILABLE:
-                    failed_details = "; ".join([
-                        f"{s.get('type', 'unknown')}: {s.get('error', 'unknown error')}"
-                        for s in failed
-                    ])
-                    reflection = self.reflect_on_failure(task, error_msg, failed_details)
-                    result['reflection'] = reflection
+                # Hard Blocker Classification (Legion AAR, council vote 7f24c56f)
+                blocker_type = self._classify_blocker(failed)
+                result['blocker_type'] = blocker_type
 
-                    # Log improvements for future learning
-                    if reflection.get('improvements'):
-                        print(f"[REFLECT] Improvements suggested: {reflection['improvements']}")
+                if blocker_type != 'RETRYABLE':
+                    print(f"[BLOCKER] Structural blocker: {blocker_type} — skipping retries")
+                    result['error'] = f'{error_msg} [BLOCKED: {blocker_type}]'
+                else:
+                    # Phase 3: Use MAR Reflexion to analyze failure (only for retryable errors)
+                    if LLM_REASONER_AVAILABLE:
+                        failed_details = "; ".join([
+                            f"{s.get('type', 'unknown')}: {s.get('error', 'unknown error')}"
+                            for s in failed
+                        ])
+                        reflection = self.reflect_on_failure(task, error_msg, failed_details)
+                        result['reflection'] = reflection
 
-                    # Phase 11: Self-Healing Retry with Reflection
-                    # Council vote 6428bcda34efc7f9 — bounded at MAX_RETRIES
-                    if reflection.get('should_retry'):
-                        current_result = result
-                        current_reflection = reflection
-                        for attempt in range(1, self.MAX_RETRIES + 1):
-                            retry_result = self._retry_with_reflection(
-                                task, instructions, current_result,
-                                current_reflection, attempt,
-                                previous_result=current_result
-                            )
-                            result['retry_attempts'].append({
-                                'attempt': attempt,
-                                'success': retry_result.get('success'),
-                                'error': retry_result.get('error')
-                            })
+                        # Log improvements for future learning
+                        if reflection.get('improvements'):
+                            print(f"[REFLECT] Improvements suggested: {reflection['improvements']}")
 
-                            if retry_result.get('success'):
-                                result['success'] = True
-                                result['steps_executed'] = retry_result.get('steps_executed', [])
-                                result['error'] = None
-                                result['recovered_via_retry'] = attempt
-                                print(f"[RETRY] Task recovered after {attempt} retry(s)")
-                                break
-                            else:
-                                # Re-reflect before next attempt
-                                print(f"[RETRY] Attempt {attempt} failed, re-reflecting...")
-                                retry_error = retry_result.get('error', 'Unknown')
-                                current_reflection = self.reflect_on_failure(
-                                    task, retry_error,
-                                    str(retry_result.get('steps_executed', []))
+                        # Phase 11: Self-Healing Retry with Reflection
+                        # Council vote 6428bcda34efc7f9 — bounded at MAX_RETRIES
+                        if reflection.get('should_retry'):
+                            current_result = result
+                            current_reflection = reflection
+                            for attempt in range(1, self.MAX_RETRIES + 1):
+                                retry_result = self._retry_with_reflection(
+                                    task, instructions, current_result,
+                                    current_reflection, attempt,
+                                    previous_result=current_result
                                 )
-                                current_result = retry_result
-                                if not current_reflection.get('should_retry'):
-                                    print(f"[RETRY] Reflection says stop after attempt {attempt}")
+                                result['retry_attempts'].append({
+                                    'attempt': attempt,
+                                    'success': retry_result.get('success'),
+                                    'error': retry_result.get('error')
+                                })
+
+                                if retry_result.get('success'):
+                                    result['success'] = True
+                                    result['steps_executed'] = retry_result.get('steps_executed', [])
+                                    result['error'] = None
+                                    result['recovered_via_retry'] = attempt
+                                    print(f"[RETRY] Task recovered after {attempt} retry(s)")
                                     break
+                                else:
+                                    # Re-reflect before next attempt
+                                    print(f"[RETRY] Attempt {attempt} failed, re-reflecting...")
+                                    retry_error = retry_result.get('error', 'Unknown')
+                                    current_reflection = self.reflect_on_failure(
+                                        task, retry_error,
+                                        str(retry_result.get('steps_executed', []))
+                                    )
+                                    current_result = retry_result
+                                    if not current_reflection.get('should_retry'):
+                                        print(f"[RETRY] Reflection says stop after attempt {attempt}")
+                                        break
 
                     # Phase 13: Recursive Task Decomposition (Council vote 2adc1366)
                     # If retries didn't fix it, decompose remaining steps into sub-tasks
@@ -2090,6 +2273,16 @@ class TaskExecutor:
         try:
             command = step.get('command', '')
             timeout = step.get('timeout', 300)  # 5 minute default
+
+            # QW-7: Check denied commands before execution
+            denied_match = self._check_denied_commands(command)
+            if denied_match:
+                print(f"[DENIED] Blocked command matching '{denied_match}': {command[:100]}")
+                return {
+                    'success': False,
+                    'error': f'Command blocked by denied commands safety net: {denied_match}',
+                    'type': 'bash'
+                }
 
             result = subprocess.run(
                 command,

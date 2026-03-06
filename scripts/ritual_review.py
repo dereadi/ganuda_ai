@@ -202,7 +202,7 @@ def reinforce_patterns(conn, reviews):
     return reinforced
 
 
-def generate_digest(patterns, reviews, mode, failure_results=None, new_corrective=None):
+def generate_digest(patterns, reviews, mode, failure_results=None, new_corrective=None, upcoming_events=None):
     """DIGEST — Generate cultural digest document"""
     now = datetime.now()
     digest_lines = [
@@ -311,6 +311,29 @@ def generate_digest(patterns, reviews, mode, failure_results=None, new_correctiv
         digest_lines.append("")
         for r in flagged:
             digest_lines.append(f"- Pattern ID {r['id']}: {r['reason']}")
+        digest_lines.append("")
+
+    # === Commemorative Calendar ===
+    if upcoming_events:
+        digest_lines.append("")
+        digest_lines.append("### This Week in Federation History")
+        digest_lines.append("")
+        for event in upcoming_events:
+            name = event.get("event_name", "")
+            etype = event.get("event_type", "")
+            edate = event.get("event_date", "")
+            desc = event.get("description", "")
+            years = event.get("years_ago", 0)
+            marker = {"sacred": "[SACRED]", "remembrance": "[REMEMBRANCE]", "achievement": "[ACHIEVEMENT]", "milestone": "[MILESTONE]"}.get(etype, "[EVENT]")
+            if years == 0:
+                ago_text = "(this year)"
+            elif years == 1:
+                ago_text = "(1 year ago)"
+            else:
+                ago_text = f"({years} years ago)"
+            digest_lines.append(f"- {marker} **{name}** — {edate} {ago_text}")
+            if desc:
+                digest_lines.append(f"  {desc}")
         digest_lines.append("")
 
     digest_lines.append("---")
@@ -452,12 +475,171 @@ def process_failures(conn, failed_tasks, incidents, patterns):
     return processed, new_patterns
 
 
+def check_commemorative_dates(conn, days_ahead=7):
+    """Check for federation anniversary dates within the next N days.
+    Returns list of commemorative events whose month/day falls within the window."""
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT event_name, event_type, event_date, description,
+                       EXTRACT(YEAR FROM AGE(CURRENT_DATE, event_date))::int AS years_ago
+                FROM federation_calendar
+                WHERE recurring = true
+                AND (
+                    (EXTRACT(MONTH FROM event_date) = EXTRACT(MONTH FROM CURRENT_DATE)
+                     AND EXTRACT(DAY FROM event_date) BETWEEN EXTRACT(DAY FROM CURRENT_DATE)
+                     AND EXTRACT(DAY FROM CURRENT_DATE) + %s)
+                    OR
+                    (EXTRACT(MONTH FROM event_date) = EXTRACT(MONTH FROM CURRENT_DATE + INTERVAL '1 day' * %s)
+                     AND EXTRACT(DAY FROM event_date) <= EXTRACT(DAY FROM CURRENT_DATE + INTERVAL '1 day' * %s))
+                )
+                ORDER BY EXTRACT(MONTH FROM event_date), EXTRACT(DAY FROM event_date)
+            """, (days_ahead, days_ahead, days_ahead))
+            events = cur.fetchall()
+        if events:
+            logger.info(f"Found {len(events)} commemorative event(s) in next {days_ahead} days")
+        return events
+    except Exception as e:
+        logger.warning(f"Commemorative date check failed (table may not exist yet): {e}")
+        return []
+
+
+def gather_dawn_mist(conn):
+    """DAWN MIST — Lightweight daily pulse check (no LLM, pure SQL)"""
+    pulse = {}
+
+    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        # Jr task throughput (last 24h)
+        cur.execute("""
+            SELECT
+                COUNT(*) FILTER (WHERE status = 'completed' AND updated_at > NOW() - INTERVAL '24 hours') AS completed_24h,
+                COUNT(*) FILTER (WHERE status IN ('failed', 'error') AND updated_at > NOW() - INTERVAL '24 hours') AS failed_24h,
+                COUNT(*) FILTER (WHERE status = 'pending') AS pending,
+                COUNT(*) FILTER (WHERE status = 'in_progress') AS in_progress
+            FROM jr_work_queue
+        """)
+        pulse["jr_tasks"] = dict(cur.fetchone())
+
+        # DLQ depth
+        cur.execute("""
+            SELECT COUNT(*) AS dlq_depth
+            FROM jr_work_queue
+            WHERE status IN ('failed', 'error')
+              AND updated_at > NOW() - INTERVAL '7 days'
+        """)
+        pulse["dlq_depth"] = cur.fetchone()["dlq_depth"]
+
+        # Active council votes (last 24h)
+        cur.execute("""
+            SELECT COUNT(*) AS votes_24h
+            FROM council_votes
+            WHERE voted_at > NOW() - INTERVAL '24 hours'
+        """)
+        pulse["council_votes_24h"] = cur.fetchone()["votes_24h"]
+
+        # Kanban snapshot
+        cur.execute("""
+            SELECT status, COUNT(*) AS cnt
+            FROM duyuktv_tickets
+            WHERE status NOT IN ('completed', 'blocked')
+            GROUP BY status
+            ORDER BY cnt DESC
+        """)
+        pulse["kanban"] = {row["status"]: row["cnt"] for row in cur.fetchall()}
+
+        # Thermal memory count
+        cur.execute("SELECT COUNT(*) AS total FROM thermal_memory_archive")
+        pulse["thermal_memories"] = cur.fetchone()["total"]
+
+        # Stale in_progress tasks (reaper candidates)
+        cur.execute("""
+            SELECT COUNT(*) AS stale
+            FROM jr_work_queue
+            WHERE status = 'in_progress'
+              AND started_at < NOW() - INTERVAL '10 minutes'
+        """)
+        pulse["stale_tasks"] = cur.fetchone()["stale"]
+
+    return pulse
+
+
+def generate_dawn_mist_digest(pulse, upcoming_events=None):
+    """Generate concise Dawn Mist digest (daily morning briefing)"""
+    now = datetime.now()
+    jr = pulse.get("jr_tasks", {})
+    lines = [
+        f"# Dawn Mist — {now.strftime('%A, %B %d, %Y')}",
+        "",
+        f"**Generated:** {now.strftime('%H:%M:%S')}",
+        "",
+        "## Jr Executor (24h)",
+        f"- Completed: {jr.get('completed_24h', 0)}",
+        f"- Failed: {jr.get('failed_24h', 0)}",
+        f"- Pending: {jr.get('pending', 0)}",
+        f"- In-progress: {jr.get('in_progress', 0)}",
+        f"- Stale (reaper candidates): {pulse.get('stale_tasks', 0)}",
+        "",
+        f"## DLQ Depth: {pulse.get('dlq_depth', 0)}",
+        "",
+        f"## Council Votes (24h): {pulse.get('council_votes_24h', 0)}",
+        "",
+        "## Kanban",
+    ]
+    for status, cnt in pulse.get("kanban", {}).items():
+        lines.append(f"- {status}: {cnt}")
+
+    lines.extend([
+        "",
+        f"## Thermal Memories: {pulse.get('thermal_memories', 0):,}",
+    ])
+
+    if upcoming_events:
+        lines.append("")
+        lines.append("## Commemorative Calendar")
+        for event in upcoming_events:
+            name = event.get("event_name", "")
+            years = event.get("years_ago", 0)
+            ago = f"({years} year{'s' if years != 1 else ''} ago)" if years > 0 else "(this year)"
+            lines.append(f"- **{name}** {ago}")
+
+    lines.extend([
+        "",
+        "---",
+        f"*Dawn Mist — Five Waters Tier 1 — {now.strftime('%Y-%m-%d')}*",
+    ])
+    return "\n".join(lines)
+
+
 def run_ritual(mode="weekly"):
     """Main ritual cycle: GATHER → PROCESS FAILURES → REVIEW → REINFORCE → DIGEST → SEED"""
     logger.info(f"=== RITUAL REVIEW BEGIN ({mode} mode) ===")
 
     conn = get_db_connection()
     try:
+        # === DAILY DAWN MIST (fast path — no pattern review) ===
+        if mode == "daily":
+            logger.info("DAWN MIST — Lightweight pulse check")
+            pulse = gather_dawn_mist(conn)
+            upcoming_events = check_commemorative_dates(conn, days_ahead=3)
+            digest_content = generate_dawn_mist_digest(pulse, upcoming_events)
+
+            dawn_mist_path = "/ganuda/docs/dawn_mist.md"
+            os.makedirs(os.path.dirname(dawn_mist_path), exist_ok=True)
+            with open(dawn_mist_path, "w") as f:
+                f.write(digest_content)
+
+            logger.info(f"Dawn Mist digest written to {dawn_mist_path}")
+            logger.info(f"  Jr 24h: {pulse['jr_tasks'].get('completed_24h', 0)} completed, "
+                         f"{pulse['jr_tasks'].get('failed_24h', 0)} failed")
+            logger.info(f"  DLQ depth: {pulse['dlq_depth']}")
+            logger.info(f"  Stale tasks: {pulse['stale_tasks']}")
+
+            return {
+                "mode": "daily",
+                "pulse": pulse,
+                "digest_path": dawn_mist_path
+            }
+
         # GATHER
         logger.info("GATHER — Reading behavioral patterns")
         patterns = gather_patterns(conn)
@@ -468,7 +650,7 @@ def run_ritual(mode="weekly"):
             logger.info(f"Green Corn: also reviewing {len(sacred)} sacred memories")
 
         # PROCESS FAILURES (ERN dampening — Hobson et al. 2017)
-        days_lookback = {"weekly": 7, "monthly": 30, "seasonal": 90, "green-corn": 365}
+        days_lookback = {"daily": 1, "weekly": 7, "monthly": 30, "seasonal": 90, "green-corn": 365}
         logger.info(f"PROCESS FAILURES — Reviewing last {days_lookback[mode]} days")
         failed_tasks, incidents = gather_recent_failures(conn, days_lookback[mode])
         failure_results, new_corrective = process_failures(conn, failed_tasks, incidents, patterns)
@@ -490,11 +672,15 @@ def run_ritual(mode="weekly"):
         logger.info("REINFORCE — Updating temperature scores")
         reinforced_count = reinforce_patterns(conn, reviews)
 
+        # COMMEMORATIVE CHECK
+        upcoming_events = check_commemorative_dates(conn, days_ahead=7 if mode == "weekly" else 30)
+
         # DIGEST
         logger.info("DIGEST — Generating cultural digest")
         digest_content = generate_digest(patterns, reviews, mode,
                                          failure_results=failure_results,
-                                         new_corrective=new_corrective)
+                                         new_corrective=new_corrective,
+                                         upcoming_events=upcoming_events)
 
         # SEED — Write digest to file
         logger.info(f"SEED — Writing cultural digest to {DIGEST_OUTPUT}")
@@ -553,7 +739,7 @@ def run_ritual(mode="weekly"):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Cherokee AI Federation Ritual Review")
-    parser.add_argument("--mode", choices=["weekly", "monthly", "seasonal", "green-corn"],
+    parser.add_argument("--mode", choices=["daily", "weekly", "monthly", "seasonal", "green-corn"],
                         default="weekly", help="Review mode")
     args = parser.parse_args()
 

@@ -41,7 +41,7 @@ TARGET_HASH = "093be1cf2d24094db903cbc3e8d33d306ebca49c6accaa264e44b0b675e7d9c4"
 DB_HOST = "192.168.132.222"
 DB_NAME = "zammad_production"
 DB_USER = "claude"
-DB_PASS = "TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE"
+DB_PASS = "${CHEROKEE_DB_PASS}"
 
 # LOO-identified harmful positions (removal improves MSE)
 LOO_HARMFUL = [17, 21, 27, 28, 37, 43, 46]

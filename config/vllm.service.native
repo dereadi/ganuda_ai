@@ -16,7 +16,7 @@ ExecStart=/home/dereadi/cherokee_venv/bin/python -m vllm.entrypoints.openai.api_
   --port 8000 \
   --quantization awq_marlin \
   --dtype float16 \
-  --gpu-memory-utilization 0.85 \
+  --gpu-memory-utilization 0.65 \
   --max-model-len 32768 \
   --max-num-seqs 256 \
   --enable-prefix-caching \

@@ -1,0 +1,145 @@
+<<<<<<< SEARCH
+=======
+#!/usr/bin/env python3
+"""Credential Scanner — Find plaintext secrets in /ganuda.
+
+Scans Python scripts, config files, YAML, and markdown for patterns
+that look like hardcoded credentials. Produces a remediation report.
+
+Council mandate: Quantum/PQC Sprint, Raven P0.
+Does NOT modify any files — report only.
+"""
+
+import os
+import re
+from datetime import datetime
+
+SCAN_ROOT = "/ganuda"
+REPORT_PATH = "/ganuda/reports/credential_hygiene_feb2026.md"
+
+# Directories to skip entirely
+SKIP_DIRS = {
+    "node_modules", "venv", ".venv", "cherokee_venv", "__pycache__",
+    ".git", "old_dereadi_data", "site-packages", "dist-packages",
+    "ffmpeg-7.0.2-amd64-static", "grafana", "week1_integration_env",
+    "week2_integrations", "cherokee_training_env", "icl_research_env",
+    "amem_venv", "pattern_space", "vllm_research", "trading_jr",
+    "cherokee_desktop", "pathfinder-wisdom", "sag_unified_interface",
+    "streaming-vlm", "security_jr", "linuxbrew", "snap",
+    "anker-solix-api",
+}
+
+# File extensions to scan
+SCAN_EXTENSIONS = {
+    ".py", ".yml", ".yaml", ".json", ".conf", ".cfg", ".ini",
+    ".toml", ".env", ".sh", ".md", ".txt", ".service",
+}
+
+# Patterns indicating credentials
+PATTERNS = [
+    (r'PGPASSWORD\s*=\s*["\']?([A-Za-z0-9!@#$%^&*_-]{8,})', "PostgreSQL password"),
+    (r'(?i)password\s*[=:]\s*["\']([A-Za-z0-9!@#$%^&*_-]{8,})["\']', "Quoted password"),
+    (r'(?i)db_pass\s*[=:]\s*["\']?([A-Za-z0-9!@#$%^&*_-]{8,})', "DB password variable"),
+    (r'(?i)api_key\s*[=:]\s*["\']?([A-Za-z0-9_-]{20,})', "API key"),
+    (r'(?i)bot_token\s*[=:]\s*["\']?(\d+:[A-Za-z0-9_-]{30,})', "Telegram bot token"),
+    (r'(?i)secret_key\s*[=:]\s*["\']?([A-Za-z0-9_-]{16,})', "Secret key"),
+]
+
+# Files that legitimately contain credentials
+ALLOWLIST_FILES = {
+    ".env", "token.pickle", "credentials.json",
+}
+
+
+def scan_file(fpath):
+    """Scan a single file for credential patterns."""
+    findings = []
+    try:
+        with open(fpath, 'r', errors='ignore') as f:
+            for lineno, line in enumerate(f, 1):
+                for pattern, desc in PATTERNS:
+                    match = re.search(pattern, line)
+                    if match:
+                        # Redact the credential value
+                        value = match.group(1) if match.lastindex else match.group(0)
+                        redacted = value[:3] + "***" + value[-3:] if len(value) > 6 else "***"
+                        findings.append({
+                            "file": fpath,
+                            "line": lineno,
+                            "type": desc,
+                            "redacted": redacted,
+                            "context": line.strip()[:80],
+                        })
+                        break
+    except (PermissionError, IsADirectoryError, UnicodeDecodeError):
+        pass
+    return findings
+
+
+def main():
+    all_findings = []
+    files_scanned = 0
+
+    for root, dirs, files in os.walk(SCAN_ROOT):
+        # Prune skip directories
+        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+
+        for fname in files:
+            # Check extension
+            _, ext = os.path.splitext(fname)
+            if ext not in SCAN_EXTENSIONS:
+                continue
+            # Skip allowlisted files
+            if fname in ALLOWLIST_FILES:
+                continue
+
+            fpath = os.path.join(root, fname)
+            files_scanned += 1
+            findings = scan_file(fpath)
+            all_findings.extend(findings)
+
+    # Generate report
+    report = []
+    report.append("# Credential Hygiene Report — Cherokee AI Federation")
+    report.append(f"**Date**: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+    report.append(f"**Files Scanned**: {files_scanned}")
+    report.append(f"**Findings**: {len(all_findings)}")
+    report.append(f"**Council Mandate**: Quantum/PQC Sprint, Raven P0")
+    report.append("")
+    report.append("---")
+    report.append("")
+
+    if all_findings:
+        report.append("## Findings")
+        report.append("")
+        report.append("| # | File | Line | Type | Redacted Value |")
+        report.append("|---|------|------|------|----------------|")
+        for i, f in enumerate(all_findings, 1):
+            rel_path = f["file"].replace("/ganuda/", "")
+            report.append(f"| {i} | `{rel_path}` | {f['line']} | {f['type']} | `{f['redacted']}` |")
+        report.append("")
+        report.append("## Remediation Recommendations")
+        report.append("")
+        report.append("1. Move credentials to `.env` files (already in .gitignore)")
+        report.append("2. Use `os.getenv()` with fallback to EnvironmentFile in systemd")
+        report.append("3. Remove credentials from markdown/memory files")
+        report.append("4. Consider HashiCorp Vault or similar for secrets management")
+        report.append("")
+    else:
+        report.append("No plaintext credentials found.")
+
+    report.append("---")
+    report.append("*Generated by credential_scanner.py — Council mandate Raven P0*")
+
+    os.makedirs(os.path.dirname(REPORT_PATH), exist_ok=True)
+    with open(REPORT_PATH, 'w') as f:
+        f.write('\n'.join(report))
+
+    print(f"Report: {REPORT_PATH}")
+    print(f"Files scanned: {files_scanned}")
+    print(f"Findings: {len(all_findings)}")
+
+
+if __name__ == "__main__":
+    main()
+>>>>>>> REPLACE

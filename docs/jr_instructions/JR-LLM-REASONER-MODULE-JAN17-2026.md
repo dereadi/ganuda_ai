@@ -192,7 +192,7 @@ from typing import Optional
 
 CHEROKEE_URL = "http://localhost:8002/v1/chat/completions"
 GATEWAY_URL = "http://localhost:8080"
-API_KEY = "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+API_KEY = "REDACTED_USE_ENV_VAR"
 
 class JrLLMReasoner:
     """Gives Jrs the ability to reason using Cherokee Constitutional model."""

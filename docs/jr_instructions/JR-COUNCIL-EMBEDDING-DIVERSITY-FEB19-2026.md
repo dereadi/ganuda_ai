@@ -44,7 +44,7 @@ EMBEDDING_MODEL = "bge-large-en-v1.5"
 DB_HOST = os.environ.get("DB_HOST", "192.168.132.222")
 DB_NAME = os.environ.get("DB_NAME", "zammad_production")
 DB_USER = os.environ.get("DB_USER", "claude")
-DB_PASS = os.environ.get("DB_PASS", "TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE")
+DB_PASS = os.environ.get("DB_PASS", "${CHEROKEE_DB_PASS}")
 
 
 def get_embedding(text: str) -> list:

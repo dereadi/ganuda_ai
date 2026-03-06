@@ -325,15 +325,16 @@ def apply_circuit_breaker_to_confidence(
     breaker_states: Dict[str, str]
 ) -> float:
     """
-    Compute adjusted confidence score based on circuit breaker states.
+    Compute confidence score — all voices at full weight.
 
-    Logic:
-      - OPEN specialists: their concerns are excluded from the count entirely
-      - HALF_OPEN specialists: their concerns are weighted at 0.5x
-      - CLOSED specialists: their concerns count normally (1.0x)
+    Reform (Council vote ffbb923b, Chief directive March 2 2026):
+    Circuit breaker states are SIGNALS for structural mitigation, not silencers.
+    Every specialist's concern counts at full weight (1.0x). OPEN/HALF_OPEN
+    states trigger a "needs mitigation" log so the TPM can write risk mitigation
+    into the next relevant specification.
 
-    Original formula: max(0.25, 1.0 - (len(concerns) * 0.15))
-    Adjusted formula: max(0.25, 1.0 - (weighted_concern_count * 0.15))
+    "Their concerns are valid. Rather than weight their responses, maybe
+    sometimes we write that risk mitigation into the project." — Chief
 
     Args:
         base_concerns: List of concern_type strings from all specialists.
@@ -341,9 +342,9 @@ def apply_circuit_breaker_to_confidence(
         breaker_states: Dict from get_circuit_breaker_states().
 
     Returns:
-        Adjusted confidence float, range [0.25, 1.0].
+        Confidence float, range [0.25, 1.0].
     """
-    weighted_concern_count = 0.0
+    concern_count = 0
 
     for resp in specialist_responses:
         if not resp.has_concern:
@@ -352,29 +353,28 @@ def apply_circuit_breaker_to_confidence(
         sid = resp.specialist_id
         state = breaker_states.get(sid, 'CLOSED')
 
-        if state == 'OPEN':
-            # Drifted specialist — exclude their concern
-            logger.info(
-                f"Circuit breaker OPEN for {sid}: "
-                f"excluding concern '{resp.concern_type}'"
-            )
-            continue
-        elif state == 'HALF_OPEN':
-            # Partially drifted — half weight
-            logger.info(
-                f"Circuit breaker HALF_OPEN for {sid}: "
-                f"concern '{resp.concern_type}' weighted at 0.5x"
-            )
-            weighted_concern_count += 0.5
-        else:
-            # CLOSED — normal weight
-            weighted_concern_count += 1.0
+        # Every concern counts at full weight — no voice is silenced
+        concern_count += 1
 
-    confidence = max(0.25, 1.0 - (weighted_concern_count * 0.15))
+        # OPEN/HALF_OPEN = signal that this concern recurs and needs
+        # structural mitigation in specs, NOT discounting
+        if state == 'OPEN':
+            logger.warning(
+                f"RECURRING CONCERN NEEDS MITIGATION — {sid}: "
+                f"'{resp.concern_type}' (circuit breaker OPEN). "
+                f"TPM: write mitigation into next relevant spec."
+            )
+        elif state == 'HALF_OPEN':
+            logger.info(
+                f"Recurring concern noted — {sid}: "
+                f"'{resp.concern_type}' (circuit breaker HALF_OPEN). "
+                f"Consider structural mitigation in specs."
+            )
+
+    confidence = max(0.25, 1.0 - (concern_count * 0.15))
 
     logger.info(
         f"Confidence: {confidence:.2f} "
-        f"(weighted concerns: {weighted_concern_count}, "
-        f"raw concerns: {len(base_concerns)})"
+        f"(concerns: {concern_count}, all at full weight)"
     )
     return confidence

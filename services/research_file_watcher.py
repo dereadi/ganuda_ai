@@ -32,7 +32,7 @@ REQUEST_DIR = Path("/ganuda/research/requests")
 COMPLETED_DIR = Path("/ganuda/research/completed")
 PROCESSED_DIR = Path("/ganuda/research/requests/processed")
 GATEWAY_URL = os.environ.get("LLM_GATEWAY_URL", "http://localhost:8080")
-API_KEY = os.environ.get("LLM_API_KEY", "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5")
+API_KEY = os.environ.get("LLM_API_KEY", "REDACTED_USE_ENV_VAR")
 
 DB_CONFIG = {
     'host': os.environ.get('CHEROKEE_DB_HOST', '192.168.132.222'),

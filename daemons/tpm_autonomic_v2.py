@@ -21,6 +21,7 @@ from datetime import datetime, timedelta
 from collections import deque
 
 import psycopg2
+import psycopg2.pool
 from psycopg2.extras import RealDictCursor
 
 logger = logging.getLogger("tpm-autonomic")
@@ -60,98 +61,128 @@ BASIN_THRESHOLDS = {
 
 # ── Database Helpers ───────────────────────────────────────────────────────
 
+# Connection pool (initialized once, reused across cycles)
+_db_pool = None
+
+def init_db_pool():
+    """Initialize the connection pool. Call once at daemon startup."""
+    global _db_pool
+    _db_pool = psycopg2.pool.ThreadedConnectionPool(
+        minconn=1,
+        maxconn=5,
+        cursor_factory=RealDictCursor,
+        **DB_PARAMS
+    )
+
 def get_db():
-    """Get a database connection."""
-    return psycopg2.connect(**DB_PARAMS, cursor_factory=RealDictCursor)
+    """Get a pooled database connection. Must call put_db() when done."""
+    if _db_pool is None:
+        init_db_pool()
+    return _db_pool.getconn()
+
+def put_db(conn):
+    """Return a connection to the pool."""
+    if _db_pool and conn:
+        _db_pool.putconn(conn)
 
 
 def fetch_pending_tasks(limit=5):
     """Fetch pending tasks from jr_work_queue, oldest first by priority."""
     conn = get_db()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT id, task_id, title, instruction_file, assigned_jr, priority,
-               sacred_fire_priority, use_rlm, parameters, created_at
-        FROM jr_work_queue
-        WHERE status = 'pending'
-        ORDER BY priority ASC, created_at ASC
-        LIMIT %s
-    """, (limit,))
-    tasks = cur.fetchall()
-    cur.close()
-    conn.close()
-    return tasks
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, task_id, title, instruction_file, assigned_jr, priority,
+                   sacred_fire_priority, use_rlm, parameters, created_at
+            FROM jr_work_queue
+            WHERE status = 'pending'
+            ORDER BY priority ASC, created_at ASC
+            LIMIT %s
+        """, (limit,))
+        tasks = cur.fetchall()
+        cur.close()
+        return tasks
+    finally:
+        put_db(conn)
 
 
 def claim_task(task_id):
     """Atomically claim a task (pending → in_progress) with row locking."""
     conn = get_db()
-    cur = conn.cursor()
-    cur.execute("""
-        UPDATE jr_work_queue
-        SET status = 'in_progress', started_at = NOW(), updated_at = NOW(),
-            status_message = 'Claimed by TPM Autonomic Daemon v2'
-        WHERE id = %s AND status = 'pending'
-        RETURNING id
-    """, (task_id,))
-    claimed = cur.fetchone()
-    conn.commit()
-    cur.close()
-    conn.close()
-    return claimed is not None
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE jr_work_queue
+            SET status = 'in_progress', started_at = NOW(), updated_at = NOW(),
+                status_message = 'Claimed by TPM Autonomic Daemon v2'
+            WHERE id = %s AND status = 'pending'
+            RETURNING id
+        """, (task_id,))
+        claimed = cur.fetchone()
+        conn.commit()
+        cur.close()
+        return claimed is not None
+    finally:
+        put_db(conn)
 
 
 def complete_task(task_id, result_data=None):
     """Mark task as completed."""
     conn = get_db()
-    cur = conn.cursor()
-    cur.execute("""
-        UPDATE jr_work_queue
-        SET status = 'completed', completed_at = NOW(), updated_at = NOW(),
-            result = %s, status_message = 'Completed by TPM Autonomic Daemon v2'
-        WHERE id = %s
-    """, (json.dumps(result_data or {}), task_id))
-    conn.commit()
-    cur.close()
-    conn.close()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE jr_work_queue
+            SET status = 'completed', completed_at = NOW(), updated_at = NOW(),
+                result = %s, status_message = 'Completed by TPM Autonomic Daemon v2'
+            WHERE id = %s
+        """, (json.dumps(result_data or {}), task_id))
+        conn.commit()
+        cur.close()
+    finally:
+        put_db(conn)
 
 
 def fail_task(task_id, error_msg):
     """Mark task as failed."""
     conn = get_db()
-    cur = conn.cursor()
-    cur.execute("""
-        UPDATE jr_work_queue
-        SET status = 'failed', completed_at = NOW(), updated_at = NOW(),
-            error_message = %s, status_message = 'Failed in TPM Autonomic Daemon v2'
-        WHERE id = %s
-    """, (error_msg[:2000], task_id))
-    conn.commit()
-    cur.close()
-    conn.close()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE jr_work_queue
+            SET status = 'failed', completed_at = NOW(), updated_at = NOW(),
+                error_message = %s, status_message = 'Failed in TPM Autonomic Daemon v2'
+            WHERE id = %s
+        """, (error_msg[:2000], task_id))
+        conn.commit()
+        cur.close()
+    finally:
+        put_db(conn)
 
 
 def log_thermal_memory(content, temperature=75.0, sacred=False):
     """Store a thermal memory record."""
     conn = get_db()
-    cur = conn.cursor()
-    memory_hash = hashlib.sha256(content.encode()).hexdigest()
-    cur.execute("""
-        INSERT INTO thermal_memory_archive
-        (original_content, temperature_score, sacred_pattern, memory_hash,
-         metadata, created_at)
-        VALUES (%s, %s, %s, %s, %s, NOW())
-        ON CONFLICT (memory_hash) DO NOTHING
-    """, (
-        content[:10000],
-        temperature,
-        sacred,
-        memory_hash,
-        json.dumps({"source": "tpm_autonomic_v2", "timestamp": datetime.utcnow().isoformat()})
-    ))
-    conn.commit()
-    cur.close()
-    conn.close()
+    try:
+        cur = conn.cursor()
+        memory_hash = hashlib.sha256(content.encode()).hexdigest()
+        cur.execute("""
+            INSERT INTO thermal_memory_archive
+            (original_content, temperature_score, sacred_pattern, memory_hash,
+             metadata, created_at)
+            VALUES (%s, %s, %s, %s, %s, NOW())
+            ON CONFLICT (memory_hash) DO NOTHING
+        """, (
+            content[:10000],
+            temperature,
+            sacred,
+            memory_hash,
+            json.dumps({"source": "tpm_autonomic_v2", "timestamp": datetime.utcnow().isoformat()})
+        ))
+        conn.commit()
+        cur.close()
+    finally:
+        put_db(conn)
 
 
 # ── Basin Signal Detection ─────────────────────────────────────────────────
@@ -272,9 +303,59 @@ def check_basin_signals():
             "detail": f"{row['cnt']} sacred memories below 40°C (drift detected)"
         })
 
+    # Write detected signals to basin_signal_history for trend analysis
+    for s in signals:
+        cur.execute("""
+            INSERT INTO basin_signal_history
+            (signal_type, signal_value, threshold, detail, escalated, detected_at)
+            VALUES (%s, %s, %s, %s, false, NOW())
+        """, (s["type"], s["value"], s["threshold"], s["detail"][:2000]))
+    if signals:
+        conn.commit()
+
     cur.close()
-    conn.close()
+    put_db(conn)
     return signals
+
+
+# ── Thermal Decay ─────────────────────────────────────────────────────────
+
+def apply_thermal_decay():
+    """Cool memories that haven't been accessed recently. Run every basin check cycle."""
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+
+        # Cool non-sacred memories by 2 degrees if not accessed in 48 hours
+        cur.execute("""
+            UPDATE thermal_memory_archive
+            SET temperature_score = GREATEST(temperature_score - 2.0, 5.0)
+            WHERE sacred_pattern = false
+              AND temperature_score > 5.0
+              AND (last_access IS NULL OR last_access < NOW() - INTERVAL '48 hours')
+              AND created_at < NOW() - INTERVAL '48 hours'
+        """)
+        cooled_nonsacred = cur.rowcount
+
+        # Cool sacred memories by 0.5 degrees if not accessed in 7 days (floor at 40)
+        cur.execute("""
+            UPDATE thermal_memory_archive
+            SET temperature_score = GREATEST(temperature_score - 0.5, 40.0)
+            WHERE sacred_pattern = true
+              AND temperature_score > 40.0
+              AND (last_access IS NULL OR last_access < NOW() - INTERVAL '7 days')
+              AND created_at < NOW() - INTERVAL '7 days'
+        """)
+        cooled_sacred = cur.rowcount
+
+        conn.commit()
+        cur.close()
+
+        if cooled_nonsacred > 0 or cooled_sacred > 0:
+            logger.info(f"Thermal decay: cooled {cooled_nonsacred} non-sacred, {cooled_sacred} sacred memories")
+
+    finally:
+        put_db(conn)
 
 
 # ── Telegram Notification ──────────────────────────────────────────────────
@@ -421,6 +502,7 @@ class TPMAutonomicDaemon:
                 now = datetime.utcnow()
                 if (now - self.last_basin_check).total_seconds() >= BASIN_CHECK_INTERVAL:
                     await self._check_basins()
+                    apply_thermal_decay()
                     self.last_basin_check = now
 
                 # Poll for pending tasks if we have capacity
@@ -519,6 +601,20 @@ class TPMAutonomicDaemon:
 
                 # Phase transition detection: 3+ signals = escalate
                 if len(signals) >= BASIN_THRESHOLDS["phase_transition_threshold"]:
+                    # Mark escalated signals in basin_signal_history
+                    esc_conn = get_db()
+                    try:
+                        esc_cur = esc_conn.cursor()
+                        for s in signals:
+                            esc_cur.execute("""
+                                UPDATE basin_signal_history SET escalated = true
+                                WHERE signal_type = %s AND detected_at > NOW() - INTERVAL '5 minutes'
+                                  AND escalated = false
+                            """, (s["type"],))
+                        esc_conn.commit()
+                        esc_cur.close()
+                    finally:
+                        put_db(esc_conn)
                     await self._escalate_to_council(signals)
                 else:
                     # Log basin signals to thermal memory

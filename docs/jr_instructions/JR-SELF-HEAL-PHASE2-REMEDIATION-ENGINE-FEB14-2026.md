@@ -404,7 +404,7 @@ from prompt_templates import CLASSIFY_ALERT_PROMPT, FILL_TEMPLATE_PROMPT
 # Configuration
 VLLM_URL = "http://192.168.132.223:8000/v1/chat/completions"
 GATEWAY_URL = "http://192.168.132.223:8080"
-API_KEY = os.environ.get("CHEROKEE_API_KEY", "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5")
+API_KEY = os.environ.get("CHEROKEE_API_KEY", "REDACTED_USE_ENV_VAR")
 DB_HOST = "192.168.132.222"
 DB_NAME = "zammad_production"
 DB_USER = "claude"

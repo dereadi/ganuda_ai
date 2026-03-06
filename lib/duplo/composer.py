@@ -31,6 +31,35 @@ from datetime import datetime
 
 logger = logging.getLogger("duplo.composer")
 
+# White Duplo immune system integration
+_IMMUNE_ENABLED = True
+
+def _check_immune_registry(substrate: str) -> dict:
+    """Pre-execution immune check. Returns match dict if blocked, None if clean."""
+    if not _IMMUNE_ENABLED:
+        return None
+    try:
+        from lib.duplo.immune_registry import check_substrate
+        return check_substrate(substrate, min_severity=3)
+    except Exception as e:
+        logger.debug(f"Immune check skipped: {e}")
+        return None
+
+def _post_scan(substrate: str, product: str, profile_name: str) -> None:
+    """Post-execution scan. Registers new threats found in substrates that weren't caught pre-execution."""
+    if not _IMMUNE_ENABLED:
+        return
+    try:
+        from lib.duplo.white_duplo import scan_and_register
+        result = scan_and_register(substrate, detected_by=f"post_scan:{profile_name}")
+        if result["threats_found"] > 0:
+            logger.warning(
+                f"Post-scan detected {result['threats_found']} threat(s) in substrate for {profile_name}, "
+                f"registered {result['registered']} new pattern(s)"
+            )
+    except Exception as e:
+        logger.debug(f"Post-scan skipped: {e}")
+
 # LLM backends — same as specialist_council.py
 BACKENDS = {
     "qwen": {
@@ -40,7 +69,7 @@ BACKENDS = {
     },
     "deepseek": {
         "url": "http://192.168.132.21:8800/v1/chat/completions",
-        "model": "mlx-community/DeepSeek-R1-Distill-Qwen-32B-4bit",
+        "model": "mlx-community/DeepSeek-R1-Distill-Llama-70B-4bit",
         "timeout": 120,
     },
     "vlm": {
@@ -135,23 +164,26 @@ def _log_usage(profile_name: str, caller_id: str, substrate: str,
                modifiers: list = None):
     """Log enzyme invocation to duplo_usage_log and token_ledger."""
     try:
+        import hashlib
         from lib.ganuda_db import get_connection
+        product_hash = hashlib.sha256((product or "").encode()).hexdigest()[:16]
         conn = get_connection()
         try:
             cur = conn.cursor()
-            # Usage log
+            # Usage log — product_hash for integrity verification (Eagle Eye concern #46b8d97b)
             cur.execute("""
                 INSERT INTO duplo_usage_log
                 (profile_name, caller_id, substrate, product, tools_used,
                  input_tokens, output_tokens, model_used, latency_ms,
-                 success, error_message, modifiers)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                 success, error_message, modifiers, product_hash)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 profile_name, caller_id,
                 (substrate or "")[:2000], (product or "")[:2000],
                 tools_used, input_tokens, output_tokens, model,
                 latency_ms, success, error_msg,
                 json.dumps([m.get("condition", "") for m in (modifiers or [])]),
+                product_hash,
             ))
             # Token ledger (ATP accounting)
             cur.execute("""
@@ -223,6 +255,29 @@ def compose_enzyme(
                 "suppressed": True,
             }
 
+        # White Duplo pre-execution immune check
+        immune_match = _check_immune_registry(substrate)
+        if immune_match:
+            logger.warning(
+                f"IMMUNE BLOCK: Enzyme {profile_name} substrate blocked by pattern "
+                f"{immune_match['signature_hash'][:12]}... type={immune_match['pattern_type']} "
+                f"severity={immune_match['severity']}"
+            )
+            return {
+                "product": None,
+                "product_hash": None,
+                "tools_used": [],
+                "tokens": {"input": 0, "output": 0, "total": 0},
+                "latency_ms": 0,
+                "modifiers": [m["condition"] for m in modifiers],
+                "success": False,
+                "error": f"IMMUNE_BLOCK: Pattern {immune_match['pattern_type']} "
+                         f"(severity {immune_match['severity']}) detected. "
+                         f"Signature: {immune_match['signature_hash'][:12]}...",
+                "immune_blocked": True,
+                "immune_match": immune_match,
+            }
+
         system_prompt = active_profile.get("system_prompt", "")
         max_tokens = active_profile.get("max_tokens", 512)
         temperature = active_profile.get("temperature", 0.3)
@@ -289,8 +344,16 @@ def compose_enzyme(
             modifiers=modifiers,
         )
 
+        # White Duplo post-execution scan (learn from unblocked substrates)
+        if success and product:
+            _post_scan(substrate, product, profile_name)
+
+        import hashlib
+        product_hash = hashlib.sha256((product or "").encode()).hexdigest()[:16]
+
         return {
             "product": product,
+            "product_hash": product_hash,
             "tools_used": tools_actually_used,
             "tokens": {
                 "input": input_tokens,

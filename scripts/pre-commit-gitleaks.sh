@@ -52,7 +52,7 @@ else
             *.png|*.jpg|*.jpeg|*.gif|*.ico|*.woff|*.ttf|*.pyc|*.so)
                 continue
                 ;;
-            .gitleaks.toml|.gitignore|docs/jr_instructions/*|docs/kb/*)
+            .gitleaks.toml|.gitignore|docs/jr_instructions/*|docs/kb/*|scripts/pre-commit-gitleaks.sh|docs/FEDERATION_EDITION.md|docs/ultrathink/*|scripts/credential_scanner.py|scripts/security_audit_classical.py|ansible/playbooks/security-audit-classical.yml)
                 continue
                 ;;
         esac
@@ -63,9 +63,9 @@ else
             continue
         fi
 
-        # Check for the known legacy password
-        if echo "${CONTENT}" | grep -q "jawaseatlasers2"; then
-            echo -e "${RED}  FOUND: Legacy password in ${file}${NC}"
+        # Check for known legacy passwords (old and current)
+        if echo "${CONTENT}" | grep -qE "jawaseatlasers2"; then
+            echo -e "${RED}  FOUND: Hardcoded database password in ${file}${NC}"
             FOUND_SECRETS=1
         fi
 

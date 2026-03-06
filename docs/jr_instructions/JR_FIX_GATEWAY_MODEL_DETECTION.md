@@ -109,7 +109,7 @@ cd /ganuda/services/llm_gateway && nohup /home/dereadi/cherokee_venv/bin/python 
 ```bash
 # Test chat completion
 curl -s http://localhost:8080/v1/chat/completions \
-  -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" \
+  -H "Authorization: Bearer REDACTED_USE_ENV_VAR" \
   -H "Content-Type: application/json" \
   -d '{"model": "auto", "messages": [{"role": "user", "content": "hello"}]}' | jq .
 ```

@@ -149,13 +149,13 @@ Find the second occurrence of `cur.close()` / `conn.close()` / `return results` 
 After deployment, run a test query through the council gateway:
 
 ```text
-curl -s http://192.168.132.223:8080/v1/council/vote -H "Content-Type: application/json" -H "Authorization: Bearer ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5" -d '{"question": "What is the current state of thermal memory?", "context": "Phase 0 retrieval logging test"}'
+curl -s http://192.168.132.223:8080/v1/council/vote -H "Content-Type: application/json" -H "Authorization: Bearer $GATEWAY_API_KEY" -d '{"question": "What is the current state of thermal memory?", "context": "Phase 0 retrieval logging test"}'
 ```
 
 Then verify access_count was incremented:
 
 ```text
-PGPASSWORD='TYDo5U2NVkXqQ8DHuhIpvRgLUrXf2iZE' psql -h 192.168.132.222 -U claude -d zammad_production -c "SELECT COUNT(*) FROM thermal_memory_archive WHERE last_access > NOW() - INTERVAL '5 minutes';"
+PGPASSWORD='${CHEROKEE_DB_PASS}' psql -h 192.168.132.222 -U claude -d zammad_production -c "SELECT COUNT(*) FROM thermal_memory_archive WHERE last_access > NOW() - INTERVAL '5 minutes';"
 ```
 
 Should return > 0 rows with updated access_count.

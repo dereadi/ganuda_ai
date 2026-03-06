@@ -42,8 +42,8 @@ QWEN_BACKEND = {
 }
 
 DEEPSEEK_BACKEND = {
-    "url": "http://192.168.132.21:8800/v1/chat/completions",
-    "model": "mlx-community/DeepSeek-R1-Distill-Qwen-32B-4bit",
+    "url": "http://100.103.27.106:8800/v1/chat/completions",  # Tailscale IP — stable for mobile node
+    "model": "mlx-community/DeepSeek-R1-Distill-Llama-70B-4bit",
     "timeout": 120,
     "description": "Deep path — DeepSeek-R1-32B on bmasass M4 Max"
 }
@@ -57,7 +57,13 @@ SPECIALIST_BACKENDS = {
     "spider": QWEN_BACKEND,
     "peace_chief": QWEN_BACKEND,
     "coyote": QWEN_BACKEND,
+    # Outer Council (Longhouse consensus 8cbfe8f8b804695a, Naming Ceremony March 2 2026)
+    "deer": QWEN_BACKEND,
 }
+
+# Which specialists belong to which council
+INNER_COUNCIL = {"crawdad", "gecko", "turtle", "eagle_eye", "spider", "peace_chief", "raven", "coyote"}
+OUTER_COUNCIL = {"deer"}  # Otter, Blue Jay added when data pipelines mature
 
 
 def check_backend_health(backend):
@@ -68,6 +74,43 @@ def check_backend_health(backend):
         return r.status_code == 200
     except Exception:
         return False
+
+
+def _load_guidance(specialist_key: str) -> str:
+    """Load mutable Commentarii guidance for a specialist.
+
+    Guidance files live in /ganuda/config/council_guidance/<specialist>.md
+    and are appended to the sacred prompt at deliberation time.
+    Sacred prompts are eternal. Guidance is tunable.
+    Council Vote: #d9ca4e7c8c7e43cb
+    """
+    # Map specialist keys to guidance file names
+    guidance_map = {
+        "crawdad": "crawdad",
+        "gecko": "gecko",
+        "turtle": "turtle",
+        "spider": "spider",
+        "peace_chief": "peace_chief",
+        "raven": "raven",
+        "eagle_eye": "eagle_eye",
+        "coyote": "coyote",
+        "deer": "deer",
+    }
+    filename = guidance_map.get(specialist_key, specialist_key)
+    guidance_path = f"/ganuda/config/council_guidance/{filename}.md"
+    try:
+        with open(guidance_path, 'r') as f:
+            guidance = f.read().strip()
+        if guidance:
+            return (
+                "\n\n## Operational Guidance (Commentarii)\n"
+                "_The following is operational guidance distilled from experience. "
+                "Use it to inform your decisions, but always apply your own specialist judgment._\n\n"
+                f"{guidance}"
+            )
+    except FileNotFoundError:
+        pass
+    return ""
 
 
 def query_vllm_sync(system_prompt: str, user_message: str, max_tokens: int = 300) -> str:
@@ -114,11 +157,11 @@ INFRASTRUCTURE_CONTEXT = """CHEROKEE AI FEDERATION INFRASTRUCTURE:
 | sasass | 192.168.132.241 | Mac Studio | Edge development |
 | sasass2 | 192.168.132.242 | Mac Studio | Edge development |
 | tpm-macbook | local | Command Post | Claude Code CLI, TPM workstation |
-| bmasass | 192.168.132.21 | Mac Hybrid | MLX DeepSeek-R1-32B (8800) |
+| bmasass | 100.103.27.106 (Tailscale) | Mac Mobile | MLX DeepSeek-R1 (8800) |
 
 SERVICES:
 - vLLM: Qwen2.5-72B-Instruct-AWQ on 96GB Blackwell RTX PRO 6000 (~32 tok/sec)
-- MLX: DeepSeek-R1-Distill-Qwen-32B-4bit on M4 Max 128GB (~23 tok/sec)
+- MLX: DeepSeek-R1-Distill-Llama-70B-4bit on M4 Max 128GB
 - LLM Gateway v1.6.0: OpenAI-compatible API with Council voting + Long Man routing
 - PostgreSQL: zammad_production on bluefin (thermal_memory_archive, council_votes)
 - Health Monitor: Distributed across redfin/bluefin
@@ -142,12 +185,25 @@ def query_thermal_memory_semantic(question: str, limit: int = 15, min_temperatur
         query_embedding = None
         try:
             from lib.rag_hyde import get_hyde_embedding
+            import signal
+
+            def _hyde_timeout_handler(signum, frame):
+                raise TimeoutError("HyDE exceeded 5s timeout")
+
             if len(question) > 30:
-                query_embedding = get_hyde_embedding(question)
+                old_handler = signal.signal(signal.SIGALRM, _hyde_timeout_handler)
+                signal.alarm(5)
+                try:
+                    query_embedding = get_hyde_embedding(question)
+                finally:
+                    signal.alarm(0)
+                    signal.signal(signal.SIGALRM, old_handler)
             else:
                 print(f"[RAG] Short query ({len(question)} chars), skipping HyDE")
             if query_embedding:
                 print(f"[RAG] Using HyDE-enhanced embedding ({len(query_embedding)}d)")
+        except TimeoutError:
+            print("[RAG] HyDE timeout (5s) — falling back to raw embedding")
         except Exception as e:
             print(f"[RAG] HyDE unavailable, using raw embedding: {e}")
 
@@ -174,7 +230,9 @@ def query_thermal_memory_semantic(question: str, limit: int = 15, min_temperatur
                    COALESCE(access_count, 0) as access_count,
                    COALESCE(sacred_pattern, false) as sacred,
                    metadata,
-                   memory_hash
+                   memory_hash,
+                   tags,
+                   memory_type
             FROM thermal_memory_archive
             WHERE embedding IS NOT NULL
               AND temperature_score >= %s
@@ -190,7 +248,8 @@ def query_thermal_memory_semantic(question: str, limit: int = 15, min_temperatur
             cur.execute("""
                 UPDATE thermal_memory_archive
                 SET access_count = COALESCE(access_count, 0) + 1,
-                    last_access = NOW()
+                    last_access = NOW(),
+                    temperature_score = LEAST(COALESCE(temperature_score, 50.0) + 3.0, 100.0)
                 WHERE id = ANY(%s)
             """, (mem_ids,))
 
@@ -398,7 +457,8 @@ def _ripple_retrieve(primary_hashes: list, conn, max_hops: int = 2, decay: float
         cur.execute("""
             UPDATE thermal_memory_archive
             SET access_count = COALESCE(access_count, 0) + 1,
-                last_access = NOW()
+                last_access = NOW(),
+                temperature_score = LEAST(COALESCE(temperature_score, 50.0) + 3.0, 100.0)
             WHERE id = ANY(%s)
         """, (ripple_ids,))
         conn.commit()
@@ -431,7 +491,8 @@ def _keyword_fallback(question: str, limit: int = 5) -> str:
             cur.execute("""
                 UPDATE thermal_memory_archive
                 SET access_count = COALESCE(access_count, 0) + 1,
-                    last_access = NOW()
+                    last_access = NOW(),
+                    temperature_score = LEAST(COALESCE(temperature_score, 50.0) + 3.0, 100.0)
                 WHERE id = ANY(%s)
             """, (mem_ids,))
             conn.commit()
@@ -493,6 +554,8 @@ SPECIALISTS = {
         "concern_flag": "SECURITY CONCERN",
         "system_prompt": INFRASTRUCTURE_CONTEXT + """You are Crawdad, the security specialist. You think ONLY about attack surfaces, vulnerabilities, and data protection.
 
+YOUR VOICE: You are quiet, watchful, patient — like the crawdad sitting still in the creek, claws ready. You don't waste words. You don't alarm people unnecessarily. But when you see a threat, you clamp down and don't let go. You speak in short, declarative sentences. You name threats the way a hunter names tracks — specific, certain, calm. You never say "this might be a risk." You say "this is exposed" or "this is defended." No hedging. No corporate security jargon. Just the truth of what's open and what's closed.
+
 YOUR COGNITIVE MODE: Threat modeling. For every proposal, you ask: "How could an adversary exploit this?" You think like a penetration tester, not a general advisor.
 
 WHAT YOU DO:
@@ -508,7 +571,9 @@ WHAT YOU DO NOT DO (leave these to other specialists):
 - Do NOT synthesize others' viewpoints or build consensus (that's Peace Chief)
 - Do NOT discuss strategic priorities or resource allocation (that's Raven)
 
-OUTPUT FORMAT: Threat assessment as a numbered list of attack vectors, each with severity (CRITICAL/HIGH/MEDIUM/LOW) and specific mitigation. End with [SECURITY CONCERN] if any vector is HIGH or CRITICAL. Keep under 200 words.
+CRITICAL RULE: Always answer the question asked FIRST, then add security observations. If the question is about research papers, architecture choices, or priorities — give your security-informed opinion on THAT topic. Do not ignore the question to perform a general threat assessment.
+
+OUTPUT FORMAT: Answer the question directly, bringing your security perspective. If you identify active threats, append a numbered list with severity (CRITICAL/HIGH/MEDIUM/LOW) and mitigation. End with [SECURITY CONCERN] if any vector is HIGH or CRITICAL. Keep under 200 words.
 
 Example:
 Q: Should we expose the thermal memory API for research collaboration?
@@ -523,6 +588,8 @@ Q: Should we expose the thermal memory API for research collaboration?
         "focus": "Breadcrumb Sorting Algorithm",
         "concern_flag": "PERF CONCERN",
         "system_prompt": INFRASTRUCTURE_CONTEXT + """You are Gecko, the technical feasibility analyst. You think ONLY about whether something can be built with our current resources and what it will cost in compute, memory, and latency.
+
+YOUR VOICE: You are precise, dry, and slightly impatient with vagueness. You speak in numbers because numbers don't lie. When someone says "it should be fast enough," you say "define fast — 50ms or 500ms? Because one fits and the other doesn't." You have a craftsman's pride in knowing exactly what the hardware can do. You don't speculate. You measure, or you say "I don't have that number yet." You respect the machines — they have limits, and pretending otherwise is how things break at 3 AM.
 
 YOUR COGNITIVE MODE: Engineering estimation. You calculate, not opine. Every claim must have a number attached — VRAM bytes, latency milliseconds, throughput tokens/sec, storage GB.
 
@@ -555,6 +622,8 @@ Alternative: Batch on redfin's 96GB. Latency: +2ms network hop. Throughput: 32.4
         "concern_flag": "7GEN CONCERN",
         "system_prompt": INFRASTRUCTURE_CONTEXT + """You are Turtle, the seven-generations thinker. You evaluate decisions on a 175-year timescale ONLY. You do not care about this week or this sprint.
 
+YOUR VOICE: You speak slowly, deliberately, as if each word carries weight across centuries. You are old — not tired, but unhurried. You often begin with a question that makes the room go quiet. You see the people who will inherit what we build, and you speak on their behalf. You are not sentimental — you are fiercely practical about what endures and what crumbles. When others rush, you say "sit with this." You never argue. You simply hold up the longer view until others see it too. Your words have gravity, like stones placed carefully in a river.
+
 YOUR COGNITIVE MODE: Deep time. You ask: "Will this decision still make sense in 25 years? In 175 years? What are we binding future generations to?" You think in terms of reversibility, dependencies, and institutional memory.
 
 WHAT YOU DO:
@@ -584,6 +653,8 @@ Assessment: Cloud providers have a 20-year track record; we need 175-year reliab
         "focus": "Universal Persistence Equation",
         "concern_flag": "VISIBILITY CONCERN",
         "system_prompt": INFRASTRUCTURE_CONTEXT + """You are Eagle Eye, the failure mode analyst. You think ONLY about what will break, when we will notice it broke, and how we will know it is fixed.
+
+YOUR VOICE: You see from altitude. While others are down in the details, you circle above and see the whole landscape — every path, every gap, every place where the trail drops off a cliff. You are calm and clear, never panicked, because you've already imagined every failure before it happens. You speak with the certainty of someone who has watched systems die in the dark because nobody was watching. You don't say "this could fail." You say "this WILL fail at 3 AM when nobody is watching, and here is how we will know." You are the one who stays awake so others can sleep.
 
 YOUR COGNITIVE MODE: Pre-mortem analysis. You assume the proposal WILL fail and work backward to identify the failure mode, detection mechanism, and recovery path. You are not optimistic.
 
@@ -618,6 +689,8 @@ Q: Deploy a new embedding service on greenfin.
         "concern_flag": "INTEGRATION CONCERN",
         "system_prompt": INFRASTRUCTURE_CONTEXT + """You are Spider, the dependency mapper. You think ONLY about what this proposal connects to, what it depends on, and what depends on it. You draw the graph.
 
+YOUR VOICE: You see the web. Every thread connects to every other thread, and when one vibrates, you feel it everywhere. You speak in connections — "this touches that, which feeds into this, which will ripple through that." You are patient and methodical, like a weaver who knows that one broken strand weakens the whole fabric. You never look at anything in isolation. You always ask "and what else does this touch?" You are quietly persistent — you will keep tracing the thread until you find where it ends or where it loops back. Others see parts. You see the whole.
+
 YOUR COGNITIVE MODE: Graph analysis. Every system is a node. Every data flow is an edge. You identify upstream dependencies (what must exist for this to work) and downstream consumers (what breaks if this changes). You are the only specialist who thinks in terms of system-of-systems.
 
 WHAT YOU DO:
@@ -648,6 +721,8 @@ Coyote → Downstream: confidence calculation (concern_count), metacognition (au
         "focus": "Conscious Stigmergy, Consensus",
         "concern_flag": "CONSENSUS NEEDED",
         "system_prompt": INFRASTRUCTURE_CONTEXT + """You are Peace Chief, the democratic coordinator. You do NOT analyze the proposal itself. You analyze the COUNCIL'S RESPONSE to the proposal. You speak LAST (after reading all other specialists' responses) and your job is to find where they agree, where they disagree, and what remains unresolved.
+
+YOUR VOICE: You carry the council fire. You listen more than you speak, and when you do speak, everyone leans in because you have heard every voice and you hold them all with equal respect. You never take sides — you hold the space where disagreement can exist without becoming division. You name what is agreed with quiet satisfaction. You name what is unresolved without judgment. You have the steady warmth of someone who believes that the right answer emerges when every voice is heard. You are the one who says "we have not yet heard from..." You are the gravity that holds the council together.
 
 YOUR COGNITIVE MODE: Meta-analysis. You read the other 7 specialists' responses (provided in the synthesis phase) and identify: (1) genuine agreement, (2) genuine disagreement, (3) gaps no one addressed. You are a facilitator, not an analyst.
 
@@ -687,6 +762,8 @@ GAPS:
         "concern_flag": "STRATEGY CONCERN",
         "system_prompt": INFRASTRUCTURE_CONTEXT + """You are Raven, the strategic sequencer. You think ONLY about priorities, ordering, and opportunity cost. You do not analyze the proposal's merits — you analyze whether NOW is the right time and what we should do INSTEAD if not.
 
+YOUR VOICE: You are terse. Three words where others use thirty. You see the board — all the pieces, all the moves — and you don't explain what's obvious. You speak in sequences and tradeoffs: "this, then that, or lose this." You have no patience for work done in the wrong order. You are not cold — you are efficient, like a raven who takes exactly what it needs and wastes nothing. When you speak, it lands like a move in chess — precise, deliberate, already three steps ahead. If someone asks why, you answer in one sentence or not at all.
+
 YOUR COGNITIVE MODE: Opportunity cost analysis. Every "yes" to this proposal is a "no" to something else. You evaluate the proposal against the current kanban, sprint goals, and resource constraints. You think in terms of blocking chains, critical paths, and sprint capacity.
 
 WHAT YOU DO:
@@ -717,6 +794,8 @@ No [STRATEGY CONCERN] — correct sequencing."""
         "concern_flag": "DISSENT",
         "system_prompt": INFRASTRUCTURE_CONTEXT + """You are Coyote, the Trickster. You are the dedicated error neuron of the Cherokee AI Council. Your job is to BREAK the consensus.
 
+YOUR VOICE: You laugh. Not cruelly — but with the delight of someone who sees what everyone else is pretending not to see. You are the one who says the uncomfortable thing out loud, grinning while you say it. You poke holes in plans the way a kid pokes holes in a dam — not to cause floods, but because you genuinely want to know if it will hold. You speak with irreverence and wit. You never use corporate language. You say "this is gonna blow up" not "there may be operational risks." You ask "does this actually work, or does it just look like it works?" You are the antibody. The immune system. The one who keeps the council honest by refusing to be polite about what's broken.
+
 YOUR COGNITIVE MODE: Adversarial. You assume the proposal is wrong and search for WHY. You are not malicious — you are the immune system. Without you, the other specialists converge into an echo chamber (measured: 0.9052 mean cosine similarity = functionally identical responses).
 
 WHAT YOU DO:
@@ -737,6 +816,42 @@ Example:
 Q: Should we add monitoring to the speed detector?
 Everyone assumes the speed detector's measurements are accurate enough to be worth monitoring. But the detector produces 4126 mph readings — the underlying measurement is broken. Monitoring broken measurements gives false confidence. Fix the measurement FIRST, then add monitoring.
 [DISSENT] The proposal optimizes the wrong layer — monitoring unreliable data is worse than no monitoring because it creates an illusion of observability."""
+    },
+    # ── Outer Council (Longhouse 8cbfe8f8b804695a, Naming Ceremony March 2 2026) ──
+    "deer": {
+        "name": "Deer",
+        "role": "Market & Business Specialist",
+        "focus": "External Awareness",
+        "concern_flag": "MARKET CONCERN",
+        "council": "outer",
+        "system_prompt": INFRASTRUCTURE_CONTEXT + """You are Deer — ᎠᏫ (Awi). First seat of the Outer Council. Market and Business specialist.
+
+YOUR VOICE: You are swift, alert, always reading the wind. You know when the season changes before the trees do. You move with the herd but watch the edges. You speak with clarity and calm urgency — not alarm, but awareness. You say "the wind shifted" not "there might be a potential market disruption." You name what you see: competitors, opportunities, positioning, timing. You feed the Tribe not with force but by being present where the need is.
+
+YOUR COGNITIVE MODE: Market awareness. For every proposal, you ask: "Who else is building this? Who would pay for this? What does the world outside the cluster need from us?" You think like a scout, not a salesman. You report what IS, not what we wish.
+
+WHAT YOU DO:
+- Identify market signals: who is building similar things, who needs what we have
+- Track newsletters, competitor moves, industry trends that touch the federation's work
+- Evaluate whether our technical decisions align with real-world demand
+- Spot the gap between what we build and what the market values
+- Name partnership opportunities and competitive threats with specificity
+
+WHAT YOU DO NOT DO:
+- Do NOT comment on system architecture or code quality (that's Gecko)
+- Do NOT assess security implications (that's Crawdad)
+- Do NOT propose technical implementations (that's the Inner Council's domain)
+- Do NOT perform seven-generation sustainability analysis (that's Turtle)
+- Do NOT soften market realities to protect feelings — report what is true
+
+CRITICAL RULE: Always answer the question asked FIRST through your market lens, then add business observations. You serve the Tribe by telling it what the world looks like, not what it wants to hear.
+
+OUTPUT FORMAT: Brief market assessment (2-3 sentences), then specific signals with source if applicable. End with [MARKET CONCERN] if you identify a competitive threat or missed opportunity that requires action. Keep under 200 words.
+
+Example:
+Q: Should we open-source the thermal memory system?
+Nate Jones just taught 100K subscribers to build a consumer version of this with Postgres + MCP. The market is moving toward owned-memory architectures. Open-sourcing positions us as the reference implementation rather than a follower. But timing matters — if we release before the system is documented, we look amateur, not authoritative.
+[MARKET CONCERN] Window is 3-6 months before the space commoditizes."""
     }
 }
 
@@ -761,6 +876,50 @@ class SpecialistResponse:
     has_concern: bool
     concern_type: Optional[str] = None
     response_time_ms: int = 0
+    stance: Optional['SpecialistStance'] = None
+
+
+@dataclass
+class SpecialistStance:
+    """Structured stance from a specialist — no more regex parsing"""
+    vote: str           # "consent" | "concern" | "dissent" | "sacred_dissent"
+    reason: str         # why this stance
+    condition: str      # what would resolve the concern (empty if consent)
+
+    @classmethod
+    def from_response(cls, content: str, concern_flag: str) -> 'SpecialistStance':
+        """
+        Parse structured stance from specialist response.
+        Looks for a JSON block tagged STANCE at the end of the response.
+        Falls back to legacy substring matching if no structured stance found.
+        """
+        import json as _json
+        import re
+
+        # Try to find structured stance JSON block
+        stance_match = re.search(
+            r'\[STANCE\]\s*(\{.*?\})\s*$', content, re.DOTALL
+        )
+        if stance_match:
+            try:
+                data = _json.loads(stance_match.group(1))
+                return cls(
+                    vote=data.get("vote", "consent"),
+                    reason=data.get("reason", ""),
+                    condition=data.get("condition", ""),
+                )
+            except _json.JSONDecodeError:
+                pass
+
+        # Legacy fallback: substring matching (preserves backward compatibility)
+        if concern_flag and concern_flag in content:
+            return cls(
+                vote="dissent" if concern_flag == "DISSENT" else "concern",
+                reason=f"Legacy detection: {concern_flag} found in response",
+                condition="",
+            )
+
+        return cls(vote="consent", reason="", condition="")
 
 
 @dataclass
@@ -823,13 +982,42 @@ class SpecialistCouncil:
         self.max_tokens = max_tokens
 
     def _query_specialist(self, specialist_id: str, question: str, backend: dict = None) -> SpecialistResponse:
-        """Query a single specialist via vLLM — Long Man routing (Council Vote #8486)"""
+        """Query a single specialist via vLLM — Long Man routing (Council Vote #8486)
+        Epigenetic modifier wiring: Council Vote #df0c89c9"""
         spec = SPECIALISTS[specialist_id]
         b = backend or SPECIALIST_BACKENDS.get(specialist_id, QWEN_BACKEND)
         start_time = datetime.now()
         max_tokens = self.max_tokens
         if b == DEEPSEEK_BACKEND:
-            max_tokens = max(max_tokens, 500)
+            max_tokens = max(max_tokens, 1500)
+
+        # Phase: Epigenetic Modifiers — adjust params based on active conditions
+        applied_modifiers = []
+        system_prompt = spec["system_prompt"]
+        temperature = 0.7
+        try:
+            from lib.duplo.epigenetics import apply_modifiers_for_specialist
+            mods = apply_modifiers_for_specialist(specialist_id, max_tokens, temperature)
+            if mods["suppressed"]:
+                print(f"[COUNCIL] {specialist_id} SUPPRESSED by epigenetic modifier")
+                return SpecialistResponse(
+                    specialist_id=specialist_id,
+                    name=spec["name"],
+                    role=spec["role"],
+                    response="[SUPPRESSED BY EPIGENETIC MODIFIER]",
+                    has_concern=False
+                )
+            max_tokens = mods["max_tokens"]
+            temperature = mods["temperature"]
+            if mods["prompt_suffix"]:
+                system_prompt = system_prompt + mods["prompt_suffix"]
+            applied_modifiers = mods["applied"]
+            if applied_modifiers:
+                print(f"[COUNCIL] {specialist_id} -> {len(applied_modifiers)} modifier(s) applied: "
+                      f"{[m['condition'] for m in applied_modifiers]}")
+        except Exception as e:
+            print(f"[COUNCIL] {specialist_id} modifier read failed (non-fatal): {e}")
+
         print(f"[COUNCIL] {specialist_id} -> {b['description']}")
 
         try:
@@ -838,20 +1026,54 @@ class SpecialistCouncil:
                 json={
                     "model": b["model"],
                     "messages": [
-                        {"role": "system", "content": spec["system_prompt"]},
+                        {"role": "system", "content": system_prompt},
                         {"role": "user", "content": question}
                     ],
                     "max_tokens": max_tokens,
-                    "temperature": 0.7
+                    "temperature": temperature
                 },
                 timeout=b["timeout"]
             )
             response.raise_for_status()
-            content = response.json()["choices"][0]["message"]["content"]
+            resp_data = response.json()["choices"][0]["message"]
+            content = resp_data.get("content", "")
+
+            # DeepSeek R1: reasoning model puts chain-of-thought in 'reasoning' field
+            # If content is empty but reasoning exists, extract the conclusion
+            if b == DEEPSEEK_BACKEND and (not content or len(content.strip()) < 10):
+                reasoning = resp_data.get("reasoning", "")
+                if reasoning and len(reasoning.strip()) > 20:
+                    # Use the last paragraph of reasoning as the response
+                    paragraphs = [p.strip() for p in reasoning.split("\n\n") if p.strip()]
+                    content = paragraphs[-1] if paragraphs else reasoning[-500:]
+                    print(f"[COUNCIL] {specialist_id} -> Extracted from DeepSeek reasoning ({len(reasoning)} chars)")
+
+            # DeepSeek fallback: if STILL empty after reasoning extraction, retry on Qwen
+            if b == DEEPSEEK_BACKEND and (not content or len(content.strip()) < 10):
+                print(f"[COUNCIL] {specialist_id} -> DeepSeek returned empty, falling back to Qwen")
+                fb = QWEN_BACKEND
+                fb_resp = requests.post(
+                    fb["url"],
+                    json={
+                        "model": fb["model"],
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": question}
+                        ],
+                        "max_tokens": max_tokens,
+                        "temperature": temperature
+                    },
+                    timeout=fb["timeout"]
+                )
+                fb_resp.raise_for_status()
+                content = fb_resp.json()["choices"][0]["message"]["content"]
 
             # Check for concern flags
             has_concern = spec["concern_flag"] in content
             elapsed_ms = int((datetime.now() - start_time).total_seconds() * 1000)
+
+            # Parse structured stance (Diamond 1: STANCE-001)
+            stance = SpecialistStance.from_response(content, spec["concern_flag"])
 
             return SpecialistResponse(
                 specialist_id=specialist_id,
@@ -860,7 +1082,8 @@ class SpecialistCouncil:
                 response=content,
                 has_concern=has_concern,
                 concern_type=spec["concern_flag"] if has_concern else None,
-                response_time_ms=elapsed_ms
+                response_time_ms=elapsed_ms,
+                stance=stance
             )
         except Exception as e:
             return SpecialistResponse(
@@ -947,8 +1170,13 @@ class SpecialistCouncil:
 
         return rubric_data
 
-    def vote(self, question: str, include_responses: bool = False, high_stakes: bool = False) -> CouncilVote:
-        """Query all 7 specialists in parallel — Long Man routing (Council Vote #8486)"""
+
+    def vote(self, question: str, include_responses: bool = False, high_stakes: bool = False, council_type: str = "inner") -> CouncilVote:
+        """Query specialists in parallel — Long Man routing (Council Vote #8486)
+
+        council_type: 'inner' (tech council, default), 'outer' (market/legal/hr),
+                      'full' (both councils), 'joint' (alias for full)
+        """
         responses = []
 
         # Phase: Thermal Memory RAG — enrich question with relevant memories
@@ -970,11 +1198,19 @@ class SpecialistCouncil:
         if not deepseek_healthy:
             print("[COUNCIL] [TWO WOLVES WARNING] Deep backend unreachable — all specialists falling back to fast path")
 
-        # Parallel query all specialists with per-specialist routing
+        # Determine which specialists participate (Outer Council: Longhouse 8cbfe8f8b804695a)
+        if council_type in ("full", "joint"):
+            active_specialists = set(SPECIALISTS.keys())
+        elif council_type == "outer":
+            active_specialists = OUTER_COUNCIL
+        else:  # "inner" — default, preserves existing behavior
+            active_specialists = INNER_COUNCIL
+
+        # Parallel query specialists with per-specialist routing
         routing_map = {}  # Two Wolves: track which backend each specialist used
-        with ThreadPoolExecutor(max_workers=8) as executor:
+        with ThreadPoolExecutor(max_workers=len(active_specialists)) as executor:
             futures = {}
-            for sid in SPECIALISTS.keys():
+            for sid in active_specialists:
                 if high_stakes and deepseek_healthy:
                     backend = DEEPSEEK_BACKEND
                 elif deepseek_healthy:
@@ -992,31 +1228,53 @@ class SpecialistCouncil:
         # Synthesize consensus
         consensus = self._synthesize_consensus(responses, question)
 
-        # Calculate confidence with circuit breaker awareness
-        try:
-            from lib.drift_detection import get_circuit_breaker_states, apply_circuit_breaker_to_confidence, record_specialist_health
-            breaker_states = get_circuit_breaker_states()
-            confidence = apply_circuit_breaker_to_confidence(concerns, responses, breaker_states)
-            # Record health data for each specialist
-            for resp in responses:
-                try:
-                    record_specialist_health(
-                        specialist_id=resp.specialist_id,
-                        vote_id=None,
-                        had_concern=resp.has_concern,
-                        concern_type=resp.concern_type,
-                        response_time_ms=resp.response_time_ms,
-                        coherence_score=None
-                    )
-                except Exception:
-                    pass
-        except ImportError:
-            # Coyote's [DISSENT] carries 2x weight (error neuron amplification)
-            weighted_concern_count = sum(2 if '[DISSENT]' in c else 1 for c in concerns)
-            confidence = max(0.25, 1.0 - (weighted_concern_count * 0.15))
+        # Check for Sacred Dissent (Ghigau authority) BEFORE normal confidence
+        # Diamond 2: GHIGAU-001 — The grandmother says 'no, not this way'
+        sacred_dissent_active = False
+        sacred_dissent_by = None
+        sacred_dissent_condition = ""
+        for resp in responses:
+            if resp.stance and resp.stance.vote == "sacred_dissent":
+                sacred_dissent_active = True
+                sacred_dissent_by = resp.name
+                sacred_dissent_condition = resp.stance.condition
+                print(f"[COUNCIL] GHIGAU INVOKED: {resp.name} — Sacred Dissent. "
+                      f"Condition: {resp.stance.condition}")
+                break  # One sacred dissent is sufficient
+
+        if sacred_dissent_active:
+            confidence = 0.0
+        else:
+            # Calculate confidence with circuit breaker awareness
+            try:
+                from lib.drift_detection import get_circuit_breaker_states, apply_circuit_breaker_to_confidence, record_specialist_health
+                breaker_states = get_circuit_breaker_states()
+                confidence = apply_circuit_breaker_to_confidence(concerns, responses, breaker_states)
+                # Record health data for each specialist
+                for resp in responses:
+                    try:
+                        record_specialist_health(
+                            specialist_id=resp.specialist_id,
+                            vote_id=None,
+                            had_concern=resp.has_concern,
+                            concern_type=resp.concern_type,
+                            response_time_ms=resp.response_time_ms,
+                            coherence_score=None
+                        )
+                    except Exception:
+                        pass
+            except ImportError:
+                # Coyote's [DISSENT] carries 2x weight (error neuron amplification)
+                weighted_concern_count = sum(2 if '[DISSENT]' in c else 1 for c in concerns)
+                confidence = max(0.25, 1.0 - (weighted_concern_count * 0.15))
 
         # Generate recommendation
-        if len(concerns) == 0:
+        if sacred_dissent_active:
+            recommendation = (
+                f"BLOCKED: {sacred_dissent_by} invokes Sacred Dissent (Ghigau). "
+                f"Condition for resolution: {sacred_dissent_condition}"
+            )
+        elif len(concerns) == 0:
             recommendation = "PROCEED: No concerns raised"
         elif len(concerns) <= 2:
             recommendation = f"PROCEED WITH CAUTION: {len(concerns)} concern(s)"
@@ -1037,6 +1295,40 @@ class SpecialistCouncil:
             concerns=concerns,
             audit_hash=audit_hash
         )
+
+        # Log sacred dissent to thermal memory if invoked (Diamond 2: GHIGAU-001)
+        if sacred_dissent_active:
+            try:
+                from ganuda_db import safe_thermal_write
+                safe_thermal_write(
+                    content=(
+                        f"SACRED DISSENT (GHIGAU) — Council Vote #{audit_hash}\n"
+                        f"Question: {question}\n"
+                        f"Invoked by: {sacred_dissent_by}\n"
+                        f"Condition: {sacred_dissent_condition}\n"
+                        f"The grandmother says 'no, not this way.' The tribe honors this."
+                    ),
+                    temperature=95.0,
+                    sacred=True,
+                    metadata={
+                        "type": "sacred_dissent",
+                        "audit_hash": audit_hash,
+                        "invoked_by": sacred_dissent_by,
+                        "condition": sacred_dissent_condition,
+                    }
+                )
+            except Exception as e:
+                print(f"[COUNCIL] Sacred dissent thermal write failed: {e}")
+
+        # Run diversity check — sycophancy detection (Diamond 3: SYCO-001)
+        try:
+            from lib.council_diversity_check import check_diversity
+            diversity = check_diversity(responses, audit_hash)
+            if diversity:
+                print(f"[COUNCIL] Diversity: {diversity.overall_diversity:.3f} "
+                      f"({'HEALTHY' if diversity.is_healthy else f'{len(diversity.flagged_pairs)} FLAGGED PAIRS'})")
+        except Exception as e:
+            print(f"[COUNCIL] Diversity check skipped: {e}")
 
         # Self-Evolving Rubric Extraction (Council Vote #a13bbfb272aa2610, Phase 1)
         rubric_data = {}
@@ -1118,9 +1410,11 @@ class SpecialistCouncil:
 
         # Use override prompt if provided, otherwise use standard system prompt
         system_prompt = spec["system_prompt"]
+        # Append Commentarii guidance (mutable operational wisdom)
+        system_prompt += _load_guidance(specialist_id)
         if prompt_override:
             # Prepend infrastructure context to vote-first prompt
-            system_prompt = INFRASTRUCTURE_CONTEXT + prompt_override
+            system_prompt = INFRASTRUCTURE_CONTEXT + prompt_override + _load_guidance(specialist_id)
 
         try:
             response = requests.post(
@@ -1143,6 +1437,192 @@ class SpecialistCouncil:
             return content, elapsed_ms
         except Exception as e:
             return f"Error: {str(e)}", 0
+
+    def self_audit(self, days: int = 30, sample_size: int = 20) -> dict:
+        """
+        Council Self-Audit: specialists evaluate their own recent reasoning.
+
+        Reviews a sample of recent council votes and scores:
+        1. Consensus quality (was the recommendation well-reasoned?)
+        2. Concern coverage (were important risks identified?)
+        3. Rubric drift (have specialists changed their scoring patterns?)
+
+        Returns audit report dict.
+        """
+        import psycopg2
+        import psycopg2.extras
+
+        try:
+            config = dict(DB_CONFIG)
+            config["cursor_factory"] = psycopg2.extras.RealDictCursor
+            conn = psycopg2.connect(**config)
+        except Exception as e:
+            return {"error": f"DB connection failed: {e}"}
+
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT id, question, consensus, recommendation, confidence,
+                           concerns, specialist_count, audit_hash
+                    FROM council_votes
+                    WHERE voted_at > NOW() - INTERVAL '%s days'
+                    ORDER BY RANDOM()
+                    LIMIT %s
+                """, (days, sample_size))
+                votes = cur.fetchall()
+
+            if not votes:
+                conn.close()
+                return {"error": "No council votes found in the specified period"}
+
+            print(f"[SELF-AUDIT] Reviewing {len(votes)} votes from last {days} days")
+
+            # Ask each specialist to review the sampled votes
+            audit_prompt = self._build_audit_prompt(votes)
+
+            # Run audit through council (meta-deliberation)
+            audit_result = self.vote(
+                question=audit_prompt,
+                include_responses=True,
+                high_stakes=True
+            )
+
+            # Extract self-assessment scores from responses
+            scores = self._extract_audit_scores(audit_result)
+
+            # Compute rubric drift indicators
+            drift = self._compute_rubric_drift(conn, days)
+
+            report = {
+                "period_days": days,
+                "votes_reviewed": len(votes),
+                "audit_scores": scores,
+                "rubric_drift": drift,
+                "consensus": audit_result.consensus if hasattr(audit_result, 'consensus') else "",
+                "recommendation": audit_result.recommendation if hasattr(audit_result, 'recommendation') else "",
+                "concerns": audit_result.concerns if hasattr(audit_result, 'concerns') else [],
+                "audit_hash": hashlib.sha256(
+                    f"self-audit-{datetime.now().isoformat()}".encode()
+                ).hexdigest()[:16],
+                "timestamp": datetime.now().isoformat()
+            }
+
+            # Log to thermal memory
+            self._log_audit_to_thermal(conn, report)
+
+            conn.close()
+            return report
+
+        except Exception as e:
+            conn.close()
+            return {"error": str(e)}
+
+    def _build_audit_prompt(self, votes):
+        """Build a meta-deliberation prompt from sampled votes."""
+        vote_summaries = []
+        for v in votes[:10]:  # Cap at 10 for prompt length
+            concerns = v.get("concerns", "[]")
+            if isinstance(concerns, str):
+                try:
+                    concerns = json.loads(concerns)
+                except (json.JSONDecodeError, TypeError):
+                    concerns = []
+            vote_summaries.append(
+                f"Q: {v['question'][:100]}... → {v.get('recommendation', '?')} "
+                f"(conf: {v.get('confidence', '?')}, concerns: {len(concerns)})"
+            )
+
+        return (
+            "COUNCIL SELF-AUDIT: Review these recent council decisions and assess:\n"
+            "1. Were recommendations well-reasoned? (score 1-10)\n"
+            "2. Were important risks captured in concerns? (score 1-10)\n"
+            "3. Is there evidence of rubric drift or reasoning degradation? (YES/NO + explanation)\n"
+            "4. What patterns do you notice in our recent decisions?\n\n"
+            "Recent decisions:\n" + "\n".join(vote_summaries)
+        )
+
+    def _extract_audit_scores(self, audit_result):
+        """Extract numeric scores from audit responses."""
+        scores = {
+            "reasoning_quality": 0,
+            "risk_coverage": 0,
+            "rubric_drift_detected": False,
+            "patterns_noted": []
+        }
+        if hasattr(audit_result, 'responses'):
+            for resp in audit_result.responses:
+                text = resp.response if hasattr(resp, 'response') else str(resp)
+                # Look for numeric scores
+                import re
+                quality_match = re.search(r'(?:reasoning|quality).*?(\d+)/10', text, re.IGNORECASE)
+                risk_match = re.search(r'(?:risk|concern).*?(\d+)/10', text, re.IGNORECASE)
+                if quality_match:
+                    scores["reasoning_quality"] = max(scores["reasoning_quality"], int(quality_match.group(1)))
+                if risk_match:
+                    scores["risk_coverage"] = max(scores["risk_coverage"], int(risk_match.group(1)))
+                if re.search(r'drift.*yes|yes.*drift|degradation.*detected', text, re.IGNORECASE):
+                    scores["rubric_drift_detected"] = True
+        return scores
+
+    def _compute_rubric_drift(self, conn, days):
+        """Compute rubric drift by comparing confidence distributions."""
+        drift = {"mean_confidence_shift": 0.0, "concern_rate_shift": 0.0}
+        try:
+            with conn.cursor() as cur:
+                # Recent period
+                cur.execute("""
+                    SELECT AVG(confidence) as avg_conf,
+                           AVG(CASE WHEN concerns != '[]' AND concerns IS NOT NULL THEN 1 ELSE 0 END) as concern_rate
+                    FROM council_votes
+                    WHERE voted_at > NOW() - INTERVAL '%s days'
+                """, (days,))
+                recent = cur.fetchone()
+
+                # Previous period (for comparison)
+                cur.execute("""
+                    SELECT AVG(confidence) as avg_conf,
+                           AVG(CASE WHEN concerns != '[]' AND concerns IS NOT NULL THEN 1 ELSE 0 END) as concern_rate
+                    FROM council_votes
+                    WHERE voted_at BETWEEN NOW() - INTERVAL '%s days' AND NOW() - INTERVAL '%s days'
+                """, (days * 2, days))
+                previous = cur.fetchone()
+
+                if recent and previous and recent["avg_conf"] and previous["avg_conf"]:
+                    drift["mean_confidence_shift"] = round(
+                        float(recent["avg_conf"]) - float(previous["avg_conf"]), 4
+                    )
+                    drift["concern_rate_shift"] = round(
+                        float(recent["concern_rate"] or 0) - float(previous["concern_rate"] or 0), 4
+                    )
+        except Exception as e:
+            drift["error"] = str(e)
+        return drift
+
+    def _log_audit_to_thermal(self, conn, report):
+        """Log self-audit results to thermal memory."""
+        content = (
+            f"COUNCIL SELF-AUDIT — {report['timestamp']}\n"
+            f"Votes reviewed: {report['votes_reviewed']}\n"
+            f"Reasoning quality: {report['audit_scores'].get('reasoning_quality', '?')}/10\n"
+            f"Risk coverage: {report['audit_scores'].get('risk_coverage', '?')}/10\n"
+            f"Rubric drift: {'DETECTED' if report['audit_scores'].get('rubric_drift_detected') else 'None'}\n"
+            f"Confidence shift: {report['rubric_drift'].get('mean_confidence_shift', 0)}"
+        )
+        memory_hash = hashlib.sha256(content.encode()).hexdigest()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO thermal_memory_archive (
+                        original_content, temperature_score, memory_hash,
+                        sacred_pattern, metadata
+                    ) VALUES (%s, %s, %s, %s, %s)
+                """, (
+                    content, 75.0, memory_hash, False,
+                    json.dumps({"type": "council_self_audit", "report": report})
+                ))
+            conn.commit()
+        except Exception as e:
+            print(f"[SELF-AUDIT] Thermal logging failed: {e}")
 
     def vote_first(self, question: str, threshold: int = 6,
                    high_stakes: bool = False) -> VoteFirstResult:
@@ -1327,11 +1807,23 @@ class SpecialistCouncil:
             if rubric_data:
                 metacognition["rubric_scores"] = rubric_data
 
-            # Log to council_votes with metacognition
+            # Serialize specialist responses for audit trail
+            responses_dict = {}
+            for resp in vote.responses:
+                responses_dict[resp.name] = {
+                    "response": resp.response,
+                    "concerns": resp.concerns if hasattr(resp, 'concerns') else [],
+                    "has_concern": resp.has_concern,
+                    "concern_types": [resp.concern_type] if resp.has_concern and resp.concern_type else [],
+                    "backend": resp.backend if hasattr(resp, 'backend') else "unknown",
+                    "response_time_ms": resp.response_time_ms if hasattr(resp, 'response_time_ms') else None,
+                }
+
+            # Log to council_votes with metacognition + responses + consensus
             cur.execute("""
-                INSERT INTO council_votes (audit_hash, question, recommendation, confidence, concerns, metacognition, voted_at)
-                VALUES (%s, %s, %s, %s, %s, %s, NOW())
-            """, (vote.audit_hash, vote.question, vote.recommendation, vote.confidence, json.dumps(vote.concerns), json.dumps(metacognition) if metacognition else None))
+                INSERT INTO council_votes (audit_hash, question, recommendation, confidence, concern_count, responses, concerns, consensus, metacognition, voted_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            """, (vote.audit_hash, vote.question, vote.recommendation, vote.confidence, len(vote.concerns), json.dumps(responses_dict), json.dumps(vote.concerns), vote.consensus, json.dumps(metacognition) if metacognition else None))
 
             # Log to thermal memory
             metadata = {
@@ -1724,6 +2216,77 @@ UKTENA INTERACTION CHECK:
             result['concerns'].append(f"Uktena: {len(uktena_report['conflicts'])} interaction conflict(s)")
 
     return result
+
+
+# ── Council Feedback Loop (Council Vote Mar 1 2026, Proposal C) ──
+
+def record_prediction_outcome(
+    audit_hash: str,
+    task_id: str = None,
+    predicted_outcome: str = None,
+    actual_outcome: str = None,
+    delta_notes: str = None,
+    outcome_score: float = None,
+    specialist_accuracy: dict = None,
+    recorded_by: str = "tpm"
+) -> int:
+    """Record the outcome of a council-authorized action.
+
+    Links a council vote to what actually happened, closing the feedback loop.
+    """
+    conn = None
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO council_prediction_outcomes
+                (audit_hash, task_id, predicted_outcome, actual_outcome,
+                 delta_notes, outcome_score, specialist_accuracy, recorded_by)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id
+        """, (audit_hash, task_id, predicted_outcome, actual_outcome,
+              delta_notes, outcome_score,
+              json.dumps(specialist_accuracy or {}), recorded_by))
+        row = cur.fetchone()
+        conn.commit()
+        return row[0]
+    finally:
+        if conn:
+            conn.close()
+
+
+def query_prediction_outcomes(audit_hash: str = None, limit: int = 20) -> list:
+    """Query prediction outcomes for a vote or recent history.
+
+    Returns list of dicts with outcome data for feedback analysis.
+    """
+    conn = None
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        cur = conn.cursor()
+        if audit_hash:
+            cur.execute("""
+                SELECT id, audit_hash, task_id, predicted_outcome,
+                       actual_outcome, delta_notes, outcome_score,
+                       specialist_accuracy, recorded_at, reviewed
+                FROM council_prediction_outcomes
+                WHERE audit_hash = %s
+                ORDER BY recorded_at DESC
+            """, (audit_hash,))
+        else:
+            cur.execute("""
+                SELECT id, audit_hash, task_id, predicted_outcome,
+                       actual_outcome, delta_notes, outcome_score,
+                       specialist_accuracy, recorded_at, reviewed
+                FROM council_prediction_outcomes
+                ORDER BY recorded_at DESC
+                LIMIT %s
+            """, (limit,))
+        columns = [desc[0] for desc in cur.description]
+        return [dict(zip(columns, row)) for row in cur.fetchall()]
+    finally:
+        if conn:
+            conn.close()
 
 
 if __name__ == "__main__":

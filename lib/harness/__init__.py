@@ -1,0 +1,32 @@
+"""
+Cherokee AI Federation -- Graduated Harness Tiers
+
+Three-tier inference architecture with automatic confidence-based escalation.
+Tier 1 (Reflex) -> Tier 2 (Deliberation) -> Tier 3 (Council)
+
+Users never choose tiers. The system finds its level.
+DC-6 Gradient Principle: specialization is gravity, not boundary.
+
+Longhouse #b940f09b18605c97 -- UNANIMOUS (14 voices)
+Council Vote #2c2fa88a53817307 -- APPROVED
+"""
+
+from lib.harness.core import (
+    HarnessRequest,
+    HarnessResponse,
+    TierResult,
+    StakesLevel,
+)
+from lib.harness.config import HarnessConfig, TierConfig, load_harness_config
+from lib.harness.escalation import EscalationEngine
+
+__all__ = [
+    "HarnessRequest",
+    "HarnessResponse",
+    "TierResult",
+    "StakesLevel",
+    "HarnessConfig",
+    "TierConfig",
+    "load_harness_config",
+    "EscalationEngine",
+]

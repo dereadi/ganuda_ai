@@ -2,7 +2,7 @@ import requests
 import json
 
 LLM_GATEWAY = "http://192.168.132.223:8080/v1/chat/completions"
-API_KEY = "ck-cabccc2d6037c1dce1a027cc80df7b14cdba66143e3c2d4f3bdf0fd53b6ab4a5"
+API_KEY = "REDACTED_USE_ENV_VAR"
 
 def analyze_email_with_llm(email_data: dict) -> dict:
     """
