@@ -17,6 +17,11 @@ Fallback: On failure, sends cached last-good briefing with STALE warning.
 
 import json
 import logging
+from lib.harness.core import HarnessRequest
+from lib.harness.config import load_harness_config
+from lib.harness.escalation import EscalationEngine
+from lib.harness.tier1_reflex import Tier1Reflex
+from lib.harness.tier2_deliberation import Tier2Deliberation
 import os
 import time
 from datetime import datetime, timedelta, timezone
@@ -448,3 +453,31 @@ class DailyBriefingGenerator:
         except Exception as e:
             logger.error("Failed to send cached briefing: %s", e)
             return False
+# Harness integration (DC-10)
+_harness_engine = None
+
+def _get_harness():
+    global _harness_engine
+    if _harness_engine is not None:
+        return _harness_engine
+    config = load_harness_config()
+    engine = EscalationEngine(config)
+    if config.tier1.enabled:
+        engine.register_tier(1, Tier1Reflex(config.tier1))
+    if config.tier2.enabled:
+        engine.register_tier(2, Tier2Deliberation(config.tier2))
+    _harness_engine = engine
+    return _harness_engine
+
+
+def harness_query(query, context=None, user_id="chief_pa"):
+    """Route a query through the graduated harness."""
+    engine = _get_harness()
+    req = HarnessRequest(
+        query=query,
+        context=context or {},
+        user_id=user_id,
+    )
+    resp = engine.handle_request(req)
+    return resp.answer, resp.tier_used, resp.confidence
+

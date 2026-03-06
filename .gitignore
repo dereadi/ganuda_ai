@@ -183,6 +183,7 @@ tmp/
 tmp_*.pdf
 test_*.py
 !security/ai_red_team/test_memory_poisoning.py
+!tests/test_*.py
 thermal_memory_fokker_planck.py
 tem_phase_coherence_visualization.py
 database_migration_wave2_physics.sql
