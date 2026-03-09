@@ -1,5 +1,3 @@
-<<<<<<< SEARCH
-=======
 #!/usr/bin/env python3
 """Safety Canary Probe System.
 
@@ -326,4 +324,3 @@ def main():
 
 if __name__ == "__main__":
     main()
->>>>>>> REPLACE

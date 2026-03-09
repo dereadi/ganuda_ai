@@ -1,5 +1,3 @@
-<<<<<<< SEARCH
-=======
 #!/usr/bin/env python3
 """Credential Scanner — Find plaintext secrets in /ganuda.
 
@@ -142,4 +140,3 @@ def main():
 
 if __name__ == "__main__":
     main()
->>>>>>> REPLACE

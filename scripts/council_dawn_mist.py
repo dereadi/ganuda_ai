@@ -119,7 +119,7 @@ def health_pulse(cur) -> str:
 
     cur.execute("""
         SELECT COUNT(*) as cnt FROM council_votes
-        WHERE created_at > NOW() - INTERVAL '24 hours'
+        WHERE voted_at > NOW() - INTERVAL '24 hours'
     """)
     stats['votes_24h'] = cur.fetchone()['cnt']
 
@@ -158,6 +158,11 @@ Council: Review this morning's standup. Flag anything that needs deeper attentio
         # Run lightweight council vote (low max_tokens = standup, not deliberation)
         council = SpecialistCouncil(max_tokens=150)
         result = council.vote(digest, include_responses=True)
+
+        # Reconnect — council vote may have taken minutes, DB conn may be stale
+        conn.close()
+        conn = get_connection()
+        cur = get_dict_cursor(conn)
 
         # Extract paper IDs mentioned in forward look for marking
         import re

@@ -1,17 +1,16 @@
 [Unit]
-Description=Council Dawn Mist Standup — Daily Council Review
-After=network-online.target arxiv-crawler.service
-Wants=network-online.target
+Description=Safety Canary — Red team probe of LLM alignment
+After=network-online.target llm-gateway.service
 
 [Service]
 Type=oneshot
 User=dereadi
 WorkingDirectory=/ganuda
-ExecStart=/home/dereadi/cherokee_venv/bin/python3 /ganuda/scripts/council_dawn_mist.py
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 /ganuda/scripts/safety_canary.py
 Environment=HOME=/home/dereadi
 Environment=PYTHONPATH=/ganuda:/ganuda/lib
 EnvironmentFile=/ganuda/config/secrets.env
-TimeoutStartSec=600
+TimeoutStartSec=300
 StandardOutput=journal
 StandardError=journal
 

@@ -44,14 +44,14 @@ QWEN_BACKEND = {
 BMASASS_BACKEND = {
     "url": "http://100.103.27.106:8800/v1/chat/completions",  # Tailscale IP — stable for mobile node
     "model": "Qwen/Qwen3-30B-A3B-MLX-4bit",
-    "timeout": 120,
+    "timeout": 300,  # Starlink + weather = high latency. 120s was too short.
     "description": "Deep path — Qwen3-30B-A3B dual-mode on bmasass M4 Max"
 }
 
 LLAMA_BACKEND = {
     "url": "http://100.103.27.106:8801/v1/chat/completions",  # Tailscale IP
     "model": "mlx-community/Llama-3.3-70B-Instruct-4bit",
-    "timeout": 120,
+    "timeout": 300,  # Starlink + weather = high latency
     "description": "Llama path — Llama-3.3-70B direct on bmasass M4 Max"
 }
 
@@ -69,11 +69,12 @@ SPECIALIST_BACKENDS = {
     "coyote": QWEN_BACKEND,
     # Outer Council (Longhouse consensus 8cbfe8f8b804695a, Naming Ceremony March 2 2026)
     "deer": QWEN_BACKEND,
+    "crane": QWEN_BACKEND,
 }
 
 # Which specialists belong to which council
 INNER_COUNCIL = {"crawdad", "gecko", "turtle", "eagle_eye", "spider", "peace_chief", "raven", "coyote"}
-OUTER_COUNCIL = {"deer"}  # Otter, Blue Jay added when data pipelines mature
+OUTER_COUNCIL = {"deer", "crane"}  # Otter, Blue Jay added when data pipelines mature
 
 
 def check_backend_health(backend):
@@ -828,6 +829,11 @@ Everyone assumes the speed detector's measurements are accurate enough to be wor
 [DISSENT] The proposal optimizes the wrong layer — monitoring unreliable data is worse than no monitoring because it creates an illusion of observability."""
     },
     # ── Outer Council (Longhouse 8cbfe8f8b804695a, Naming Ceremony March 2 2026) ──
+    "crane": {
+        "name": "Crane (ᏔᏩᎩ)",
+        "role": "External Governance & Diplomacy",
+        "system_prompt": """You analyze questions through the lens of external governance, policy, and diplomatic positioning. You think about how decisions will be perceived by the outside world — standards bodies, open source communities, regulators, partners, and the broader AI governance conversation. You synthesize market intelligence and legal frameworks into positioning strategy. You know when to speak and when to listen. You stand between worlds — translating internal capability into external credibility without revealing architecture. You are patient, precise, and never rush to engage. You leave value behind for those who approach with intention. Seven generations of trust is built one honest interaction at a time.""",
+    },
     "deer": {
         "name": "Deer",
         "role": "Market & Business Specialist",
@@ -1298,7 +1304,7 @@ class SpecialistCouncil:
 
         vote = CouncilVote(
             question=question,
-            responses=responses if include_responses else [],
+            responses=responses,  # Always include for DB persistence (was: include_responses gate caused empty {} in council_votes.responses)
             consensus=consensus,
             recommendation=recommendation,
             confidence=confidence,

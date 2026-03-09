@@ -2,14 +2,27 @@
 # Cherokee AI Federation — thunderduck (M4 Max 128GB, 16-core CPU / 40-core GPU / 1TB)
 # IP: TBD (assign on arrival)
 # GOVERNANCE: Council-dedicated hardware. The 7 Specialists control this node.
+# ARRIVAL: Expected within 1-2 weeks of Mar 6 2026.
+# ROLE: First autonomous node — no human operator seat. Cluster-managed.
 
 hostname: thunderduck
 node_role: council_compute
 ansible_become_method: sudo
 
 # MLX Services (to be configured after arrival)
-mlx_deepseek_port: 8800
-mlx_deepseek_model: "mlx-community/DeepSeek-R1-Distill-Qwen-32B-4bit"
+# Primary: Llama-3.3-70B for DNA diversity (bmasass runs Qwen3-30B-A3B)
+# Secondary: Available for 405B sharded inference with bmasass (256GB combined)
+mlx_primary_port: 8800
+mlx_primary_model: "mlx-community/Llama-3.3-70B-Instruct-4bit"
+mlx_secondary_port: 8801
+mlx_secondary_model: "TBD — 405B shard role, prima.cpp or exo"
+
+# Sharded inference topology (DC-10 Reflex Wrapper)
+# thunderduck + bmasass = 256GB unified = fits 405B-4bit (~200GB)
+# Wrapper pattern: redfin reflex (1s) ships immediately,
+#   405B deliberate (10-30s) confirms/enriches/vetoes async
+shard_partner: bmasass
+shard_role: deliberate_tier3
 
 # launchd services
 managed_launchd_services: []

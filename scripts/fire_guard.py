@@ -98,6 +98,94 @@ def check_timer_freshness(timer_name, max_age_seconds):
         return False, str(e)
 
 
+def check_stale_tasks():
+    """Check if Jr executor has stalled — tasks stuck in_progress or no completions."""
+    import psycopg2
+    alerts = []
+    try:
+        conn = psycopg2.connect(host=DB_HOST, port=5432, dbname=DB_NAME, user=DB_USER, password=DB_PASS)
+        cur = conn.cursor()
+
+        # Check for tasks stuck in_progress > 2 hours
+        cur.execute("""
+            SELECT count(*), min(updated_at)
+            FROM jr_work_queue
+            WHERE status = 'in_progress'
+              AND updated_at < NOW() - INTERVAL '2 hours'
+        """)
+        stuck_count, oldest = cur.fetchone()
+        if stuck_count and stuck_count > 0:
+            alerts.append(f"STALE TASKS: {stuck_count} task(s) stuck in_progress since {oldest}")
+
+        # Check if pending tasks exist but no completions in 4 hours
+        cur.execute("""
+            SELECT count(*) FROM jr_work_queue WHERE status = 'pending'
+        """)
+        pending_count = cur.fetchone()[0]
+
+        if pending_count and pending_count > 0:
+            cur.execute("""
+                SELECT max(updated_at) FROM jr_work_queue WHERE status = 'completed'
+            """)
+            last_completed = cur.fetchone()[0]
+            if last_completed:
+                cur.execute("SELECT NOW() - %s > INTERVAL '4 hours'", (last_completed,))
+                is_stale = cur.fetchone()[0]
+                if is_stale:
+                    alerts.append(f"IDLE EXECUTOR: {pending_count} pending task(s), last completion: {last_completed}")
+
+        cur.close()
+        conn.close()
+    except Exception as e:
+        # DB down is caught by port check — don't double-alert
+        pass
+    return alerts
+
+
+ZOMBIE_THRESHOLD_HOURS = 6
+
+
+def reset_zombie_tasks():
+    """Reset tasks stuck in_progress for longer than ZOMBIE_THRESHOLD_HOURS.
+
+    Returns list of reset task titles for alerting.
+    Coyote rule: cost of over-escalation < cost of under-escalation.
+    """
+    import psycopg2
+    reset_tasks = []
+    try:
+        conn = psycopg2.connect(host=DB_HOST, port=5432, dbname=DB_NAME, user=DB_USER, password=DB_PASS)
+        cur = conn.cursor()
+
+        cur.execute("""
+            UPDATE jr_work_queue
+            SET status = 'pending', updated_at = NOW()
+            WHERE status = 'in_progress'
+              AND updated_at < NOW() - INTERVAL '%s hours'
+            RETURNING task_id, title
+        """, (ZOMBIE_THRESHOLD_HOURS,))
+        reset_tasks = cur.fetchall()
+
+        if reset_tasks:
+            # Log the reset to thermal memory
+            content = f"FIRE GUARD ZOMBIE RESET: {len(reset_tasks)} task(s) reset from in_progress to pending after {ZOMBIE_THRESHOLD_HOURS}h stall: " + "; ".join(t[1] for t in reset_tasks)
+            memory_hash = hashlib.sha256(content.encode()).hexdigest()
+            cur.execute("""INSERT INTO thermal_memory_archive
+                (original_content, temperature_score, sacred_pattern, memory_hash, domain_tag, tags, metadata)
+                VALUES (%s, 75, false, %s, 'fire_guard', %s, %s::jsonb)
+                ON CONFLICT (memory_hash) DO NOTHING""",
+                (content, memory_hash,
+                 ['fire_guard', 'zombie_reset', 'auto_recovery'],
+                 json.dumps({"source": "fire_guard", "action": "zombie_reset", "count": len(reset_tasks), "tasks": [t[1] for t in reset_tasks]})))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception:
+        pass
+    return reset_tasks
+
+
 def run_checks():
     results = {"local": [], "remote": [], "timers": [], "timestamp": datetime.now().isoformat()}
     alerts = []
@@ -123,6 +211,25 @@ def run_checks():
         results["timers"].append({"name": timer, "ok": ok, "msg": msg})
         if not ok:
             alerts.append(f"TIMER STALE: {timer} — {msg}")
+
+    # Queue depth metrics
+    queue_metrics = {"pending": 0, "in_progress": 0, "last_completed": "unknown"}
+    try:
+        import psycopg2
+        conn = psycopg2.connect(host=DB_HOST, port=5432, dbname=DB_NAME, user=DB_USER, password=DB_PASS)
+        cur = conn.cursor()
+        cur.execute("SELECT status, count(*) FROM jr_work_queue WHERE status IN ('pending', 'in_progress') GROUP BY status")
+        for status, count in cur.fetchall():
+            queue_metrics[status] = count
+        cur.execute("SELECT max(updated_at) FROM jr_work_queue WHERE status = 'completed'")
+        row = cur.fetchone()
+        if row and row[0]:
+            queue_metrics["last_completed"] = str(row[0])[:16]
+        cur.close()
+        conn.close()
+    except Exception:
+        pass
+    results["queue"] = queue_metrics
 
     results["alerts"] = alerts
     results["healthy"] = len(alerts) == 0

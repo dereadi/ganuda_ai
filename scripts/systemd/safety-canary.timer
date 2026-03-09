@@ -1,0 +1,10 @@
+[Unit]
+Description=Safety Canary — Daily at 3 AM
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target

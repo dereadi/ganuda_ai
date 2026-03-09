@@ -1,0 +1,10 @@
+[Unit]
+Description=Owl Debt Reckoning — Weekly Wednesday 5 AM
+
+[Timer]
+OnCalendar=Wed *-*-* 05:00:00
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target
