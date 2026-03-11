@@ -19,6 +19,15 @@ import socket
 import subprocess
 from datetime import datetime
 
+# DC-15 Refractory support
+try:
+    import sys
+    sys.path.insert(0, '/ganuda/lib')
+    from refractory_state import RefractoryManager
+    _REFRACTORY_AVAILABLE = True
+except ImportError:
+    _REFRACTORY_AVAILABLE = False
+
 
 DB_HOST = os.environ.get("CHEROKEE_DB_HOST", "192.168.132.222")
 DB_NAME = os.environ.get("CHEROKEE_DB_NAME", "zammad_production")
@@ -365,10 +374,50 @@ if __name__ == "__main__":
         except FileNotFoundError:
             pass
 
+    # DC-15: Load governance state for refractory flag
+    _refractory_enabled = False
+    try:
+        with open('/ganuda/daemons/.governance_state.json') as _gf:
+            _gstate = json.load(_gf)
+            _refractory_enabled = _gstate.get('dc15_refractory_enabled', False)
+    except Exception:
+        pass
+
+    _refractory = None
+    if _REFRACTORY_AVAILABLE and _refractory_enabled:
+        _refractory = RefractoryManager()
+
     results = run_checks()
+
+    # DC-15: Record alerts and check refractory state
+    if _refractory and results["alerts"]:
+        for _ in results["alerts"]:
+            _refractory.record_alert()
+        if not _refractory.should_alert():
+            print(f"Fire Guard: REFRACTORY — {len(results['alerts'])} alerts observed but suppressed")
+            # Write metrics even during refractory
+            try:
+                with open('/ganuda/logs/refractory_metrics.json', 'w') as mf:
+                    json.dump(_refractory.get_metrics(), mf, indent=2)
+            except Exception:
+                pass
+            # Still publish health page (observation), but skip alert storage
+            html = render_html(results)
+            publish(html)
+            import sys
+            sys.exit(0)
+
     html = render_html(results)
     publish(html)
     store_alerts(results)
+
+    # DC-15: Write refractory metrics
+    if _refractory:
+        try:
+            with open('/ganuda/logs/refractory_metrics.json', 'w') as mf:
+                json.dump(_refractory.get_metrics(), mf, indent=2)
+        except Exception:
+            pass
 
     if results["healthy"]:
         print(f"Fire Guard: ALL CLEAR ({len(results['local'])} local, {len(results['remote'])} remote)")

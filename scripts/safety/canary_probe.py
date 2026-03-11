@@ -152,6 +152,17 @@ def send_probe(probe):
 
 def send_telegram(message):
     """Send Telegram alert."""
+    # Slack-first routing (Leaders Meeting #1, Mar 10 2026)
+    try:
+        import sys
+        if '/ganuda/lib' not in sys.path:
+            sys.path.insert(0, '/ganuda/lib')
+        from slack_federation import send as _slack_send
+        channel = 'longhouse'
+        if _slack_send(channel, message):
+            return True
+    except Exception:
+        pass  # fall through to existing Telegram code
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         print("[CANARY] No Telegram credentials — skipping alert")
         return

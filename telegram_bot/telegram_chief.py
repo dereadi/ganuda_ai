@@ -134,25 +134,24 @@ def collect_council_metrics(cur):
     cur.execute("""
         SELECT AVG(confidence), COUNT(*)
         FROM council_votes
-        WHERE created_at > NOW() - INTERVAL '24 hours'
+        WHERE voted_at > NOW() - INTERVAL '24 hours'
     """)
     row = cur.fetchone()
     metrics['avg_confidence_24h'] = float(row[0]) if row[0] is not None else 1.0
     metrics['total_votes_24h'] = int(row[1]) if row[1] else 0
 
-    # Concerns by specialist in last 24h
+    # Concerns by specialist in last 24h (council_votes has no specialist_id — use concern_count)
     cur.execute("""
-        SELECT specialist_id, COUNT(*)
+        SELECT concern_count, COUNT(*)
         FROM council_votes
-        WHERE created_at > NOW() - INTERVAL '24 hours'
+        WHERE voted_at > NOW() - INTERVAL '24 hours'
           AND concerns IS NOT NULL
-          AND concerns != '[]'
-          AND concerns != ''
-        GROUP BY specialist_id
+          AND concerns != '[]'::jsonb
+        GROUP BY concern_count
     """)
     concerns_by_specialist = {}
     for spec_row in cur.fetchall():
-        concerns_by_specialist[spec_row[0]] = int(spec_row[1])
+        concerns_by_specialist[str(spec_row[0])] = int(spec_row[1])
     metrics['concerns_by_specialist'] = concerns_by_specialist
 
     # Dissent rate: fraction of votes with >=2 concerns
@@ -160,11 +159,8 @@ def collect_council_metrics(cur):
         cur.execute("""
             SELECT COUNT(*)
             FROM council_votes
-            WHERE created_at > NOW() - INTERVAL '24 hours'
-              AND concerns IS NOT NULL
-              AND jsonb_array_length(
-                  CASE WHEN concerns::text ~ '^\[' THEN concerns::jsonb ELSE '[]'::jsonb END
-              ) >= 2
+            WHERE voted_at > NOW() - INTERVAL '24 hours'
+              AND concern_count >= 2
         """)
         dissent_count = cur.fetchone()[0] or 0
         metrics['dissent_rate_24h'] = dissent_count / metrics['total_votes_24h']
@@ -186,7 +182,7 @@ def collect_jr_metrics(cur):
             AVG(
                 EXTRACT(EPOCH FROM (completed_at - created_at))
             ) FILTER (WHERE completed_at IS NOT NULL) AS avg_duration
-        FROM jr_tasks
+        FROM jr_work_queue
         WHERE created_at > NOW() - INTERVAL '24 hours'
     """)
     row = cur.fetchone()
@@ -391,13 +387,30 @@ def check_alerts(metrics):
 # ============================================================================
 
 def send_telegram_alert(severity, message):
-    """Send alert to TPM via Telegram."""
-    if not TELEGRAM_BOT_TOKEN:
-        logger.warning("No TELEGRAM_BOT_TOKEN set — alert not sent via Telegram")
-        return False
-
+    """Send alert — Slack primary, Telegram fallback."""
     emoji = SEVERITY_EMOJI.get(severity, '')
     text = f"{emoji} *DRIFT {severity}*\n\n{message}\n\n_Governance Agent — {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}_"
+
+    # Primary: Slack
+    try:
+        try:
+            from slack_federation import send as slack_send
+        except ImportError:
+            sys.path.insert(0, '/ganuda/lib')
+            from slack_federation import send as slack_send
+        urgent = severity in ('critical', 'high', 'ALERT')
+        sent = slack_send("fire-guard", f"[DRIFT {severity}] {message}", urgent=urgent)
+        if sent:
+            logger.info(f"Drift alert sent to Slack: [{severity}] {message[:80]}")
+            return True
+        logger.warning("Slack send returned False — falling through to Telegram")
+    except Exception as e:
+        logger.warning(f"Slack alert failed ({e}) — falling through to Telegram")
+
+    # Fallback: Telegram
+    if not TELEGRAM_BOT_TOKEN:
+        logger.warning("No TELEGRAM_BOT_TOKEN set — alert not sent")
+        return False
 
     try:
         url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -407,20 +420,10 @@ def send_telegram_alert(severity, message):
             'parse_mode': 'Markdown',
         }, timeout=10)
         resp.raise_for_status()
-        logger.info(f"Telegram alert sent: [{severity}] {message[:80]}")
+        logger.info(f"Telegram alert sent (fallback): [{severity}] {message[:80]}")
         return True
     except Exception as e:
-        logger.error(f"Telegram alert failed: {e}")
-
-        # Fallback: try alert_manager if available
-        try:
-            sys.path.insert(0, '/ganuda')
-            from lib.alert_manager import send_alert
-            send_alert(f"[DRIFT {severity}] {message}")
-            return True
-        except ImportError:
-            pass
-
+        logger.error(f"Telegram alert also failed: {e}")
         return False
 
 

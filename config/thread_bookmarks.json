@@ -1,0 +1,46 @@
+[
+  {
+    "thread_id": "11a587b3-aea5-4667-bfc3-b06c2d2a299a",
+    "topic": "DC-18 Autonomic Tiers",
+    "last_action": "ADAPT complete, design doc written, all concerns tooled in",
+    "open_questions": [],
+    "emotional_valence": "exploring",
+    "file_refs": [],
+    "created_at": "2026-03-10T19:00:17.503468+00:00",
+    "updated_at": "2026-03-10T19:00:17.503468+00:00",
+    "checksum": "47bab4b624d9f33abb985a035e00854905a19bd3fe0cec36e615aebaa8fc5dd4"
+  },
+  {
+    "thread_id": "81a11990-103f-4e98-83b1-5e6a87713ea2",
+    "topic": "DC-14 Watershed Zero Trust",
+    "last_action": "BUILD stage, 3 scripts landed (coherence_scan, context_link, thread_bookmarks)",
+    "open_questions": [],
+    "emotional_valence": "exploring",
+    "file_refs": [],
+    "created_at": "2026-03-10T19:00:17.521835+00:00",
+    "updated_at": "2026-03-10T19:00:17.521835+00:00",
+    "checksum": "03433357c06d8ea5100e8b57bb4f36b822f585743b428b163a3c7a7bf4ff66d3"
+  },
+  {
+    "thread_id": "c689ae1a-3609-4f33-a0c5-6536e352e6c9",
+    "topic": "Deer Blog: 8-Hour Gap",
+    "last_action": "Gated on scout daemon verification, thermal #122476",
+    "open_questions": [],
+    "emotional_valence": "exploring",
+    "file_refs": [],
+    "created_at": "2026-03-10T19:00:17.538770+00:00",
+    "updated_at": "2026-03-10T19:00:17.538770+00:00",
+    "checksum": "089dc811cd5f9a172b6376000a32c2dd33fbd8ecc73afdea93bfdc1f6d436cb9"
+  },
+  {
+    "thread_id": "177cd02e-3e89-49e4-b6e1-2b89ecb42c68",
+    "topic": "Nelson Spence Thread",
+    "last_action": "Thermalized #122521, Deer briefed, Tulip engagement suggested",
+    "open_questions": [],
+    "emotional_valence": "exploring",
+    "file_refs": [],
+    "created_at": "2026-03-10T19:00:17.555529+00:00",
+    "updated_at": "2026-03-10T19:00:17.555529+00:00",
+    "checksum": "ce9bbd625685c57ca4b7c653791e54c71485152a367db0b6f94b2bb7ac967fa6"
+  }
+]

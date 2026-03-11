@@ -78,6 +78,16 @@ def get_conn():
 
 def send_telegram(text: str) -> bool:
     """Send message to TPM Telegram group."""
+    # Slack-first routing (Leaders Meeting #1, Mar 10 2026)
+    try:
+        import sys as _sys
+        if '/ganuda/lib' not in _sys.path:
+            _sys.path.insert(0, '/ganuda/lib')
+        from slack_telegram_bridge import send_telegram as _slack_send
+        if _slack_send(text):
+            return True
+    except Exception:
+        pass  # fall through to Telegram
     try:
         url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
         resp = requests.post(url, json={

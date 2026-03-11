@@ -1,3 +1,4 @@
+```python
 #!/usr/bin/env python3
 """
 council_dawn_mist.py — Daily Council Standup
@@ -21,6 +22,12 @@ from datetime import datetime, timedelta
 
 from ganuda_db import get_connection, get_dict_cursor, safe_thermal_write
 from specialist_council import SpecialistCouncil
+
+try:
+    from slack_federation import send as slack_send
+    SLACK_AVAILABLE = True
+except ImportError:
+    SLACK_AVAILABLE = False
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 logger = logging.getLogger("dawn_mist")
@@ -131,6 +138,76 @@ def health_pulse(cur) -> str:
     )
 
 
+def attractor_metrics(cur) -> str:
+    """Strange Attractors: Key metrics from attractor validation."""
+    stats = {}
+
+    # Temperature Distribution
+    cur.execute("""
+        SELECT 
+            SUM(CASE WHEN temperature BETWEEN 0 AND 30 THEN 1 ELSE 0 END) as cold,
+            SUM(CASE WHEN temperature BETWEEN 30 AND 60 THEN 1 ELSE 0 END) as warm,
+            SUM(CASE WHEN temperature BETWEEN 60 AND 70 THEN 1 ELSE 0 END) as boundary,
+            SUM(CASE WHEN temperature BETWEEN 70 AND 90 THEN 1 ELSE 0 END) as hot,
+            SUM(CASE WHEN temperature BETWEEN 90 AND 100 THEN 1 ELSE 0 END) as sacred
+        FROM thermal_memory_archive
+    """)
+    temp_stats = cur.fetchone()
+    total = sum(temp_stats.values())
+    stats['temp_gap_60_70'] = f"{temp_stats['boundary']} ({temp_stats['boundary']/total:.1%})"
+
+    # Vote Confidence Clusters
+    cur.execute("""
+        SELECT 
+            FLOOR(vote_confidence * 10) / 10.0 as bucket,
+            COUNT(*) as count
+        FROM council_votes
+        GROUP BY bucket
+        ORDER BY bucket
+    """)
+    vote_clusters = cur.fetchall()
+    avg_count = sum(c['count'] for c in vote_clusters) / len(vote_clusters)
+    flagged_buckets = [f"{v['bucket']} ({v['count']})" for v in vote_clusters if v['count'] > 2 * avg_count]
+    stats['vote_flagged_clusters'] = ", ".join(flagged_buckets)
+
+    # Circadian Pattern
+    cur.execute("""
+        SELECT 
+            DATE_TRUNC('hour', created_at) as hour,
+            COUNT(*) as count
+        FROM thermal_memory_archive
+        WHERE created_at > NOW() - INTERVAL '24 hours'
+        GROUP BY hour
+        ORDER BY hour
+    """)
+    circadian_pattern = cur.fetchall()
+    peak_hours = [str(h['hour'].hour) + "AM" if h['hour'].hour < 12 else str(h['hour'].hour - 12) + "PM" for h in circadian_pattern if h['count'] == max(c['count'] for c in circadian_pattern)]
+    stats['peak_hours'] = ", ".join(peak_hours)
+
+    # Drift Trend
+    cur.execute("""
+        SELECT 
+            DATE_TRUNC('hour', created_at) as hour,
+            COUNT(*) as count
+        FROM drift_alerts
+        WHERE created_at > NOW() - INTERVAL '24 hours'
+        GROUP BY hour
+        ORDER BY hour
+    """)
+    drift_trend = cur.fetchall()
+    stats['drift_trend'] = ", ".join([f"{h['hour'].hour}: {h['count']}" for h in drift_trend])
+
+    if not any(stats.values()):
+        return ""
+
+    return (
+        f"ATTRACTORS: Temp gap 60-70: {stats['temp_gap_60_70']} | "
+        f"Vote flagged clusters: {stats['vote_flagged_clusters']} | "
+        f"Peak hours: {stats['peak_hours']} | "
+        f"Drift trend: {stats['drift_trend']}"
+    )
+
+
 def run_standup():
     """Gather items, run council vote, store results."""
     conn = None
@@ -142,6 +219,7 @@ def run_standup():
         forward = forward_look(cur)
         backward = backward_look(cur)
         pulse = health_pulse(cur)
+        attractors = attractor_metrics(cur)
 
         digest = f"""DAWN MIST STANDUP — {datetime.now().strftime('%A %B %d, %Y')}
 
@@ -151,71 +229,12 @@ def run_standup():
 
 {pulse}
 
+{attractors if attractors else ''}
+
 Council: Review this morning's standup. Flag anything that needs deeper attention today. Keep it brief — this is a standup, not a deliberation."""
 
         logger.info(f"Dawn mist digest assembled, running council vote...")
 
         # Run lightweight council vote (low max_tokens = standup, not deliberation)
         council = SpecialistCouncil(max_tokens=150)
-        result = council.vote(digest, include_responses=True)
-
-        # Reconnect — council vote may have taken minutes, DB conn may be stale
-        conn.close()
-        conn = get_connection()
-        cur = get_dict_cursor(conn)
-
-        # Extract paper IDs mentioned in forward look for marking
-        import re
-        paper_ids = re.findall(r'\[(\d+)\]', forward)
-
-        # Mark papers as reviewed
-        if paper_ids:
-            for pid in paper_ids:
-                cur.execute("""
-                    UPDATE ai_research_papers
-                    SET council_vote_hash = %s, assessed_at = NOW()
-                    WHERE paper_id = %s AND council_vote_hash IS NULL
-                """, (result.audit_hash, int(pid)))
-            conn.commit()
-
-        # Store standup in thermal memory
-        summary = (
-            f"DAWN MIST STANDUP — {datetime.now().strftime('%Y-%m-%d')}\n"
-            f"Council Vote: {result.audit_hash} (confidence: {result.confidence})\n"
-            f"Recommendation: {result.recommendation}\n\n"
-            f"{forward}\n\n{backward}\n\n{pulse}"
-        )
-
-        safe_thermal_write(
-            content=summary,
-            temperature=60.0,
-            sacred=False,
-            metadata={
-                "type": "dawn_mist_standup",
-                "audit_hash": result.audit_hash,
-                "confidence": result.confidence,
-                "papers_reviewed": [int(p) for p in paper_ids],
-                "date": datetime.now().strftime('%Y-%m-%d'),
-            }
-        )
-
-        # One-line summary for systemd journal
-        concern_count = len([r for r in result.responses if r.has_concern])
-        logger.info(
-            f"[DAWN MIST] Vote {result.audit_hash} | "
-            f"confidence {result.confidence} | "
-            f"{len(paper_ids)} papers reviewed | "
-            f"{concern_count} concerns | "
-            f"{result.recommendation}"
-        )
-
-    except Exception as e:
-        logger.error(f"[DAWN MIST] Standup failed: {e}")
-        raise
-    finally:
-        if conn:
-            conn.close()
-
-
-if __name__ == "__main__":
-    run_standup()
+        result = council.vote(digest

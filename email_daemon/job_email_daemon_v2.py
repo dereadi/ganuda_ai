@@ -207,6 +207,20 @@ class JobEmailDaemon:
 
 def send_job_alert_v2(email: dict, classification: str, priority: int) -> bool:
     """Enhanced alert with match score."""
+    # Slack-first routing (Leaders Meeting #1, Mar 10 2026)
+    try:
+        import sys
+        if '/ganuda/lib' not in sys.path:
+            sys.path.insert(0, '/ganuda/lib')
+        from slack_federation import send as _slack_send
+        _subj = email.get('subject', 'Job Alert')
+        _score = email.get('match_score', 0)
+        _msg = f"Job Alert (P{priority}): {_subj} [score: {_score}] — {classification}"
+        if _slack_send('deer-signals', _msg):
+            return True
+    except Exception:
+        pass  # fall through to existing Telegram code
+
     import requests
     
     TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')

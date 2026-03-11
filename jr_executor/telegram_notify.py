@@ -11,6 +11,16 @@ OWNER_CHAT_ID = 8025375307
 
 def send_notification(message: str) -> bool:
     """Send a notification to the owner via Telegram"""
+    # Slack-first routing (Leaders Meeting #1, Mar 10 2026)
+    try:
+        import sys as _sys
+        if '/ganuda/lib' not in _sys.path:
+            _sys.path.insert(0, '/ganuda/lib')
+        from slack_telegram_bridge import send_telegram as _slack_send
+        if _slack_send(message):
+            return True
+    except Exception:
+        pass  # fall through to Telegram
     try:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
         data = {

@@ -39,26 +39,44 @@ class JrQueueClient:
         self._conn = None
 
     def _get_connection(self):
-        """Get or create database connection."""
+        """Get or create database connection with staleness check."""
         if self._conn is None or self._conn.closed:
-            self._conn = psycopg2.connect(**DB_CONFIG)
+            self._conn = psycopg2.connect(**DB_CONFIG, connect_timeout=10)
         return self._conn
 
-    def _execute(self, query: str, params: tuple = None, fetch: bool = True) -> Any:
-        """Execute a query and optionally fetch results."""
-        conn = self._get_connection()
+    def _reset_connection(self):
+        """Force-close and reset connection after failure."""
         try:
-            with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(query, params)
-                if fetch:
-                    result = cur.fetchall()
-                    conn.commit()  # P0 FIX: Commit after SELECT to close transaction (Jan 27, 2026)
-                    return result
-                conn.commit()
-                return cur.rowcount
-        except Exception as e:
-            conn.rollback()  # Rollback on error to release locks
-            raise
+            if self._conn and not self._conn.closed:
+                self._conn.close()
+        except Exception:
+            pass
+        self._conn = None
+
+    def _execute(self, query: str, params: tuple = None, fetch: bool = True) -> Any:
+        """Execute a query and optionally fetch results. Auto-reconnects on stale connections."""
+        for attempt in range(2):
+            conn = self._get_connection()
+            try:
+                with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                    cur.execute(query, params)
+                    if fetch:
+                        result = cur.fetchall()
+                        conn.commit()  # P0 FIX: Commit after SELECT to close transaction (Jan 27, 2026)
+                        return result
+                    conn.commit()
+                    return cur.rowcount
+            except (psycopg2.OperationalError, psycopg2.InterfaceError) as e:
+                self._reset_connection()
+                if attempt == 0:
+                    continue  # Retry once with fresh connection
+                raise
+            except Exception as e:
+                try:
+                    conn.rollback()  # Rollback on error to release locks
+                except Exception:
+                    self._reset_connection()
+                raise
 
     def heartbeat(self) -> bool:
         """

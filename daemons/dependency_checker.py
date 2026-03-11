@@ -51,6 +51,16 @@ def load_secrets():
 
 def send_telegram_alert(message, secrets):
     """Send alert via Telegram bot."""
+    # Slack-first routing (Leaders Meeting #1, Mar 10 2026)
+    try:
+        import sys as _sys
+        if '/ganuda/lib' not in _sys.path:
+            _sys.path.insert(0, '/ganuda/lib')
+        from slack_telegram_bridge import send_telegram as _slack_send
+        if _slack_send(message):
+            return
+    except Exception:
+        pass  # fall through to Telegram
     token = secrets.get("TELEGRAM_BOT_TOKEN", "")
     chat_id = secrets.get("TELEGRAM_CHAT_ID", "")
     if not token or not chat_id:

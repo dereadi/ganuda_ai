@@ -24,6 +24,7 @@ import re
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 import hashlib as _hashlib
+import py_compile as _py_compile
 
 # Add lib to path for reasoner import
 sys.path.insert(0, '/ganuda/lib')
@@ -989,6 +990,11 @@ class TaskExecutor:
                 return result
 
             instruction_source = 'instruction_file'
+            # Resolve instruction file path — check as-is, then under /ganuda/
+            if not os.path.isabs(instruction_file) and not os.path.exists(instruction_file):
+                ganuda_path = os.path.join('/ganuda', instruction_file)
+                if os.path.exists(ganuda_path):
+                    instruction_file = ganuda_path
             # Read the instruction file
             try:
                 with open(instruction_file, 'r') as f:

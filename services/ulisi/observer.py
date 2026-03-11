@@ -327,6 +327,20 @@ def decay_valence_on_silence():
 
 def send_telegram_alert(valence):
     """Send critical valence alert via Telegram."""
+    # Slack-first routing (Leaders Meeting #1, Mar 10 2026)
+    try:
+        import sys
+        if '/ganuda/lib' not in sys.path:
+            sys.path.insert(0, '/ganuda/lib')
+        from slack_federation import send as _slack_send
+        channel = 'longhouse'
+        msg = (f"ELISI CRITICAL VALENCE: V={valence:.4f}\n"
+               f"System degradation detected. high_load modifier activated (TTL {MODIFIER_TTL_HOURS}hr).\n"
+               f"Kill switch: UPDATE epigenetic_modifiers SET active=FALSE WHERE activated_by LIKE 'elisi_%';")
+        if _slack_send(channel, msg):
+            return True
+    except Exception:
+        pass  # fall through to existing Telegram code
     import requests
     tg_token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
     tg_chat = os.environ.get('TELEGRAM_CHAT_ID', '')

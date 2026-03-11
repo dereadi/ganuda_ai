@@ -68,6 +68,21 @@ def check_elisi_heartbeat():
 
 def alert_blind_spot(db_down=False):
     """Log blind spot alert to thermal memory + Telegram."""
+    # Slack-first routing (Leaders Meeting #1, Mar 10 2026)
+    try:
+        import sys
+        if '/ganuda/lib' not in sys.path:
+            sys.path.insert(0, '/ganuda/lib')
+        from slack_federation import send as _slack_send
+        channel = 'fire-guard'
+        _blind_msg = (
+            f"ELISI BLIND SPOT: No observations in {SILENCE_THRESHOLD_SECONDS}s. "
+            f"{'Additionally, bluefin DB is unreachable from silverfin. Possible multi-node outage.' if db_down else 'Elisi observer on redfin may be down. Check: ssh redfin systemctl status elisi-observer'}"
+        )
+        if _slack_send(channel, _blind_msg):
+            return True
+    except Exception:
+        pass  # fall through to existing Telegram code
     if db_down:
         msg = (f"ELISI BLIND SPOT: No observations in {SILENCE_THRESHOLD_SECONDS}s. "
                f"Additionally, bluefin DB is unreachable from silverfin. "

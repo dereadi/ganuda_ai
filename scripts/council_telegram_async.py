@@ -47,6 +47,18 @@ def format_council_response(result):
     return "\n".join(lines)
 
 def send_telegram(chat_id, text):
+    # Slack-first routing (Leaders Meeting #1, Mar 10 2026)
+    try:
+        import sys
+        if '/ganuda/lib' not in sys.path:
+            sys.path.insert(0, '/ganuda/lib')
+        from slack_federation import send as _slack_send
+        channel = 'council-votes'
+        if _slack_send(channel, text):
+            return True
+    except Exception:
+        pass  # fall through to existing Telegram code
+
     if not BOT_TOKEN:
         print(f"No bot token, would send to {chat_id}: {text[:100]}")
         return

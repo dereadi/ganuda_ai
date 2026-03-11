@@ -59,6 +59,39 @@ def gather_stats():
         WHERE title LIKE 'EPIC%' ORDER BY id DESC LIMIT 8""")
     stats["epics"] = cur.fetchall()
 
+    # Unified activity stream — merges Jr completions, council votes, sacred thermals
+    cur.execute("""
+        (SELECT completed_at AS ts, 'jr' AS kind,
+                title AS detail, NULL AS extra
+         FROM jr_work_queue
+         WHERE completed_at > NOW() - INTERVAL '12 hours'
+           AND title NOT LIKE '[TEG]%%'
+         ORDER BY completed_at DESC LIMIT 10)
+        UNION ALL
+        (SELECT voted_at AS ts, 'vote' AS kind,
+                LEFT(question, 80) AS detail,
+                ROUND(confidence::numeric, 2)::text AS extra
+         FROM council_votes
+         WHERE voted_at > NOW() - INTERVAL '12 hours'
+         ORDER BY voted_at DESC LIMIT 10)
+        UNION ALL
+        (SELECT created_at AS ts,
+                CASE WHEN sacred_pattern = true THEN 'sacred' ELSE 'thermal' END AS kind,
+                LEFT(original_content, 80) AS detail,
+                temperature_score::text AS extra
+         FROM thermal_memory_archive
+         WHERE created_at > NOW() - INTERVAL '12 hours'
+           AND temperature_score >= 65
+           AND original_content NOT LIKE 'FIRE GUARD ALERT%%'
+           AND original_content NOT LIKE 'ALERT: LLM Gateway%%'
+           AND original_content NOT LIKE 'ELISI%%'
+           AND original_content NOT LIKE 'COUNCIL VOTE:%%'
+           AND original_content NOT LIKE 'COUNCIL DIVERSITY%%'
+         ORDER BY created_at DESC LIMIT 10)
+        ORDER BY ts DESC LIMIT 25
+    """)
+    stats["activity"] = [(r[0], r[1], r[2], r[3]) for r in cur.fetchall()]
+
     cur.close()
     conn.close()
     return stats
@@ -95,6 +128,23 @@ def render_html(stats):
         recent_html += f'<div class="item done"><span class="time">{ts}</span> {title}</div>\n'
     if not recent_html:
         recent_html = '<div class="item">No recent completions</div>'
+
+    # Unified activity stream
+    activity_html = ""
+    kind_icons = {"jr": "&#9654;", "vote": "&#9878;", "sacred": "&#10025;", "thermal": "&#9672;"}
+    kind_colors = {"jr": "#6b8", "vote": "#7af", "sacred": "#e8b04a", "thermal": "#a97"}
+    for ts, kind, detail, extra in stats.get("activity", []):
+        time_str = ts.strftime("%H:%M") if ts else ""
+        icon = kind_icons.get(kind, "?")
+        color = kind_colors.get(kind, "#888")
+        extra_str = ""
+        if kind == "vote" and extra:
+            extra_str = f' <span style="color:#556">(conf {extra})</span>'
+        elif kind == "sacred" and extra:
+            extra_str = f' <span style="color:#e8b04a">(temp {extra})</span>'
+        activity_html += f'<div class="item" style="color:{color}"><span class="time">{time_str}</span> {icon} {detail}{extra_str}</div>\n'
+    if not activity_html:
+        activity_html = '<div class="item">No recent activity</div>'
 
     # Epics
     epics_html = ""
@@ -157,7 +207,12 @@ def render_html(stats):
 </div>
 
 <div class="card">
-  <h2>Recently Completed</h2>
+  <h2>Organism Activity (12h)</h2>
+  {activity_html}
+</div>
+
+<div class="card">
+  <h2>Recently Completed (Jr Tasks)</h2>
   {recent_html}
 </div>
 
@@ -176,7 +231,7 @@ def render_html(stats):
 </div>
 
 <div style="text-align:center; margin-top:16px; font-size:0.7em; color:#444;">
-  For Seven Generations &mdash; DC-1 through DC-11
+  For Seven Generations &mdash; DC-1 through DC-18
 </div>
 </body>
 </html>"""

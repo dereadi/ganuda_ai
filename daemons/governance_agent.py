@@ -391,6 +391,24 @@ def check_alerts(metrics):
 # ============================================================================
 
 def send_telegram_alert(severity, message):
+    # Primary: Slack (try multiple import paths)
+    try:
+        try:
+            from slack_federation import send as slack_send
+        except ImportError:
+            import sys
+            sys.path.insert(0, '/ganuda/lib')
+            from slack_federation import send as slack_send
+        urgent = severity in ('critical', 'high')
+        sent = slack_send("fire-guard", f"[DRIFT {severity}] {message}", urgent=urgent)
+        if sent:
+            logger.info(f"Drift alert sent to Slack: [{severity}] {message[:80]}")
+            return
+        # Slack returned False (no token?) — fall through to Telegram
+        logger.warning("Slack send returned False — falling through to Telegram")
+    except Exception as e:
+        logger.warning(f"Slack alert failed ({e}) — falling through to Telegram")
+    # Fallback: Telegram
     """Send alert to TPM via Telegram."""
     if not TELEGRAM_BOT_TOKEN:
         logger.warning("No TELEGRAM_BOT_TOKEN set — alert not sent via Telegram")

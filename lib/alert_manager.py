@@ -11,6 +11,19 @@ from datetime import datetime
 from typing import Optional
 from collections import defaultdict
 
+# Slack federation (primary alert channel)
+try:
+    from slack_federation import send as slack_send
+    _HAS_SLACK = True
+except ImportError:
+    try:
+        import sys
+        sys.path.insert(0, '/ganuda/lib')
+        from slack_federation import send as slack_send
+        _HAS_SLACK = True
+    except ImportError:
+        _HAS_SLACK = False
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -86,6 +99,21 @@ def send_alert(
         for k, v in list(context.items())[:5]:
             text += f"• {k}: `{v}`\n"
 
+    # Primary: Slack
+    if _HAS_SLACK:
+        try:
+            channel = "fire-guard" if severity in ('critical', 'high') else "dawn-mist"
+            urgent = severity in ('critical', 'high')
+            sent = slack_send(channel, text, urgent=urgent)
+            if sent:
+                _alert_cooldowns[alert_type] = now
+                logger.info(f"Alert sent to Slack #{channel}: {title}")
+                return True
+            logger.warning(f"Slack send returned False for: {title}")
+        except Exception as e:
+            logger.warning(f"Slack alert failed ({e}), falling back to Telegram")
+
+    # Fallback: Telegram
     try:
         response = requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
@@ -99,10 +127,10 @@ def send_alert(
 
         if response.status_code == 200:
             _alert_cooldowns[alert_type] = now
-            logger.info(f"Alert sent: {title}")
+            logger.info(f"Alert sent to Telegram: {title}")
             return True
         else:
-            logger.error(f"Alert failed: {response.status_code}")
+            logger.error(f"Telegram alert failed: {response.status_code}")
             return False
 
     except Exception as e:

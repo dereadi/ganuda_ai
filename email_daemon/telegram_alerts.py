@@ -84,6 +84,18 @@ def send_job_alert(email: dict, classification: str, priority: int) -> bool:
         gmail_url = get_gmail_url(message_id)
         message += f"\n<a href='{gmail_url}'>Open in Gmail</a>"
 
+    # Slack-first routing (Leaders Meeting #1, Mar 10 2026)
+    try:
+        import sys
+        if '/ganuda/lib' not in sys.path:
+            sys.path.insert(0, '/ganuda/lib')
+        from slack_federation import send as _slack_send
+        channel = 'deer-signals'
+        if _slack_send(channel, message):
+            return True
+    except Exception:
+        pass  # fall through to existing Telegram code
+
     try:
         response = requests.post(
             f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage',

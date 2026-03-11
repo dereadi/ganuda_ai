@@ -17,6 +17,8 @@ def generate():
 
     links = [
         ("Status", "/status.html", "#4a7", "Live cluster vitals, Jr tasks, kanban"),
+        ("Health", "/status-health.html", "#f74", "Node health, services, circuit breakers"),
+        ("Activity", "/status-activity.html", "#af7", "Recent thermals, votes, Jr completions"),
         ("Briefing", "/briefing.html", "#7af", "Daily morning briefing from Chief PA"),
         ("Blog", "/blog/index.html", "#fa7", "Federation technical blog"),
         ("Photos", "/photos.html", "#a7f", "Cherokee Nation + Federation gallery"),
@@ -52,7 +54,7 @@ def generate():
 <h1>Cherokee AI Federation</h1>
 <div class="subtitle">Ops Console &mdash; {now}</div>
 {grid_html}
-<div class="footer">For Seven Generations &mdash; DC-1 through DC-11</div>
+<div class="footer">For Seven Generations &mdash; DC-1 through DC-17</div>
 </body>
 </html>"""
 

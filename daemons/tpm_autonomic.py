@@ -85,6 +85,16 @@ def store_thermal_memory(conn, content, temperature=60, source="tpm-autonomic"):
 
 def send_telegram(message):
     """Send alert to Chief via Telegram."""
+    # Slack-first routing (Leaders Meeting #1, Mar 10 2026)
+    try:
+        import sys as _sys
+        if '/ganuda/lib' not in _sys.path:
+            _sys.path.insert(0, '/ganuda/lib')
+        from slack_telegram_bridge import send_telegram as _slack_send
+        if _slack_send(message):
+            return True
+    except Exception:
+        pass  # fall through to Telegram
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         log.warning("Telegram not configured, skipping alert")
         return False

@@ -57,7 +57,8 @@ TRIBE_MEMBERS = {
     "Owl":                  {"role": "reviewer",   "ghigau": False},
     # Outer Council (Longhouse 916bc7343be8f3c7, March 2 2026)
     "Deer":                 {"role": "outer_council", "ghigau": False},
-    "Otter":                {"role": "outer_council", "ghigau": False},  # unborn — future seat
+    "Crane":                {"role": "outer_council", "ghigau": False},  # Diplomat, ratified Mar 6 (1f8f9548, e16b9755, fa5a89fe)
+    "Otter":                {"role": "outer_council", "ghigau": False},  # Legal/Regulatory, born Mar 6
     "Blue Jay":             {"role": "outer_council", "ghigau": False},  # unborn — future seat
 }
 
@@ -264,16 +265,18 @@ class Longhouse:
         for member, response in responses.items():
             if member not in TRIBE_MEMBERS:
                 raise ValueError(f"'{member}' is not a recognized tribe member.")
-            if not response.get("consent", True):
-                entry = {
-                    "member": member,
-                    "role": TRIBE_MEMBERS[member]["role"],
-                    "reason": response.get("reason", ""),
-                }
-                if response.get("standing_dissent", False):
-                    standing_dissent.append(entry)
-                else:
-                    non_consenting.append(entry)
+            entry = {
+                "member": member,
+                "role": TRIBE_MEMBERS[member]["role"],
+                "reason": response.get("reason", ""),
+            }
+            # Standing dissent is independent of consent -- Coyote's archetype
+            # consents to the decision but registers a challenge that must be answered.
+            # This is NOT non-consent. It strengthens the decision it tests.
+            if response.get("standing_dissent", False):
+                standing_dissent.append(entry)
+            elif not response.get("consent", True):
+                non_consenting.append(entry)
                 if TRIBE_MEMBERS[member].get("ghigau"):
                     ghigau_invoked = True
 

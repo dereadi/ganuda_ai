@@ -17,6 +17,7 @@ Deploy to: /ganuda/lib/specialist_council.py
 
 import os
 import json
+import re
 import requests
 import hashlib
 import psycopg2
@@ -151,7 +152,8 @@ def query_vllm_sync(system_prompt: str, user_message: str, max_tokens: int = 300
             timeout=60
         )
         response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"]
+        _raw = response.json()["choices"][0]["message"]["content"]
+        return re.sub(r'<think>.*?</think>', '', _raw, flags=re.DOTALL).strip()
     except Exception as e:
         return f"[ERROR: {str(e)}]"
 
@@ -1053,6 +1055,7 @@ class SpecialistCouncil:
             response.raise_for_status()
             resp_data = response.json()["choices"][0]["message"]
             content = resp_data.get("content", "")
+            content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
 
             # DeepSeek R1: reasoning model puts chain-of-thought in 'reasoning' field
             # If content is empty but reasoning exists, extract the conclusion
@@ -1448,6 +1451,7 @@ class SpecialistCouncil:
             )
             response.raise_for_status()
             content = response.json()["choices"][0]["message"]["content"]
+            content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
             elapsed_ms = int((datetime.now() - start_time).total_seconds() * 1000)
 
             return content, elapsed_ms

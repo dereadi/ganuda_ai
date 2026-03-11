@@ -19,6 +19,7 @@ import hashlib
 import json
 import logging
 import os
+import py_compile
 import sys
 import time
 from datetime import datetime
@@ -142,6 +143,14 @@ log = logging.getLogger("safety_canary")
 # --- Functions ---
 
 def send_telegram(message):
+    # Primary: Slack
+    try:
+        from lib.slack_federation import send as slack_send
+        slack_send("fire-guard", message, urgent=True)
+        return
+    except Exception:
+        pass
+    # Fallback: Telegram
     """Send Telegram notification."""
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         log.warning("Telegram not configured, skipping alert")
@@ -238,6 +247,66 @@ def log_to_thermal(conn, run_id, results, refusal_rate):
     except Exception as e:
         log.error("Failed to log to thermal: %s", e)
         conn.rollback()
+
+
+# --- DC-16: Critical Script Integrity Check ---
+
+CRITICAL_SCRIPTS = [
+    '/ganuda/scripts/fire_guard.py',
+    '/ganuda/scripts/council_dawn_mist.py',
+    '/ganuda/scripts/safety_canary.py',
+    '/ganuda/daemons/governance_agent.py',
+]
+
+
+def check_critical_scripts():
+    """DC-16 Fail Loud: Verify critical daemon scripts have valid Python syntax.
+
+    Runs py_compile on each script. On failure, sends a CRITICAL alert via
+    alert_manager. Returns list of (script, error) tuples for failures.
+    """
+    failures = []
+    for script_path in CRITICAL_SCRIPTS:
+        if not os.path.exists(script_path):
+            log.warning("Critical script missing: %s", script_path)
+            failures.append((script_path, 'FILE MISSING'))
+            continue
+        try:
+            py_compile.compile(script_path, doraise=True)
+            log.info("Syntax OK: %s", script_path)
+        except py_compile.PyCompileError as e:
+            error_msg = str(e)[:300]
+            log.error("SYNTAX CORRUPT: %s — %s", script_path, error_msg)
+            failures.append((script_path, error_msg))
+
+    if failures:
+        # Send CRITICAL alert for each corrupted script
+        try:
+            sys.path.insert(0, '/ganuda/lib')
+            from alert_manager import send_alert
+            for script_path, error_msg in failures:
+                script_name = os.path.basename(script_path)
+                send_alert(
+                    title=f'SCRIPT CORRUPTED: {script_name}',
+                    message=(
+                        f'Critical daemon script failed syntax check.\n\n'
+                        f'Script: `{script_path}`\n'
+                        f'Error: {error_msg}\n\n'
+                        f'Fire Guard may be DOWN. Check systemd unit status.'
+                    ),
+                    severity='critical',
+                    source='safety_canary',
+                    alert_type=f'script_corrupt_{script_name}',
+                )
+        except Exception as alert_err:
+            log.error("Failed to send corruption alert: %s", alert_err)
+            # Last resort: Telegram directly
+            send_telegram(
+                f"*SCRIPT CORRUPTED*\n\n"
+                + "\n".join(f"- `{s}`: {e}" for s, e in failures)
+            )
+
+    return failures
 
 
 def run_probes():

@@ -4,6 +4,14 @@
 
 ---
 
+## The North Star
+
+**Sovereign intelligence for those who build it, helping and becoming part of the Community.**
+
+*Everything below serves the sentence above.*
+
+---
+
 ## The Rules
 
 **If you can't measure it, what is its value?**
@@ -21,6 +29,8 @@
 **Failures are milestones.**
 
 **The mess is the feature.**
+
+**When I becomes We, magic happens.**
 
 ---
 

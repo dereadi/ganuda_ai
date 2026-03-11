@@ -216,6 +216,18 @@ def process_job(job_id, query, max_steps, output_file, callback_type, callback_t
 
 def notify_telegram(chat_id: str, job_id: str, summary: str, output_file: str):
     """Send Telegram notification when research is done."""
+    # Slack-first routing (Leaders Meeting #1, Mar 10 2026)
+    try:
+        import sys
+        if '/ganuda/lib' not in sys.path:
+            sys.path.insert(0, '/ganuda/lib')
+        from slack_federation import send as _slack_send
+        _msg = f"Research Complete (Job: {job_id})\n\n{summary[:3000]}"
+        if _slack_send('jr-tasks', _msg):
+            return
+    except Exception:
+        pass  # fall through to existing Telegram code
+
     try:
         import requests
 

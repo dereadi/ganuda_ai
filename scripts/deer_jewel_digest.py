@@ -75,6 +75,18 @@ def send_digest(hours: int = 24) -> bool:
     jewels = get_recent_jewels(hours)
     message = format_digest(jewels, hours)
 
+    # Slack-first routing (Leaders Meeting #1, Mar 10 2026)
+    try:
+        import sys
+        if '/ganuda/lib' not in sys.path:
+            sys.path.insert(0, '/ganuda/lib')
+        from slack_federation import send as _slack_send
+        channel = 'deer-signals'
+        if _slack_send(channel, message):
+            return True
+    except Exception:
+        pass  # fall through to existing Telegram code
+
     bot_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
     chat_id = os.environ.get("TELEGRAM_GROUP_CHAT_ID", "-1003439875431")
 
