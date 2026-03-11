@@ -208,6 +208,18 @@ results = dispatch_parallel([
 - No API keys appear in any script or config file
 - `python3 -c "import py_compile; py_compile.compile('scripts/claude_fleet_dispatch.py', doraise=True)"` passes
 
+## Operating Modes (DC-1 Lazy Awareness + DC-9 Waste Heat)
+
+The fleet does NOT run at full capacity by default. Three modes:
+
+| Mode | Claude Usage | When |
+|------|-------------|------|
+| **Idle** | Zero — local LLMs only | Normal operations, no time pressure |
+| **Normal** | Opus TPM only | Council coordination, Chief interface, complex reasoning |
+| **Turbo** | Full fleet (Opus + Sonnet + Haiku) | Parallel sprints, deadline pressure, Saturday Morning Meeting prep |
+
+As local hardware matures (Thunderduck, future nodes), the fleet leans more on-cluster. Claude fleet is the booster rocket — use it to reach orbit, then local hardware sustains. Eventually the organism runs sovereign, with Claude as an optional accelerant, not a dependency. Same dispatch interface, different backend. DC-11.
+
 ## Future: Autonomous Fleet Management (out of scope)
 
 Once the fleet is wired, the TPM can:
