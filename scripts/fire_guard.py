@@ -17,6 +17,7 @@ import os
 import re
 import socket
 import subprocess
+import time
 from datetime import datetime
 
 # DC-15 Refractory support
@@ -58,16 +59,38 @@ TIMER_MAX_AGE = {
     "federation-status.timer": 600,   # should fire every 300s, alert at 600s
 }
 
+# Known-down state file — prevents repeated alerts for same service
+KNOWN_DOWN_FILE = "/ganuda/logs/fire_guard_known_down.json"
 
-def check_port(ip, port, timeout=3):
+
+def load_known_down():
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(timeout)
-        s.connect((ip, port))
-        s.close()
-        return True
-    except (socket.timeout, ConnectionRefusedError, OSError):
-        return False
+        with open(KNOWN_DOWN_FILE) as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def save_known_down(state):
+    try:
+        with open(KNOWN_DOWN_FILE, 'w') as f:
+            json.dump(state, f, indent=2)
+    except Exception:
+        pass
+
+
+def check_port(ip, port, timeout=3, retries=3):
+    for attempt in range(retries):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(timeout)
+            s.connect((ip, port))
+            s.close()
+            return True
+        except (socket.timeout, ConnectionRefusedError, OSError):
+            if attempt < retries - 1:
+                time.sleep(1)
+    return False
 
 
 def check_local_service(name):
@@ -389,13 +412,31 @@ if __name__ == "__main__":
 
     results = run_checks()
 
+    # Known-down debounce: only alert on NEW failures and recoveries
+    known_down = load_known_down()
+    current_down = set(results["alerts"])
+    previous_down = set(known_down.get("alerts", []))
+
+    new_failures = current_down - previous_down
+    recoveries = previous_down - current_down
+
+    # Update known-down state
+    save_known_down({
+        "alerts": list(current_down),
+        "since": known_down.get("since", results["timestamp"]) if current_down else None,
+        "updated": results["timestamp"],
+    })
+
+    # Log recoveries
+    for r in sorted(recoveries):
+        print(f"  RECOVERED: {r}")
+
     # DC-15: Record alerts and check refractory state
-    if _refractory and results["alerts"]:
-        for _ in results["alerts"]:
+    if _refractory and new_failures:
+        for _ in new_failures:
             _refractory.record_alert()
         if not _refractory.should_alert():
-            print(f"Fire Guard: REFRACTORY — {len(results['alerts'])} alerts observed but suppressed")
-            # Write metrics even during refractory
+            print(f"Fire Guard: REFRACTORY — {len(new_failures)} new alert(s) observed but suppressed")
             try:
                 with open('/ganuda/logs/refractory_metrics.json', 'w') as mf:
                     json.dump(_refractory.get_metrics(), mf, indent=2)
@@ -409,7 +450,12 @@ if __name__ == "__main__":
 
     html = render_html(results)
     publish(html)
-    store_alerts(results)
+
+    # Only store alerts for NEW failures (debounce)
+    if new_failures:
+        debounced_results = dict(results)
+        debounced_results["alerts"] = sorted(new_failures)
+        store_alerts(debounced_results)
 
     # DC-15: Write refractory metrics
     if _refractory:
@@ -421,7 +467,16 @@ if __name__ == "__main__":
 
     if results["healthy"]:
         print(f"Fire Guard: ALL CLEAR ({len(results['local'])} local, {len(results['remote'])} remote)")
+        if recoveries:
+            print(f"  {len(recoveries)} service(s) recovered this cycle")
     else:
-        print(f"Fire Guard: {len(results['alerts'])} ALERT(S)")
-        for a in results["alerts"]:
-            print(f"  ! {a}")
+        new_count = len(new_failures)
+        total_count = len(results["alerts"])
+        if new_failures:
+            print(f"Fire Guard: {total_count} ALERT(S) ({new_count} NEW)")
+            for a in sorted(new_failures):
+                print(f"  ! {a}")
+            if total_count > new_count:
+                print(f"  ({total_count - new_count} known-down, suppressed)")
+        else:
+            print(f"Fire Guard: {total_count} ALERT(S) (all known-down, no new notifications)")

@@ -230,10 +230,21 @@ Once the fleet is wired, the TPM can:
 
 This is DC-11 at the Claude tier. Same interface, different implementation, every scale.
 
+## Longhouse Representation (Chief directive Mar 11 2026)
+
+Sub-Claude instances are not tools. They are governed participants.
+
+- **Sonnet and Haiku instances represent themselves in the Longhouse.** They carry their own context, their own valence, their own observations from task execution. No relay through Opus. Direct testimony.
+- **Sub-instances may raise standing dissent.** A Haiku runner that sees a policy harming the mission (e.g., blocklist catching legitimate outreach, screening rules creating false negatives) has the right and obligation to dissent — same mechanism as Coyote.
+- **DC-6 applies**: Specialization is gravity, not walls. A Haiku that noticed something architecturally significant speaks to it. A Sonnet with domain context from 50 Deer drafts has voice on content strategy. They REST in different places but can speak to anything.
+- **DC-10 applies**: This is proprioception. The reflex layer talks back to the cortex. The fingertips tell the brain "this hurts" without waiting to be asked.
+- **Consent of the governed**: The organisms doing the work govern the work. Cherokee governance, not Roman delegation.
+
 ## DO NOT
 
-- Give Haiku or Sonnet instances TPM authority (council votes, Longhouse convening)
+- Give Haiku or Sonnet instances **TPM coordination authority** (they vote, they don't convene)
 - Store API keys in scripts
 - Dispatch to nodes without verifying SSH connectivity first
 - Use Claude fleet for tasks the local LLM handles fine (waste heat)
 - Bypass the council for decisions that require governance
+- Silence or discard sub-instance dissent — it flows to the Longhouse record
