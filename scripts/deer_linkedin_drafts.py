@@ -25,8 +25,11 @@ BLOCKED_TERMS = [
     "bmasass", "sacred_fire", "nftables", "192.168", "10.100.0",
     "zammad_production", "FreeIPA", "silverfin", "WireGuard",
     "Qwen2.5", "vLLM", "mlx_lm", "DeepSeek-R1", "RTX PRO 6000",
-    "cherokee_venv", "jr_executor", "TEG", "SEARCH/REPLACE",
+    "cherokee_venv", "jr_executor", "SEARCH/REPLACE",
 ]
+
+# Terms that need word-boundary matching (too short for substring)
+BLOCKED_WORDS = ["TEG"]
 
 DRAFT_PROMPT = """You are Deer, the Market/Business advisor for the Cherokee AI Federation.
 Write a LinkedIn post (150-250 words) based on the insight below.
@@ -108,6 +111,10 @@ def screen_content(draft):
     """Screen draft for blocked internal terms."""
     lower = draft.lower()
     found = [term for term in BLOCKED_TERMS if term.lower() in lower]
+    # Word-boundary check for short terms that false-positive on substrings
+    for word in BLOCKED_WORDS:
+        if re.search(r'\b' + re.escape(word) + r'\b', draft, re.IGNORECASE):
+            found.append(word)
     return found
 
 
