@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cherokee AI Federation — Sovereign Intelligence</title>
+<meta name="description" content="Sovereign intelligence for those who build it. A distributed AI federation running on consumer hardware, governed by constitutional consensus.">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --navy: #1a365d;
+    --charcoal: #2d3748;
+    --gold: #d4a843;
+    --teal: #4fd1c5;
+    --warm: #f7fafc;
+    --text: #e2e8f0;
+    --muted: #a0aec0;
+    --dark: #1a202c;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background:var(--charcoal); color:var(--text); line-height:1.8; }
+  a { color:var(--teal); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+
+  .nav { background:var(--navy); padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--gold); }
+  .nav .brand { color:var(--gold); font-weight:700; font-size:1.1rem; letter-spacing:-0.5px; }
+  .nav .nav-links a { color:var(--muted); font-size:0.9rem; margin-left:1.5rem; }
+  .nav .nav-links a:hover { color:var(--teal); text-decoration:none; }
+
+  .hero { text-align:center; padding:3rem 2rem 1rem; }
+  .hero img { width:100%; max-width:360px; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.08); }
+  .hero h1 { font-size:2.4rem; color:white; margin-top:1.5rem; letter-spacing:-1px; line-height:1.2; }
+  .hero .tagline { font-size:1.15rem; color:var(--muted); margin-top:0.5rem; font-style:italic; }
+
+  .page { max-width:740px; margin:0 auto; padding:2rem 2rem 1rem; }
+
+  .intro { margin-bottom:2.5rem; font-size:1.05rem; color:var(--text); }
+  .intro p { margin-bottom:1rem; }
+  .intro strong { color:white; }
+
+  .stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:2.5rem; }
+  .stat { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:1.2rem 0.8rem; text-align:center; transition:border-color 0.2s; }
+  .stat:hover { border-color:var(--gold); }
+  .stat .num { font-size:1.6em; font-weight:700; color:var(--gold); }
+  .stat .label { font-size:0.7em; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:1px; }
+
+  .section-title { font-size:0.8rem; color:var(--gold); text-transform:uppercase; letter-spacing:1px; font-weight:600; margin-bottom:1rem; }
+
+  .pillars { margin-bottom:2.5rem; }
+  .pillar { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:1.5rem; margin-bottom:0.8rem; transition:border-color 0.2s; }
+  .pillar:hover { border-color:var(--gold); }
+  .pillar .pillar-title { font-weight:700; color:white; font-size:1rem; margin-bottom:0.4rem; }
+  .pillar .pillar-desc { font-size:0.9rem; color:var(--muted); }
+
+  .nodes { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:2.5rem; }
+  .node { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:0.8rem 1rem; transition:border-color 0.2s; }
+  .node:hover { border-color:var(--gold); }
+  .node .name { font-weight:600; font-size:0.9em; color:white; }
+  .node .spec { font-size:0.75em; color:var(--muted); margin-top:2px; }
+
+  .apps { margin-bottom:2.5rem; }
+  .app { display:block; padding:1.5rem; margin-bottom:0.8rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; text-decoration:none; transition:transform 0.2s, border-color 0.2s; }
+  .app:hover { transform:translateY(-2px); border-color:var(--gold); text-decoration:none; }
+  .app .name { font-weight:700; color:white; font-size:1.05rem; }
+  .app .desc { font-size:0.85em; color:var(--muted); margin-top:4px; }
+
+  .founder { background:var(--dark); border-radius:12px; padding:2rem; margin-bottom:2.5rem; border:1px solid rgba(255,255,255,0.06); }
+  .founder p { margin-bottom:0.8rem; font-size:0.95rem; }
+  .founder .name { font-weight:700; color:white; font-size:1.1rem; margin-bottom:0.3rem; }
+
+  blockquote { border-left:3px solid var(--gold); padding-left:1.2rem; margin:1.5rem 0; color:var(--muted); font-style:italic; font-size:1.05rem; }
+
+  .footer { background:var(--navy); text-align:center; padding:3rem 2rem; border-top:2px solid var(--gold); }
+  .footer .cherokee { font-size:1.3rem; margin-bottom:0.3rem; letter-spacing:2px; }
+  .footer p { color:var(--muted); font-size:0.85rem; }
+  .footer .links { margin-top:1rem; }
+  .footer .links a { color:var(--muted); margin:0 0.8rem; font-size:0.85rem; }
+  .footer .links a:hover { color:var(--teal); }
+
+  @media (max-width:600px) {
+    .hero h1 { font-size:1.8rem; }
+    .hero img { max-width:280px; }
+    .page { padding:1.5rem; }
+    .stats { grid-template-columns:1fr 1fr; }
+    .stat .num { font-size:1.3em; }
+    .nodes { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <span class="brand">Ganuda</span>
+  <div class="nav-links">
+    <a href="/blog/index.html">Blog</a>
+    <a href="https://vetassist.ganuda.us">VetAssist</a>
+    <a href="mailto:hello@ganuda.us">Contact</a>
+  </div>
+</div>
+
+<div class="hero">
+  <img src="/OPder.png" alt="Cherokee AI Federation" loading="eager">
+  <h1>Cherokee AI Federation</h1>
+  <div class="tagline">Sovereign intelligence for those who build it</div>
+</div>
+
+<div class="page">
+
+  <div class="intro">
+    <p>This is a <strong>living AI system</strong> &mdash; not a demo, not a pitch deck, not a proof of concept. It runs 24/7 on consumer hardware in Northwest Arkansas. Eight nodes. No cloud dependency. No vendor lock-in. Every decision governed by constitutional consensus.</p>
+    <p>The federation manages its own task pipeline, writes its own code, monitors its own health, and corrects its own errors &mdash; all under the oversight of a specialist council that votes on every significant action. It has shipped over 900 tasks autonomously, held 8,800+ governance votes, and accumulated 92,000+ persistent memories across 10 months of continuous operation.</p>
+    <p>This isn&rsquo;t theory. <strong>This is running.</strong></p>
+  </div>
+
+  <div class="section-title">By the Numbers</div>
+  <div class="stats">
+    <div class="stat"><div class="num">92K+</div><div class="label">Thermal Memories</div></div>
+    <div class="stat"><div class="num">8,860</div><div class="label">Council Votes</div></div>
+    <div class="stat"><div class="num">917</div><div class="label">Tasks Shipped</div></div>
+    <div class="stat"><div class="num">8</div><div class="label">Nodes</div></div>
+    <div class="stat"><div class="num">17</div><div class="label">Design Constraints</div></div>
+    <div class="stat"><div class="num">10mo</div><div class="label">Running</div></div>
+  </div>
+
+  <div class="section-title">What Makes This Different</div>
+  <div class="pillars">
+    <div class="pillar">
+      <div class="pillar-title">Constitutional Governance</div>
+      <div class="pillar-desc">Every significant decision goes through a specialist council &mdash; eight roles from Strategic Planning to Adversarial Error Detection. Consensus is measured, not assumed. Dissent is preserved, not silenced. A Longhouse constitutional body oversees structural changes. The governance topology itself is a patent candidate.</div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-title">Sovereign Architecture</div>
+      <div class="pillar-desc">No API calls to external AI providers for core operations. Local inference on local hardware. Persistent memory that the system owns, not a vendor. Data never leaves the federation. The architecture runs on consumer GPUs and Apple Silicon &mdash; proving that sovereign AI doesn&rsquo;t require a datacenter.</div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-title">Thermal Memory</div>
+      <div class="pillar-desc">92,000+ memories with temperature-based importance scoring, sacred pattern detection, and three-layer cognitive architecture (working, episodic, valence). The system remembers what matters, forgets what doesn&rsquo;t, and knows the difference. Memories cool over time unless accessed &mdash; a biological pattern, not a database pattern.</div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-title">Autonomous Task Execution</div>
+      <div class="pillar-desc">The federation has shipped over 900 tasks autonomously &mdash; code, configurations, reports, deployments &mdash; against real infrastructure, with zero human intervention. Junior agents execute against production, not sandboxes. What makes this possible isn&rsquo;t just automation &mdash; it&rsquo;s governance. A specialist council votes on priorities. A TPM coordinates across lanes. Every outcome is captured in thermal memory so the organism learns from what it ships. The task pipeline isn&rsquo;t a queue &mdash; it&rsquo;s a constitutional process.</div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-title">Design Constraints as DNA</div>
+      <div class="pillar-desc">17 ratified design constraints govern how the system evolves &mdash; from DC-1 (Lazy Awareness: minimal energy for awareness states) to DC-10 (The Reflex Principle: autonomous response at every timescale). These aren&rsquo;t guidelines. They&rsquo;re constitutional law, voted on by the Longhouse and enforced in code.</div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-title">Infrastructure Immune System</div>
+      <div class="pillar-desc">The federation monitors its own health and heals itself. Fire Guard checks every node every two minutes. When a WiFi bridge drops, it reconnects. When a database misconfiguration causes connection flapping, it diagnoses the root cause and applies fixes live &mdash; zero downtime. Alert storms are suppressed by a refractory principle borrowed from neuroscience: after a burst of alerts, the system enters observation-only mode until the situation stabilizes. Every incident is recorded in thermal memory so the organism learns from its own failures. This isn&rsquo;t monitoring &mdash; it&rsquo;s an immune system.</div>
+    </div>
+  </div>
+
+  <blockquote>&ldquo;The same governance pattern repeats at every scale because physics demands it &mdash; not because we designed it.&rdquo;<br><span style="font-size:0.85em; color:var(--gold); font-style:normal;">&mdash; First Law, Cherokee AI Federation</span></blockquote>
+
+  <div class="section-title">The Cluster</div>
+  <div class="nodes">
+    <div class="node"><div class="name">Node 1</div><div class="spec">RTX PRO 6000 &middot; 96GB VRAM &middot; Primary inference + task execution</div></div>
+    <div class="node"><div class="name">Node 2</div><div class="spec">RTX 5070 &middot; PostgreSQL + vision services</div></div>
+    <div class="node"><div class="name">Node 3</div><div class="spec">Linux &middot; FreeIPA bridge + embedding services</div></div>
+    <div class="node"><div class="name">Node 4</div><div class="spec">M4 Max &middot; 128GB unified &middot; Mobile deep inference</div></div>
+    <div class="node"><div class="name">Node 5</div><div class="spec">Linux &middot; DMZ web + keepalived HA (primary)</div></div>
+    <div class="node"><div class="name">Node 6</div><div class="spec">Linux &middot; DMZ web + keepalived HA (backup)</div></div>
+    <div class="node"><div class="name">Node 7</div><div class="spec">M1 Max &middot; 64GB unified &middot; macOS workstation</div></div>
+    <div class="node"><div class="name">Node 8</div><div class="spec">M1 Max &middot; 64GB unified &middot; macOS workstation</div></div>
+  </div>
+
+  <div class="section-title">Live Applications</div>
+  <div class="apps">
+    <a href="https://vetassist.ganuda.us" class="app">
+      <div class="name">VetAssist</div>
+      <div class="desc">AI-powered VA disability claims assistant for veterans. Free. No account required. Your data stays on our servers, never sent to third-party AI providers.</div>
+    </a>
+    <a href="/blog/index.html" class="app">
+      <div class="name">Blog</div>
+      <div class="desc">Technical writing from inside the federation &mdash; architecture decisions, design constraints, and lessons from building sovereign AI on consumer hardware.</div>
+    </a>
+    <a href="/photos.html" class="app">
+      <div class="name">Photos</div>
+      <div class="desc">Cherokee Nation, Oklahoma, and Northwest Arkansas &mdash; the land this was built on.</div>
+    </a>
+  </div>
+
+  <div class="section-title">About the Builder</div>
+  <div class="founder">
+    <div class="name">Darrell Reading</div>
+    <p>Cherokee Nation citizen. Self-taught. Started at Help Desk without a formal technical pedigree &mdash; ended up architecting platforms handling 6 million transactions per day at Walmart corporate. Air Force, then Arkansas Army National Guard &mdash; 1-142nd Field Artillery (MLRS), deployed to Iraq as a Squad Leader. 20+ years working inside every box the enterprise has &mdash; Fortune 1 retail, defense, security operations, air-gapped environments &mdash; and reverse-engineering the black boxes nobody else wanted to open.</p>
+    <p>Pushed for server virtualization when the prevailing wisdom said hypervisor latency made it too risky at scale. That bet paid off. Built remote forensic capture infrastructure internationally over a single weekend under active threat conditions. Solved a Jane Street neural net puzzle with a 10<sup>122</sup> search space using a distributed fleet of consumer hardware. The pattern is consistent: step into harder problems than you&rsquo;re formally prepared for, and build your way through.</p>
+    <p>The architecture draws equally from Cherokee governance traditions (consensus-based council, seven-generation thinking, the Longhouse) and modern distributed systems (WireGuard mesh, keepalived HA, FreeIPA identity management). The result is something that doesn&rsquo;t exist anywhere else: <strong>a self-governing AI system that runs on hardware you can buy at Best Buy</strong>. Built from a home office in Bentonville, Arkansas, starting May 2025.</p>
+    <p>Currently seeking roles in AI infrastructure, distributed systems, or platform engineering &mdash; or partners interested in deploying sovereign AI architectures.</p>
+    <p style="margin-bottom:0;"><a href="mailto:hello@ganuda.us">hello@ganuda.us</a> &middot; <a href="https://linkedin.com/in/darrell-reading">LinkedIn</a></p>
+  </div>
+
+  <blockquote>&ldquo;When I becomes We, magic happens.&rdquo;</blockquote>
+
+</div>
+
+<div class="footer">
+  <div class="cherokee">&#x13E3;&#x13B3;&#x13A9; &#x13D7;&#x13C2;&#x13F8;&#x13B5;</div>
+  <p>Cherokee AI Federation</p>
+  <p style="margin-top:0.3rem;">For Seven Generations</p>
+  <div class="links">
+    <a href="/llms.txt">llms.txt</a>
+    <a href="/blog/index.html">Blog</a>
+    <a href="https://vetassist.ganuda.us">VetAssist</a>
+    <a href="mailto:hello@ganuda.us">Contact</a>
+  </div>
+  <p style="margin-top:1.5rem; font-size:0.75rem;">&copy; 2025-2026 Ganuda</p>
+</div>
+
+</body>
+</html>
