@@ -27,6 +27,13 @@ from dataclasses import dataclass, field
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import traceback
 
+# Foundation Agents GAP 1: Emotion State (Longhouse c4e68ce0fcea60a3)
+try:
+    from lib.council_emotion import build_emotion_prompt_modifier, update_emotions_from_vote
+    _EMOTION_AVAILABLE = True
+except ImportError:
+    _EMOTION_AVAILABLE = False
+
 # Configuration
 VLLM_URL = "http://localhost:8000/v1/chat/completions"
 VLLM_MODEL = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
@@ -1036,6 +1043,16 @@ class SpecialistCouncil:
         except Exception as e:
             print(f"[COUNCIL] {specialist_id} modifier read failed (non-fatal): {e}")
 
+        # Foundation Agents GAP 1: Emotion state modulation
+        if _EMOTION_AVAILABLE and hasattr(self, '_emotion_conn') and self._emotion_conn:
+            try:
+                emotion_modifier = build_emotion_prompt_modifier(specialist_id, self._emotion_conn)
+                if emotion_modifier:
+                    system_prompt = system_prompt + emotion_modifier
+                    print(f"[COUNCIL] {specialist_id} -> emotion state active")
+            except Exception as e:
+                print(f"[COUNCIL] {specialist_id} emotion read failed (non-fatal): {e}")
+
         print(f"[COUNCIL] {specialist_id} -> {b['description']}")
 
         try:
@@ -1199,6 +1216,14 @@ class SpecialistCouncil:
                       'full' (both councils), 'joint' (alias for full)
         """
         responses = []
+
+        # Foundation Agents GAP 1: Open shared emotion connection for this vote cycle
+        self._emotion_conn = None
+        if _EMOTION_AVAILABLE:
+            try:
+                self._emotion_conn = psycopg2.connect(**DB_CONFIG, connect_timeout=3)
+            except Exception as e:
+                print(f"[EMOTION] Connection failed (non-fatal, emotions disabled this vote): {e}")
 
         # Phase: Thermal Memory RAG — enrich question with relevant memories
         thermal_context = ""
@@ -1420,6 +1445,23 @@ class SpecialistCouncil:
                 print(f"[CONSTRUCTAL] Extracted {len(facts)} facts, stored {stored} for vote {vote.audit_hash}")
         except Exception as e:
             print(f"[CONSTRUCTAL] Fact extraction skipped (non-fatal): {e}")
+
+        # Foundation Agents GAP 1: Emotion feedback loop — vote outcomes shift specialist emotions
+        if _EMOTION_AVAILABLE:
+            try:
+                _emo_fb_conn = psycopg2.connect(**DB_CONFIG, connect_timeout=3)
+                update_emotions_from_vote(vote, _emo_fb_conn)
+                _emo_fb_conn.close()
+                print(f"[EMOTION] Post-vote emotion update applied")
+            except Exception as e:
+                print(f"[EMOTION] Post-vote emotion update failed (non-fatal): {e}")
+        # Close the shared emotion conn used during specialist queries
+        if self._emotion_conn:
+            try:
+                self._emotion_conn.close()
+            except Exception:
+                pass
+            self._emotion_conn = None
 
         return vote
 

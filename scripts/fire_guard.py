@@ -35,6 +35,19 @@ DB_NAME = os.environ.get("CHEROKEE_DB_NAME", "zammad_production")
 DB_USER = os.environ.get("CHEROKEE_DB_USER", "claude")
 DB_PASS = os.environ.get("CHEROKEE_DB_PASS", "")
 
+# ── Emergency Brake (Foundation Agents GAP 7, Longhouse c4e68ce0fcea60a3) ──
+BRAKE_STATE_FILE = "/ganuda/state/emergency_brake.json"
+EMERGENCY_THRESHOLDS = {
+    "jr_failure_rate_1h": 0.5,         # >50% Jr failures in last hour
+    "thermal_write_rate_1m": 100,      # >100 thermals/minute (runaway)
+    "cpu_percent": 95,                 # sustained >95% CPU
+    "disk_percent": 95,                # >95% disk usage
+    "postgres_connections": 90,        # >90 active connections
+}
+BRAKE_AUTO_DISENGAGE_MINUTES = 30
+ANOMALY_WINDOW_SECONDS = 300           # 5 minutes
+ANOMALY_THRESHOLD = 3                  # 3+ anomalies across different subsystems = brake
+
 # Critical local services on redfin
 LOCAL_SERVICES = [
     "vllm.service",
@@ -61,6 +74,204 @@ TIMER_MAX_AGE = {
 
 # Known-down state file — prevents repeated alerts for same service
 KNOWN_DOWN_FILE = "/ganuda/logs/fire_guard_known_down.json"
+
+
+def load_brake_state():
+    """Load emergency brake state from file."""
+    try:
+        with open(BRAKE_STATE_FILE) as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {"brake_engaged": False, "engaged_at": None, "engaged_by": None,
+                "reason": None, "auto_disengage_at": None, "history": []}
+
+
+def save_brake_state(state):
+    """Save emergency brake state to file."""
+    os.makedirs(os.path.dirname(BRAKE_STATE_FILE), exist_ok=True)
+    with open(BRAKE_STATE_FILE, 'w') as f:
+        json.dump(state, f, indent=2)
+
+
+def engage_brake(reason, engaged_by="fire_guard", auto_disengage=True):
+    """Engage the emergency brake. Halts new Jr task execution."""
+    state = load_brake_state()
+    if state["brake_engaged"]:
+        return False  # already engaged
+    now = datetime.now().isoformat()
+    state["brake_engaged"] = True
+    state["engaged_at"] = now
+    state["engaged_by"] = engaged_by
+    state["reason"] = reason
+    if auto_disengage:
+        from datetime import timedelta
+        disengage_at = (datetime.now() + timedelta(minutes=BRAKE_AUTO_DISENGAGE_MINUTES)).isoformat()
+        state["auto_disengage_at"] = disengage_at
+    else:
+        state["auto_disengage_at"] = None
+    state["history"].append({
+        "action": "engaged", "at": now, "by": engaged_by, "reason": reason
+    })
+    # Keep history bounded
+    if len(state["history"]) > 100:
+        state["history"] = state["history"][-100:]
+    save_brake_state(state)
+    print(f"  EMERGENCY BRAKE ENGAGED by {engaged_by}: {reason}")
+    return True
+
+
+def disengage_brake(disengaged_by="fire_guard"):
+    """Disengage the emergency brake."""
+    state = load_brake_state()
+    if not state["brake_engaged"]:
+        return False  # not engaged
+    now = datetime.now().isoformat()
+    state["brake_engaged"] = False
+    state["engaged_at"] = None
+    state["engaged_by"] = None
+    state["reason"] = None
+    state["auto_disengage_at"] = None
+    state["history"].append({
+        "action": "disengaged", "at": now, "by": disengaged_by
+    })
+    if len(state["history"]) > 100:
+        state["history"] = state["history"][-100:]
+    save_brake_state(state)
+    print(f"  EMERGENCY BRAKE DISENGAGED by {disengaged_by}")
+    return True
+
+
+def check_auto_disengage():
+    """Check if auto-disengage time has passed and conditions have resolved."""
+    state = load_brake_state()
+    if not state["brake_engaged"] or not state["auto_disengage_at"]:
+        return
+    try:
+        disengage_time = datetime.fromisoformat(state["auto_disengage_at"])
+        if datetime.now() >= disengage_time:
+            disengage_brake("auto_disengage")
+    except (ValueError, TypeError):
+        pass
+
+
+def check_emergency_thresholds():
+    """Check all emergency thresholds. Returns list of breached thresholds."""
+    breaches = []
+    import psycopg2
+
+    # CPU check
+    try:
+        with open('/proc/loadavg') as f:
+            load_1m = float(f.read().split()[0])
+        cpu_count = os.cpu_count() or 1
+        cpu_pct = (load_1m / cpu_count) * 100
+        if cpu_pct > EMERGENCY_THRESHOLDS["cpu_percent"]:
+            breaches.append(f"CPU load {cpu_pct:.0f}% > {EMERGENCY_THRESHOLDS['cpu_percent']}%")
+    except Exception:
+        pass
+
+    # Disk check
+    try:
+        st = os.statvfs('/')
+        disk_pct = ((st.f_blocks - st.f_bfree) / st.f_blocks) * 100
+        if disk_pct > EMERGENCY_THRESHOLDS["disk_percent"]:
+            breaches.append(f"Disk {disk_pct:.0f}% > {EMERGENCY_THRESHOLDS['disk_percent']}%")
+    except Exception:
+        pass
+
+    # DB-dependent checks
+    try:
+        conn = psycopg2.connect(host=DB_HOST, port=5432, dbname=DB_NAME, user=DB_USER, password=DB_PASS, connect_timeout=5)
+        cur = conn.cursor()
+
+        # Jr failure rate in last hour
+        cur.execute("""
+            SELECT
+                COUNT(*) FILTER (WHERE status = 'cancelled' AND updated_at > NOW() - INTERVAL '1 hour') as failed,
+                COUNT(*) FILTER (WHERE updated_at > NOW() - INTERVAL '1 hour' AND status IN ('completed', 'cancelled')) as total
+            FROM jr_work_queue
+        """)
+        failed, total = cur.fetchone()
+        if total and total > 2:
+            rate = failed / total
+            if rate > EMERGENCY_THRESHOLDS["jr_failure_rate_1h"]:
+                breaches.append(f"Jr failure rate {rate:.0%} > {EMERGENCY_THRESHOLDS['jr_failure_rate_1h']:.0%} ({failed}/{total} in 1h)")
+
+        # Thermal write rate (last minute)
+        cur.execute("""
+            SELECT COUNT(*) FROM thermal_memory_archive
+            WHERE created_at > NOW() - INTERVAL '1 minute'
+        """)
+        thermal_rate = cur.fetchone()[0]
+        if thermal_rate > EMERGENCY_THRESHOLDS["thermal_write_rate_1m"]:
+            breaches.append(f"Thermal write rate {thermal_rate}/min > {EMERGENCY_THRESHOLDS['thermal_write_rate_1m']}/min")
+
+        # Active postgres connections
+        cur.execute("SELECT count(*) FROM pg_stat_activity WHERE state = 'active'")
+        active_conns = cur.fetchone()[0]
+        if active_conns > EMERGENCY_THRESHOLDS["postgres_connections"]:
+            breaches.append(f"Postgres active connections {active_conns} > {EMERGENCY_THRESHOLDS['postgres_connections']}")
+
+        cur.close()
+        conn.close()
+    except Exception:
+        pass  # DB down is caught elsewhere
+
+    return breaches
+
+
+def check_anomaly_cluster():
+    """Coyote circuit breaker: 3+ anomalies across different subsystems in 5 min = brake.
+
+    Uses the current run_checks results stored in the known-down file to track
+    anomaly history across Fire Guard runs.
+    """
+    anomaly_file = "/ganuda/state/anomaly_history.json"
+    now = time.time()
+    try:
+        with open(anomaly_file) as f:
+            history = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        history = []
+
+    return history, anomaly_file, now
+
+
+def record_anomalies(alerts, anomaly_file, now):
+    """Record current anomalies and check if cluster threshold is breached."""
+    try:
+        with open(anomaly_file) as f:
+            history = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        history = []
+
+    # Categorize alerts by subsystem
+    for alert in alerts:
+        subsystem = "unknown"
+        if "LOCAL" in alert:
+            subsystem = "local_service"
+        elif "REMOTE" in alert:
+            subsystem = "remote_node"
+        elif "TIMER" in alert:
+            subsystem = "timer"
+        elif "STALE" in alert or "IDLE" in alert:
+            subsystem = "executor"
+        history.append({"subsystem": subsystem, "alert": alert, "at": now})
+
+    # Prune old entries outside window
+    cutoff = now - ANOMALY_WINDOW_SECONDS
+    history = [h for h in history if h["at"] > cutoff]
+
+    # Write back
+    os.makedirs(os.path.dirname(anomaly_file), exist_ok=True)
+    with open(anomaly_file, 'w') as f:
+        json.dump(history, f)
+
+    # Check: 3+ distinct subsystems with anomalies in window
+    subsystems_hit = set(h["subsystem"] for h in history)
+    if len(subsystems_hit) >= ANOMALY_THRESHOLD:
+        return True, f"Coyote circuit breaker: {len(subsystems_hit)} subsystems anomalous in {ANOMALY_WINDOW_SECONDS}s ({', '.join(sorted(subsystems_hit))})"
+    return False, None
 
 
 def load_known_down():
@@ -413,6 +624,40 @@ def store_alerts(results):
 
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Fire Guard — federation watchdog")
+    parser.add_argument("--brake", choices=["on", "off", "status"],
+                        help="Emergency brake: on=engage, off=disengage, status=report")
+    parser.add_argument("--brake-reason", default="Manual engagement by Partner",
+                        help="Reason for engaging brake (used with --brake on)")
+    args = parser.parse_args()
+
+    # Handle brake CLI commands immediately (no DB needed)
+    if args.brake == "on":
+        engage_brake(args.brake_reason, engaged_by="partner_manual", auto_disengage=False)
+        print("Emergency brake ENGAGED. Jr executor will not start new tasks.")
+        print("Use --brake off to release.")
+        sys.exit(0)
+    elif args.brake == "off":
+        disengage_brake("partner_manual")
+        print("Emergency brake DISENGAGED. Jr executor resuming normal operations.")
+        sys.exit(0)
+    elif args.brake == "status":
+        state = load_brake_state()
+        if state["brake_engaged"]:
+            print(f"BRAKE ENGAGED since {state['engaged_at']} by {state['engaged_by']}")
+            print(f"Reason: {state['reason']}")
+            if state["auto_disengage_at"]:
+                print(f"Auto-disengage at: {state['auto_disengage_at']}")
+        else:
+            print("Brake NOT engaged. Normal operations.")
+        if state["history"]:
+            print(f"\nLast 5 events:")
+            for evt in state["history"][-5:]:
+                print(f"  {evt['at']} — {evt['action']} by {evt['by']}" +
+                      (f" ({evt.get('reason', '')})" if evt.get('reason') else ""))
+        sys.exit(0)
+
     if not DB_PASS:
         try:
             with open("/ganuda/config/secrets.env") as f:
@@ -437,7 +682,28 @@ if __name__ == "__main__":
     if _REFRACTORY_AVAILABLE and _refractory_enabled:
         _refractory = RefractoryManager()
 
+    # ── Emergency Brake: auto-disengage check ──
+    check_auto_disengage()
+
     results = run_checks()
+
+    # ── Emergency Brake: threshold checks ──
+    threshold_breaches = check_emergency_thresholds()
+    if threshold_breaches:
+        reason = "; ".join(threshold_breaches)
+        engaged = engage_brake(reason, engaged_by="threshold_auto", auto_disengage=True)
+        if engaged:
+            results["alerts"].append(f"EMERGENCY BRAKE ENGAGED: {reason}")
+
+    # ── Emergency Brake: Coyote anomaly cluster ──
+    if results["alerts"]:
+        anomaly_triggered, anomaly_reason = record_anomalies(
+            results["alerts"], "/ganuda/state/anomaly_history.json", time.time()
+        )
+        if anomaly_triggered:
+            engaged = engage_brake(anomaly_reason, engaged_by="coyote_circuit_breaker", auto_disengage=True)
+            if engaged:
+                results["alerts"].append(f"COYOTE CIRCUIT BREAKER: {anomaly_reason}")
 
     # Known-down debounce: only alert on NEW failures and recoveries
     known_down = load_known_down()

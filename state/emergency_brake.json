@@ -1,0 +1,20 @@
+{
+  "brake_engaged": false,
+  "engaged_at": null,
+  "engaged_by": null,
+  "reason": null,
+  "auto_disengage_at": null,
+  "history": [
+    {
+      "action": "engaged",
+      "at": "2026-03-13T09:15:16.262184",
+      "by": "partner_manual",
+      "reason": "Test engagement"
+    },
+    {
+      "action": "disengaged",
+      "at": "2026-03-13T09:15:16.359741",
+      "by": "partner_manual"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+[Unit]
+Description=Thermal Forgetting Protocol — Weekly Sunday 3 AM
+
+[Timer]
+OnCalendar=Sun *-*-* 03:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
