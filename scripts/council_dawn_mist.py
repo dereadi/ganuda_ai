@@ -1,4 +1,3 @@
-```python
 #!/usr/bin/env python3
 """
 council_dawn_mist.py — Daily Council Standup
@@ -211,15 +210,83 @@ def attractor_metrics(cur) -> str:
 
 def partner_rhythm_report(cur) -> str:
     """Partner Rhythm: Predictive insights from partner's digital breadcrumbs."""
-    engine = PartnerRhythmEngine()
-    report = engine.generate_report()
+    try:
+        engine = PartnerRhythmEngine()
+        report = engine.generate_report()
+        return (
+            f"PARTNER RHYTHM — {datetime.now().strftime('%A %B %d, %Y %H:%M CT')}\n"
+            f"Partner Phase: {report.get('current_phase', 'unknown')}\n"
+            f"Predicted Focus: {', '.join(report.get('predicted_focus', []))}\n"
+        )
+    except Exception as e:
+        logger.warning(f"Partner rhythm report skipped: {e}")
+        return ""
 
-    return (
-        f"PARTNER RHYTHM — {datetime.now().strftime('%A %B %d, %Y %H:%M CT')}\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"Partner Phase: {report['current_phase']}\n"
-        f"Predicted Focus: {', '.join(report['predicted_focus'])}\n"
-        f"Sacred Window: {report['sacred_window']['next_likely_window']} "
-        f"({report['sacred_window']['confidence']}% confidence)\n\n"
-        f"Overnight:\n"
-        f"  Fire Guard: {report['overnight']['fire_guard']} alerts
+
+def run_standup():
+    """Gather items, run council vote, store results."""
+    conn = None
+    try:
+        conn = get_connection()
+        cur = get_dict_cursor(conn)
+
+        # Gather the standup sections
+        forward = forward_look(cur)
+        backward = backward_look(cur)
+        pulse = health_pulse(cur)
+        attractors = attractor_metrics(cur)
+        rhythm = partner_rhythm_report(cur)
+
+        digest = (
+            f"DAWN MIST STANDUP — {datetime.now().strftime('%A %B %d, %Y')}\n\n"
+            f"{forward}\n\n{backward}\n\n{pulse}"
+            f"{('\n\n' + attractors) if attractors else ''}"
+            f"{('\n\n' + rhythm) if rhythm else ''}"
+            "\n\nCouncil: Review this morning's standup. Flag anything that needs "
+            "deeper attention today. Keep it brief — this is a standup, not a deliberation."
+        )
+
+        logger.info("Dawn mist digest assembled, running council vote...")
+
+        council = SpecialistCouncil(max_tokens=150)
+        result = council.vote(digest)
+
+        paper_ids = []  # populated by forward_look if available
+
+        summary = (
+            f"DAWN MIST STANDUP — {datetime.now().strftime('%Y-%m-%d')}\n"
+            f"Council Vote: {result.audit_hash} (confidence: {result.confidence})\n"
+            f"Recommendation: {result.recommendation}\n\n"
+            f"{forward}\n\n{backward}\n\n{pulse}"
+        )
+
+        safe_thermal_write(
+            content=summary,
+            temperature=60.0,
+            sacred=False,
+            metadata={
+                "type": "dawn_mist_standup",
+                "audit_hash": result.audit_hash,
+                "confidence": result.confidence,
+                "date": datetime.now().strftime('%Y-%m-%d'),
+            }
+        )
+
+        concern_count = len([r for r in result.responses if r.has_concern])
+        logger.info(
+            f"[DAWN MIST] Vote {result.audit_hash} | "
+            f"confidence {result.confidence} | "
+            f"{concern_count} concerns | "
+            f"{result.recommendation}"
+        )
+
+    except Exception as e:
+        logger.error(f"[DAWN MIST] Standup failed: {e}")
+        raise
+    finally:
+        if conn:
+            conn.close()
+
+
+if __name__ == "__main__":
+    run_standup()
