@@ -2,7 +2,7 @@
 """SLA Baseline Metrics — Cherokee AI Federation
 
 Measures current performance baselines for SLA definition.
-Task #1206. Run from redfin.
+Task #1206 / #1257. Run from redfin.
 
 Usage:
     python3 /ganuda/scripts/sla_baseline_metrics.py
@@ -19,7 +19,7 @@ import psycopg2
 import psycopg2.extras
 import requests
 
-# --- DB Config ---
+
 def load_secrets():
     secrets = {}
     secrets_path = '/ganuda/config/secrets.env'
@@ -32,6 +32,7 @@ def load_secrets():
                     secrets[k.strip()] = v.strip()
     return secrets
 
+
 secrets = load_secrets()
 
 DB_CONFIG = {
@@ -43,7 +44,7 @@ DB_CONFIG = {
 }
 
 GATEWAY_URL = "http://192.168.132.223:8080"
-REPORT_PATH = "/ganuda/docs/business/SLA-BASELINE-METRICS-MAR09-2026.md"
+REPORT_PATH = "/ganuda/docs/business/SLA-BASELINE-METRICS-MAR12-2026.md"
 
 
 def get_connection():
@@ -51,15 +52,14 @@ def get_connection():
 
 
 def measure_council_vote_time(cur):
-    """Measure time between vote creation and resolution (last 30 days)."""
+    """Measure council vote cadence — interval between successive votes (last 30 days)."""
     cur.execute("""
         SELECT
-            EXTRACT(EPOCH FROM (updated_at - created_at)) as resolution_seconds
-        FROM longhouse_votes
-        WHERE created_at > NOW() - INTERVAL '30 days'
-          AND updated_at IS NOT NULL
-          AND updated_at > created_at
-        ORDER BY created_at DESC
+            EXTRACT(EPOCH FROM (voted_at - LAG(voted_at) OVER (ORDER BY voted_at))) as interval_seconds
+        FROM council_votes
+        WHERE voted_at > NOW() - INTERVAL '30 days'
+          AND voted_at IS NOT NULL
+        ORDER BY voted_at DESC
         LIMIT 100
     """)
     rows = cur.fetchall()
@@ -164,14 +164,13 @@ def measure_gateway_response(url=GATEWAY_URL):
 
 
 def measure_dawn_mist_generation(cur):
-    """Measure dawn mist generation time from thermal records."""
+    """Measure dawn mist cadence — interval between successive dawn mist thermals."""
     cur.execute("""
         SELECT
-            EXTRACT(EPOCH FROM (updated_at - created_at)) as gen_seconds
+            EXTRACT(EPOCH FROM (created_at - LAG(created_at) OVER (ORDER BY created_at))) as interval_seconds
         FROM thermal_memory_archive
-        WHERE content ILIKE '%%dawn mist%%'
+        WHERE original_content ILIKE '%%dawn mist%%'
           AND created_at > NOW() - INTERVAL '30 days'
-          AND updated_at IS NOT NULL
         ORDER BY created_at DESC
         LIMIT 30
     """)
@@ -245,8 +244,34 @@ def write_report(report_text):
     """Write report to markdown file."""
     os.makedirs(os.path.dirname(REPORT_PATH), exist_ok=True)
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    md = f"""# SLA Baseline Metrics
+    header = "# SLA Baseline Metrics\n\n"
+    header += f"**Generated:** {now}\n"
+    header += "**Task:** #1206 / #1257\n"
+    header += "**Purpose:** Baseline measurements for SLA Framework (Task #1207)\n\n"
+    md = header + report_text + "\n"
+    with open(REPORT_PATH, "w") as f:
+        f.write(md)
+    print(f"Report written to {REPORT_PATH}")
 
-**Generated:** {now}
-**Task:** #1206
-**Purpose:** Baseline measurements for SLA Framework (Task #1207)
+
+def collect_all_metrics():
+    """Collect all SLA baseline measurements."""
+    load_secrets()
+    conn = get_connection()
+    cur = conn.cursor()
+    metrics = {
+        "council_vote": measure_council_vote_time(cur),
+        "jr_task": measure_jr_task_completion(cur),
+        "thermal_write": measure_thermal_write_latency(cur),
+        "gateway": measure_gateway_response(),
+        "dawn_mist": measure_dawn_mist_generation(cur),
+    }
+    cur.close()
+    conn.close()
+    return metrics
+
+
+if __name__ == "__main__":
+    metrics = collect_all_metrics()
+    report = print_report(metrics)
+    write_report(report)

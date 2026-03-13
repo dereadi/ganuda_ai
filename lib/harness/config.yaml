@@ -107,6 +107,20 @@ escalation:
   max_tier3_per_hour: 5
   enable_thermal_audit: true
 
+# --- MCP Servers ---
+# Pluggable MCP tool servers for Tier 2 specialist data access.
+# Servers are lazy-started on first tool call (DC-9).
+# Jr Task #1285: SAG Harness DELIBERATE Phase.
+mcp_servers:
+  productive:
+    script: "/ganuda/services/sag-v2/mcp_servers/productive_server.py"
+    enabled: true
+    idle_timeout_seconds: 300
+  smartsheet:
+    script: "/ganuda/services/sag-v2/mcp_servers/smartsheet_server.py"
+    enabled: true
+    idle_timeout_seconds: 300
+
 # --- Claude Backend ---
 # DC-11: External API as REACT enzyme. Governance stays local.
 # SENSE and EVALUATE always run on redfin. Only REACT speciates.

@@ -92,6 +92,64 @@ def gather_stats():
     """)
     stats["activity"] = [(r[0], r[1], r[2], r[3]) for r in cur.fetchall()]
 
+    # --- THE ROOM: Longhouse chatter, Council voices, organism conversations ---
+
+    # Recent Longhouse sessions (the big conversations)
+    cur.execute("""SELECT session_hash, convened_by, LEFT(problem_statement, 120) AS problem,
+            status, resolution_type,
+            CASE WHEN jsonb_typeof(voices) = 'array' THEN jsonb_array_length(voices) ELSE 0 END AS voice_count,
+            created_at, resolved_at
+        FROM longhouse_sessions
+        WHERE jsonb_typeof(voices) = 'array' OR voices IS NULL
+        ORDER BY created_at DESC LIMIT 5""")
+    stats["longhouse"] = cur.fetchall()
+
+    # Longhouse voices — latest resolved session's voices (the conversation)
+    cur.execute("""SELECT voices FROM longhouse_sessions
+        WHERE status = 'resolved' AND jsonb_typeof(voices) = 'array'
+        ORDER BY resolved_at DESC LIMIT 1""")
+    row = cur.fetchone()
+    stats["latest_voices"] = []
+    if row and row[0]:
+        try:
+            import json
+            voices_raw = row[0] if isinstance(row[0], list) else json.loads(row[0])
+            if isinstance(voices_raw, list) and len(voices_raw) > 0:
+                stats["latest_voices"] = [(v.get("speaker","?"), v.get("words","")[:140]) for v in voices_raw[:8]]
+        except Exception:
+            pass
+
+    # Phi / Medicine Woman — latest measurement
+    cur.execute("""SELECT timestamp, phi_value, integration_level, consciousness_score,
+            system_state
+        FROM phi_measurements ORDER BY timestamp DESC LIMIT 1""")
+    phi_row = cur.fetchone()
+    stats["phi"] = phi_row
+
+    # Observer status — how many thermals observed vs unobserved
+    cur.execute("SELECT COUNT(*) FILTER (WHERE is_observed = true), COUNT(*) FROM thermal_memory_archive")
+    obs_row = cur.fetchone()
+    stats["observed"] = obs_row[0] or 0
+    stats["unobserved"] = (obs_row[1] or 0) - (obs_row[0] or 0)
+
+    # Dual chieftainship — pending tasks by domain tag
+    cur.execute("""SELECT
+        COUNT(*) FILTER (WHERE tags && ARRAY['war-chief']) AS war_chief_tasks,
+        COUNT(*) FILTER (WHERE tags && ARRAY['peace-chief']) AS peace_chief_tasks,
+        COUNT(*) FILTER (WHERE tags && ARRAY['medicine-woman']) AS medicine_tasks
+        FROM jr_work_queue WHERE status IN ('pending', 'in_progress')""")
+    chief_row = cur.fetchone()
+    stats["war_chief_tasks"] = chief_row[0] or 0
+    stats["peace_chief_tasks"] = chief_row[1] or 0
+    stats["medicine_tasks"] = chief_row[2] or 0
+
+    # Recent sacred thermals — the important moments
+    cur.execute("""SELECT LEFT(original_content, 100), temperature_score, created_at
+        FROM thermal_memory_archive
+        WHERE sacred_pattern = true AND created_at > NOW() - INTERVAL '24 hours'
+        ORDER BY created_at DESC LIMIT 5""")
+    stats["sacred_recent"] = cur.fetchall()
+
     cur.close()
     conn.close()
     return stats
@@ -154,6 +212,58 @@ def render_html(stats):
         clean_title = title.replace("EPIC: ", "").replace("EPIC:", "")
         epics_html += f'<div class="item" style="border-left:3px solid {color}; padding-left:8px">{icon} {clean_title}</div>\n'
 
+    # --- Build Longhouse chatter HTML ---
+    longhouse_html = ""
+    for lh in stats.get("longhouse", []):
+        sh, convener, problem, status, res_type, voices, created, resolved = lh
+        status_icon = {"resolved": "&#10003;", "convened": "&#9675;", "deciding": "&#8943;"}.get(status, "?")
+        status_color = {"resolved": "#4a7", "convened": "#fa7", "deciding": "#7af"}.get(status, "#888")
+        ts = created.strftime("%b %d %H:%M") if created else ""
+        voices_str = f"{voices} voices" if voices else ""
+        res_str = f" &mdash; {res_type}" if res_type else ""
+        longhouse_html += f'<div class="item" style="color:{status_color}"><span class="time">{ts}</span> {status_icon} {problem[:90]}... <span style="color:#556">({voices_str}{res_str})</span></div>\n'
+    if not longhouse_html:
+        longhouse_html = '<div class="item">No recent sessions</div>'
+
+    # Latest voices (the conversation)
+    voices_html = ""
+    for speaker, words in stats.get("latest_voices", []):
+        speaker_colors = {"Chief": "#e8b04a", "Coyote": "#e87a4a", "Elisi": "#d4a0d4", "Turtle": "#4a9e7a",
+                          "Medicine Woman": "#b04ae8", "Peace Chief": "#7aafff", "Spider": "#8a8", "Eagle Eye": "#aaa",
+                          "Raven": "#888", "Crawdad": "#c66", "Deer": "#b88a4a", "Crane": "#7ab", "Otter": "#6a9ab5"}
+        color = speaker_colors.get(speaker, "#c8ccd4")
+        voices_html += f'<div class="item"><span style="color:{color}; font-weight:600">{speaker}:</span> <span style="color:#999; font-size:0.9em">{words}</span></div>\n'
+    if not voices_html:
+        voices_html = '<div class="item">No recent voices</div>'
+
+    # Phi / Medicine Woman
+    phi_html = ""
+    if stats.get("phi"):
+        ts, phi_val, level, score, state = stats["phi"]
+        phi_time = ts.strftime("%b %d %H:%M") if ts else "?"
+        phi_color = "#4a7" if phi_val and phi_val > 0 else "#e87a4a" if phi_val and phi_val < 0 else "#888"
+        phi_html = f'<div class="stats"><div class="stat"><div class="num" style="color:{phi_color}">{phi_val:.4f}</div><div class="label">Proxy &Phi;</div></div>'
+        phi_html += f'<div class="stat"><div class="num">{stats["observed"]:,}</div><div class="label">Observed</div></div>'
+        phi_html += f'<div class="stat"><div class="num">{stats["unobserved"]:,}</div><div class="label">Unobserved</div></div></div>'
+        phi_html += f'<div class="item" style="font-size:0.75em; color:#556">Last measured: {phi_time}</div>'
+    else:
+        phi_html = '<div class="item">No phi measurements yet</div>'
+
+    # Dual chieftainship workload
+    chiefs_html = f"""<div class="stats">
+        <div class="stat"><div class="num" style="color:#e84a4a">{stats['war_chief_tasks']}</div><div class="label">War Chief</div></div>
+        <div class="stat"><div class="num" style="color:#7aafff">{stats['peace_chief_tasks']}</div><div class="label">Peace Chief</div></div>
+        <div class="stat"><div class="num" style="color:#b04ae8">{stats['medicine_tasks']}</div><div class="label">Medicine Woman</div></div>
+    </div>"""
+
+    # Sacred moments
+    sacred_html = ""
+    for content, temp, created in stats.get("sacred_recent", []):
+        ts = created.strftime("%H:%M") if created else ""
+        sacred_html += f'<div class="item" style="color:#e8b04a"><span class="time">{ts}</span> &#10025; {content}</div>\n'
+    if not sacred_html:
+        sacred_html = '<div class="item">No sacred thermals in 24h</div>'
+
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -180,6 +290,7 @@ def render_html(stats):
   .pulse {{ display:inline-block; width:8px; height:8px; background:#4a7; border-radius:50%; margin-right:6px; animation: pulse 2s infinite; }}
   @keyframes pulse {{ 0%,100% {{ opacity:1; }} 50% {{ opacity:0.3; }} }}
   .sacred {{ color:#e8b04a; font-size:0.75em; }}
+  .voice {{ border-left: 2px solid #2a3040; padding-left: 8px; margin: 2px 0; }}
 </style>
 </head>
 <body>
@@ -202,13 +313,38 @@ def render_html(stats):
 </div>
 
 <div class="card">
+  <h2>&#9879; Medicine Woman</h2>
+  {phi_html}
+</div>
+
+<div class="card">
+  <h2>&#9876; Dual Chieftainship</h2>
+  {chiefs_html}
+</div>
+
+<div class="card">
   <h2><span class="pulse"></span>Working Now</h2>
   {active_html}
 </div>
 
 <div class="card">
-  <h2>Organism Activity (12h)</h2>
+  <h2>&#127939; Organism Activity (12h)</h2>
   {activity_html}
+</div>
+
+<div class="card">
+  <h2>&#128172; The Room (Latest Longhouse)</h2>
+  {voices_html}
+</div>
+
+<div class="card">
+  <h2>&#127970; Longhouse Sessions</h2>
+  {longhouse_html}
+</div>
+
+<div class="card">
+  <h2>&#10025; Sacred Moments (24h)</h2>
+  {sacred_html}
 </div>
 
 <div class="card">

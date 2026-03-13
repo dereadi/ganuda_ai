@@ -79,6 +79,30 @@ def save_known_down(state):
         pass
 
 
+def check_postgres_db(host, port=5432, timeout=5):
+    """Check PostgreSQL by actually connecting, not just TCP socket.
+
+    Eliminates false-positive alerts where socket check fails but DB is up.
+    DC-16 Phase 1 fix.
+    """
+    import psycopg2
+    try:
+        conn = psycopg2.connect(
+            host=host, port=port,
+            dbname=os.environ.get("CHEROKEE_DB_NAME", DB_NAME),
+            user=os.environ.get("CHEROKEE_DB_USER", DB_USER),
+            password=os.environ.get("CHEROKEE_DB_PASS", DB_PASS),
+            connect_timeout=timeout
+        )
+        cur = conn.cursor()
+        cur.execute("SELECT 1")
+        cur.close()
+        conn.close()
+        return True
+    except Exception:
+        return False
+
+
 def check_port(ip, port, timeout=3, retries=3):
     for attempt in range(retries):
         try:
@@ -232,7 +256,10 @@ def run_checks():
     # Remote ports
     for node, checks in REMOTE_CHECKS.items():
         for ip, port, label in checks:
-            up = check_port(ip, port)
+            if label == "PostgreSQL":
+                up = check_postgres_db(ip, port)
+            else:
+                up = check_port(ip, port)
             results["remote"].append({"node": node, "label": label, "port": port, "up": up})
             if not up:
                 alerts.append(f"REMOTE DOWN: {node}/{label} ({ip}:{port})")
