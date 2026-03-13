@@ -1,0 +1,19 @@
+[Unit]
+Description=Stoneclad Body Report — 6-Hour Organism Health Digest
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=dereadi
+WorkingDirectory=/ganuda
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 /ganuda/scripts/body_report.py
+Environment=HOME=/home/dereadi
+Environment=PYTHONPATH=/ganuda:/ganuda/lib
+EnvironmentFile=/ganuda/config/secrets.env
+TimeoutStartSec=300
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
