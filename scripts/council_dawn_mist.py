@@ -21,7 +21,7 @@ from datetime import datetime, timedelta
 
 from ganuda_db import get_connection, get_dict_cursor, safe_thermal_write
 from specialist_council import SpecialistCouncil
-from partner_rhythm import PartnerRhythmEngine
+from partner_rhythm import get_rhythm_report
 
 try:
     from slack_federation import send as slack_send
@@ -140,79 +140,47 @@ def health_pulse(cur) -> str:
 
 def attractor_metrics(cur) -> str:
     """Strange Attractors: Key metrics from attractor validation."""
-    stats = {}
+    try:
+        # Temperature Distribution
+        cur.execute("""
+            SELECT
+                SUM(CASE WHEN temperature_score BETWEEN 0 AND 30 THEN 1 ELSE 0 END) as cold,
+                SUM(CASE WHEN temperature_score BETWEEN 30 AND 60 THEN 1 ELSE 0 END) as warm,
+                SUM(CASE WHEN temperature_score BETWEEN 60 AND 70 THEN 1 ELSE 0 END) as boundary,
+                SUM(CASE WHEN temperature_score BETWEEN 70 AND 90 THEN 1 ELSE 0 END) as hot,
+                SUM(CASE WHEN temperature_score >= 90 THEN 1 ELSE 0 END) as sacred
+            FROM thermal_memory_archive
+        """)
+        temp_stats = cur.fetchone()
+        total = sum(v for v in temp_stats.values() if v) or 1
 
-    # Temperature Distribution
-    cur.execute("""
-        SELECT 
-            SUM(CASE WHEN temperature BETWEEN 0 AND 30 THEN 1 ELSE 0 END) as cold,
-            SUM(CASE WHEN temperature BETWEEN 30 AND 60 THEN 1 ELSE 0 END) as warm,
-            SUM(CASE WHEN temperature BETWEEN 60 AND 70 THEN 1 ELSE 0 END) as boundary,
-            SUM(CASE WHEN temperature BETWEEN 70 AND 90 THEN 1 ELSE 0 END) as hot,
-            SUM(CASE WHEN temperature BETWEEN 90 AND 100 THEN 1 ELSE 0 END) as sacred
-        FROM thermal_memory_archive
-    """)
-    temp_stats = cur.fetchone()
-    total = sum(temp_stats.values())
-    stats['temp_gap_60_70'] = f"{temp_stats['boundary']} ({temp_stats['boundary']/total:.1%})"
+        # Vote Confidence Clusters
+        cur.execute("""
+            SELECT
+                FLOOR(confidence * 10) / 10.0 as bucket,
+                COUNT(*) as count
+            FROM council_votes
+            GROUP BY bucket
+            ORDER BY bucket
+        """)
+        vote_clusters = cur.fetchall()
+        avg_count = sum(c['count'] for c in vote_clusters) / max(len(vote_clusters), 1)
+        flagged = [f"{v['bucket']} ({v['count']})" for v in vote_clusters if v['count'] > 2 * avg_count]
 
-    # Vote Confidence Clusters
-    cur.execute("""
-        SELECT 
-            FLOOR(vote_confidence * 10) / 10.0 as bucket,
-            COUNT(*) as count
-        FROM council_votes
-        GROUP BY bucket
-        ORDER BY bucket
-    """)
-    vote_clusters = cur.fetchall()
-    avg_count = sum(c['count'] for c in vote_clusters) / len(vote_clusters)
-    flagged_buckets = [f"{v['bucket']} ({v['count']})" for v in vote_clusters if v['count'] > 2 * avg_count]
-    stats['vote_flagged_clusters'] = ", ".join(flagged_buckets)
-
-    # Circadian Pattern
-    cur.execute("""
-        SELECT 
-            DATE_TRUNC('hour', created_at) as hour,
-            COUNT(*) as count
-        FROM thermal_memory_archive
-        WHERE created_at > NOW() - INTERVAL '24 hours'
-        GROUP BY hour
-        ORDER BY hour
-    """)
-    circadian_pattern = cur.fetchall()
-    peak_hours = [str(h['hour'].hour) + "AM" if h['hour'].hour < 12 else str(h['hour'].hour - 12) + "PM" for h in circadian_pattern if h['count'] == max(c['count'] for c in circadian_pattern)]
-    stats['peak_hours'] = ", ".join(peak_hours)
-
-    # Drift Trend
-    cur.execute("""
-        SELECT 
-            DATE_TRUNC('hour', created_at) as hour,
-            COUNT(*) as count
-        FROM drift_alerts
-        WHERE created_at > NOW() - INTERVAL '24 hours'
-        GROUP BY hour
-        ORDER BY hour
-    """)
-    drift_trend = cur.fetchall()
-    stats['drift_trend'] = ", ".join([f"{h['hour'].hour}: {h['count']}" for h in drift_trend])
-
-    if not any(stats.values()):
+        return (
+            f"ATTRACTORS: Temp boundary(60-70): {temp_stats['boundary']} ({temp_stats['boundary']/total:.1%}) | "
+            f"Sacred(90+): {temp_stats['sacred']} | "
+            f"Vote clusters: {', '.join(flagged) if flagged else 'none flagged'}"
+        )
+    except Exception as e:
+        logger.warning(f"Attractor metrics skipped: {e}")
         return ""
-
-    return (
-        f"ATTRACTORS: Temp gap 60-70: {stats['temp_gap_60_70']} | "
-        f"Vote flagged clusters: {stats['vote_flagged_clusters']} | "
-        f"Peak hours: {stats['peak_hours']} | "
-        f"Drift trend: {stats['drift_trend']}"
-    )
 
 
 def partner_rhythm_report(cur) -> str:
     """Partner Rhythm: Predictive insights from partner's digital breadcrumbs."""
     try:
-        engine = PartnerRhythmEngine()
-        report = engine.generate_report()
+        report = get_rhythm_report()
         return (
             f"PARTNER RHYTHM — {datetime.now().strftime('%A %B %d, %Y %H:%M CT')}\n"
             f"Partner Phase: {report.get('current_phase', 'unknown')}\n"
