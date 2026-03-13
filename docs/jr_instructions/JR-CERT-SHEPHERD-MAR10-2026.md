@@ -54,7 +54,7 @@ Option A (rsync) is the pragmatic choice. It's simple, uses infrastructure we al
 
 ## Steps (for Option A — adapt if you pick differently)
 
-### 1. Identify Caddy cert storage path
+### Step 1: Identify Caddy cert storage path
 
 SSH to owlfin and find the cert storage:
 ```bash
@@ -64,7 +64,7 @@ sudo find /root/.local/share/caddy -type f 2>/dev/null
 # Caddy 2.x default: $XDG_DATA_HOME/caddy or /var/lib/caddy/.local/share/caddy
 ```
 
-### 2. Set up SSH key for rsync (owlfin -> eaglefin)
+### Step 2: Set up SSH key for rsync (owlfin to eaglefin)
 
 On owlfin, generate a dedicated key pair for cert sync (if not already available):
 ```bash
@@ -73,9 +73,10 @@ sudo -u caddy ssh-keygen -t ed25519 -f /var/lib/caddy/.ssh/id_cert_sync -N "" -C
 
 Add the public key to eaglefin's authorized_keys for the caddy user (or root if caddy can't SSH). Restrict the key to rsync only using `command=` in authorized_keys for least privilege.
 
-### 3. Create the sync script
+### Step 3: Create the sync script
 
-Create `/ganuda/scripts/cert_shepherd.sh`:
+**File:** `/ganuda/scripts/cert_shepherd.sh`
+
 ```bash
 #!/bin/bash
 # Cert Shepherd — sync Caddy TLS certs from owlfin to eaglefin
@@ -107,14 +108,14 @@ else
 fi
 ```
 
-### 4. Create cron job on owlfin
+### Step 4: Create cron job on owlfin
 
 ```bash
 # /etc/cron.d/cert-shepherd
 0 * * * * root /bin/bash /ganuda/scripts/cert_shepherd.sh >> /var/log/cert-shepherd.log 2>&1
 ```
 
-### 5. Verify
+### Step 5: Verify
 
 From an external machine (or redfin):
 ```bash

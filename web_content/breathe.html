@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Breathe — Cherokee AI Federation</title>
+<style>
+  /* Dark, calm, mobile-first */
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, system-ui, sans-serif;
+    background: #0a0e14;
+    color: #8b95a5;
+    padding: 16px;
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+
+  .vitals {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .vital .num { font-size: 1.4em; font-weight: 700; color: #e8b04a; }
+  .vital .label { font-size: 0.65em; color: #556; text-transform: uppercase; letter-spacing: 1px; }
+
+  .pulse-dot {
+    width: 6px; height: 6px;
+    background: #2a4a2a;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    animation: pulse 4s ease-in-out infinite;
+  }
+  .pulse-dot.alive { background: #4a7a4a; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  .stream { list-style: none; }
+  .event {
+    padding: 8px 0;
+    border-bottom: 1px solid #111820;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+    font-size: 0.85em;
+    line-height: 1.4;
+  }
+  .event .time { color: #334; font-size: 0.8em; margin-right: 6px; }
+  .event.sacred { color: #e8b04a; }
+  .event.thermal { color: #a08060; }
+  .event.vote { color: #7aafff; }
+  .event.task_done { color: #6b8a6b; }
+  .event.task_start { color: #c8a050; }
+  .event.fire_guard { color: #2a3a2a; font-size: 0.75em; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 0.6em;
+    color: #223;
+  }
+</style>
+</head>
+<body>
+
+<div class="vitals" id="vitals">
+  <div class="vital"><div class="num" id="v-memories">—</div><div class="label">Memories</div></div>
+  <div class="vital"><div class="num" id="v-votes">—</div><div class="label">Votes</div></div>
+  <div class="vital"><div class="num" id="v-tasks">—</div><div class="label">Tasks</div></div>
+</div>
+
+<div style="margin-bottom: 12px; font-size: 0.7em; color: #334;">
+  <span class="pulse-dot" id="heartbeat"></span>
+  <span id="last-breath">...</span>
+</div>
+
+<ul class="stream" id="stream">
+  <!-- Events populate here via JS -->
+</ul>
+
+<div class="footer">For Seven Generations</div>
+
+<script>
+// Poll /api/breathing every 15 seconds
+// Render events as flowing stream
+// Update vitals
+// Show time-since for each event
+// Fire Guard pulse = heartbeat indicator
+
+let knownEvents = new Set();
+
+function timeAgo(iso) {
+  const seconds = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (seconds < 60) return seconds + 's ago';
+  if (seconds < 3600) return Math.floor(seconds/60) + 'm ago';
+  if (seconds < 86400) return Math.floor(seconds/3600) + 'h ago';
+  return Math.floor(seconds/86400) + 'd ago';
+}
+
+async function breathe() {
+  try {
+    const resp = await fetch('/api/breathing');
+    const data = await resp.json();
+
+    // Update vitals
+    document.getElementById('v-memories').textContent = data.vitals.memories.toLocaleString();
+    document.getElementById('v-votes').textContent = data.vitals.votes.toLocaleString();
+    document.getElementById('v-tasks').textContent = data.vitals.tasks_done.toLocaleString();
+
+    // Heartbeat
+    const hb = document.getElementById('heartbeat');
+    hb.classList.toggle('alive', data.vitals.tasks_active > 0);
+    if (data.vitals.last_fire_guard) {
+      document.getElementById('last-breath').textContent = 'Last breath: ' + timeAgo(data.vitals.last_fire_guard);
+    }
+
+    // Stream
+    const stream = document.getElementById('stream');
+    const newEvents = data.events.filter(e => !knownEvents.has(e.ts + e.kind + e.detail));
+
+    newEvents.forEach(e => {
+      knownEvents.add(e.ts + e.kind + e.detail);
+      const li = document.createElement('li');
+      li.className = 'event ' + e.kind;
+      const timeStr = e.ts ? timeAgo(e.ts) : '';
+      let extra = '';
+      if (e.kind === 'vote' && e.extra) extra = ' (conf ' + e.extra + ')';
+      if (e.kind === 'sacred' && e.extra) extra = ' (temp ' + e.extra + ')';
+      li.innerHTML = '<span class="time">' + timeStr + '</span> ' + (e.detail || '') + extra;
+      stream.insertBefore(li, stream.firstChild);
+    });
+
+    // Trim old events
+    while (stream.children.length > 50) {
+      stream.removeChild(stream.lastChild);
+    }
+
+  } catch (err) {
+    // Silent — don't interrupt the calm
+  }
+}
+
+// Initial load + poll
+breathe();
+setInterval(breathe, 15000);
+
+// Update time-ago every 30 seconds
+setInterval(() => {
+  document.querySelectorAll('.event .time').forEach(el => {
+    const iso = el.closest('.event').dataset.iso;
+    if (iso) {
+      el.textContent = timeAgo(iso);
+    }
+  });
+}, 30000);
+</script>
+</body>
+</html>

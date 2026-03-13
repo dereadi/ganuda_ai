@@ -30,7 +30,7 @@ Use the `ganuda_db.get_connection()` / `ganuda_db.get_dict_cursor()` pattern fro
 
 ## Steps
 
-### 1. Query Live Stats
+### Step 1: Query Live Stats
 
 ```sql
 -- Thermal memory count
@@ -44,26 +44,31 @@ SELECT COUNT(*) FROM jr_work_queue WHERE status = 'completed';
 ```
 
 Node count is hardcoded to `8` (current federation size). Define it as a constant at the top of the file:
+
+**File:** `/ganuda/scripts/stats_keeper.py`
+
 ```python
 FEDERATION_NODE_COUNT = 8  # redfin, bluefin, greenfin, bmasass, owlfin, eaglefin, sasass, sasass2
 ```
 
-### 2. Read Current Landing Page
+### Step 2: Read Current Landing Page
 
 ```sql
 SELECT content FROM web_content WHERE path = '/index.html';
 ```
 
-### 3. Format Numbers for Display
+### Step 3: Format Numbers for Display
 
 - Thermal memories: Format as "XXK+" (e.g., 19808 becomes "19K+", 93412 becomes "93K+"). Use `f"{count // 1000}K+"`.
 - Council votes: Format with commas (e.g., "8,850"). Use `f"{count:,}"`.
 - Completed tasks: Format with commas (e.g., "913"). Use `f"{count:,}"`.
 - Node count: Plain integer string.
 
-### 4. Update HTML Stats
+### Step 4: Update HTML Stats
 
 Use regex substitution to find and replace the stat values. The landing page HTML contains stat blocks — look for patterns like number followed by descriptive label text. You will need to inspect the actual HTML to determine exact patterns. Likely patterns:
+
+**File:** `/ganuda/scripts/stats_keeper.py`
 
 ```python
 import re
@@ -74,7 +79,7 @@ html = re.sub(r'(\d+K\+)(\s*</.*?thermal|memories)', f'{thermal_formatted}\\2', 
 
 IMPORTANT: Be conservative with regex. Match as much surrounding context as possible to avoid replacing the wrong numbers. If the HTML structure is ambiguous, log a warning and skip the update rather than corrupting the page.
 
-### 5. Write Updated HTML Back
+### Step 5: Write Updated HTML Back
 
 ```sql
 UPDATE web_content SET content = %s, updated_at = NOW() WHERE path = '/index.html';
@@ -82,15 +87,15 @@ UPDATE web_content SET content = %s, updated_at = NOW() WHERE path = '/index.htm
 
 **CRITICAL CONSTRAINT**: The `web_content` table is the ONLY table this script writes to. All other tables are READ-ONLY. This is Coyote's binding condition.
 
-### 6. Logging
+### Step 6: Logging
 
 - Print a summary to stdout: `Stats updated: {thermal_count} thermals, {vote_count} votes, {task_count} tasks`
 - On error, print to stderr and exit with non-zero code
 - Do NOT write thermals or to any other table. Coyote's write constraint takes precedence. Log to stdout/stderr only.
 
-## Systemd Timer
+### Step 7: Create Systemd Timer
 
-### stats-keeper.service
+**File:** `/ganuda/config/systemd/stats-keeper.service`
 
 ```ini
 [Unit]
@@ -110,7 +115,7 @@ StandardOutput=journal
 StandardError=journal
 ```
 
-### stats-keeper.timer
+**File:** `/ganuda/config/systemd/stats-keeper.timer`
 
 ```ini
 [Unit]
@@ -126,7 +131,7 @@ WantedBy=timers.target
 
 Note: The timer uses local time. The system timezone on redfin must be America/Chicago. Verify with `timedatectl` before deploying.
 
-### Deploy to redfin (local node)
+### Step 8: Deploy to redfin (local node)
 
 ```bash
 sudo cp /ganuda/config/systemd/stats-keeper.service /etc/systemd/system/

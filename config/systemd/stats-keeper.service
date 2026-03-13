@@ -1,0 +1,15 @@
+[Unit]
+Description=Stats Keeper — refresh ganuda.us landing page numbers
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda
+ExecStart=/usr/bin/python3 /ganuda/scripts/stats_keeper.py
+Environment=PYTHONPATH=/ganuda/lib:/ganuda
+EnvironmentFile=/ganuda/config/secrets.env
+StandardOutput=journal
+StandardError=journal

@@ -1,0 +1,15 @@
+[Unit]
+Description=Cherokee AI Federation Chat Agent
+After=network.target
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda/services
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 /ganuda/services/chat_agent.py
+Restart=always
+RestartSec=5
+EnvironmentFile=/ganuda/config/secrets.env
+
+[Install]
+WantedBy=multi-user.target
