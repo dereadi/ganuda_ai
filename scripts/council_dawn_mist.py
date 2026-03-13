@@ -22,6 +22,7 @@ from datetime import datetime, timedelta
 
 from ganuda_db import get_connection, get_dict_cursor, safe_thermal_write
 from specialist_council import SpecialistCouncil
+from partner_rhythm import PartnerRhythmEngine
 
 try:
     from slack_federation import send as slack_send
@@ -208,33 +209,17 @@ def attractor_metrics(cur) -> str:
     )
 
 
-def run_standup():
-    """Gather items, run council vote, store results."""
-    conn = None
-    try:
-        conn = get_connection()
-        cur = get_dict_cursor(conn)
+def partner_rhythm_report(cur) -> str:
+    """Partner Rhythm: Predictive insights from partner's digital breadcrumbs."""
+    engine = PartnerRhythmEngine()
+    report = engine.generate_report()
 
-        # Gather the three items
-        forward = forward_look(cur)
-        backward = backward_look(cur)
-        pulse = health_pulse(cur)
-        attractors = attractor_metrics(cur)
-
-        digest = f"""DAWN MIST STANDUP — {datetime.now().strftime('%A %B %d, %Y')}
-
-{forward}
-
-{backward}
-
-{pulse}
-
-{attractors if attractors else ''}
-
-Council: Review this morning's standup. Flag anything that needs deeper attention today. Keep it brief — this is a standup, not a deliberation."""
-
-        logger.info(f"Dawn mist digest assembled, running council vote...")
-
-        # Run lightweight council vote (low max_tokens = standup, not deliberation)
-        council = SpecialistCouncil(max_tokens=150)
-        result = council.vote(digest
+    return (
+        f"PARTNER RHYTHM — {datetime.now().strftime('%A %B %d, %Y %H:%M CT')}\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"Partner Phase: {report['current_phase']}\n"
+        f"Predicted Focus: {', '.join(report['predicted_focus'])}\n"
+        f"Sacred Window: {report['sacred_window']['next_likely_window']} "
+        f"({report['sacred_window']['confidence']}% confidence)\n\n"
+        f"Overnight:\n"
+        f"  Fire Guard: {report['overnight']['fire_guard']} alerts

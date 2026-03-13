@@ -1086,6 +1086,7 @@ class SpecialistCouncil:
                 )
                 fb_resp.raise_for_status()
                 content = fb_resp.json()["choices"][0]["message"]["content"]
+                content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
 
             # Check for concern flags
             has_concern = spec["concern_flag"] in content
@@ -1133,7 +1134,8 @@ class SpecialistCouncil:
                 },
                 timeout=60
             )
-            return response.json()["choices"][0]["message"]["content"]
+            content = response.json()["choices"][0]["message"]["content"]
+            return re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
         except:
             return "Consensus synthesis failed - review individual responses"
 
@@ -1760,7 +1762,8 @@ class SpecialistCouncil:
                 },
                 timeout=60
             )
-            return response.json()["choices"][0]["message"]["content"]
+            content = response.json()["choices"][0]["message"]["content"]
+            return re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
         except Exception as e:
             return f"Deliberation failed: {str(e)}"
 

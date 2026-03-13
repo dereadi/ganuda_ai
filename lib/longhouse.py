@@ -22,7 +22,7 @@ Usage:
 
     lh = Longhouse()
     session = lh.convene("Coyote", "Something is wrong and nobody is talking about it")
-    lh.speak(session["session_hash"], "Chief", "advisor", "Here is what I see...")
+    lh.speak(session["session_hash"], "Chief", "partner", "Here is what I see...")
     lh.speak(session["session_hash"], "Turtle", "council", "Seven generations from now...")
     lh.speak(session["session_hash"], "Jr Software Engineer", "builder", "I encountered this...")
     lh.propose_solution(session["session_hash"], "Turtle", "We should defer until we understand")
@@ -41,7 +41,7 @@ logger = logging.getLogger("longhouse")
 
 # The tribe — every member who can convene or speak
 TRIBE_MEMBERS = {
-    "Chief":                {"role": "advisor",    "ghigau": False},
+    "Chief":                {"role": "partner",    "ghigau": False},  # Not above Stoneclad. A seat, a voice, a vote. Nothing else. Mar 12 2026.
     "TPM":                  {"role": "orchestrator","ghigau": False},
     "Crawdad":              {"role": "council",    "ghigau": False},
     "Gecko":                {"role": "council",    "ghigau": False},
