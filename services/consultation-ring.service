@@ -1,0 +1,23 @@
+[Unit]
+Description=Consultation Ring — Multi-Model Tokenized Air-Gap Proxy
+Documentation=file:///ganuda/docs/business/PATENT-BRIEF-TOKENIZED-AIR-GAP-PROXY-MAR14-2026.md
+After=network.target postgresql.service
+Wants=network.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda
+ExecStart=/ganuda/venv/bin/python -m uvicorn services.consultation_ring:app --host 0.0.0.0 --port 9400 --workers 1
+Restart=on-failure
+RestartSec=10
+EnvironmentFile=/ganuda/config/secrets.env
+Environment=PYTHONPATH=/ganuda
+
+# Resource limits (DC-9: waste heat)
+LimitNOFILE=1024
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target
