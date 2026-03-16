@@ -11,6 +11,7 @@ Example: python3 jr_task_executor.py jr-redfin-gecko redfin
 Enhanced Dec 23, 2025: Added 'content' task type for document generation.
 Enhanced Dec 23, 2025: Added 'code' task type with RAG, FARA, and syntax validation.
 Enhanced Dec 24, 2025: Added SwarmSys pheromone integration for stigmergic coordination.
+Enhanced Mar 16, 2026: Added PreFlect pre-execution self-critique (task #1410).
 
 For Seven Generations - Cherokee AI Federation
 """
@@ -59,6 +60,19 @@ from psycopg2.extras import RealDictCursor
 from datetime import datetime
 from typing import Tuple, List, Optional
 
+# Langfuse observability (LAN-only, Phase 1 hardcoded keys acceptable per Crawdad)
+try:
+    from langfuse import Langfuse
+    langfuse = Langfuse(
+        host="http://192.168.132.224:3100",
+        public_key="pk-lf-1f281f24-e575-4c62-b208-84b71544ad33",
+        secret_key="sk-lf-ba2b2dea-9392-4c59-b2c5-901d9853bb96",
+    )
+    LANGFUSE_ENABLED = True
+except Exception:
+    LANGFUSE_ENABLED = False
+    print("[WARN] langfuse not available, trace instrumentation disabled")
+
 # Configuration
 POLL_INTERVAL = 30  # seconds between task checks
 MAX_TASK_DURATION = 3600  # 1 hour timeout
@@ -103,6 +117,28 @@ CODE_SAFE_WRITE_PATHS = [
     '/ganuda/experiments/',  # Experiment outputs
 ]
 
+# PreFlect pre-execution self-critique prompt (Task #1410, Mar 16 2026)
+PREFLECT_PROMPT = """You are a plan reviewer. Examine this execution plan and identify:
+1. Assumptions that might be wrong
+2. Steps that could fail and how
+3. Missing error handling or edge cases
+4. Whether the plan actually solves the stated problem
+
+PLAN:
+{plan}
+
+TASK CONTEXT:
+{task_context}
+
+Respond with EXACTLY this format:
+ACTION: [PASS|MODIFY|FLAG]
+CRITIQUE: [Your analysis in 2-3 sentences]
+REVISED_PLAN: [Only if ACTION is MODIFY — the improved plan. Otherwise "N/A"]
+"""
+
+# Local vLLM endpoint for PreFlect (Crawdad: local only, no external models)
+PREFLECT_VLLM_URL = "http://localhost:8000/v1/chat/completions"
+
 
 class JrTaskExecutor:
     """
@@ -115,6 +151,7 @@ class JrTaskExecutor:
         self.node_name = node_name
         self.running = True
         self._conn = None
+        self._current_trace = None  # Langfuse trace for current task
         self.last_cleanup = 0  # For periodic stale task cleanup
 
         signal.signal(signal.SIGINT, self._shutdown)
@@ -393,28 +430,210 @@ class JrTaskExecutor:
         except Exception as e:
             print(f"[{self.agent_id}] Error starting task: {e}")
 
+    # =========================================================================
+    # PreFlect — Pre-Execution Self-Critique (Task #1410, Mar 16 2026)
+    # Council: Crawdad (local only), Turtle (feature flag), Coyote (track rates)
+    # =========================================================================
+
+    def _estimate_step_count(self, task_content: str) -> int:
+        """
+        Estimate the number of steps in a task from its content.
+
+        Counts numbered items (1. 2. 3.), bullet points, and
+        multi-file references as proxies for task complexity.
+        Peace Chief gate: skip PreFlect for trivial tasks (<3 steps).
+        """
+        # Count numbered steps (e.g., "1.", "2.", "Step 1:")
+        numbered = len(re.findall(r'(?m)^\s*(?:\d+[\.\):]|Step\s+\d+)', task_content))
+        if numbered >= 3:
+            return numbered
+
+        # Count bullet points
+        bullets = len(re.findall(r'(?m)^\s*[-*]\s+', task_content))
+        if bullets >= 3:
+            return bullets
+
+        # Count file references as proxy for complexity
+        file_refs = len(re.findall(r'/\S+\.\w{1,4}\b', task_content))
+        if file_refs >= 3:
+            return file_refs
+
+        # Heuristic: long content (>500 chars) with multiple paragraphs
+        paragraphs = len([p for p in task_content.split('\n\n') if p.strip()])
+        return max(paragraphs, 1)
+
+    def _preflect_critique(self, plan: str, task_context: str) -> dict:
+        """
+        Pre-execution self-critique via local vLLM.
+
+        Crawdad: Uses localhost:8000 ONLY — no external models see task context.
+        Peace Chief: Max 300 tokens for critique response.
+        Returns {action: PASS|MODIFY|FLAG, critique: str, revised_plan: str|None}
+        """
+        prompt = PREFLECT_PROMPT.format(plan=plan[:2000], task_context=task_context[:1000])
+
+        try:
+            response = requests.post(
+                PREFLECT_VLLM_URL,
+                json={
+                    "model": "default",
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": 300,
+                    "temperature": 0.3
+                },
+                timeout=30
+            )
+            response.raise_for_status()
+            data = response.json()
+            raw_text = data['choices'][0]['message']['content']
+
+            # Strip <think> tags (Qwen2.5 reasoning mode artifact)
+            raw_text = re.sub(r'<think>.*?</think>', '', raw_text, flags=re.DOTALL).strip()
+
+            # Parse structured response
+            action_match = re.search(r'ACTION:\s*(PASS|MODIFY|FLAG)', raw_text, re.IGNORECASE)
+            critique_match = re.search(r'CRITIQUE:\s*(.+?)(?=\nREVISED_PLAN:|\Z)', raw_text, re.DOTALL)
+            revised_match = re.search(r'REVISED_PLAN:\s*(.+)', raw_text, re.DOTALL)
+
+            action = action_match.group(1).upper() if action_match else 'PASS'
+            critique = critique_match.group(1).strip() if critique_match else raw_text[:200]
+            revised_plan = None
+            if action == 'MODIFY' and revised_match:
+                revised_text = revised_match.group(1).strip()
+                if revised_text and revised_text.upper() != 'N/A':
+                    revised_plan = revised_text
+
+            # Log PreFlect generation to Langfuse
+            if self._current_trace is not None:
+                try:
+                    usage = data.get('usage', {})
+                    self._current_trace.generation(
+                        name="preflect",
+                        model="qwen2.5-72b-local",
+                        input=prompt[:500],
+                        output=raw_text[:500],
+                        usage={"input": usage.get('prompt_tokens', 0),
+                               "output": usage.get('completion_tokens', 0)},
+                        metadata={"action": action},
+                    )
+                except Exception:
+                    pass  # Never break task execution for telemetry
+
+            return {
+                'action': action,
+                'critique': critique[:500],
+                'revised_plan': revised_plan
+            }
+
+        except Exception as e:
+            print(f"[{self.agent_id}] PreFlect vLLM call failed (continuing without critique): {e}")
+            return {
+                'action': 'PASS',
+                'critique': f'PreFlect unavailable: {str(e)[:100]}',
+                'revised_plan': None
+            }
+
+    def _log_preflect(self, task_id: str, preflect_result: dict):
+        """
+        Store PreFlect result in task metadata (Eagle Eye drift detection).
+
+        Coyote: Track action rates for tuning.
+        Crawdad: Ephemeral — NOT stored in thermal memory at high temp.
+        """
+        try:
+            conn = self._get_connection()
+            with conn.cursor() as cur:
+                preflect_data = json.dumps({
+                    "preflect_action": preflect_result['action'],
+                    "preflect_critique": preflect_result['critique'][:300],
+                    "preflect_at": datetime.now().isoformat()
+                })
+                cur.execute("""
+                    UPDATE jr_task_announcements
+                    SET metadata = COALESCE(metadata, '{}'::jsonb) || %s::jsonb
+                    WHERE task_id = %s
+                """, (preflect_data, task_id))
+                conn.commit()
+        except Exception as e:
+            print(f"[{self.agent_id}] PreFlect log error (non-fatal): {e}")
+
     def execute_task(self, task: dict) -> Tuple[bool, str]:
         """Execute task based on type."""
         task_type = task.get('task_type', 'unknown')
         task_id = task['task_id']
+        task_content = task.get('task_content', '')
+        _task_start_time = time.time()
+
+        # Create Langfuse trace for entire task execution
+        if LANGFUSE_ENABLED:
+            try:
+                self._current_trace = langfuse.trace(
+                    name=f"jr_task_{task_type}",
+                    metadata={
+                        "task_id": task_id,
+                        "task_type": task_type,
+                        "agent_id": self.agent_id,
+                        "node": self.node_name,
+                        "step_count": self._estimate_step_count(task_content),
+                    },
+                )
+            except Exception:
+                self._current_trace = None
 
         print(f"[{self.agent_id}] Executing {task_type} task: {task_id}")
 
+        # PreFlect pre-execution self-critique (Task #1410)
+        # Turtle: Feature flag, default enabled
+        # Peace Chief: Skip trivial tasks (<3 steps)
+        if os.environ.get('PREFLECT_ENABLED', 'true').lower() == 'true':
+            step_count = self._estimate_step_count(task_content)
+            if step_count >= 3:
+                print(f"[{self.agent_id}] [PREFLECT] Running critique (~{step_count} steps detected)")
+                preflect_result = self._preflect_critique(task_content, task_content)
+                self._log_preflect(task_id, preflect_result)
+
+                if preflect_result['action'] == 'MODIFY' and preflect_result['revised_plan']:
+                    print(f"[{self.agent_id}] [PREFLECT] MODIFY — using revised plan")
+                    task = dict(task)  # Copy to avoid mutating original
+                    task['task_content'] = preflect_result['revised_plan']
+                elif preflect_result['action'] == 'FLAG':
+                    print(f"[{self.agent_id}] [PREFLECT] FLAG — {preflect_result['critique'][:150]}")
+                else:
+                    print(f"[{self.agent_id}] [PREFLECT] PASS — plan looks good")
+            else:
+                print(f"[{self.agent_id}] [PREFLECT] Skipped (trivial task, {step_count} step(s))")
+
+        success = False
+        result_msg = ""
         try:
             if task_type == 'research':
-                return self._execute_research_task(task)
+                success, result_msg = self._execute_research_task(task)
             elif task_type == 'implementation':
-                return self._execute_implementation_task(task)
+                success, result_msg = self._execute_implementation_task(task)
             elif task_type == 'review':
-                return self._execute_review_task(task)
+                success, result_msg = self._execute_review_task(task)
             elif task_type == 'content':
-                return self._execute_content_task(task)
+                success, result_msg = self._execute_content_task(task)
             elif task_type == 'code':
-                return self._execute_code_task(task)
+                success, result_msg = self._execute_code_task(task)
             else:
-                return False, f"Unknown task type: {task_type}"
+                success, result_msg = False, f"Unknown task type: {task_type}"
         except Exception as e:
-            return False, f"Execution error: {str(e)}"
+            success, result_msg = False, f"Execution error: {str(e)}"
+        finally:
+            # Finalize Langfuse trace with outcome
+            if self._current_trace is not None:
+                try:
+                    self._current_trace.update(metadata={
+                        "task_id": task_id,
+                        "task_type": task_type,
+                        "success": success,
+                        "duration_s": round(time.time() - _task_start_time, 2),
+                    })
+                except Exception:
+                    pass
+                self._current_trace = None
+        return success, result_msg
 
     def _query_thermal_memory(self, query: str, limit: int = 5) -> str:
         """Query thermal memory using semantic search with keyword fallback."""
@@ -486,7 +705,24 @@ class JrTaskExecutor:
             )
             response.raise_for_status()
             data = response.json()
-            return data['choices'][0]['message']['content']
+            content = data['choices'][0]['message']['content']
+
+            # Log generation to Langfuse
+            if self._current_trace is not None:
+                try:
+                    usage = data.get('usage', {})
+                    self._current_trace.generation(
+                        name="llm_call",
+                        model=data.get('model', 'default'),
+                        input=prompt[:500],
+                        output=content[:500],
+                        usage={"input": usage.get('prompt_tokens', 0),
+                               "output": usage.get('completion_tokens', 0)},
+                    )
+                except Exception:
+                    pass  # Never break task execution for telemetry
+
+            return content
         except Exception as e:
             return f"LLM call failed: {str(e)}"
 
@@ -512,13 +748,32 @@ class JrTaskExecutor:
             )
             response.raise_for_status()
             data = response.json()
-            
+
             # Log which model was used
             routing = data.get("routing", {})
             if routing:
                 print(f"[{self.agent_id}] Routed to {routing.get('model_used', 'unknown')} for {routing.get('task_type', 'unknown')}")
-            
-            return data['choices'][0]['message']['content']
+
+            content = data['choices'][0]['message']['content']
+
+            # Log generation to Langfuse with routing metadata
+            if self._current_trace is not None:
+                try:
+                    usage = data.get('usage', {})
+                    model_used = routing.get('model_used', 'auto')
+                    self._current_trace.generation(
+                        name="llm_call_routed",
+                        model=model_used,
+                        input=prompt[:500],
+                        output=content[:500],
+                        usage={"input": usage.get('prompt_tokens', 0),
+                               "output": usage.get('completion_tokens', 0)},
+                        metadata={"routing": routing},
+                    )
+                except Exception:
+                    pass  # Never break task execution for telemetry
+
+            return content
         except Exception as e:
             return f"LLM call failed: {str(e)}"
 
@@ -853,6 +1108,18 @@ Generate the {language} code now. Output ONLY code, starting immediately:"""
             self._record_fara_mistake(language, clean_code, validation_msg)
             return False, f"Code syntax validation failed: {validation_msg}"
 
+        # Code review gate — sasass2 Qwen2.5-Coder:32b (soft gate)
+        review_approved, review_feedback = self._review_code_with_sasass2(
+            clean_code, task_content, language
+        )
+        if not review_approved:
+            print(f"[{self.agent_id}] CODE_REVIEW_REJECTED: {review_feedback[:200]}")
+            self._record_fara_mistake(language, clean_code, f"Review rejected: {review_feedback}")
+            return False, f"Code review rejected by sasass2: {review_feedback}"
+
+        if review_feedback not in ("reviewer_unavailable", "reviewer_timeout"):
+            print(f"[{self.agent_id}] CODE_REVIEW_APPROVED: {review_feedback[:100]}")
+
         # Determine output path
         output_path = self._extract_code_output_path(task_content, language)
 
@@ -867,7 +1134,8 @@ Generate the {language} code now. Output ONLY code, starting immediately:"""
                     f.write(clean_code)
                 # Log success with prompt size for optimization research
                 print(f"[{self.agent_id}] PROMPT_SIZE_OK: {prompt_chars} chars, output: {len(clean_code)} chars")
-                return True, f"Code generated and saved to {output_path}"
+                review_status = "reviewed" if "APPROVE" in review_feedback.upper() else review_feedback
+                return True, f"Code generated and saved to {output_path} [{review_status}]"
             except Exception as e:
                 return False, f"Could not save code: {e}"
         else:
@@ -1121,6 +1389,65 @@ fi
 
         # Default: assume valid for other languages
         return True, f"Syntax validation not implemented for {language}"
+
+    def _review_code_with_sasass2(self, code: str, task_content: str, language: str) -> tuple:
+        """Send generated code to sasass2 Qwen2.5-Coder:32b for review.
+
+        Returns (approved: bool, feedback: str).
+        Soft gate: returns (True, "reviewer_unavailable") if sasass2 is down.
+        """
+        import requests
+
+        review_prompt = f"""Review this {language} code generated for the following task.
+
+TASK: {task_content[:500]}
+
+CODE:
+```{language}
+{code[:3000]}
+```
+
+Review criteria:
+1. Security: No command injection, no hardcoded credentials, no unsafe eval/exec
+2. Correctness: Does the code accomplish the task described?
+3. Style: Reasonable variable names, no dead code, imports used
+4. Safety: No destructive operations (rm -rf, DROP TABLE, etc.) without safeguards
+
+Respond with EXACTLY one of:
+APPROVE: <one-line reason>
+REJECT: <specific issue that must be fixed>"""
+
+        try:
+            resp = requests.post(
+                "http://192.168.132.242:11434/api/generate",
+                json={
+                    "model": "qwen2.5-coder:32b",
+                    "prompt": review_prompt,
+                    "stream": False,
+                    "options": {"temperature": 0.1, "num_predict": 200},
+                },
+                timeout=60,
+            )
+            if resp.status_code != 200:
+                print(f"[{self.agent_id}] CODE_REVIEW: sasass2 returned {resp.status_code}, skipping gate")
+                return True, "reviewer_unavailable"
+
+            review = resp.json().get("response", "").strip()
+            print(f"[{self.agent_id}] CODE_REVIEW: {review[:200]}")
+
+            if review.upper().startswith("REJECT"):
+                return False, review
+            return True, review
+
+        except requests.exceptions.ConnectionError:
+            print(f"[{self.agent_id}] CODE_REVIEW: sasass2 unreachable, skipping gate")
+            return True, "reviewer_unavailable"
+        except requests.exceptions.Timeout:
+            print(f"[{self.agent_id}] CODE_REVIEW: sasass2 timeout, skipping gate")
+            return True, "reviewer_timeout"
+        except Exception as e:
+            print(f"[{self.agent_id}] CODE_REVIEW: error {e}, skipping gate")
+            return True, f"reviewer_error: {e}"
 
     def _record_fara_mistake(self, language: str, code: str, error: str):
         """Record mistake for FARA learning."""

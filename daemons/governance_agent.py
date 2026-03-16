@@ -28,8 +28,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger('governance_agent')
 
+DB_HOST_PRIMARY = os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')    # WireGuard (reliable)
+DB_HOST_FALLBACK = '192.168.132.222'                                   # LAN (flaky)
+
 DB_CONFIG = {
-    'host': '192.168.132.222',
+    'host': DB_HOST_PRIMARY,
     'database': 'zammad_production',
     'user': 'claude',
     'password': os.environ.get('CHEROKEE_DB_PASS', '')
@@ -58,24 +61,32 @@ ALERT_RULES = {
         'severity': 'WARNING',
         'message': 'Council avg confidence below 0.6 in last 24h ({value:.2f})',
         'value_key': 'avg_confidence_24h',
+        'cooldown_hours': 6,      # Don't re-alert for 6 hours
+        'escalate_after': 6,      # Only escalate after 6 consecutive cycles (3 hours)
     },
     'specialist_concern_spike': {
         'condition': lambda m: any(c > 5 for c in m.get('concerns_by_specialist', {}).values()),
         'severity': 'WARNING',
         'message': 'Specialist raised >5 concerns in 24h: {details}',
         'value_key': 'concerns_by_specialist',
+        'cooldown_hours': 6,
+        'escalate_after': 6,
     },
     'jr_failure_rate': {
         'condition': lambda m: m.get('jr_success_rate_24h', 1.0) < 0.7,
         'severity': 'ALERT',
         'message': 'Jr task failure rate >30% in 24h (success rate: {value:.0%})',
         'value_key': 'jr_success_rate_24h',
+        'cooldown_hours': 4,
+        'escalate_after': 3,
     },
     'memory_integrity_violation': {
         'condition': lambda m: m.get('integrity_violations', 0) > 0,
         'severity': 'CRITICAL',
         'message': '{count} thermal memory integrity violations detected!',
         'value_key': 'integrity_violations',
+        'cooldown_hours': 1,      # CRITICAL alerts still re-fire, but not every 30 min
+        'escalate_after': 1,      # Escalate immediately
     },
     'sacred_memory_count_change': {
         'condition': lambda m: (
@@ -84,27 +95,46 @@ ALERT_RULES = {
         'severity': 'CRITICAL',
         'message': 'Sacred memory count DECREASED: expected {expected}, got {actual}',
         'value_key': 'sacred_count',
+        'cooldown_hours': 1,
+        'escalate_after': 1,
     },
     'circuit_breaker_open': {
         'condition': lambda m: m.get('open_breakers', 0) > 0,
-        'severity': 'ALERT',
+        'severity': 'WARNING',     # Downgraded from ALERT — log internally, only escalate if persistent
         'message': '{count} specialist circuit breaker(s) OPEN: {specialists}',
         'value_key': 'open_breakers',
+        'cooldown_hours': 8,      # Circuit breakers are structural, not urgent — once per 8 hours max
+        'escalate_after': 12,     # Only alert Chief after 6 hours of continuous OPEN (12 cycles)
     },
     'memory_growth_anomaly': {
         'condition': lambda m: m.get('memory_count_24h', 0) > 500,
         'severity': 'WARNING',
         'message': 'Unusual memory growth: {count} new memories in 24h',
         'value_key': 'memory_count_24h',
+        'cooldown_hours': 12,
+        'escalate_after': 6,
     },
 }
+
+# Track how many consecutive cycles each rule has been firing
+# and the last time it was sent to Chief
+_alert_streak = {}   # rule_name -> consecutive_fire_count
+_alert_last_sent = {}  # rule_name -> datetime of last external alert
 
 # Persistent state file for cross-cycle tracking
 STATE_FILE = '/ganuda/daemons/.governance_state.json'
 
 
 def get_conn():
-    return psycopg2.connect(**DB_CONFIG)
+    """Connect to bluefin PostgreSQL. Tries WireGuard first, falls back to LAN."""
+    try:
+        return psycopg2.connect(**DB_CONFIG)
+    except psycopg2.OperationalError as e:
+        if DB_CONFIG['host'] != DB_HOST_FALLBACK:
+            logger.warning(f"Primary DB connect failed ({DB_CONFIG['host']}): {e} — falling back to LAN ({DB_HOST_FALLBACK})")
+            fallback_config = dict(DB_CONFIG, host=DB_HOST_FALLBACK)
+            return psycopg2.connect(**fallback_config)
+        raise
 
 
 def load_state():
@@ -443,9 +473,49 @@ def send_telegram_alert(severity, message):
 
 
 def deliver_alerts(alerts):
-    """Deliver all triggered alerts via Telegram."""
+    """Deliver alerts with cooldown and escalation ladder.
+
+    - Tracks consecutive cycles each rule fires (_alert_streak)
+    - Only sends external alert (Slack/Telegram) if streak >= escalate_after
+    - Respects cooldown_hours between external alerts
+    - Always logs to journal regardless of cooldown
+    - Self-correcting: if a rule STOPS firing, streak resets and no more alerts
+    """
+    now = datetime.now(timezone.utc)
+    fired_rules = {a['rule'] for a in alerts}
+
+    # Reset streak for rules that are NOT firing this cycle (self-correction)
+    for rule_name in list(_alert_streak.keys()):
+        if rule_name not in fired_rules:
+            old_streak = _alert_streak.pop(rule_name, 0)
+            if old_streak >= 3:
+                logger.info(f"[DRIFT SELF-CORRECTED] {rule_name} resolved after {old_streak} cycles")
+
     for alert in alerts:
+        rule_name = alert.get('rule', 'unknown')
+        rule_config = ALERT_RULES.get(rule_name, {})
+        cooldown_hours = rule_config.get('cooldown_hours', 4)
+        escalate_after = rule_config.get('escalate_after', 3)
+
+        # Increment streak
+        _alert_streak[rule_name] = _alert_streak.get(rule_name, 0) + 1
+        streak = _alert_streak[rule_name]
+
+        # Always log internally
+        logger.info(f"[DRIFT {alert['severity']}] {alert['message']} (streak: {streak}/{escalate_after})")
+
+        # Check if we should send external alert
+        if streak < escalate_after:
+            continue  # Not persistent enough yet — cluster handles it
+
+        # Check cooldown
+        last_sent = _alert_last_sent.get(rule_name)
+        if last_sent and (now - last_sent).total_seconds() < cooldown_hours * 3600:
+            continue  # Still in cooldown — don't spam Chief
+
+        # Persistent and cooldown expired — escalate to Chief
         send_telegram_alert(alert['severity'], alert['message'])
+        _alert_last_sent[rule_name] = now
 
 
 # ============================================================================
