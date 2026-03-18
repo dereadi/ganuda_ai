@@ -1,0 +1,48 @@
+{
+  "platform": "substack",
+  "publication": "derpatodiablo",
+  "cadence": "2x_weekly",
+  "calendar": [
+    {
+      "title": "Basins All the Way Down",
+      "source_url": "https://ganuda.us/blog/basins-all-the-way-down",
+      "substack_url": "https://derpatodiablo.substack.com/p/basins-all-the-way-down",
+      "status": "published",
+      "published_date": "2026-03-17",
+      "type": "newsletter"
+    },
+    {
+      "title": "What If the Other Side of Life Is Meta?",
+      "source_url": null,
+      "substack_url": "https://derpatodiablo.substack.com/p/what-if-the-other-side-of-life-is",
+      "status": "published",
+      "published_date": "2026-03-18",
+      "type": "newsletter"
+    },
+    {
+      "title": "Graduated Basins: How Prediction Engines Scale Into Awareness",
+      "source_url": "https://ganuda.us/blog/graduated-basins",
+      "substack_url": null,
+      "target_date": "2026-03-25",
+      "status": "scheduled",
+      "type": "newsletter"
+    },
+    {
+      "title": "Proto-Valence: When Prediction Starts to Care",
+      "source_url": "https://ganuda.us/blog/proto-valence",
+      "substack_url": null,
+      "target_date": "2026-03-28",
+      "status": "scheduled",
+      "type": "newsletter"
+    },
+    {
+      "title": "The Constitutional Stack Is Already Running",
+      "source_url": null,
+      "substack_url": null,
+      "target_date": "2026-04-01",
+      "status": "planned",
+      "type": "newsletter",
+      "notes": "Response to Travis L. Constitutional Stack framework. Tulip test — show dont tell."
+    }
+  ]
+}

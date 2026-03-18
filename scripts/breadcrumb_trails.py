@@ -163,6 +163,7 @@ def main():
         print(f"Least referenced: {stats['least_referenced_specialist']} ({memory_counts.get(stats['least_referenced_specialist'], 0)})")
 
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

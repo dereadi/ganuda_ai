@@ -149,6 +149,7 @@ def phase_quiesce(dry_run: bool = False) -> dict:
             """)
             running = cur.fetchone()[0]
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
 
             if running == 0:
@@ -343,6 +344,7 @@ def phase_verify(dry_run: bool = False) -> dict:
         results['row_count'] = {'error': str(e)}
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     duration = time.time() - start
@@ -416,6 +418,7 @@ def phase_consolidate(dry_run: bool = False) -> dict:
             cur = conn.cursor()
             cur.execute("VACUUM ANALYZE thermal_memory_archive")
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
             results['vacuum'] = {'status': 'completed'}
             logger.info("    VACUUM ANALYZE complete")

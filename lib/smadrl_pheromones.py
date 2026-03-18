@@ -120,6 +120,7 @@ def read_pheromones(
                 """, (location_type, location_id, MIN_INTENSITY_THRESHOLD))
 
             rows = cur.fetchall()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         return [
@@ -166,6 +167,7 @@ def get_agent_pheromone_affinity(agent_id: str, task_type: str) -> float:
                   AND location_id = %s
             """, (agent_id, task_type))
             row = cur.fetchone()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         if not row or (row[0] == 0 and row[1] == 0):
@@ -294,6 +296,7 @@ def get_pheromone_stats() -> Dict:
                 WHERE intensity > %s
             """, (MIN_INTENSITY_THRESHOLD,))
             row = cur.fetchone()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         return {

@@ -117,6 +117,19 @@ class JrTaskExecutor:
     def _get_connection(self):
         if self._conn is None or self._conn.closed:
             self._conn = psycopg2.connect(**DB_CONFIG)
+        else:
+            # Clean up any idle-in-transaction state from prior reads
+            try:
+                if self._conn.info.transaction_status == psycopg2.extensions.TRANSACTION_STATUS_INERROR:
+                    self._conn.rollback()
+                elif self._conn.info.transaction_status == psycopg2.extensions.TRANSACTION_STATUS_INTRANS:
+                    self._conn.commit()
+            except Exception:
+                try:
+                    self._conn.close()
+                except Exception:
+                    pass
+                self._conn = psycopg2.connect(**DB_CONFIG)
         return self._conn
 
     def _shutdown(self, signum, frame):
@@ -231,6 +244,7 @@ class JrTaskExecutor:
                     LIMIT 1
                 """, (self.agent_id,))
                 result = cur.fetchall()
+                conn.commit()  # Commit read txn to avoid implicit ROLLBACK
                 return list(result)
         except Exception as e:
             print(f"[{self.agent_id}] Error fetching tasks: {e}")

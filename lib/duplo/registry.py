@@ -213,6 +213,7 @@ class ToolRegistry:
             logger.info(f"Synced {count} tools to duplo_tool_registry")
             return count
         finally:
+            conn.commit()  # explicit commit before close
             conn.close()
 
 

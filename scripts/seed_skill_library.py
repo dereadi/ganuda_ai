@@ -379,6 +379,7 @@ def main():
             logger.info("  %s | %s | %s | d=%d | %s", row[0], row[2], row[1], row[3], row[4])
         cur.close()
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

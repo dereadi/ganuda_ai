@@ -1,82 +1,68 @@
 -- Consultation Ring: Multi-Model Consultation Service
 -- Patent Brief #7: Tokenized Air-Gap Proxy
 -- Council Vote: a3ee2a8066e04490 (UNANIMOUS)
--- Date: 2026-03-14
+-- Jr Task #1424: DB Migration + Config
+-- Date: 2026-03-18
 --
 -- Deploy: psql -h 192.168.132.222 -U claude -d zammad_production -f consultation_ring_schema.sql
 
 BEGIN;
 
--- ── Consultation model performance stats (UCB bandit) ──
-CREATE TABLE IF NOT EXISTS consultation_model_stats (
-    id SERIAL PRIMARY KEY,
-    model_name VARCHAR(100) NOT NULL,
-    provider VARCHAR(50) NOT NULL,
-    domain VARCHAR(50) NOT NULL DEFAULT 'general',
-    total_calls INTEGER DEFAULT 0,
-    successful_calls INTEGER DEFAULT 0,
-    total_reward NUMERIC(12,4) DEFAULT 0,
-    avg_latency_ms NUMERIC(10,2) DEFAULT 0,
-    total_cost NUMERIC(10,4) DEFAULT 0,
-    last_called TIMESTAMP,
-    enabled BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE(model_name, domain)
-);
+-- ── Drop old schema if exists (v1 → v2 migration) ──
+DROP TABLE IF EXISTS consultation_log CASCADE;
+DROP TABLE IF EXISTS consultation_model_stats CASCADE;
 
-CREATE INDEX IF NOT EXISTS idx_consultation_stats_domain
-    ON consultation_model_stats (domain, enabled);
-
-CREATE INDEX IF NOT EXISTS idx_consultation_stats_provider
-    ON consultation_model_stats (provider, enabled);
-
--- ── Consultation audit log ──
-CREATE TABLE IF NOT EXISTS consultation_log (
+-- ── Consultation log (audit trail, tokenized queries only) ──
+CREATE TABLE consultation_log (
     id SERIAL PRIMARY KEY,
     query_hash VARCHAR(64) NOT NULL,
-    domain VARCHAR(50) NOT NULL DEFAULT 'general',
-    model_selected VARCHAR(100) NOT NULL,
-    provider VARCHAR(50) NOT NULL,
-    tokenized BOOLEAN DEFAULT true,
-    pii_tokens_replaced INTEGER DEFAULT 0,
-    infra_tokens_replaced INTEGER DEFAULT 0,
-    outbound_scrub_passed BOOLEAN DEFAULT true,
-    valence_outcome VARCHAR(20) DEFAULT 'accept',
-    valence_score NUMERIC(5,4),
+    query_text TEXT NOT NULL,
+    domain VARCHAR(64),
+    model_selected VARCHAR(128),
+    adapter_used VARCHAR(64),
+    response_text TEXT,
+    valence_score FLOAT,
+    valence_tier VARCHAR(20) CHECK (valence_tier IN ('accept','flag','reject')),
+    token_count_in INTEGER,
+    token_count_out INTEGER,
     latency_ms INTEGER,
-    cost NUMERIC(10,6),
-    error TEXT,
-    created_at TIMESTAMP DEFAULT NOW()
+    cost_estimate FLOAT DEFAULT 0.0,
+    provenance JSONB DEFAULT '{}',
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_consultation_log_created
-    ON consultation_log (created_at);
+CREATE INDEX idx_consultation_log_created ON consultation_log (created_at);
+CREATE INDEX idx_consultation_log_model ON consultation_log (model_selected, created_at);
+CREATE INDEX idx_consultation_log_domain ON consultation_log (domain);
+CREATE INDEX idx_consultation_log_query_hash ON consultation_log (query_hash);
 
-CREATE INDEX IF NOT EXISTS idx_consultation_log_model
-    ON consultation_log (model_selected, created_at);
+-- ── Consultation model performance stats (UCB1 bandit) ──
+CREATE TABLE consultation_model_stats (
+    id SERIAL PRIMARY KEY,
+    model_name VARCHAR(128) NOT NULL UNIQUE,
+    domain VARCHAR(64) DEFAULT 'general',
+    total_pulls INTEGER DEFAULT 0,
+    total_reward FLOAT DEFAULT 0.0,
+    mean_reward FLOAT DEFAULT 0.0,
+    last_selected_at TIMESTAMPTZ,
+    enabled BOOLEAN DEFAULT true,
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
--- ── Seed frontier models for UCB bandit ──
--- Optimistic prior: 1 success / 2 total (encourages exploration)
-INSERT INTO consultation_model_stats (model_name, provider, domain, total_calls, successful_calls, total_reward)
-VALUES
-    ('claude-sonnet-4-6', 'anthropic', 'general', 2, 1, 1.0),
-    ('claude-sonnet-4-6', 'anthropic', 'code', 2, 1, 1.0),
-    ('claude-sonnet-4-6', 'anthropic', 'research', 2, 1, 1.0),
-    ('claude-sonnet-4-6', 'anthropic', 'legal', 2, 1, 1.0),
-    ('gpt-4o', 'openai', 'general', 2, 1, 1.0),
-    ('gpt-4o', 'openai', 'code', 2, 1, 1.0),
-    ('gpt-4o', 'openai', 'research', 2, 1, 1.0),
-    ('gemini-2.0-flash', 'google', 'general', 2, 1, 1.0),
-    ('gemini-2.0-flash', 'google', 'research', 2, 1, 1.0),
-    ('local-qwen-72b', 'local', 'general', 2, 1, 1.0),
-    ('local-qwen-72b', 'local', 'code', 2, 1, 1.0),
-    ('local-llama-70b', 'local', 'general', 2, 1, 1.0),
-    ('local-llama-70b', 'local', 'code', 2, 1, 1.0),
-    ('local-qwen3-30b', 'local', 'general', 2, 1, 1.0)
-ON CONFLICT (model_name, domain) DO NOTHING;
+CREATE INDEX idx_consultation_stats_domain ON consultation_model_stats (domain, enabled);
+CREATE INDEX idx_consultation_stats_enabled ON consultation_model_stats (enabled);
 
--- ── Register consultation_ring in duplo_tool_registry ──
+-- ── Seed frontier models for UCB1 bandit ──
+-- Optimistic prior: 2 pulls, 1.0 total reward, 0.5 mean reward
+INSERT INTO consultation_model_stats (model_name, domain, total_pulls, total_reward, mean_reward, enabled) VALUES
+    ('anthropic/claude-sonnet-4-6', 'general', 2, 1.0, 0.5, true),
+    ('local/qwen-72b', 'general', 2, 1.0, 0.5, true),
+    ('openai/gpt-4o', 'general', 2, 1.0, 0.5, false),
+    ('google/gemini-pro', 'general', 2, 1.0, 0.5, false);
+
+-- ── Re-register consultation_ring in duplo_tool_registry ──
 INSERT INTO duplo_tool_registry (
     tool_name, description, module_path, function_name, parameters,
     safety_class, ring_type, provider, ring_status, canonical_schema,
@@ -97,7 +83,9 @@ VALUES (
     'weekly',
     10.00
 )
-ON CONFLICT (tool_name) DO NOTHING;
+ON CONFLICT (tool_name) DO UPDATE SET
+    description = EXCLUDED.description,
+    updated_at = NOW();
 
 -- ── Add consultation-specific scrub rules ──
 INSERT INTO scrub_rules (rule_type, pattern, applies_to) VALUES

@@ -101,6 +101,7 @@ def check_database() -> bool:
         cur.execute("SELECT 1")
         cur.fetchone()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         latency_ms = int((time.time() - start) * 1000)
 
@@ -123,6 +124,7 @@ def check_research_queue_depth() -> bool:
         cur.execute("SELECT COUNT(*) FROM research_jobs WHERE status = 'pending'")
         pending = cur.fetchone()[0]
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         if pending > QUEUE_DEPTH_THRESHOLD:
@@ -158,6 +160,7 @@ def check_jr_queue_depth() -> bool:
         """)
         dlq_depth = cur.fetchone()[0]
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         if pending > 20:

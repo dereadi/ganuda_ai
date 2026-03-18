@@ -85,6 +85,7 @@ def observe_recent_council_votes(since_minutes=5):
             for r in votes
         ]
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -113,6 +114,7 @@ def observe_recent_jr_results(since_minutes=5):
             for r in tasks
         ]
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -151,6 +153,7 @@ def log_observation(observation_type, content, temperature=OBSERVATION_TEMP):
         logger.warning(f"Failed to log observation: {e}")
         conn.rollback()
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -208,6 +211,7 @@ def compute_utility(votes, tasks):
                 W_DLQ_DEPTH * dlq_score +
                 W_THERMAL_RATE * thermal_rate)
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -288,6 +292,7 @@ def apply_valence_signal(valence):
                 logger.error(f"Telegram alert failed: {e}")
 
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

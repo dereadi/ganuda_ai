@@ -107,6 +107,7 @@ def retrieve_memories(query: str, limit: int = 10) -> List[Dict]:
 
     results = [dict(row) for row in cur.fetchall()]
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     return results
 

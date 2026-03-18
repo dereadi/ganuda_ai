@@ -214,6 +214,7 @@ class DailyBriefingGenerator:
             vote_count = cur.fetchone()["cnt"]
 
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
 
             lines = [
@@ -265,6 +266,7 @@ class DailyBriefingGenerator:
             )
             if not cur.fetchone()["exists"]:
                 cur.close()
+                conn.commit()  # explicit commit before close
                 conn.close()
                 return "Email classification table not yet created."
 
@@ -278,6 +280,7 @@ class DailyBriefingGenerator:
             emails = cur.fetchall()
 
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
 
             if not emails:
@@ -339,6 +342,7 @@ class DailyBriefingGenerator:
             in_progress = cur.fetchone()["cnt"]
 
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
 
             lines = [

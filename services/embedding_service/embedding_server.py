@@ -130,6 +130,7 @@ async def semantic_search(request: SearchRequest):
         ]
     finally:
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -170,6 +171,7 @@ async def index_table(table: str = "thermal_memory_archive",
         print(f"Indexed {indexed}/{total}")
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     return {"message": f"Indexed {indexed} records", "indexed": indexed}
 

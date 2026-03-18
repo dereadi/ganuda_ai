@@ -89,6 +89,7 @@ def extract_hot_memories():
             })
 
     cursor.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     return training_data

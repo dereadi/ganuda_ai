@@ -331,12 +331,14 @@ def main():
     if DRY_RUN:
         print("\n[DRY RUN] No records inserted.")
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         return
 
     if not records:
         print("\nNothing to ingest.")
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         return
 
@@ -357,6 +359,7 @@ def main():
     print(f"Done. Total thermal memories: {total}")
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
 

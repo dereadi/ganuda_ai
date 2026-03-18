@@ -86,6 +86,7 @@ def check_pipeline():
                 f"FAILING: {fail_count} failed tasks in last {FAIL_THRESHOLD_HOURS}h (limit {FAIL_COUNT_LIMIT})."
             )
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
     return alerts

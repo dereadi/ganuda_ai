@@ -1,0 +1,15 @@
+[Unit]
+Description=Ganuda DB Query Monitor — Long-Running Query Detection
+After=network.target
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda
+ExecStart=/ganuda/venv/bin/python scripts/db_query_monitor.py
+Restart=on-failure
+RestartSec=10
+Environment=PYTHONPATH=/ganuda
+
+[Install]
+WantedBy=multi-user.target

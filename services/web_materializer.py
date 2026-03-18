@@ -112,6 +112,7 @@ def materialize():
                     log.info("Removed (unpublished): %s", local_path)
 
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         if updated > 0:
@@ -122,6 +123,7 @@ def materialize():
         log.warning("DB unreachable, serving stale cache: %s", e)
         if conn:
             try:
+                conn.commit()  # explicit commit before close
                 conn.close()
             except Exception:
                 pass

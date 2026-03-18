@@ -482,6 +482,7 @@ class StubCapacitor:
             logger.info("Released %d stubs for research (budget remaining: %d)",
                         len(released), remaining_budget - len(released))
         finally:
+            conn.commit()  # explicit commit before close
             conn.close()
 
         return released
@@ -518,6 +519,7 @@ class StubCapacitor:
                 logger.info("Merged %d duplicate stubs from burst", merged_count)
             return merged_count
         finally:
+            conn.commit()  # explicit commit before close
             conn.close()
 
 
@@ -613,6 +615,7 @@ def ingest_sensory_input(content: str, source: str = "unknown") -> dict:
                     "report": f"Content already processed (hash: {content_hash[:12]})",
                 }
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
     # 2. Extract stubs

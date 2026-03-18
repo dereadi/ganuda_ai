@@ -83,6 +83,7 @@ def publish(file_path, unpublish=False):
         except Exception as e:
             print(f"Warning: blog index regeneration failed: {e}")
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
 

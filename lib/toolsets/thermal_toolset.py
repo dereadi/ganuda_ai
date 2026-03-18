@@ -100,6 +100,7 @@ class ThermalToolSet(ToolSet):
 
         rows = cur.fetchall()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         return {
@@ -140,6 +141,7 @@ class ThermalToolSet(ToolSet):
         domains = {r[0]: r[1] for r in cur.fetchall()}
 
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         return {
@@ -214,6 +216,7 @@ class ThermalToolSet(ToolSet):
 
         rows = cur.fetchall()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         if not rows:

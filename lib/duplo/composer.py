@@ -115,6 +115,7 @@ def _load_active_modifiers(target: str) -> list:
                 for r in rows
             ]
         finally:
+            conn.commit()  # explicit commit before close
             conn.close()
     except Exception as e:
         logger.debug(f"Could not load modifiers for {target}: {e}")

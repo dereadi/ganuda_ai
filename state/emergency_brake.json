@@ -15,6 +15,28 @@
       "action": "disengaged",
       "at": "2026-03-13T09:15:16.359741",
       "by": "partner_manual"
+    },
+    {
+      "action": "engaged",
+      "at": "2026-03-14T22:02:12.021559",
+      "by": "threshold_auto",
+      "reason": "Jr failure rate 100% > 50% (3/3 in 1h)"
+    },
+    {
+      "action": "disengaged",
+      "at": "2026-03-14T22:32:55.684813",
+      "by": "auto_disengage"
+    },
+    {
+      "action": "engaged",
+      "at": "2026-03-14T22:33:11.974621",
+      "by": "threshold_auto",
+      "reason": "Jr failure rate 75% > 50% (3/4 in 1h)"
+    },
+    {
+      "action": "disengaged",
+      "at": "2026-03-14T23:03:50.455463",
+      "by": "auto_disengage"
     }
   ]
 }

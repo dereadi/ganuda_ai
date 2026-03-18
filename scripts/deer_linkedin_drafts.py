@@ -150,6 +150,7 @@ def get_thermal_fuel(hours: int = 48, limit: int = 5,
         rows = [dict(zip(cols, r)) for r in cur.fetchall()]
         return rows
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -251,6 +252,7 @@ def ensure_drafts_table():
             except psycopg2.errors.DuplicateTable:
                 conn.rollback()
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -295,6 +297,7 @@ def save_draft(thermal: dict, draft_text: str, model_node: str,
         conn.rollback()
         return False
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

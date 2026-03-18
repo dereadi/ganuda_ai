@@ -155,6 +155,7 @@ def get_daily_burn(days: int = 7) -> Dict[str, dict]:
             }
         return result
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

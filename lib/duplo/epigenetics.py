@@ -164,6 +164,7 @@ def seed_defaults() -> int:
         logger.info(f"Seeded {count} default modifiers")
         return count
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -200,6 +201,7 @@ def activate_modifier(
         logger.info(f"Activated {count} modifiers for condition '{condition_name}' by {activated_by}")
         return count
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -224,6 +226,7 @@ def deactivate_modifier(condition_name: str) -> int:
         logger.info(f"Deactivated {count} modifiers for condition '{condition_name}'")
         return count
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

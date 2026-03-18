@@ -133,6 +133,7 @@ def find_similar_memories(embedding: List[float], limit: int = 5, exclude_hash: 
         logger.error("pgvector similarity search failed: %s", e)
         return []
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -248,6 +249,7 @@ def get_linked_context(memory_hash: str, depth: int = 1) -> List[Dict]:
 
         results = cur.fetchall()
 
+    conn.commit()  # explicit commit before close
     conn.close()
     return [dict(r) for r in results]
 
@@ -266,6 +268,7 @@ def backfill_existing_memories(batch_size: int = 100, agent_id: str = 'amem_back
         """, (batch_size,))
         memories = cur.fetchall()
 
+    conn.commit()  # explicit commit before close
     conn.close()
 
     processed = 0

@@ -41,6 +41,7 @@ def api_alerts():
         cur.execute(query, params)
         alerts = cur.fetchall()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         return jsonify({
@@ -93,6 +94,7 @@ def api_monitoring_overview():
         cur.execute("SELECT count(*) FROM council_votes")
         votes_count = cur.fetchone()[0]
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         db_stats = {'thermal_memories': memory_count, 'council_votes': votes_count, 'status': 'healthy'}
     except Exception as e:

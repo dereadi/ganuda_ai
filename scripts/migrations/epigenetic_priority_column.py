@@ -44,4 +44,5 @@ cur.execute("SELECT condition_name, target, modifier_type, priority FROM epigene
 for r in cur.fetchall():
     print(f"  {r[0]:20s} {r[1]:15s} {r[2]:10s} priority={r[3]}")
 
+conn.commit()  # explicit commit before close
 conn.close()

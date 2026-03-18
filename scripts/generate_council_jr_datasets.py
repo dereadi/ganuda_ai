@@ -52,6 +52,7 @@ def extract_by_category(category_keywords, limit=300):
     cur.execute(query)
     results = cur.fetchall()
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     return results

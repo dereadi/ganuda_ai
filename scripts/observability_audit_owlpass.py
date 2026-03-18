@@ -263,6 +263,7 @@ def main():
         print(f"  Jr queue: {queue_state}")
 
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
     except Exception as e:
         issues.append(f"DATABASE: Cannot connect ({e})")

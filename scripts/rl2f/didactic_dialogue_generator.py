@@ -255,6 +255,7 @@ def main():
         for v in votes[:10]:
             print(f"  Vote #{v['id']}: {v['question'][:80]}... -> {v.get('recommendation', '?')}")
         print(f"  ... ({len(votes)} total)")
+        conn.commit()  # explicit commit before close
         conn.close()
         return
 
@@ -313,6 +314,7 @@ def main():
         }, f, indent=2)
     print(f"  Summary: {summary_path}")
 
+    conn.commit()  # explicit commit before close
     conn.close()
 
 

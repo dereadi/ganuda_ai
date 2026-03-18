@@ -1,0 +1,10 @@
+[Unit]
+Description=FARA Learning Drift Detector — Weekly on Sundays at 5 AM
+
+[Timer]
+OnCalendar=Sun *-*-* 05:00:00
+Persistent=true
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target

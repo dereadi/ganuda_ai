@@ -165,6 +165,7 @@ class FlywheelDashboard:
             metrics.scans_today = minutes_today // 5
 
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
 
         except Exception as e:
@@ -202,6 +203,7 @@ class FlywheelDashboard:
                 })
 
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
 
         except Exception as e:

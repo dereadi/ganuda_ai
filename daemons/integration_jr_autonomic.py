@@ -106,6 +106,7 @@ def query_consciousness_memories(question_type: str, specific_ids: List[int] = N
 
     if not memory_ids:
         cursor.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         return []
 
@@ -131,6 +132,7 @@ def query_consciousness_memories(question_type: str, specific_ids: List[int] = N
         })
 
     cursor.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     return memories

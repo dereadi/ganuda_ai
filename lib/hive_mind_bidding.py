@@ -171,6 +171,7 @@ class HiveMindBiddingDaemon:
                 cols = [d[0] for d in cur.description]
                 return [dict(zip(cols, row)) for row in cur.fetchall()]
         finally:
+            conn.commit()  # explicit commit before close
             conn.close()
     
     def submit_bid(self, task_id: int, bid_strength: float, action_index: int):

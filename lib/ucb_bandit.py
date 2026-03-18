@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
 """
-UCB Bandit — Multi-armed bandit model selector for consultation ring.
+UCB1 Bandit — Multi-armed bandit model selector for Consultation Ring.
 
 Patent Brief #7: Tokenized Air-Gap Proxy
 Council Vote: a3ee2a8066e04490 (UNANIMOUS)
+Jr Task: #1427
 
 UCB1 algorithm selects the best frontier model per domain.
 Cold start: optimistic prior (1 success / 2 total) encourages exploration.
-Postgres-backed via consultation_model_stats table.
+Postgres-backed via consultation_model_stats table on bluefin.
 
 DC-9: Penalizes rate-limited providers (waste heat).
+
+Table schema (created by Jr #1424):
+    consultation_model_stats(
+        id, model_name (UNIQUE), domain, total_pulls, total_reward,
+        mean_reward, last_selected_at, enabled, metadata, created_at, updated_at
+    )
 """
 
 import logging
@@ -20,7 +27,7 @@ import psycopg2
 
 from lib.secrets_loader import get_db_config
 
-logger = logging.getLogger("ucb_bandit")
+logger = logging.getLogger("consultation_ring.bandit")
 
 
 class UCBBandit:
@@ -29,177 +36,234 @@ class UCBBandit:
     def __init__(self, exploration_weight: float = 1.41):
         """
         Args:
-            exploration_weight: UCB exploration parameter (sqrt(2) ≈ 1.41 is standard).
+            exploration_weight: UCB exploration parameter (sqrt(2) ~ 1.41 is standard).
                 Higher = more exploration, lower = more exploitation.
         """
         self.exploration_weight = exploration_weight
         self._db_config = None
 
-    def _get_db(self):
+    def _get_conn(self):
+        """Get a DB connection. Lazily loads credentials via secrets_loader."""
         if self._db_config is None:
             self._db_config = get_db_config()
         return psycopg2.connect(**self._db_config)
 
-    def select_model(self, domain: str = "general",
-                     available_providers: Optional[List[str]] = None) -> Optional[dict]:
-        """Select best model for domain using UCB1.
+    def select_model(self, domain: str = "general") -> Optional[str]:
+        """Select best model for domain using UCB1 formula.
+
+        UCB1 = mean_reward + exploration_weight * sqrt(2 * ln(N) / n_i)
+        where N = total pulls across all enabled models, n_i = pulls for model i.
+
+        Only considers enabled models. Falls back to 'general' domain if
+        no domain-specific models exist.
+
+        Updates last_selected_at on the chosen model.
 
         Args:
-            domain: Query domain (general, code, research, legal)
-            available_providers: List of provider names with active adapters.
-                If None, considers all enabled models.
+            domain: Query domain (general, code, research, legal, etc.)
 
         Returns:
-            {"model_name": str, "provider": str, "ucb_score": float}
-            or None if no models available.
+            model_name of the selected model, or None if no models available.
         """
-        conn = self._get_db()
-        cur = conn.cursor()
+        conn = self._get_conn()
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    # Fetch enabled models for this domain
+                    cur.execute(
+                        """
+                        SELECT model_name, total_pulls, total_reward, mean_reward
+                        FROM consultation_model_stats
+                        WHERE domain = %s AND enabled = true
+                        """,
+                        (domain,),
+                    )
+                    rows = cur.fetchall()
 
-        query = """
-            SELECT model_name, provider, total_calls, successful_calls, total_reward
-            FROM consultation_model_stats
-            WHERE domain = %s AND enabled = true
-        """
-        params = [domain]
+                    # Domain fallback: if no models for requested domain, try general
+                    if not rows and domain != "general":
+                        logger.info(
+                            "No models for domain '%s', falling back to 'general'",
+                            domain,
+                        )
+                        cur.execute(
+                            """
+                            SELECT model_name, total_pulls, total_reward, mean_reward
+                            FROM consultation_model_stats
+                            WHERE domain = 'general' AND enabled = true
+                            """,
+                        )
+                        rows = cur.fetchall()
 
-        if available_providers:
-            placeholders = ",".join(["%s"] * len(available_providers))
-            query += f" AND provider IN ({placeholders})"
-            params.extend(available_providers)
+                    if not rows:
+                        logger.warning("No enabled models found for any domain")
+                        return None
 
-        cur.execute(query, params)
-        rows = cur.fetchall()
-        cur.close()
-        conn.close()
+                    # Total pulls across all arms (for UCB1 denominator)
+                    total_all = sum(r[1] for r in rows) or 1
 
-        if not rows:
-            # Fall back to 'general' domain if specific domain has no stats
-            if domain != "general":
-                return self.select_model("general", available_providers)
-            return None
+                    best_model = None
+                    best_score = -1.0
 
-        # Calculate total calls across all arms for UCB formula
-        total_all = sum(r[2] for r in rows) or 1
+                    for model_name, total_pulls, total_reward, mean_reward in rows:
+                        total_pulls = int(total_pulls)
 
-        best = None
-        best_score = -1
+                        if total_pulls == 0:
+                            # Untried arm gets infinite score (explore immediately)
+                            ucb = float("inf")
+                        else:
+                            # UCB1: mean_reward + c * sqrt(2 * ln(N) / n_i)
+                            mr = float(total_reward) / total_pulls
+                            exploration = self.exploration_weight * math.sqrt(
+                                2.0 * math.log(total_all) / total_pulls
+                            )
+                            ucb = mr + exploration
 
-        for model_name, provider, total_calls, successful_calls, total_reward in rows:
-            total_calls = int(total_calls)
-            total_reward = float(total_reward)
+                        if ucb > best_score:
+                            best_score = ucb
+                            best_model = model_name
 
-            if total_calls == 0:
-                # Untried model gets infinite UCB score (explore immediately)
-                ucb = float("inf")
-            else:
-                # UCB1: mean reward + exploration bonus
-                mean_reward = total_reward / total_calls
-                exploration = self.exploration_weight * math.sqrt(
-                    math.log(total_all) / total_calls
-                )
-                ucb = mean_reward + exploration
+                    # Update last_selected_at for the chosen model
+                    if best_model:
+                        cur.execute(
+                            """
+                            UPDATE consultation_model_stats
+                            SET last_selected_at = NOW(), updated_at = NOW()
+                            WHERE model_name = %s
+                            """,
+                            (best_model,),
+                        )
+                        logger.info(
+                            "UCB1 selected model='%s' (score=%.4f, domain='%s')",
+                            best_model,
+                            best_score,
+                            domain,
+                        )
 
-            if ucb > best_score:
-                best_score = ucb
-                best = {
-                    "model_name": model_name,
-                    "provider": provider,
-                    "ucb_score": round(ucb, 4),
-                }
+                    return best_model
+        finally:
+            conn.commit()  # explicit commit before close
+            conn.close()
 
-        return best
-
-    def update(self, model_name: str, domain: str, reward: float,
-               latency_ms: int, cost: float, success: bool = True):
-        """Update model stats after a consultation.
+    def update_stats(
+        self, model_name: str, reward: float, domain: str = "general"
+    ) -> None:
+        """Record outcome of a consultation.
 
         Args:
-            model_name: Model that was used
-            domain: Query domain
-            reward: Reward signal (0.0-1.0). From valence gate score.
-            latency_ms: Response latency
-            cost: Dollar cost of the call
-            success: Whether the call succeeded (False for errors/rate limits)
+            model_name: The model that was consulted.
+            reward: 0.0-1.0 reward signal (from valence gate score).
+            domain: Domain the consultation was for.
+
+        Updates total_pulls, total_reward, mean_reward.
+        If model/domain combo doesn't exist, inserts a new row.
         """
-        conn = self._get_db()
-        cur = conn.cursor()
+        reward = max(0.0, min(1.0, float(reward)))  # clamp to [0, 1]
 
-        cur.execute("""
-            UPDATE consultation_model_stats
-            SET total_calls = total_calls + 1,
-                successful_calls = successful_calls + CASE WHEN %s THEN 1 ELSE 0 END,
-                total_reward = total_reward + %s,
-                avg_latency_ms = (avg_latency_ms * total_calls + %s) / (total_calls + 1),
-                total_cost = total_cost + %s,
-                last_called = NOW(),
-                updated_at = NOW()
-            WHERE model_name = %s AND domain = %s
-        """, (success, reward, latency_ms, cost, model_name, domain))
+        conn = self._get_conn()
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        UPDATE consultation_model_stats
+                        SET total_pulls = total_pulls + 1,
+                            total_reward = total_reward + %s,
+                            mean_reward = (total_reward + %s) / (total_pulls + 1),
+                            updated_at = NOW()
+                        WHERE model_name = %s AND domain = %s
+                        """,
+                        (reward, reward, model_name, domain),
+                    )
 
-        if cur.rowcount == 0:
-            # Model/domain combo doesn't exist — insert with this call as first
-            cur.execute("""
-                INSERT INTO consultation_model_stats
-                    (model_name, provider, domain, total_calls, successful_calls,
-                     total_reward, avg_latency_ms, total_cost, last_called)
-                VALUES (%s, %s, %s, 1, %s, %s, %s, %s, NOW())
-                ON CONFLICT (model_name, domain) DO UPDATE SET
-                    total_calls = consultation_model_stats.total_calls + 1,
-                    successful_calls = consultation_model_stats.successful_calls + CASE WHEN %s THEN 1 ELSE 0 END,
-                    total_reward = consultation_model_stats.total_reward + %s,
-                    avg_latency_ms = (consultation_model_stats.avg_latency_ms * consultation_model_stats.total_calls + %s) / (consultation_model_stats.total_calls + 1),
-                    total_cost = consultation_model_stats.total_cost + %s,
-                    last_called = NOW(),
-                    updated_at = NOW()
-            """, (model_name, "unknown", domain,
-                  1 if success else 0, reward, latency_ms, cost,
-                  success, reward, latency_ms, cost))
+                    if cur.rowcount == 0:
+                        # Model/domain doesn't exist — insert with this as first pull
+                        # (on top of the optimistic prior logic: seeded rows already have
+                        # 2 pulls and 1.0 reward; new rows start fresh)
+                        cur.execute(
+                            """
+                            INSERT INTO consultation_model_stats
+                                (model_name, domain, total_pulls, total_reward,
+                                 mean_reward, enabled, metadata)
+                            VALUES (%s, %s, 1, %s, %s, true, '{}')
+                            ON CONFLICT (model_name) DO UPDATE SET
+                                total_pulls = consultation_model_stats.total_pulls + 1,
+                                total_reward = consultation_model_stats.total_reward + %s,
+                                mean_reward = (consultation_model_stats.total_reward + %s)
+                                    / (consultation_model_stats.total_pulls + 1),
+                                updated_at = NOW()
+                            """,
+                            (
+                                model_name, domain, reward, reward,
+                                reward, reward,
+                            ),
+                        )
 
-        conn.commit()
-        cur.close()
-        conn.close()
+                    logger.info(
+                        "Updated stats: model='%s' domain='%s' reward=%.3f",
+                        model_name,
+                        domain,
+                        reward,
+                    )
+        finally:
+            conn.commit()  # explicit commit before close
+            conn.close()
 
-    def penalize_rate_limited(self, model_name: str, domain: str):
-        """Penalize a rate-limited model. Counts as call with zero reward.
+    def penalize_rate_limited(self, model_name: str, domain: str = "general") -> None:
+        """Penalize a rate-limited model. Counts as pull with zero reward.
 
         DC-9: waste heat principle — rate limiting wastes energy.
         """
-        self.update(model_name, domain, reward=0.0, latency_ms=0, cost=0.0, success=False)
+        self.update_stats(model_name, reward=0.0, domain=domain)
+        logger.info("Penalized rate-limited model='%s' domain='%s'", model_name, domain)
 
-    def get_stats(self, domain: str = None) -> List[dict]:
-        """Get current stats for all models, optionally filtered by domain."""
-        conn = self._get_db()
-        cur = conn.cursor()
+    def get_stats(self, domain: Optional[str] = None) -> List[Dict]:
+        """Return current stats for all models, optionally filtered by domain.
 
-        if domain:
-            cur.execute("""
-                SELECT model_name, provider, domain, total_calls, successful_calls,
-                       total_reward, avg_latency_ms, total_cost, enabled
-                FROM consultation_model_stats
-                WHERE domain = %s
-                ORDER BY total_reward / GREATEST(total_calls, 1) DESC
-            """, (domain,))
-        else:
-            cur.execute("""
-                SELECT model_name, provider, domain, total_calls, successful_calls,
-                       total_reward, avg_latency_ms, total_cost, enabled
-                FROM consultation_model_stats
-                ORDER BY domain, total_reward / GREATEST(total_calls, 1) DESC
-            """)
+        Args:
+            domain: If provided, filter to this domain. Otherwise return all.
 
-        rows = cur.fetchall()
-        cur.close()
-        conn.close()
+        Returns:
+            List of dicts with model stats, ordered by mean_reward descending.
+        """
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                if domain:
+                    cur.execute(
+                        """
+                        SELECT model_name, domain, total_pulls, total_reward,
+                               mean_reward, last_selected_at, enabled, metadata
+                        FROM consultation_model_stats
+                        WHERE domain = %s
+                        ORDER BY mean_reward DESC
+                        """,
+                        (domain,),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        SELECT model_name, domain, total_pulls, total_reward,
+                               mean_reward, last_selected_at, enabled, metadata
+                        FROM consultation_model_stats
+                        ORDER BY domain, mean_reward DESC
+                        """,
+                    )
 
-        return [
-            {
-                "model_name": r[0], "provider": r[1], "domain": r[2],
-                "total_calls": r[3], "successful_calls": r[4],
-                "mean_reward": round(r[5] / max(r[3], 1), 4),
-                "avg_latency_ms": float(r[6] or 0),
-                "total_cost": float(r[7] or 0),
-                "enabled": r[8],
-            }
-            for r in rows
-        ]
+                rows = cur.fetchall()
+                return [
+                    {
+                        "model_name": r[0],
+                        "domain": r[1],
+                        "total_pulls": r[2],
+                        "total_reward": float(r[3]),
+                        "mean_reward": float(r[4]),
+                        "last_selected_at": r[5].isoformat() if r[5] else None,
+                        "enabled": r[6],
+                        "metadata": r[7] or {},
+                    }
+                    for r in rows
+                ]
+        finally:
+            conn.commit()  # explicit commit before close
+            conn.close()

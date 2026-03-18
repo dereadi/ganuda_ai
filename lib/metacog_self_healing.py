@@ -39,6 +39,7 @@ def check_council_health():
     rows = cur.fetchall()
     if len(rows) < 5:
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         return {"status": "INSUFFICIENT_DATA", "votes_analyzed": len(rows)}
     confidences = [r[0] for r in rows if r[0] is not None]
@@ -73,6 +74,7 @@ def check_council_health():
         "checked_at": datetime.now().isoformat()
     }
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     return result
 

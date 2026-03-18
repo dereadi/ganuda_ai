@@ -105,6 +105,7 @@ def extract_and_store(messages: List[Dict], user_id: str = "tribe",
                 conn.rollback()
                 errors += 1
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
     return {

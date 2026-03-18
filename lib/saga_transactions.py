@@ -686,6 +686,7 @@ class SagaTransactionManager:
                 return all_success
 
         finally:
+            conn.commit()  # explicit commit before close
             conn.close()
 
     def can_retry(self, tx: Transaction) -> bool:

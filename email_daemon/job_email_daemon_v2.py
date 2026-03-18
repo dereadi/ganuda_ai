@@ -55,7 +55,7 @@ class JobEmailDaemon:
         logger.info('Connected to Gmail')
 
     def connect_db(self):
-        self.conn = psycopg2.connect(host=self.config["db_host"], database=self.config["db_name"], user=self.config["db_user"], password=self.config["db_password"])
+        self.conn = psycopg2.connect(host=self.config["db_host"], database=self.config["db_name"], user=self.config["db_user"], password=self.config.get('db_password', os.environ.get('CHEROKEE_DB_PASS', '')))
         logger.info('Connected to database')
 
     def sync_and_classify(self, max_results=50):

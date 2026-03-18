@@ -151,6 +151,7 @@ def gather_stats():
     stats["sacred_recent"] = cur.fetchall()
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     return stats
 

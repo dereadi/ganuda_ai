@@ -286,6 +286,7 @@ def main():
             print(f"  P{priority} [{status:10s}] {task_id} → {assigned_jr}")
 
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
     print("\nFor Seven Generations")

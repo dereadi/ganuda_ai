@@ -57,6 +57,7 @@ def get_thermal_context(question, max_tokens=500):
             LIMIT 5""", (str(embedding),))
         rows = cur.fetchall()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         context = "\n---\n".join([f"[temp:{r[1]}] {r[0][:200]}" for r in rows])

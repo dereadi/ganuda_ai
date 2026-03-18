@@ -101,6 +101,69 @@ def fetch_kanban_velocity(conn) -> Dict[str, int]:
         results = cursor.fetchall()
     return {row['status']: {'count': row['count'], 'story_points': row['story_points']} for row in results}
 
+def fetch_observability_summary(conn) -> str:
+    """
+    Condensed observability summary for the Saturday Morning Meeting.
+    BSM Leg 3 integration — executive-level, not the full report.
+
+    Pulls: rollback rate, connection utilization, and reads the weekly
+    report recommendations section if available.
+    """
+    lines = []
+
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            # Rollback rate for primary DB
+            cursor.execute("""
+                SELECT datname,
+                       CASE WHEN (xact_commit + xact_rollback) > 0
+                            THEN ROUND(100.0 * xact_rollback / (xact_commit + xact_rollback), 2)
+                            ELSE 0 END AS rollback_pct,
+                       deadlocks
+                FROM pg_stat_database
+                WHERE datname = 'zammad_production'
+            """)
+            row = cursor.fetchone()
+            if row:
+                lines.append(f"Rollback Rate: {row['rollback_pct']}%")
+                lines.append(f"Deadlocks: {row['deadlocks']}")
+
+            # Connection count
+            cursor.execute("""
+                SELECT COUNT(*) AS total,
+                       COUNT(*) FILTER (WHERE state = 'active') AS active,
+                       (SELECT setting::int FROM pg_settings WHERE name = 'max_connections') AS max_conn
+                FROM pg_stat_activity
+            """)
+            crow = cursor.fetchone()
+            if crow:
+                util = round(100.0 * crow['total'] / (crow['max_conn'] or 100), 1)
+                lines.append(f"DB Connections: {crow['total']}/{crow['max_conn']} ({util}%), {crow['active']} active")
+    except Exception as e:
+        lines.append(f"DB metrics unavailable: {e}")
+
+    # Pull recommendations from weekly report if file exists and is fresh
+    report_path = "/ganuda/logs/weekly_observability_report.md"
+    try:
+        if os.path.exists(report_path):
+            mtime = os.path.getmtime(report_path)
+            age_days = (datetime.datetime.now().timestamp() - mtime) / 86400
+            if age_days <= 7:
+                with open(report_path, "r") as f:
+                    content = f.read()
+                # Extract recommendations section
+                if "## 6. Recommendations" in content:
+                    rec_section = content.split("## 6. Recommendations")[1].split("---")[0].strip()
+                    if rec_section and "No actionable" not in rec_section:
+                        lines.append(f"Weekly Recs: {rec_section[:200]}")
+                    else:
+                        lines.append("Weekly Recs: All metrics within thresholds")
+    except Exception:
+        pass
+
+    return "\n".join(lines) if lines else "Observability data unavailable"
+
+
 def generate_report() -> str:
     conn = get_connection()
     thermal_rates = fetch_thermal_rates(conn)
@@ -109,6 +172,7 @@ def generate_report() -> str:
     council_count, council_avg_confidence = fetch_council_health(conn)
     jr_executor_stats = fetch_jr_executor_stats(conn)
     kanban_velocity = fetch_kanban_velocity(conn)
+    obs_summary = fetch_observability_summary(conn)
 
     report = f"# Saturday Morning Meeting Report - {datetime.date.today().strftime('%Y-%m-%d')}\n\n"
 
@@ -139,6 +203,10 @@ def generate_report() -> str:
         report += f"- {status.capitalize()}: {data['count']} tickets, {data['story_points']} story points\n"
     report += "\n"
 
+    report += "## Observability (BSM Leg 3)\n"
+    report += obs_summary + "\n\n"
+
+    conn.commit()  # explicit commit before close
     conn.close()
     return report
 

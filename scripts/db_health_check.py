@@ -127,6 +127,7 @@ def db_health_check():
             send_alerts(alerts)
 
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 # Function to manage the frequency of health checks

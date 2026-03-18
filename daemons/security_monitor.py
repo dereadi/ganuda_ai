@@ -99,6 +99,7 @@ def check_blocked_executions():
             LIMIT 10
         """)
         rows = cur.fetchall()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         for row in rows:
@@ -133,6 +134,7 @@ def check_failed_logins():
             ORDER BY fail_count DESC
         """, (FAILED_LOGIN_WINDOW_MINUTES, FAILED_LOGIN_THRESHOLD))
         rows = cur.fetchall()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         for row in rows:
@@ -167,6 +169,7 @@ def check_suspicious_thermal_memories():
             LIMIT 50
         """)
         rows = cur.fetchall()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         flagged = 0
@@ -208,6 +211,7 @@ def check_unknown_queue_sources():
             LIMIT 20
         """)
         rows = cur.fetchall()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         flagged = 0
@@ -237,6 +241,7 @@ def check_pg_connections():
         cur = conn.cursor()
         cur.execute("SELECT count(*) FROM pg_stat_activity;")
         count = cur.fetchone()[0]
+        conn.commit()  # explicit commit before close
         conn.close()
 
         if count > PG_CONNECTION_ALERT_THRESHOLD:

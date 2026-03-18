@@ -292,6 +292,7 @@ class MAGRPOGroupTracker:
             logger.error(f"[MAGRPO] Failed to persist participation: {e}")
         finally:
             if conn:
+                conn.commit()  # explicit commit before close
                 conn.close()
 
     def _persist_handoff(self, handoff: Dict):
@@ -318,6 +319,7 @@ class MAGRPOGroupTracker:
             logger.error(f"[MAGRPO] Failed to persist handoff: {e}")
         finally:
             if conn:
+                conn.commit()  # explicit commit before close
                 conn.close()
 
     def _persist_rewards(self, task_id: str, success: bool, rewards: Dict[str, float]):
@@ -339,6 +341,7 @@ class MAGRPOGroupTracker:
             logger.error(f"[MAGRPO] Failed to persist rewards: {e}")
         finally:
             if conn:
+                conn.commit()  # explicit commit before close
                 conn.close()
 
 

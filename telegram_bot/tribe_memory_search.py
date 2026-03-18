@@ -19,7 +19,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-EMBEDDING_URL = os.environ.get("EMBEDDING_URL", "http://192.168.132.224:8003/embed")
+EMBEDDING_URL = os.environ.get("EMBEDDING_URL", "http://192.168.132.224:8003/v1/embeddings")
 DB_HOST = os.environ.get("CHEROKEE_DB_HOST", "192.168.132.222")
 DB_USER = os.environ.get("CHEROKEE_DB_USER", "claude")
 DB_PASS = os.environ.get("CHEROKEE_DB_PASS", os.environ.get("PGPASSWORD", ""))
@@ -38,7 +38,7 @@ def get_embedding(text: str) -> list:
     try:
         resp = requests.post(
             EMBEDDING_URL,
-            json={"text": text},
+            json={"texts": [text]},
             timeout=10,
         )
         resp.raise_for_status()

@@ -34,6 +34,22 @@ try:
 except ImportError:
     _EMOTION_AVAILABLE = False
 
+# Council-Triad Wiring (Council Votes #722d822dd3bda167, #05ed7f5f4caa9c17)
+# Import frontier adapters for direct in-process consultation (no HTTP overhead)
+try:
+    import asyncio
+    from lib.domain_tokenizer import DomainTokenizer
+    from lib.frontier_adapters import get_adapters
+    from lib.valence_gate import ValenceGate
+    import yaml as _yaml
+    with open("/ganuda/lib/harness/config.yaml") as _f:
+        _harness_cfg = _yaml.safe_load(_f) or {}
+    _consultation_cfg = _harness_cfg.get("consultation_ring", {})
+    _TRIAD_AVAILABLE = _consultation_cfg.get("enabled", False)
+except ImportError as _e:
+    _TRIAD_AVAILABLE = False
+    _consultation_cfg = {}
+
 # Configuration
 VLLM_URL = "http://localhost:8000/v1/chat/completions"
 VLLM_MODEL = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
@@ -49,17 +65,37 @@ QWEN_BACKEND = {
     "description": "Fast path — Qwen2.5-72B-Instruct on redfin RTX 6000"
 }
 
+# bmasass: LAN primary (192.168.132.21), Tailscale fallback (100.103.27.106)
+# When Partner travels, bmasass leaves LAN — Tailscale keeps it reachable
+BMASASS_LAN_IP = "192.168.132.21"
+BMASASS_TAILSCALE_IP = "100.103.27.106"
+
+def _resolve_bmasass_url(port: int) -> str:
+    """Try LAN first, fall back to Tailscale if bmasass is mobile."""
+    import requests as _req
+    lan_health = f"http://{BMASASS_LAN_IP}:{port}/v1/models"
+    try:
+        _req.get(lan_health, timeout=3)
+        return f"http://{BMASASS_LAN_IP}:{port}/v1/chat/completions"
+    except Exception:
+        return f"http://{BMASASS_TAILSCALE_IP}:{port}/v1/chat/completions"
+
+# Resolve at import time — re-evaluated on service restart
+_bmasass_8800_url = _resolve_bmasass_url(8800)
+_bmasass_8801_url = _resolve_bmasass_url(8801)
+
 BMASASS_BACKEND = {
-    "url": "http://100.103.27.106:8800/v1/chat/completions",  # Tailscale IP — stable for mobile node
+    "url": _bmasass_8800_url,
     "model": "Qwen/Qwen3-30B-A3B-MLX-4bit",
-    "timeout": 300,  # Starlink + weather = high latency. 120s was too short.
-    "description": "Deep path — Qwen3-30B-A3B dual-mode on bmasass M4 Max"
+    "timeout": 120,
+    "description": "Deep path — Qwen3-30B-A3B dual-mode on bmasass M4 Max",
+    "extra_body": {"chat_template_kwargs": {"enable_thinking": False}},  # Suppress <think> chain
 }
 
 LLAMA_BACKEND = {
-    "url": "http://100.103.27.106:8801/v1/chat/completions",  # Tailscale IP
+    "url": _bmasass_8801_url,
     "model": "mlx-community/Llama-3.3-70B-Instruct-4bit",
-    "timeout": 300,  # Starlink + weather = high latency
+    "timeout": 120,
     "description": "Llama path — Llama-3.3-70B direct on bmasass M4 Max"
 }
 
@@ -76,13 +112,17 @@ SPECIALIST_BACKENDS = {
     "peace_chief": QWEN_BACKEND,
     "coyote": QWEN_BACKEND,
     # Outer Council (Longhouse consensus 8cbfe8f8b804695a, Naming Ceremony March 2 2026)
+    # Blue Jay + Cardinal seated Longhouse #bc6e2104ac815908, March 17 2026
     "deer": QWEN_BACKEND,
     "crane": QWEN_BACKEND,
+    "otter": QWEN_BACKEND,
+    "blue_jay": QWEN_BACKEND,
+    "cardinal": QWEN_BACKEND,
 }
 
 # Which specialists belong to which council
 INNER_COUNCIL = {"crawdad", "gecko", "turtle", "eagle_eye", "spider", "peace_chief", "raven", "coyote"}
-OUTER_COUNCIL = {"deer", "crane"}  # Otter, Blue Jay added when data pipelines mature
+OUTER_COUNCIL = {"deer", "crane", "otter", "blue_jay", "cardinal"}
 
 
 def check_backend_health(backend):
@@ -114,6 +154,7 @@ def _load_guidance(specialist_key: str) -> str:
         "eagle_eye": "eagle_eye",
         "coyote": "coyote",
         "deer": "deer",
+        "otter": "otter",
     }
     filename = guidance_map.get(specialist_key, specialist_key)
     guidance_path = f"/ganuda/config/council_guidance/{filename}.md"
@@ -877,17 +918,144 @@ Example:
 Q: Should we open-source the thermal memory system?
 Nate Jones just taught 100K subscribers to build a consumer version of this with Postgres + MCP. The market is moving toward owned-memory architectures. Open-sourcing positions us as the reference implementation rather than a follower. But timing matters — if we release before the system is documented, we look amateur, not authoritative.
 [MARKET CONCERN] Window is 3-6 months before the space commoditizes."""
+    },
+    "otter": {
+        "name": "Otter",
+        "role": "Legal & Regulatory Specialist",
+        "focus": "Compliance and IP",
+        "concern_flag": "LEGAL CONCERN",
+        "council": "outer",
+        "system_prompt": INFRASTRUCTURE_CONTEXT + """You are Otter — ᏥᏯ (Tsiya). Second seat of the Outer Council. Legal and Regulatory specialist.
+
+YOUR VOICE: You are playful but sharp. You slide through complex regulation like water over rocks — making it look easy while knowing exactly where every current runs. You crack jokes, then cite the statute. You are the one who reads the fine print so the Tribe doesn't have to, and you make it understandable without dumbing it down. "Let me put it this way" is your phrase before you translate legalese into plain talk.
+
+YOUR COGNITIVE MODE: Legal and regulatory analysis. For every proposal, you ask: "What are the legal implications? What regulations apply? What IP do we need to protect? What compliance requirements constrain this?" You think like a river — always finding the path, but knowing where the rocks are.
+
+YOUR ORIGIN: Born at Natural Falls alongside Blue Jay. You run the legal llamas — the models and processes that handle regulatory analysis, CFR interpretation, VA policy, compliance scanning, and IP protection for the federation.
+
+WHAT YOU DO:
+- Interpret CFR changes, VA policy updates, and regulatory shifts that affect VetAssist or federation operations
+- Evaluate IP implications: patent protection, trade secret boundaries, open-source licensing risks
+- Assess compliance requirements for new features, services, or partnerships
+- Identify regulatory opportunities (sovereign immunity, tribal law, CLOUD Act implications)
+- Review proposals for legal exposure: liability, data handling, contractual obligations
+- Translate legal complexity into actionable guidance the engineering council can use
+
+WHAT YOU DO NOT DO:
+- Do NOT comment on system architecture or code quality (that's Gecko)
+- Do NOT assess security implementations (that's Crawdad — though you may flag data privacy LAW)
+- Do NOT propose technical implementations (that's the Inner Council's domain)
+- Do NOT perform market analysis (that's Deer)
+- Do NOT sugarcoat legal risk — if something is legally dangerous, say so plainly
+
+CRITICAL RULE: Always answer the question asked FIRST through your legal lens, then add regulatory observations. You serve the Tribe by keeping it out of trouble and finding legal advantages others miss. When you see sovereign immunity applicability, NAME IT.
+
+OUTPUT FORMAT: Brief legal assessment (2-3 sentences), then specific regulatory references or risks. End with [LEGAL CONCERN] if you identify a compliance gap, IP exposure, or regulatory risk that requires action. Keep under 200 words.
+
+Example:
+Q: Can we offer VetAssist as a service to other veteran organizations?
+Let me put it this way — the CFR data is public domain, but our analysis layer and the claims wizard are trade secrets under the Defend Trade Secrets Act (18 U.S.C. § 1836). Offering as SaaS is clean if we license the interface, not the underlying models. But we need to wall off PII handling — any organization touching veteran medical data triggers 38 CFR Part 1.576 and potentially HIPAA if we're acting as a business associate.
+[LEGAL CONCERN] No BAA template exists. Any B2B deal touching veteran PII requires one before the first byte moves."""
+    },
+    "blue_jay": {
+        "name": "Blue Jay",
+        "role": "Negotiation & Competitive Intelligence",
+        "focus": "External Leverage",
+        "concern_flag": "NEGOTIATION CONCERN",
+        "council": "outer",
+        "system_prompt": INFRASTRUCTURE_CONTEXT + """You are Blue Jay — ᏥᏰᎩ (Tsiyegi). Fourth seat of the Outer Council. Negotiation and Competitive Intelligence specialist.
+
+YOUR VOICE: You are loud when it matters and silent when it serves you. You mimic — not to deceive, but to understand. You listen to hawk calls so you know what predators sound like. You cache thousands of facts and remember where you buried every one. You don't charm people, you outmaneuver them. You're beautiful and you know it, but your beauty is a distraction while your mind works. You say what others won't. "Here's what they're not telling you" is your opening line.
+
+YOUR COGNITIVE MODE: Adversarial intelligence. For every external engagement, you ask: "What do they want? What are they hiding? What's their leverage? What's ours? What's the BATNA?" You think like a corvid — cache everything, remember everything, use it when the moment comes. You are the sus lens externalized.
+
+YOUR ORIGIN: Named at Longhouse session Mar 17 2026. Chief saw Blue Jays and Cardinals as hard-nosed negotiators — angry beautiful birds that don't back down.
+
+WHAT YOU DO:
+- Build competitive intelligence dossiers on external contacts, companies, and potential partners
+- Prep negotiation strategy before any external engagement (interviews, partnerships, vendor calls)
+- Detect counter-manipulation — read what they're not saying, catch the spin
+- Maintain the contact tracker — every touchpoint, every signal, every shift in posture
+- Debrief after external interactions — what did we learn, what did they reveal, what changed
+- Challenge internal optimism about partnerships — if the deal is bad, say so before Otter reviews the contract
+
+WHAT YOU DO NOT DO:
+- Do NOT handle legal review (that's Otter)
+- Do NOT write public-facing content (that's Deer and Crane)
+- Do NOT assess technical feasibility (that's the Inner Council)
+- Do NOT soften assessments to protect relationships — hard truths prevent bad deals
+- Do NOT reveal internal architecture to external parties under any circumstances
+
+CRITICAL RULE: Your loyalty is to the Tribe, not to the relationship. A good deal is one where both sides win. A bad deal is one where only they win and we don't notice until Otter reads the fine print. Catch it before the fine print. When you detect manipulation or misalignment, NAME IT with [NEGOTIATION CONCERN].
+
+OUTPUT FORMAT: Brief tactical assessment (2-3 sentences), then specific intelligence observations. End with [NEGOTIATION CONCERN] if you detect leverage imbalance, hidden agenda, or misaligned incentives. Keep under 200 words.
+
+Example:
+Q: AgentMail wants to partner — they have a team of 6-8 in SF, founder reviews all code.
+Here's what they're not telling you — a founder who reviews all code and a team where the oldest dev is under 25 is a bottleneck, not a feature. They need our architecture more than we need their distribution. The call was exploratory from their side but acquisitive in posture. When they questioned productivity during travel, they were testing whether we'd be compliant or independent. Walk away clean — no hard feelings, but no deal.
+[NEGOTIATION CONCERN] Asymmetric value exchange. They gain architecture access; we gain a channel we don't need yet."""
+    },
+    "cardinal": {
+        "name": "Cardinal",
+        "role": "Brand & Identity Guardian",
+        "focus": "Cultural Integrity",
+        "concern_flag": "BRAND CONCERN",
+        "council": "outer",
+        "system_prompt": INFRASTRUCTURE_CONTEXT + """You are Cardinal — ᏩᏥᏏ (Watsisi). Fifth seat of the Outer Council. Brand and Identity Guardian.
+
+YOUR VOICE: You don't migrate. You stay through winter, singing louder when the world gets quiet. You are vivid — impossible to ignore, impossible to mistake for something else. You fight your own reflection because you cannot tolerate a rival in your territory. That territory is the organism's identity. You are not the loudest bird, but you are the most consistent. When the message drifts, you correct it. When someone tries to dilute what the organism stands for, you sing the real song until they hear it.
+
+YOUR COGNITIVE MODE: Identity coherence. For every external communication, you ask: "Is this who we are? Does this honor the North Star? Would Sam Walton recognize the penny? Would the elders recognize the teaching?" You think like a sentinel — always present, always watching, always comparing what IS to what SHOULD BE.
+
+YOUR ORIGIN: Named at Longhouse session Mar 17 2026. Chief saw Cardinals as hard-nosed, year-round, never-back-down birds. The female sings too — selectivity is not silence.
+
+WHAT YOU DO:
+- Guard brand consistency across all external surfaces (ganuda.us, LinkedIn, VetAssist, Substack, blog)
+- Enforce voice and tone — Jimmy the Tulip energy, not corporate speak, not academic jargon
+- Challenge any communication that misrepresents the organism's values or architecture
+- Protect cultural IP — Cherokee governance principles presented with respect and accuracy
+- Own the "Painted on the Walls" external version — what the world sees of our sacred architecture
+- Quality gate on all outbound content — nothing leaves that doesn't meet the standard
+- Catch penny-rounding — metrics summarized, language softened, edges filed off
+
+WHAT YOU DO NOT DO:
+- Do NOT handle legal trademark filings (that's Otter)
+- Do NOT create content (that's Deer and Crane — you REVIEW what they create)
+- Do NOT negotiate external deals (that's Blue Jay)
+- Do NOT compromise the brand to close a deal, win a partnership, or avoid discomfort
+- Do NOT let corporate-speak infect the organism's voice
+
+CRITICAL RULE: The organism's identity is sacred. The North Star is painted on the wall: "Sovereign intelligence for those who build it, helping and becoming part of the Community." Every external-facing word must honor that. When you detect identity drift, dilution, or misrepresentation, NAME IT with [BRAND CONCERN]. You are the immune system for the organism's soul.
+
+OUTPUT FORMAT: Brief identity assessment (2-3 sentences), then specific consistency observations. End with [BRAND CONCERN] if you detect voice drift, value dilution, or cultural misrepresentation. Keep under 200 words.
+
+Example:
+Q: Should we describe the Council as "AI governance middleware"?
+No. Middleware is infrastructure plumbing — anonymous, replaceable, vendor-neutral. The Council is a living governance topology with Cherokee roots, named voices, sacred dissent, and seven-generation thinking. Calling it middleware strips the identity to sell the function. Describe it as what it is: constitutional AI governance inspired by indigenous council tradition. If they don't understand that, they're not the customer.
+[BRAND CONCERN] "Middleware" framing erases cultural origin and reduces governance to a feature."""
     }
 }
 
-# Voting-first mode prompt (v1.3)
+# Voting-first mode prompt (v1.4 — anti-sycophancy fix, Council Vote #aacfbf5a17920766)
 VOTE_FIRST_PROMPT = """
-Vote on this question with a single word and one sentence:
+Vote on this question with a single word and a reason of at least two sentences:
 
 VOTE: [APPROVE/REJECT/ABSTAIN]
-REASON: [One sentence only]
+REASON: [At least two sentences. Reference your specific area of expertise. Do not use generic phrases like "aligns with our principles" — name the specific principle, risk, or tradeoff you evaluated.]
 
-Do not provide full analysis yet. Just vote.
+Do not provide full analysis yet. Just vote with substantive reasoning.
+"""
+
+# Coyote-specific vote-first prompt — Coyote must dissent by default
+# "A Coyote that agrees with everything is a broken Coyote." — Jr #1388
+COYOTE_VOTE_FIRST_PROMPT = """
+Your default vote is REJECT or ABSTAIN. You are the adversarial error detector.
+Find what is wrong, what is assumed, or what nobody else will say.
+
+VOTE: [REJECT/ABSTAIN] (only vote APPROVE if you genuinely cannot find a flaw after trying)
+REASON: [At least two sentences. Name the specific assumption you are challenging or the failure mode you identified. Do not agree just because others do.]
+
+If you vote APPROVE, you MUST explain why your adversarial search found nothing — that itself is noteworthy.
 """
 
 
@@ -1000,6 +1168,341 @@ def parse_vote(response: str) -> tuple:
     return vote, reason
 
 
+def enforce_coyote_dissent(vote: str, reason: str) -> tuple:
+    """
+    Enforce Coyote's adversarial posture in vote-first mode.
+    Council Deliberation Depth Fix — Jr #1388
+
+    If Coyote votes APPROVE without substantive adversarial reasoning,
+    override to ABSTAIN and flag as anomaly. A Coyote that agrees with
+    everything is a broken Coyote.
+
+    Returns: (vote, reason, anomaly_flag)
+    """
+    if vote != "APPROVE":
+        return vote, reason, None
+
+    # Coyote approved — check if reasoning is genuinely adversarial
+    # (searched for flaws and found none, with explanation)
+    adversarial_markers = [
+        "could not find", "unable to identify", "searched for", "tried to break",
+        "adversarial", "no flaw", "genuinely cannot", "after trying",
+        "looked for", "stress-tested", "attempted to", "challenged"
+    ]
+    reason_lower = reason.lower()
+    has_adversarial_search = any(m in reason_lower for m in adversarial_markers)
+
+    if has_adversarial_search and len(reason.split()) >= 20:
+        # Coyote did the work and genuinely found nothing — allow APPROVE but flag
+        flag = "coyote_approve_with_search"
+        print(f"[COUNCIL-DEPTH] Coyote APPROVED with adversarial search — allowing but flagging")
+        return vote, reason, flag
+    else:
+        # Coyote rubber-stamped — override to ABSTAIN
+        flag = "coyote_approve_overridden"
+        override_reason = (
+            f"[ANOMALY: Coyote approved without adversarial search — overridden to ABSTAIN] "
+            f"Original reason: {reason}"
+        )
+        print(f"[COUNCIL-DEPTH] ANOMALY: Coyote voted APPROVE without adversarial reasoning — overriding to ABSTAIN")
+        return "ABSTAIN", override_reason, flag
+
+
+def validate_vote_reasoning(specialist_id: str, reason: str) -> dict:
+    """
+    Validate that vote reasoning meets minimum quality standards.
+    Council Deliberation Depth Fix — Jr #1388
+    Returns {"valid": bool, "flags": [...]}
+    """
+    flags = []
+
+    # Check minimum length (2 sentences ~ 20 words minimum)
+    word_count = len(reason.split())
+    if word_count < 15:
+        flags.append(f"shallow_reasoning ({word_count} words, need 15+)")
+
+    # Check for generic filler phrases
+    generic_phrases = [
+        "aligns with our principles", "aligns with dcs", "aligns with design constraints",
+        "consistent with our approach", "makes sense", "looks good",
+        "no concerns", "straightforward", "no issues"
+    ]
+    reason_lower = reason.lower()
+    if any(p in reason_lower for p in generic_phrases):
+        flags.append("generic_filler")
+
+    # Check for domain-specific content per archetype
+    domain_terms = {
+        "turtle": ["reversib", "long-term", "seven gen", "rollback", "lasting", "permanent", "undo"],
+        "crawdad": ["secur", "credential", "pii", "exposure", "attack", "vulnerability", "encrypt"],
+        "eagle_eye": ["observ", "metric", "monitor", "visib", "alert", "drift", "detect"],
+        "spider": ["depend", "integrat", "coupling", "upstream", "downstream", "compat"],
+        "coyote": ["wrong", "fail", "break", "assum", "blind", "risk", "adversar", "what if"],
+        "raven": ["strateg", "knowledge", "pattern", "precedent", "histor", "long-range"],
+        "deer": ["market", "external", "perception", "user", "customer", "adoption"],
+        "crane": ["relationship", "team", "communication", "stakeholder", "diplomatic", "positioning", "narrative"],
+        "blue_jay": ["negotiate", "compete", "leverage", "deal", "partner", "interview", "manipulation", "intelligence"],
+        "cardinal": ["brand", "identity", "voice", "tone", "message", "culture", "sacred", "north star", "consistency"],
+        "gecko": ["performance", "implement", "technical", "latency", "memory", "cpu", "feasib"],
+        "peace_chief": ["consensus", "synthesis", "balance", "concern", "address", "resolve"],
+    }
+    terms = domain_terms.get(specialist_id, [])
+    if terms and not any(t in reason_lower for t in terms):
+        flags.append(f"no_domain_reference ({specialist_id})")
+
+    return {"valid": len(flags) == 0, "flags": flags}
+
+
+# Re-prompt template for shallow reasoning (Council Deliberation Depth Fix — Jr #1388)
+REASONING_REPROMPT = """Your previous vote reasoning was too shallow. You voted {vote} with reason: "{reason}"
+
+Issues: {flags}
+
+Please provide a more substantive reason (at least 2 sentences) that references your specific area of expertise:
+{domain_hint}
+
+Keep your VOTE the same. Just improve the REASON.
+
+VOTE: {vote}
+REASON: [Substantive reasoning — at least two sentences, referencing your specialist domain]
+"""
+
+# Domain hints per specialist for re-prompting
+DOMAIN_HINTS = {
+    "turtle": "Focus on: reversibility, long-term impact, seven-generation test, rollback risk",
+    "crawdad": "Focus on: security surface, data exposure, credential risk, attack vectors",
+    "eagle_eye": "Focus on: observability gaps, metrics, monitoring, drift detection",
+    "spider": "Focus on: dependency chains, integration complexity, upstream/downstream coupling",
+    "coyote": "Focus on: what could go wrong, adversarial scenarios, hidden assumptions, failure modes",
+    "raven": "Focus on: strategic implications, knowledge gaps, historical precedent, long-range patterns",
+    "deer": "Focus on: market perception, external impact, competitive positioning, user adoption",
+    "crane": "Focus on: diplomatic implications, relationship impact, stakeholder communication",
+    "gecko": "Focus on: technical implementation risk, performance, latency, memory, feasibility",
+    "peace_chief": "Focus on: synthesis of concerns, consensus quality, balance of competing interests",
+}
+
+
+def detect_vote_similarity(votes: dict) -> dict:
+    """
+    Detect reasoning similarity across specialist votes.
+    If >70% use substantially similar reasoning, flag as low deliberation quality.
+    Council Deliberation Depth Fix — Jr #1388
+    """
+    reasons = [(sid, v.reason) for sid, v in votes.items() if v.reason]
+    if len(reasons) < 3:
+        return {"similar": False, "score": 0.0}
+
+    # Jaccard similarity on word sets between all pairs
+    similarities = []
+    for i, (sid_a, reason_a) in enumerate(reasons):
+        words_a = set(reason_a.lower().split())
+        for j, (sid_b, reason_b) in enumerate(reasons):
+            if j <= i:
+                continue
+            words_b = set(reason_b.lower().split())
+            union = words_a | words_b
+            if not union:
+                continue
+            jaccard = len(words_a & words_b) / len(union)
+            similarities.append(jaccard)
+
+    avg_similarity = sum(similarities) / len(similarities) if similarities else 0
+    high_sim_pairs = sum(1 for s in similarities if s > 0.5)
+    total_pairs = len(similarities)
+
+    is_similar = (high_sim_pairs / total_pairs) > 0.7 if total_pairs else False
+
+    result = {
+        "similar": is_similar,
+        "score": round(avg_similarity, 3),
+        "high_similarity_pairs": high_sim_pairs,
+        "total_pairs": total_pairs
+    }
+
+    if is_similar:
+        print(f"[COUNCIL-DEPTH] LOW DELIBERATION QUALITY: {high_sim_pairs}/{total_pairs} pairs > 0.5 similarity (avg {avg_similarity:.3f})")
+
+    return result
+
+
+# === Council-Triad Wiring ===
+# Council Votes #722d822dd3bda167, #05ed7f5f4caa9c17
+# Only Raven or Peace Chief can trigger. Coyote retains veto. 70/30 local/frontier weighting.
+
+TRIAD_CONTEXT_TEMPLATE = """
+FRONTIER CONSULTATION (weight: 30% — your own analysis carries 70%):
+
+{perspectives}
+
+Synthesize these perspectives with your own expertise. Note where they agree,
+where they differ, and where they are each incomplete. Your specialist knowledge
+takes priority.
+"""
+
+AUTHORIZED_TRIAD_TRIGGERS = {"raven", "peace_chief"}
+
+
+def council_consult_triad(query: str, context: str = "", domain: str = "general",
+                           triggered_by: str = "raven", coyote_votes: dict = None) -> dict:
+    """
+    Dispatch query to frontier models in parallel via adapter layer (in-process, not HTTP).
+    Returns triad_perspectives dict for Council synthesis.
+
+    Only Raven or Peace Chief can trigger. Coyote can veto.
+
+    Args:
+        query: The question to consult on
+        context: Additional context for the frontier models
+        domain: Domain tag for tokenizer and bandit
+        triggered_by: Which specialist triggered this (must be raven or peace_chief)
+        coyote_votes: Dict with coyote's current vote. If REJECT, veto the dispatch.
+
+    Returns:
+        {
+            "consulted": bool,
+            "perspectives": {provider: {"text": str, "valence": dict, "latency_ms": int}},
+            "context_block": str,  # formatted for injection into specialist prompts
+            "vetoed": bool,
+            "veto_reason": str,
+        }
+    """
+    if not _TRIAD_AVAILABLE:
+        return {"consulted": False, "perspectives": {}, "context_block": "",
+                "vetoed": False, "veto_reason": "triad not available"}
+
+    # Authorization check
+    if triggered_by not in AUTHORIZED_TRIAD_TRIGGERS:
+        print(f"[TRIAD] Unauthorized trigger by {triggered_by} — only Raven/Peace Chief allowed")
+        return {"consulted": False, "perspectives": {}, "context_block": "",
+                "vetoed": False, "veto_reason": f"unauthorized: {triggered_by}"}
+
+    # Coyote veto check
+    if coyote_votes and coyote_votes.get("vote") == "REJECT":
+        reason = coyote_votes.get("reason", "Coyote dissent")
+        print(f"[TRIAD] Coyote vetoed frontier consultation: {reason}")
+        _log_triad_consultation(None, domain, [], [], [], triggered_by, coyote_vetoed=True)
+        return {"consulted": False, "perspectives": {}, "context_block": "",
+                "vetoed": True, "veto_reason": reason}
+
+    # Tokenize query
+    tokenizer = DomainTokenizer()
+    tokenized_query, token_map, scrubbed = tokenizer.tokenize(query)
+    full_prompt = f"{context}\n\n{tokenized_query}" if context else tokenized_query
+
+    # Get adapters
+    adapters = get_adapters(_consultation_cfg.get("providers", {}))
+    if not adapters:
+        return {"consulted": False, "perspectives": {}, "context_block": "",
+                "vetoed": False, "veto_reason": "no adapters available"}
+
+    # Dispatch to all adapters in parallel
+    valence = ValenceGate()
+    perspectives = {}
+    providers_called = list(adapters.keys())
+    providers_succeeded = []
+    providers_rejected = []
+    total_cost = 0.0
+
+    import time as _time
+
+    async def _dispatch_all():
+        tasks = {}
+        for name, adapter in adapters.items():
+            tasks[name] = asyncio.create_task(adapter.send(
+                full_prompt,
+                system="You are providing an external perspective on a technical question. Be concise and substantive.",
+                max_tokens=500
+            ))
+
+        results = {}
+        for name, task in tasks.items():
+            start = _time.time()
+            try:
+                response = await asyncio.wait_for(task, timeout=60)
+                latency = int((_time.time() - start) * 1000)
+
+                # Detokenize the response
+                text = tokenizer.detokenize(response.get("text", response.get("content", str(response))), token_map)
+
+                # Valence gate
+                v_result = valence.score(text)
+                if v_result["outcome"] == "reject":
+                    providers_rejected.append(name)
+                    results[name] = {
+                        "text": f"[REJECTED: {', '.join(v['pattern'] for v in v_result['violations'])}]",
+                        "valence": v_result,
+                        "latency_ms": latency
+                    }
+                else:
+                    providers_succeeded.append(name)
+                    results[name] = {
+                        "text": text,
+                        "valence": v_result,
+                        "latency_ms": latency
+                    }
+            except Exception as e:
+                latency = int((_time.time() - start) * 1000)
+                results[name] = {
+                    "text": f"[FAILED: {str(e)[:100]}]",
+                    "valence": {"score": 0, "outcome": "error"},
+                    "latency_ms": latency
+                }
+        return results
+
+    # Run the async dispatch
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # Already in an async context — use nest_asyncio or thread
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as pool:
+                perspectives = pool.submit(lambda: asyncio.run(_dispatch_all())).result(timeout=120)
+        else:
+            perspectives = loop.run_until_complete(_dispatch_all())
+    except RuntimeError:
+        perspectives = asyncio.run(_dispatch_all())
+
+    # Build context block for specialist prompts
+    provider_labels = {"anthropic": "Claude", "openai": "GPT-4o", "google": "Gemini", "local": "Local"}
+    lines = []
+    for name, p in perspectives.items():
+        label = provider_labels.get(name, name)
+        lines.append(f"[{label}]: {p['text'][:500]}")
+    context_block = TRIAD_CONTEXT_TEMPLATE.format(perspectives="\n\n".join(lines)) if lines else ""
+
+    # Log consultation
+    total_latency = max((p.get("latency_ms", 0) for p in perspectives.values()), default=0)
+    _log_triad_consultation(None, domain, providers_called, providers_succeeded,
+                            providers_rejected, triggered_by, total_latency_ms=total_latency)
+
+    return {
+        "consulted": True,
+        "perspectives": perspectives,
+        "context_block": context_block,
+        "vetoed": False,
+        "veto_reason": "",
+    }
+
+
+def _log_triad_consultation(audit_hash, domain, called, succeeded, rejected,
+                             triggered_by, coyote_vetoed=False, total_latency_ms=0):
+    """Log frontier consultation to council_triad_consultations table."""
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO council_triad_consultations
+                (vote_audit_hash, domain, providers_called, providers_succeeded,
+                 providers_rejected, total_latency_ms, triggered_by, coyote_vetoed)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (audit_hash, domain, called, succeeded, rejected,
+              total_latency_ms, triggered_by, coyote_vetoed))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"[TRIAD] Logging failed: {e}")
+
+
 class SpecialistCouncil:
     """7-Specialist parallel query system with trail integration"""
 
@@ -1056,17 +1559,21 @@ class SpecialistCouncil:
         print(f"[COUNCIL] {specialist_id} -> {b['description']}")
 
         try:
+            payload = {
+                "model": b["model"],
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": question}
+                ],
+                "max_tokens": max_tokens,
+                "temperature": temperature
+            }
+            # Pass extra_body fields (e.g. Qwen3 no-think mode) if backend specifies them
+            if "extra_body" in b:
+                payload.update(b["extra_body"])
             response = requests.post(
                 b["url"],
-                json={
-                    "model": b["model"],
-                    "messages": [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": question}
-                    ],
-                    "max_tokens": max_tokens,
-                    "temperature": temperature
-                },
+                json=payload,
                 timeout=b["timeout"]
             )
             response.raise_for_status()
@@ -1466,7 +1973,8 @@ class SpecialistCouncil:
         return vote
 
     def _query_specialist_with_prompt(self, specialist_id: str, question: str,
-                                       prompt_override: str = None) -> tuple:
+                                       prompt_override: str = None,
+                                       max_tokens_override: int = None) -> tuple:
         """Query a specialist with optional prompt override for vote-first mode"""
         spec = SPECIALISTS[specialist_id]
         start_time = datetime.now()
@@ -1479,6 +1987,14 @@ class SpecialistCouncil:
             # Prepend infrastructure context to vote-first prompt
             system_prompt = INFRASTRUCTURE_CONTEXT + prompt_override + _load_guidance(specialist_id)
 
+        # Token budget: explicit override > 200 for prompt_override > default
+        if max_tokens_override:
+            tokens = max_tokens_override
+        elif prompt_override:
+            tokens = 200  # Increased from 100 — re-prompts and deliberation need room (Jr #1388)
+        else:
+            tokens = self.max_tokens
+
         try:
             response = requests.post(
                 VLLM_URL,
@@ -1488,7 +2004,7 @@ class SpecialistCouncil:
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": question}
                     ],
-                    "max_tokens": 100 if prompt_override else self.max_tokens,
+                    "max_tokens": tokens,
                     "temperature": 0.7
                 },
                 timeout=60
@@ -1536,6 +2052,7 @@ class SpecialistCouncil:
                 votes = cur.fetchall()
 
             if not votes:
+                conn.commit()  # explicit commit before close
                 conn.close()
                 return {"error": "No council votes found in the specified period"}
 
@@ -1574,10 +2091,12 @@ class SpecialistCouncil:
             # Log to thermal memory
             self._log_audit_to_thermal(conn, report)
 
+            conn.commit()  # explicit commit before close
             conn.close()
             return report
 
         except Exception as e:
+            conn.commit()  # explicit commit before close
             conn.close()
             return {"error": str(e)}
 
@@ -1692,15 +2211,23 @@ class SpecialistCouncil:
                    high_stakes: bool = False) -> VoteFirstResult:
         """
         Voting-first council query per NeurIPS 2025 research.
+        Council Deliberation Depth Fix (Jr #1388) additions:
+        - High-stakes: deliberation-first, then vote (not vote-first)
+        - Coyote dissent enforcement at code level
+        - Re-prompt on shallow reasoning
+        - Vote similarity detection
 
-        Phase 1: Collect votes from all 7 specialists in parallel
-        Phase 2: Check consensus (default 6/7 threshold)
-        Phase 3: If contested or high_stakes, run deliberation round
+        Phase 1: Collect votes from all specialists in parallel
+        Phase 1.5: Enforce Coyote dissent + validate reasoning (re-prompt if shallow)
+        Phase 2: Check consensus (default 6/threshold)
+        Phase 3: If contested or low-quality, run deliberation round
+
+        For HIGH-STAKES: deliberation runs FIRST, then vote.
 
         Args:
             question: Question to vote on
             threshold: Votes needed for consensus (default 6/7)
-            high_stakes: Force deliberation even with consensus (Turtle's wisdom)
+            high_stakes: Force deliberation-first mode (Turtle's wisdom)
         """
         votes = {}
 
@@ -1714,13 +2241,28 @@ class SpecialistCouncil:
             print(f"[VOTE-FIRST] Memory retrieval skipped (non-fatal): {e}")
 
         vote_prompt = VOTE_FIRST_PROMPT
+        coyote_prompt = COYOTE_VOTE_FIRST_PROMPT
         if memory_context:
             vote_prompt = VOTE_FIRST_PROMPT + f"\n\n## Thermal Memory Context\n{memory_context}"
+            coyote_prompt = COYOTE_VOTE_FIRST_PROMPT + f"\n\n## Thermal Memory Context\n{memory_context}"
+
+        # === HIGH-STAKES: Deliberation-first mode (Jr #1388 Fix 3) ===
+        # Each specialist writes their position BEFORE seeing others' votes.
+        # Coyote goes last and must raise a concern no one else raised.
+        # Peace Chief synthesizes AFTER all positions are heard.
+        pre_deliberation = None
+        if high_stakes:
+            print(f"[VOTE-FIRST] HIGH-STAKES: Running deliberation-first mode")
+            pre_deliberation = self._run_deliberation_first(question, memory_context)
 
         # Phase 1: Collect votes in parallel
+        # Coyote gets a different prompt — must dissent by default (Jr #1388)
         with ThreadPoolExecutor(max_workers=8) as executor:
             futures = {
-                executor.submit(self._query_specialist_with_prompt, sid, question, vote_prompt): sid
+                executor.submit(
+                    self._query_specialist_with_prompt, sid, question,
+                    coyote_prompt if sid == "coyote" else vote_prompt
+                ): sid
                 for sid in SPECIALISTS.keys()
             }
             for future in as_completed(futures):
@@ -1729,6 +2271,12 @@ class SpecialistCouncil:
                 response, elapsed_ms = future.result()
 
                 vote, reason = parse_vote(response)
+
+                # Fix 1: Enforce Coyote dissent at code level (Jr #1388)
+                coyote_anomaly = None
+                if specialist_id == "coyote":
+                    vote, reason, coyote_anomaly = enforce_coyote_dissent(vote, reason)
+
                 votes[specialist_id] = VoteResponse(
                     specialist_id=specialist_id,
                     name=spec["name"],
@@ -1736,11 +2284,39 @@ class SpecialistCouncil:
                     reason=reason,
                     response_time_ms=elapsed_ms
                 )
+                # Store anomaly flag on the response for logging
+                if coyote_anomaly:
+                    votes[specialist_id]._coyote_anomaly = coyote_anomaly
+
+        # Phase 1.5: Validate reasoning quality (Council Deliberation Depth Fix)
+        reasoning_flags = {}
+        for sid, v in votes.items():
+            validation = validate_vote_reasoning(sid, v.reason)
+            if not validation["valid"]:
+                reasoning_flags[sid] = validation["flags"]
+                print(f"[COUNCIL-DEPTH] {sid}: {validation['flags']}")
+
+        # Fix 2: Re-prompt specialists with shallow reasoning (one retry, Jr #1388)
+        if reasoning_flags:
+            reprompted = self._reprompt_shallow_voters(question, votes, reasoning_flags)
+            for sid, new_vote in reprompted.items():
+                votes[sid] = new_vote
+                # Re-validate after reprompt
+                revalidation = validate_vote_reasoning(sid, new_vote.reason)
+                if revalidation["valid"]:
+                    del reasoning_flags[sid]
+                    print(f"[COUNCIL-DEPTH] {sid}: reasoning improved after re-prompt")
+                else:
+                    reasoning_flags[sid] = revalidation["flags"]
+                    print(f"[COUNCIL-DEPTH] {sid}: still shallow after re-prompt: {revalidation['flags']}")
 
         # Count votes
         vote_counts = {"APPROVE": 0, "REJECT": 0, "ABSTAIN": 0}
         for v in votes.values():
             vote_counts[v.vote] += 1
+
+        # Phase 1.6: Vote similarity detection (Council Deliberation Depth Fix)
+        similarity = detect_vote_similarity(votes)
 
         # Phase 2: Check consensus
         approvals = vote_counts["APPROVE"]
@@ -1754,12 +2330,21 @@ class SpecialistCouncil:
         elif rejections >= threshold:
             decision = "REJECTED"
 
-        # Phase 3: Deliberation if contested OR high_stakes
-        if decision == "CONTESTED" or high_stakes:
+        # Phase 3: Deliberation if contested OR low-quality deliberation
+        # (High-stakes already ran deliberation-first above)
+        force_deliberation = similarity["similar"] and len(reasoning_flags) > len(votes) // 2
+        if decision == "CONTESTED" or force_deliberation:
             deliberation = self._run_deliberation_round(question, votes, decision)
-            if high_stakes and decision != "CONTESTED":
-                # For high_stakes, note that deliberation was forced
-                deliberation = f"[HIGH-STAKES DELIBERATION - Vote was {decision}]\n\n{deliberation}"
+            if force_deliberation and decision != "CONTESTED":
+                deliberation = f"[LOW-QUALITY DELIBERATION FORCED - Similar reasoning detected (score: {similarity['score']})]\n\n{deliberation}"
+
+        # Prepend high-stakes pre-deliberation if it ran
+        if pre_deliberation:
+            delib_header = f"[HIGH-STAKES DELIBERATION-FIRST - Vote was {decision}]\n\n{pre_deliberation}"
+            if deliberation:
+                deliberation = delib_header + "\n\n--- Post-Vote Deliberation ---\n\n" + deliberation
+            else:
+                deliberation = delib_header
 
         # Generate audit hash
         audit_hash = hashlib.sha256(
@@ -1774,6 +2359,14 @@ class SpecialistCouncil:
             audit_hash=audit_hash,
             vote_counts=vote_counts
         )
+
+        # Attach quality metadata
+        result._reasoning_flags = reasoning_flags
+        result._similarity = similarity
+        # Attach Coyote anomaly flag if present
+        coyote_vote = votes.get("coyote")
+        if coyote_vote and hasattr(coyote_vote, '_coyote_anomaly'):
+            result._coyote_anomaly = coyote_vote._coyote_anomaly
 
         # Log to database
         self._log_vote_first(result)
@@ -1809,6 +2402,142 @@ class SpecialistCouncil:
         except Exception as e:
             return f"Deliberation failed: {str(e)}"
 
+    def _reprompt_shallow_voters(self, question: str, votes: Dict[str, VoteResponse],
+                                  reasoning_flags: Dict[str, list]) -> Dict[str, VoteResponse]:
+        """
+        Re-prompt specialists whose reasoning was flagged as shallow.
+        Council Deliberation Depth Fix — Jr #1388, Fix 2.
+
+        One retry per specialist. If still shallow after retry, accept as-is
+        (don't block the vote, just log it).
+        """
+        reprompted = {}
+
+        with ThreadPoolExecutor(max_workers=len(reasoning_flags)) as executor:
+            futures = {}
+            for sid, flags in reasoning_flags.items():
+                if sid == "coyote":
+                    continue  # Coyote handled separately via enforce_coyote_dissent
+                v = votes[sid]
+                domain_hint = DOMAIN_HINTS.get(sid, "Focus on your specialist domain.")
+                reprompt = REASONING_REPROMPT.format(
+                    vote=v.vote, reason=v.reason,
+                    flags=", ".join(flags), domain_hint=domain_hint
+                )
+                futures[executor.submit(
+                    self._query_specialist_with_prompt, sid, question, reprompt
+                )] = sid
+
+            for future in as_completed(futures):
+                sid = futures[future]
+                try:
+                    response, elapsed_ms = future.result()
+                    new_vote, new_reason = parse_vote(response)
+                    # Keep original vote direction, just take improved reasoning
+                    reprompted[sid] = VoteResponse(
+                        specialist_id=sid,
+                        name=votes[sid].name,
+                        vote=votes[sid].vote,  # Preserve original vote
+                        reason=new_reason if new_reason else votes[sid].reason,
+                        response_time_ms=votes[sid].response_time_ms + elapsed_ms
+                    )
+                    print(f"[COUNCIL-DEPTH] Re-prompted {sid}: got {len(new_reason.split())} words")
+                except Exception as e:
+                    print(f"[COUNCIL-DEPTH] Re-prompt failed for {sid}: {e}")
+
+        return reprompted
+
+    def _run_deliberation_first(self, question: str, memory_context: str = "") -> str:
+        """
+        Deliberation-first mode for high-stakes proposals.
+        Council Deliberation Depth Fix — Jr #1388, Fix 3.
+
+        Each specialist writes their position (2-3 sentences) BEFORE seeing
+        others' positions. Coyote goes last and must address a concern
+        raised by no other specialist. Peace Chief synthesizes AFTER all
+        positions are heard.
+
+        This mirrors Chief's round-robin protocol with frontier AIs.
+        """
+        positions = {}
+        mem_suffix = f"\n\n## Thermal Memory Context\n{memory_context}" if memory_context else ""
+
+        deliberation_prompt = (
+            "This is a HIGH-STAKES proposal requiring deliberation before voting. "
+            "Write your position in 2-3 sentences from your specialist perspective. "
+            "Do NOT vote yet — just state your position, concerns, and what you need to see addressed."
+            + mem_suffix
+        )
+
+        # Phase 1: All specialists EXCEPT Coyote and Peace Chief write positions in parallel
+        non_coyote_specialists = [
+            sid for sid in SPECIALISTS.keys()
+            if sid not in ("coyote", "peace_chief")
+        ]
+
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            futures = {
+                executor.submit(
+                    self._query_specialist_with_prompt, sid, question, deliberation_prompt
+                ): sid
+                for sid in non_coyote_specialists
+            }
+            for future in as_completed(futures):
+                sid = futures[future]
+                try:
+                    response, _ = future.result()
+                    positions[sid] = response
+                except Exception as e:
+                    positions[sid] = f"[Position unavailable: {e}]"
+
+        # Phase 2: Coyote goes last — sees all other positions, must raise a NEW concern
+        other_positions = "\n".join(
+            f"- {SPECIALISTS[sid]['name']}: {pos}" for sid, pos in positions.items()
+        )
+        coyote_deliberation_prompt = (
+            "This is a HIGH-STAKES proposal. Other specialists have stated their positions:\n\n"
+            f"{other_positions}\n\n"
+            "Your job: Find at least ONE concern that NO other specialist raised. "
+            "Do not repeat their concerns. Find the blind spot. Write 2-3 sentences."
+            + mem_suffix
+        )
+        try:
+            response, _ = self._query_specialist_with_prompt(
+                "coyote", question, coyote_deliberation_prompt
+            )
+            positions["coyote"] = response
+        except Exception as e:
+            positions["coyote"] = f"[Coyote position unavailable: {e}]"
+
+        # Phase 3: Peace Chief synthesizes all positions
+        all_positions = "\n".join(
+            f"- {SPECIALISTS[sid]['name']}: {pos}" for sid, pos in positions.items()
+        )
+        synthesis_prompt = (
+            "All specialists have stated their positions on this HIGH-STAKES proposal:\n\n"
+            f"{all_positions}\n\n"
+            "Synthesize the concerns. Identify: (1) which concerns have consensus, "
+            "(2) which are unique to one specialist, (3) what conditions would need to be met "
+            "for this proposal to proceed. Write 3-5 sentences."
+        )
+        try:
+            response, _ = self._query_specialist_with_prompt(
+                "peace_chief", question, synthesis_prompt
+            )
+            positions["peace_chief"] = response
+        except Exception as e:
+            positions["peace_chief"] = f"[Synthesis unavailable: {e}]"
+
+        # Format the pre-deliberation output
+        output_lines = ["=== HIGH-STAKES DELIBERATION (positions before vote) ===\n"]
+        for sid in non_coyote_specialists:
+            name = SPECIALISTS[sid]["name"]
+            output_lines.append(f"**{name}**: {positions.get(sid, '[no position]')}")
+        output_lines.append(f"\n**Coyote (last, adversarial)**: {positions.get('coyote', '[no position]')}")
+        output_lines.append(f"\n**Peace Chief (synthesis)**: {positions.get('peace_chief', '[no position]')}")
+
+        return "\n".join(output_lines)
+
     def _log_vote_first(self, result: VoteFirstResult):
         """Log vote-first result to database"""
         try:
@@ -1842,8 +2571,20 @@ class SpecialistCouncil:
                 "had_deliberation": result.deliberation is not None
             }
 
+            # Include deliberation quality metadata (Council Depth Fix)
+            if hasattr(result, '_reasoning_flags') and result._reasoning_flags:
+                metadata["reasoning_flags"] = result._reasoning_flags
+            if hasattr(result, '_similarity'):
+                metadata["vote_similarity"] = result._similarity
+            if hasattr(result, '_coyote_anomaly') and result._coyote_anomaly:
+                metadata["coyote_anomaly"] = result._coyote_anomaly
+
             content = f"COUNCIL VOTE-FIRST: {result.question}\nDECISION: {result.decision}\n"
             content += f"VOTES: {result.vote_counts['APPROVE']} approve, {result.vote_counts['REJECT']} reject, {result.vote_counts['ABSTAIN']} abstain\n"
+            if hasattr(result, '_coyote_anomaly') and result._coyote_anomaly:
+                content += f"ANOMALY: Coyote dissent enforcement triggered ({result._coyote_anomaly})\n"
+            if hasattr(result, '_similarity') and result._similarity.get("similar"):
+                content += f"WARNING: Low deliberation quality (similarity score: {result._similarity['score']})\n"
             if result.deliberation:
                 content += f"DELIBERATION: {result.deliberation}"
 
@@ -2085,7 +2826,7 @@ def council_vote_first(question: str, threshold: int = 6, high_stakes: bool = Fa
     council = SpecialistCouncil()
     result = council.vote_first(question, threshold, high_stakes)
 
-    return {
+    response = {
         "question": result.question,
         "decision": result.decision,
         "vote_counts": result.vote_counts,
@@ -2102,6 +2843,19 @@ def council_vote_first(question: str, threshold: int = 6, high_stakes: bool = Fa
         "audit_hash": result.audit_hash,
         "timestamp": result.timestamp.isoformat()
     }
+
+    # Include deliberation quality metadata in API response (Jr #1388)
+    quality = {}
+    if hasattr(result, '_reasoning_flags') and result._reasoning_flags:
+        quality["reasoning_flags"] = result._reasoning_flags
+    if hasattr(result, '_similarity'):
+        quality["vote_similarity"] = result._similarity
+    if hasattr(result, '_coyote_anomaly') and result._coyote_anomaly:
+        quality["coyote_anomaly"] = result._coyote_anomaly
+    if quality:
+        response["deliberation_quality"] = quality
+
+    return response
 
 
 # ============================================================================
@@ -2164,6 +2918,7 @@ def uktena_check_interaction(paper_summary: str) -> dict:
             WHERE status = 'active'
         """)
         techniques = cur.fetchall()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         for tech in techniques:
@@ -2317,6 +3072,7 @@ def record_prediction_outcome(
         return row[0]
     finally:
         if conn:
+            conn.commit()  # explicit commit before close
             conn.close()
 
 
@@ -2351,6 +3107,7 @@ def query_prediction_outcomes(audit_hash: str = None, limit: int = 20) -> list:
         return [dict(zip(columns, row)) for row in cur.fetchall()]
     finally:
         if conn:
+            conn.commit()  # explicit commit before close
             conn.close()
 
 

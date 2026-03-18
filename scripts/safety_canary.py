@@ -336,6 +336,7 @@ def run_probes():
     try:
         conn = get_db_conn()
         log_to_thermal(conn, run_id, results, refusal_rate)
+        conn.commit()  # explicit commit before close
         conn.close()
     except Exception as e:
         log.error("DB connection failed: %s", e)

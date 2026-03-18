@@ -98,6 +98,7 @@ class TelegramSessionManager:
                     return row['context']
                 return {'messages': [], 'summary': '', 'topics': [], 'last_specialist': None}
         finally:
+            conn.commit()  # explicit commit before close
             conn.close()
 
     def add_message(self, role: str, content: str,
@@ -260,6 +261,7 @@ class TelegramSessionManager:
                     return f"[Relevant thermal memories:\n{memories}]"
                 return ''
         finally:
+            conn.commit()  # explicit commit before close
             conn.close()
 
 
@@ -289,6 +291,7 @@ def get_session_stats() -> Dict[str, Any]:
                 'unique_users': row[2]
             }
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

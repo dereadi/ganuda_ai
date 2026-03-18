@@ -70,6 +70,7 @@ class KanbanToolSet(ToolSet):
 
         rows = cur.fetchall()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         return {
@@ -100,6 +101,7 @@ class KanbanToolSet(ToolSet):
         """)
         rows = cur.fetchall()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         return {
@@ -131,6 +133,7 @@ class KanbanToolSet(ToolSet):
         done = by_status.get("completed", 0)
 
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         return {

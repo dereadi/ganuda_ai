@@ -252,6 +252,7 @@ def main():
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(1)
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

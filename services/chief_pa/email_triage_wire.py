@@ -246,6 +246,7 @@ class EmailTriageWire:
         finally:
             if conn:
                 try:
+                    conn.commit()  # explicit commit before close
                     conn.close()
                 except Exception:
                     pass

@@ -166,6 +166,7 @@ def save_to_thermal_memory(memory_hash, content, temperature=90, sacred=False):
     cursor.execute("SELECT id FROM thermal_memory_archive WHERE memory_hash = %s", (memory_hash,))
     memory_id = cursor.fetchone()[0]
     cursor.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     return memory_id
@@ -409,6 +410,7 @@ def hot_memories():
     } for row in results]
 
     cursor.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     return jsonify({'memories': memories})

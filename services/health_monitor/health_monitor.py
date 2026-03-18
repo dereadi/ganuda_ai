@@ -102,6 +102,7 @@ def check_postgres():
         cur = conn.cursor()
         cur.execute("SELECT 1")
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         return True, int((datetime.now() - start).total_seconds() * 1000), None
     except Exception as e:
@@ -191,6 +192,7 @@ def get_restart_attempts(node, service_name):
         cur = conn.cursor()
         cur.execute("SELECT restart_attempts FROM service_health WHERE node_name = %s AND service_name = %s", (node, service_name))
         row = cur.fetchone()
+        conn.commit()  # explicit commit before close
         conn.close()
         return row[0] if row else 0
     except:

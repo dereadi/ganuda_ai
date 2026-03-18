@@ -40,6 +40,7 @@ def api_tribe_council_votes():
 
         votes = cur.fetchall()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         return jsonify({

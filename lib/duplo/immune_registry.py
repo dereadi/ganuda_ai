@@ -96,6 +96,7 @@ def register_pattern(
         conn.rollback()
         return None
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -178,6 +179,7 @@ def check_substrate(substrate: str, min_severity: int = 1) -> Optional[Dict]:
         logger.error(f"Failed to check substrate: {e}")
         return None
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -206,6 +208,7 @@ def get_registry_stats() -> Dict:
             "pattern_types": row[4],
         }
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

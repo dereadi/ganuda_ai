@@ -165,6 +165,7 @@ def run_staleness_cycle():
         raise
     finally:
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

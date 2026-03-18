@@ -109,6 +109,7 @@ def breathing() -> str:
     last_fire_guard = row["created_at"].isoformat() if row else None
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     # Convert timestamps

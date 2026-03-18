@@ -172,6 +172,7 @@ def query_votes(args):
         print(f"  Modes: {', '.join(f'{k}={v}' for k,v in modes.items())}")
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
 

@@ -38,25 +38,63 @@ class SubAgentDispatch:
     """Dispatch work to local models across the cluster."""
 
     NODES = {
+        # === Redfin (RTX PRO 6000 96GB) — fast path ===
         "redfin_vllm": {
             "url": "http://localhost:8000/v1",
-            "model": "Qwen/Qwen2.5-7B-Instruct",
+            "model": "/ganuda/models/qwen2.5-72b-instruct-awq",
             "type": "openai",
+            "tier": 1,
         },
+        # === bmasass (M4 Max 128GB) — council Raven/Turtle paths ===
         "bmasass_qwen3": {
             "url": "http://100.103.27.106:8800/v1",
             "model": "mlx-community/Qwen3-30B-A3B-4bit",
             "type": "openai",
+            "tier": 2,
         },
+        "bmasass_llama70": {
+            "url": "http://100.103.27.106:8801/v1",
+            "model": "mlx-community/Llama-3.3-70B-Instruct-4bit",
+            "type": "openai",
+            "tier": 2,
+        },
+        # === sasass (64GB) — research expansion ===
         "sasass_ollama": {
             "url": "http://192.168.132.241:11434",
             "model": "qwen2.5:7b",
             "type": "ollama",
+            "tier": 3,
         },
+        "sasass_mixtral": {
+            "url": "http://192.168.132.241:11434",
+            "model": "mixtral:latest",
+            "type": "ollama",
+            "tier": 3,
+        },
+        "sasass_devstral": {
+            "url": "http://192.168.132.241:11434",
+            "model": "devstral:latest",
+            "type": "ollama",
+            "tier": 3,
+        },
+        "sasass_llama70": {
+            "url": "http://192.168.132.241:11434",
+            "model": "llama3.3:latest",
+            "type": "ollama",
+            "tier": 2,
+        },
+        # === sasass2 (64GB) — THUNDERDUCK ZERO — Jr code reviewer ===
         "sasass2_ollama": {
             "url": "http://192.168.132.242:11434",
             "model": "qwen2.5-coder:32b",
             "type": "ollama",
+            "tier": 3,
+        },
+        "sasass2_codellama": {
+            "url": "http://192.168.132.242:11434",
+            "model": "codellama:34b",
+            "type": "ollama",
+            "tier": 3,
         },
     }
 

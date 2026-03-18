@@ -69,6 +69,7 @@ def get_pulse():
     not_deployed = cur.fetchone()[0]
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     pulse = (

@@ -95,6 +95,7 @@ def main():
     assert len(tables) == 2, f"Missing tables! Found: {tables}"
     print("All migrations deployed successfully.")
 
+    conn.commit()  # explicit commit before close
     conn.close()
 
 if __name__ == '__main__':

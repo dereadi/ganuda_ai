@@ -113,6 +113,7 @@ class Longhouse:
             return session
         finally:
             if conn is not None:
+                conn.commit()  # explicit commit before close
                 conn.close()
 
     def speak(self, session_hash: str, speaker: str, words: str) -> dict:
@@ -179,6 +180,7 @@ class Longhouse:
             return result
         finally:
             if conn is not None:
+                conn.commit()  # explicit commit before close
                 conn.close()
 
     def propose_solution(self, session_hash: str, proposer: str,
@@ -231,6 +233,7 @@ class Longhouse:
             return result
         finally:
             if conn is not None:
+                conn.commit()  # explicit commit before close
                 conn.close()
 
     def seek_consensus(self, session_hash: str,
@@ -347,6 +350,7 @@ class Longhouse:
                 )
         finally:
             if conn is not None:
+                conn.commit()  # explicit commit before close
                 conn.close()
 
         withdrawal_text = f"Question withdrawn by {convener}."
@@ -394,6 +398,7 @@ class Longhouse:
             return result
         finally:
             if conn is not None:
+                conn.commit()  # explicit commit before close
                 conn.close()
 
     def _thermalize(self, session: dict) -> None:
@@ -460,6 +465,7 @@ class Longhouse:
             return dict(result)
         finally:
             if conn is not None:
+                conn.commit()  # explicit commit before close
                 conn.close()
 
     def get_active_sessions(self) -> list:
@@ -478,6 +484,7 @@ class Longhouse:
             return [dict(row) for row in cur.fetchall()]
         finally:
             if conn is not None:
+                conn.commit()  # explicit commit before close
                 conn.close()
 
     def get_resolved_sessions(self, limit: int = 20) -> list:
@@ -497,4 +504,5 @@ class Longhouse:
             return [dict(row) for row in cur.fetchall()]
         finally:
             if conn is not None:
+                conn.commit()  # explicit commit before close
                 conn.close()

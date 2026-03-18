@@ -155,6 +155,7 @@ def scan_and_flag_memory(memory_hash: str, content: str, conn=None) -> Dict:
             conn.rollback()
         finally:
             if close_conn:
+                conn.commit()  # explicit commit before close
                 conn.close()
 
     return result
@@ -189,6 +190,7 @@ def backfill_sacred_scan(batch_size: int = 500) -> Dict:
                 flagged += 1
 
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
     return {"scanned": scanned, "flagged": flagged, "batch_size": batch_size}

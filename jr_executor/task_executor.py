@@ -271,6 +271,7 @@ class TaskExecutor:
                 cur.execute("""
                     UPDATE jr_work_queue
                     SET status = 'permanently_failed',
+                        completed_at = NOW(),
                         error_message = 'Exceeded max escalation count (' || %s || '). Loop prevention triggered.'
                     WHERE id = %s
                 """, (str(self.MAX_ESCALATION_COUNT), task_id))
@@ -1008,6 +1009,22 @@ class TaskExecutor:
 
         print(f"[TaskExecutor] Using instructions from {instruction_source} ({len(instructions)} chars)")
 
+        # Experience Bank: Inject relevant thermal memory experiences (Council #fb526dd2212e09a7)
+        if os.environ.get('EXPERIENCE_RETRIEVAL_ENABLED', 'true').lower() == 'true':
+            try:
+                from experience_retriever import ExperienceRetriever
+                retriever = ExperienceRetriever(enabled=True)
+                experiences = retriever.retrieve(
+                    task_description=f"{task.get('title', '')} {task.get('description', '')}"[:2000]
+                )
+                experience_context = retriever.format_for_prompt(experiences)
+                if experience_context:
+                    instructions = instructions + "\n" + experience_context
+                    print(f"[EXPERIENCE] Injected {len(experiences)} experiences (top similarity: {experiences[0]['similarity']:.3f})")
+                retriever.close()
+            except Exception as e:
+                print(f"[EXPERIENCE] Retrieval failed (non-blocking): {e}")
+
         # Phase 8: Check if task should use Research Executor (web research)
         if RESEARCH_EXECUTOR_AVAILABLE and is_research_task(task, instructions):
             print(f"[Research] Task flagged for web research: {task.get('title')}")
@@ -1041,6 +1058,19 @@ class TaskExecutor:
         if not steps:
             result['error'] = 'No executable steps found in instruction file'
             return result
+
+        # PreFlect: Pre-execution self-critique (Council Turtle slate vote)
+        if os.environ.get('PREFLECT_ENABLED', 'true').lower() == 'true' and len(steps) >= 3:
+            preflect = self._preflect_critique(
+                steps=steps,
+                task_context=f"Title: {task.get('title', 'unknown')}\nDescription: {task.get('description', '')[:500]}",
+                task_id=task.get('task_id')
+            )
+            if preflect['action'] == 'MODIFY' and preflect['revised_steps']:
+                print(f"[PREFLECT] Reordering {len(steps)} steps per self-critique")
+                steps = preflect['revised_steps']
+            elif preflect['action'] == 'FLAG':
+                print(f"[PREFLECT] Flagged: {preflect['critique']}")
 
         # Constructal Pre-Flight: Hash target files before execution
         preflight_results = self._preflight_hash_check(steps)
@@ -1500,6 +1530,113 @@ class TaskExecutor:
         except Exception as e:
             print(f"[REFLECT] Reflection error: {e}")
             return {"should_retry": False, "analysis": f"Reflection failed: {e}"}
+
+    def _preflect_critique(self, steps: list, task_context: str, task_id: str = None) -> dict:
+        """
+        PreFlect: Pre-execution self-critique via local vLLM.
+        Council Turtle slate vote. Non-blocking — fails open on error.
+        Returns: {action: PASS|MODIFY|FLAG, critique: str, revised_steps: list|None}
+        """
+        import time
+
+        if not LLM_REASONER_AVAILABLE:
+            return {"action": "PASS", "critique": "reasoner_unavailable", "revised_steps": None}
+
+        # Build readable plan from steps
+        plan_lines = []
+        for i, step in enumerate(steps, 1):
+            step_type = step.get('type', 'unknown') if isinstance(step, dict) else 'unknown'
+            step_desc = step.get('description', step.get('content', str(step)))[:200] if isinstance(step, dict) else str(step)[:200]
+            plan_lines.append(f"Step {i} ({step_type}): {step_desc}")
+        plan_text = "\n".join(plan_lines)
+
+        prompt = f"""You are a pre-execution reviewer for an automated task executor.
+Review this execution plan and identify problems BEFORE execution.
+
+TASK CONTEXT:
+{task_context[:2000]}
+
+EXECUTION PLAN:
+{plan_text}
+
+Check for:
+1. Missing dependencies between steps (step 3 needs output from step 2?)
+2. File paths that look wrong or don't exist
+3. Security risks (chmod 777, hardcoded credentials, destructive commands)
+4. Steps that will fail because of missing context
+5. Steps in wrong order
+
+Respond with EXACTLY one of:
+ACTION: PASS
+(if the plan looks reasonable)
+
+ACTION: FLAG
+CRITIQUE: <one sentence explaining the concern>
+(if there's a concern but execution can proceed with caution)
+
+ACTION: MODIFY
+CRITIQUE: <one sentence explaining what's wrong>
+REVISED_STEP_ORDER: <comma-separated step numbers in better order>
+(if steps need reordering)
+"""
+
+        try:
+            start = time.time()
+            reasoner = get_reasoner_sync()
+            response = reasoner.simple_completion(prompt, max_tokens=300)
+            latency_ms = int((time.time() - start) * 1000)
+
+            response_text = response.strip() if response else ""
+
+            action = "PASS"
+            critique = ""
+            revised_steps = None
+
+            if "ACTION: FLAG" in response_text:
+                action = "FLAG"
+                critique_match = re.search(r'CRITIQUE:\s*(.+)', response_text)
+                critique = critique_match.group(1).strip() if critique_match else "unspecified concern"
+
+            elif "ACTION: MODIFY" in response_text:
+                action = "MODIFY"
+                critique_match = re.search(r'CRITIQUE:\s*(.+)', response_text)
+                critique = critique_match.group(1).strip() if critique_match else "reorder needed"
+                order_match = re.search(r'REVISED_STEP_ORDER:\s*([\d,\s]+)', response_text)
+                if order_match:
+                    try:
+                        new_order = [int(x.strip()) - 1 for x in order_match.group(1).split(',')]
+                        revised_steps = [steps[i] for i in new_order if i < len(steps)]
+                    except (ValueError, IndexError):
+                        revised_steps = None
+                        action = "FLAG"
+                        critique += " (reorder parse failed, proceeding with original order)"
+
+            print(f"[PREFLECT] {action} in {latency_ms}ms — {critique or 'plan looks good'}")
+
+            # Log to task metadata
+            if task_id:
+                try:
+                    conn = psycopg2.connect(**self.db_config)
+                    cur = conn.cursor()
+                    cur.execute("""
+                        UPDATE jr_work_queue
+                        SET parameters = COALESCE(parameters, '{}'::jsonb) || %s::jsonb
+                        WHERE task_id = %s
+                    """, (
+                        '{"preflect_action": "%s", "preflect_critique": "%s", "preflect_latency_ms": %d}' % (
+                            action, critique[:500].replace('"', '\\"'), latency_ms),
+                        task_id
+                    ))
+                    conn.commit()
+                    conn.close()
+                except Exception as e:
+                    print(f"[PREFLECT] Metadata log failed: {e}")
+
+            return {"action": action, "critique": critique, "revised_steps": revised_steps}
+
+        except Exception as e:
+            print(f"[PREFLECT] Failed: {e} — skipping (non-blocking)")
+            return {"action": "PASS", "critique": f"preflect_error: {e}", "revised_steps": None}
 
     def _retry_with_reflection(self, task: Dict, instructions: str, failed_result: Dict,
                                reflection: Dict, attempt: int, previous_result: Dict = None) -> Dict:

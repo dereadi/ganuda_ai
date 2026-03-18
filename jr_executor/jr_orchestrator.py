@@ -131,7 +131,7 @@ class JrOrchestrator:
         try:
             while not self.shutdown_flag:
                 self._check_worker_health()
-                time.sleep(1)
+                time.sleep(10)  # Was 1s (6M+ seq scans/month). 10s is plenty for heartbeat checks.
         except KeyboardInterrupt:
             self.shutdown_flag = True
             self.logger.info("Shutting down orchestrator...")

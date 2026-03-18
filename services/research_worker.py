@@ -128,6 +128,7 @@ SOURCES: {source_urls}"""
         if cur.fetchone():
             logging.info(f"Research {job_id} already in thermal memory")
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
             return
 

@@ -63,6 +63,7 @@ def main():
     if not row:
         print("No approved drafts to publish")
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         return
 
@@ -84,6 +85,7 @@ def main():
         print(f"Publish failed: {e}")
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
 

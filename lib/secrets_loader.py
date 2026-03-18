@@ -169,13 +169,38 @@ def get_db_config(prefix="CHEROKEE"):
 
     Returns:
         dict with keys: host, dbname, user, password, port
+
+    Includes WireGuard fallback for bluefin: if LAN (192.168.132.222)
+    is unreachable, tries WireGuard (10.100.0.2). Known issue: bluefin
+    LAN:5432 flaky from redfin, WireGuard reliable.
     """
+    host = get_secret(f"{prefix}_DB_HOST")
+    port = int(get_secret(f"{prefix}_DB_PORT"))
+
+    # WireGuard fallback map — LAN IP → WireGuard IP
+    _wg_fallback = {
+        "192.168.132.222": "10.100.0.2",  # bluefin
+    }
+
+    # Test LAN connectivity, fall back to WireGuard if needed
+    if host in _wg_fallback:
+        import socket
+        try:
+            s = socket.create_connection((host, port), timeout=3)
+            s.close()
+        except (socket.timeout, OSError):
+            wg_host = _wg_fallback[host]
+            logging.getLogger('secrets_loader').info(
+                f"DB host {host}:{port} unreachable on LAN, falling back to WireGuard {wg_host}"
+            )
+            host = wg_host
+
     return {
-        "host": get_secret(f"{prefix}_DB_HOST"),
+        "host": host,
         "dbname": get_secret(f"{prefix}_DB_NAME"),
         "user": get_secret(f"{prefix}_DB_USER"),
         "password": get_secret(f"{prefix}_DB_PASS"),
-        "port": int(get_secret(f"{prefix}_DB_PORT")),
+        "port": port,
     }
 
 

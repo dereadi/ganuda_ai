@@ -53,6 +53,7 @@ def extract_thermal_timeseries(days: int = 30, interval_hours: int = 6):
     cur.execute(query)
     rows = cur.fetchall()
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     if not rows:

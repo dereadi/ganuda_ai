@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cherokee AI Command Center</title>
+    <link rel="stylesheet" href="css/winbox.bundle.min.css">
+    <link rel="stylesheet" href="css/cherokee-theme.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <!-- Command Bar -->
+    <header class="cc-header">
+        <div class="cc-header-left">
+            <h1 class="cc-title">Cherokee AI Command Center</h1>
+            <span class="cc-subtitle">For Seven Generations</span>
+        </div>
+        <div class="cc-header-center">
+            <input type="text" id="spotlight-search" class="cc-spotlight"
+                   placeholder="Search windows... (Ctrl+Space)"
+                   autocomplete="off">
+            <div id="spotlight-results" class="cc-spotlight-results"></div>
+        </div>
+        <div class="cc-header-right">
+            <span id="federation-badge" class="cc-badge">
+                <span class="cc-badge-dot"></span>
+                <span id="federation-badge-text">Connecting...</span>
+            </span>
+            <span id="clock" class="cc-clock"></span>
+        </div>
+    </header>
+
+    <!-- Desktop Surface -->
+    <div id="desktop" class="cc-desktop"></div>
+
+    <!-- Taskbar -->
+    <footer class="cc-taskbar">
+        <div class="cc-taskbar-apps" id="taskbar-launchers">
+            <button class="cc-launcher" data-app="federation-status" title="Federation Status">&#127956; Federation</button>
+            <button class="cc-launcher" data-app="events-triage" title="Events Triage">&#9888; Events</button>
+            <button class="cc-launcher" data-app="cameras" title="Cameras">&#128249; Cameras</button>
+            <button class="cc-launcher" data-app="alert-feed" title="Alert Feed">&#128276; Alerts</button>
+            <button class="cc-launcher" data-app="home-iot" title="Home &amp; IoT">&#127968; Home</button>
+            <span class="cc-taskbar-divider"></span>
+            <button class="cc-launcher" data-app="federation-canvas" title="Federation Canvas">&#127760; Canvas</button>
+            <button class="cc-launcher" data-app="chiefs-theater" title="Chiefs Theater">&#127917; Chiefs</button>
+            <span class="cc-taskbar-divider"></span>
+            <button class="cc-launcher" data-app="email-intel" title="Email Intelligence">&#9993; Email</button>
+            <button class="cc-launcher" data-app="kanban" title="Kanban Board">&#128203; Kanban</button>
+            <button class="cc-launcher" data-app="console" title="Command Console">&#9881; Console</button>
+            <button class="cc-launcher" data-app="tribe-council" title="Tribe Council">&#127963; Tribe</button>
+            <button class="cc-launcher" data-app="monitoring" title="Monitoring">&#128200; Monitor</button>
+            <button class="cc-launcher" data-app="secrets" title="Secrets">&#128274; Secrets</button>
+            <button class="cc-launcher" data-app="messages" title="Messages">&#128172; Messages</button>
+            <span class="cc-taskbar-divider"></span>
+            <button class="cc-launcher" data-app="chat" title="Cherokee Chat">&#128488; Chat</button>
+            <button class="cc-launcher" data-app="daily-briefing" title="Daily Briefing">&#127749; Briefing</button>
+        </div>
+        <div class="cc-taskbar-windows" id="taskbar-windows"></div>
+        <div class="cc-taskbar-right">
+            <span id="taskbar-time" class="cc-taskbar-time"></span>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/winbox.bundle.min.js"></script>
+    <script src="js/app-registry.js"></script>
+    <script src="js/window-manager.js"></script>
+    <script src="js/flow-core.js"></script>
+    <!-- Phase 1 Windows -->
+    <script src="js/windows/federation-status.js"></script>
+    <script src="js/windows/events-triage.js"></script>
+    <script src="js/windows/cameras.js"></script>
+    <script src="js/windows/alert-feed.js"></script>
+    <script src="js/windows/home-iot.js"></script>
+    <!-- Phase 2 Windows -->
+    <script src="js/windows/email-intel.js"></script>
+    <script src="js/windows/console.js"></script>
+    <script src="js/windows/secrets.js"></script>
+    <script src="js/windows/kanban.js"></script>
+    <script src="js/windows/tribe-council.js"></script>
+    <script src="js/windows/messages.js"></script>
+    <script src="js/windows/monitoring.js"></script>
+    <!-- Phase 3 Windows -->
+    <script src="js/windows/chat.js"></script>
+    <script src="js/windows/daily-briefing.js"></script>
+    <!-- Cherokee Features -->
+    <script src="js/federation-canvas.js"></script>
+    <script src="js/chiefs-theater.js"></script>
+</body>
+</html>

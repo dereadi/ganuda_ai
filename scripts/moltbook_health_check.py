@@ -121,6 +121,7 @@ def log_to_thermal_memory(health_report):
         print(f"WARNING: Failed to log to DB: {e}")
     finally:
         if conn:
+            conn.commit()  # explicit commit before close
             conn.close()
 
 

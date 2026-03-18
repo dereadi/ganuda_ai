@@ -149,6 +149,7 @@ def main():
 
     if total == 0:
         print("[DONE] Nothing to process")
+        conn.commit()  # explicit commit before close
         conn.close()
         return
 
@@ -178,6 +179,7 @@ def main():
             )
 
     elapsed = time.time() - start_time
+    conn.commit()  # explicit commit before close
     conn.close()
 
     print()

@@ -82,6 +82,7 @@ def prepare_training_data(min_quality=0.5):
 
     if not dialogues:
         print("[RL2F] No dialogues available. Run didactic_dialogue_generator.py first.")
+        conn.commit()  # explicit commit before close
         conn.close()
         return 0
 

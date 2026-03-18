@@ -31,6 +31,7 @@ def get_baseline_profile():
     """)
     row = cur.fetchone()
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     return row
 
@@ -54,6 +55,7 @@ def analyze_query_patterns(days=7):
     """, (cutoff,))
     hourly = dict(cur.fetchall())
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     return {
         'query_types': query_types,
@@ -76,6 +78,7 @@ def analyze_telegram_patterns(days=7):
     cur.execute("SELECT COUNT(*) FROM telegram_resonance WHERE created_at > %s", (cutoff,))
     total = cur.fetchone()[0]
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     return {'intents': intents, 'total_messages': total}
 
@@ -92,6 +95,7 @@ def calculate_squirrel_index(days=7):
     """, (cutoff,))
     messages = cur.fetchall()
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     if len(messages) < 2:
         return 0.0
@@ -116,6 +120,7 @@ def detect_hyperfocus_sessions(days=7):
     """, (cutoff, cutoff))
     timestamps = [row[0] for row in cur.fetchall()]
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     if len(timestamps) < 3:
         return []
@@ -153,6 +158,7 @@ def check_behavioral_continuity(hours=4):
     """, (cutoff,))
     tg_data = cur.fetchall()
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     if not cli_data and not tg_data:
         return {'confidence': 0, 'reason': 'No recent activity'}

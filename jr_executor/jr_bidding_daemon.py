@@ -53,6 +53,19 @@ class JrBiddingDaemon:
     def _get_connection(self):
         if self._conn is None or self._conn.closed:
             self._conn = psycopg2.connect(**DB_CONFIG)
+        else:
+            # Clean up any idle-in-transaction state from prior reads
+            try:
+                if self._conn.info.transaction_status == psycopg2.extensions.TRANSACTION_STATUS_INERROR:
+                    self._conn.rollback()
+                elif self._conn.info.transaction_status == psycopg2.extensions.TRANSACTION_STATUS_INTRANS:
+                    self._conn.commit()
+            except Exception:
+                try:
+                    self._conn.close()
+                except Exception:
+                    pass
+                self._conn = psycopg2.connect(**DB_CONFIG)
         return self._conn
 
     def _shutdown(self, signum, frame):
@@ -70,6 +83,7 @@ class JrBiddingDaemon:
                     WHERE agent_id = %s
                 """, (self.agent_id,))
                 result = cur.fetchone()
+                conn.commit()  # Commit read txn to avoid implicit ROLLBACK
 
                 if result:
                     return {
@@ -123,7 +137,9 @@ class JrBiddingDaemon:
                     ORDER BY priority ASC, announced_at ASC
                     LIMIT 10
                 """)
-                return cur.fetchall()
+                result = cur.fetchall()
+                conn.commit()  # Commit read txn to avoid implicit ROLLBACK
+                return result
         except Exception as e:
             print(f"[{self.agent_id}] Error fetching tasks: {e}")
             return []
@@ -202,10 +218,11 @@ class JrBiddingDaemon:
                     WHERE assigned_to = %s AND status = 'assigned'
                 """, (self.agent_id,))
                 current_tasks = cur.fetchone()[0]
+                conn.commit()  # Commit read txn to avoid implicit ROLLBACK
 
                 # Assume max 3 concurrent tasks
                 return max(0.1, 1.0 - (current_tasks / 3.0))
-        except:
+        except Exception:
             return 0.5
 
     def submit_bid(self, bid: dict):

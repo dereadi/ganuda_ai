@@ -49,6 +49,7 @@ def check_elisi_heartbeat():
 
         count = cur.fetchone()[0]
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         if count > 0:

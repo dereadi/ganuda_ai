@@ -232,6 +232,7 @@ def main():
         print(f"Report saved to {REPORT_PATH}")
 
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

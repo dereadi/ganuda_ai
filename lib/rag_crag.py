@@ -164,6 +164,7 @@ def evaluate_retrieval(question: str, primary_results: list, db_config: dict) ->
         cur.execute(query, params)
 
         sentinels = cur.fetchall()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         if sentinels:

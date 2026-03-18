@@ -188,6 +188,7 @@ class OpenViewResonance:
                 logger.info(f"Updated {len(hot_patterns)} hot patterns with environmental awareness")
 
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
 
         except Exception as e:

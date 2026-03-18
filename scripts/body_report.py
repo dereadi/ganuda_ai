@@ -280,6 +280,7 @@ def main():
         log.error("Body report generation failed: %s", e)
         sys.exit(1)
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
     log.info("Body report complete")

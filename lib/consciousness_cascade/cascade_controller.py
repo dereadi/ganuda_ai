@@ -140,6 +140,7 @@ class CascadeController:
             from gpu_monitor import DB_CONFIG
             import psycopg2
             conn = psycopg2.connect(**DB_CONFIG)
+            conn.commit()  # explicit commit before close
             conn.close()
             checks['database_connected'] = True
         except:

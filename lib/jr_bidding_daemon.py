@@ -83,6 +83,19 @@ class JrBiddingDaemon:
     def _get_connection(self):
         if self._conn is None or self._conn.closed:
             self._conn = psycopg2.connect(**DB_CONFIG)
+        else:
+            # Clean up any idle-in-transaction state from prior reads
+            try:
+                if self._conn.info.transaction_status == psycopg2.extensions.TRANSACTION_STATUS_INERROR:
+                    self._conn.rollback()
+                elif self._conn.info.transaction_status == psycopg2.extensions.TRANSACTION_STATUS_INTRANS:
+                    self._conn.commit()
+            except Exception:
+                try:
+                    self._conn.close()
+                except Exception:
+                    pass
+                self._conn = psycopg2.connect(**DB_CONFIG)
         return self._conn
 
     def _shutdown(self, signum, frame):
@@ -117,7 +130,9 @@ class JrBiddingDaemon:
                     ORDER BY priority ASC, announced_at ASC
                     LIMIT 10
                 """)
-                return cur.fetchall()
+                result = cur.fetchall()
+                conn.commit()  # Commit read txn to avoid implicit ROLLBACK
+                return result
         except Exception as e:
             print(f"[{self.agent_id}] Error getting tasks: {e}")
             return []
@@ -144,6 +159,7 @@ class JrBiddingDaemon:
                       AND status = 'completed'
                 """, (self.agent_id, task_type))
                 completed = cur.fetchone()[0]
+                conn.commit()  # Commit read txn to avoid implicit ROLLBACK
 
                 # Diminishing returns: 1 completion = 0.5, 5 = 0.8, 10+ = 0.95
                 if completed == 0:
@@ -167,6 +183,7 @@ class JrBiddingDaemon:
                       AND status IN ('assigned', 'in_progress')
                 """, (self.agent_id,))
                 active_tasks = cur.fetchone()[0]
+                conn.commit()  # Commit read txn to avoid implicit ROLLBACK
 
                 # Fewer active tasks = higher score
                 if active_tasks == 0:

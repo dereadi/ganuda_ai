@@ -260,6 +260,7 @@ def main():
         logger.info("LIVE — temperatures regulated")
     logger.info("For Seven Generations.")
 
+    conn.commit()  # explicit commit before close
     conn.close()
     return 1 if all_findings else 0
 

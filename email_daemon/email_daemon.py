@@ -12,6 +12,7 @@ import logging
 import psycopg2
 from datetime import datetime
 import json
+import os
 
 class CherokeeEmailDaemon:
     def __init__(self, config):
@@ -113,7 +114,7 @@ class CherokeeEmailDaemon:
             host=self.config["db_host"],
             database=self.config["db_name"],
             user=self.config["db_user"],
-            password=self.config["db_password"]
+            password=self.config.get('db_password', os.environ.get('CHEROKEE_DB_PASS', ''))
         )
         cur = conn.cursor()
 

@@ -7,6 +7,7 @@ def fetch_data(query: str) -> List[Tuple]:
     cursor = conn.cursor()
     cursor.execute(query)
     data = cursor.fetchall()
+    conn.commit()  # explicit commit before close
     conn.close()
     return data
 

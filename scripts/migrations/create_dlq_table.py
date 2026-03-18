@@ -62,6 +62,7 @@ def create_table():
     print(f"[DLQ Migration] Table has {count} existing entries")
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
 if __name__ == '__main__':

@@ -59,6 +59,7 @@ def main() -> None:
         print(f"No stale tickets found (all updated within {STALE_DAYS} days)")
     
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
 if __name__ == '__main__':

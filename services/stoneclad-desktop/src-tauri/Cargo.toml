@@ -1,0 +1,19 @@
+[package]
+name = "stoneclad-desktop"
+version = "0.1.0"
+description = "Stoneclad Desktop — Cherokee AI Federation Command Center"
+authors = ["Cherokee AI Federation"]
+edition = "2021"
+
+[lib]
+name = "stoneclad_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

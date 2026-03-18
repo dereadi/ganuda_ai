@@ -79,6 +79,7 @@ class ReflectionEngine:
         coyote_archive = cur.fetchall()
         
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         
         return self._generate_reflection_report(decisions, outcomes, coyote_archive, days, topic)
@@ -266,6 +267,7 @@ class ReflectionEngine:
         
         results = cur.fetchall()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         
         return {

@@ -11,6 +11,7 @@ On failure: stores alert in DB, optionally notifies via telegram.
 Publishes health summary to web_content at /fire-guard.html.
 """
 
+import csv
 import hashlib
 import json
 import os
@@ -18,7 +19,7 @@ import re
 import socket
 import subprocess
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # DC-15 Refractory support
 try:
@@ -48,6 +49,22 @@ BRAKE_AUTO_DISENGAGE_MINUTES = 30
 ANOMALY_WINDOW_SECONDS = 300           # 5 minutes
 ANOMALY_THRESHOLD = 3                  # 3+ anomalies across different subsystems = brake
 
+# ── RSS Memory Tracking ──
+RSS_HISTORY_FILE = "/ganuda/state/rss_history.csv"
+RSS_GROWTH_THRESHOLD = 0.20  # 20% growth from 24h baseline triggers alert
+RSS_WINDOW_HOURS = 24
+RSS_REPORT_DAYS = 7
+
+# Systemd service names to monitor for RSS
+RSS_MONITORED_SERVICES = {
+    "consultation-ring": "consultation-ring.service",
+    "gateway": "llm-gateway.service",
+    "jr-executor": "jr-se.service",
+    "jr-bidding-daemon": "jr-bidding-daemon.service",
+    "db-query-monitor": "db-query-monitor.service",
+    "fire-guard": "fire-guard.service",
+}
+
 # Critical local services on redfin
 LOCAL_SERVICES = [
     "vllm.service",
@@ -65,6 +82,9 @@ REMOTE_CHECKS = {
     "owlfin": [("192.168.132.170", 80, "Caddy")],
     "eaglefin": [("192.168.132.84", 80, "Caddy")],
     "bmasass": [("100.103.27.106", 8800, "Qwen3"), ("100.103.27.106", 8801, "Llama")],
+    "sasass": [("192.168.132.241", 11434, "Ollama")],
+    "sasass2": [("192.168.132.242", 11434, "Ollama")],
+    "redfin_consultation": [("127.0.0.1", 9400, "ConsultationRing")],
 }
 
 # Critical timers — check they fired within expected window
@@ -213,6 +233,7 @@ def check_emergency_thresholds():
             breaches.append(f"Postgres active connections {active_conns} > {EMERGENCY_THRESHOLDS['postgres_connections']}")
 
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
     except Exception:
         pass  # DB down is caught elsewhere
@@ -308,10 +329,69 @@ def check_postgres_db(host, port=5432, timeout=5):
         cur = conn.cursor()
         cur.execute("SELECT 1")
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         return True
     except Exception:
         return False
+
+
+def check_ollama_health(host, port=11434, timeout=5):
+    """Deep health check for Ollama API — verifies service responds, not just TCP.
+
+    Hits /api/tags to confirm Ollama is alive and can list models.
+    Returns (alive: bool, model_count: int, models: list).
+    """
+    import urllib.request
+    import json as json_mod
+    try:
+        req = urllib.request.Request(f"http://{host}:{port}/api/tags")
+        resp = urllib.request.urlopen(req, timeout=timeout)
+        data = json_mod.loads(resp.read())
+        models = [m.get("name", "?") for m in data.get("models", [])]
+        return True, len(models), models
+    except Exception:
+        return False, 0, []
+
+
+def check_consultation_ring_health(host="127.0.0.1", port=9400, timeout=5):
+    """Deep health check for Consultation Ring service.
+
+    Checks config enabled flag first — if disabled, returns status "disabled"
+    without attempting connection (Turtle's kill switch).
+    If enabled, hits GET /health to confirm service is alive.
+    Returns (status: str, stats: dict).
+      status: "disabled" | "healthy" | "down"
+      stats: {"consultations_today": N, "consultations_this_hour": N} or {}
+    """
+    import urllib.request
+    import json as json_mod
+    import yaml
+
+    # Check config enabled flag first
+    try:
+        with open("/ganuda/lib/harness/config.yaml") as f:
+            config = yaml.safe_load(f)
+        cr_config = config.get("consultation_ring", {})
+        if not cr_config.get("enabled", False):
+            return "disabled", {}
+    except Exception:
+        # If we can't read config, fall through to health check
+        pass
+
+    # Service is enabled — hit the health endpoint
+    try:
+        req = urllib.request.Request(f"http://{host}:{port}/health")
+        resp = urllib.request.urlopen(req, timeout=timeout)
+        data = json_mod.loads(resp.read())
+        stats = {}
+        if "consultations_today" in data:
+            stats["consultations_today"] = data["consultations_today"]
+        if "consultations_this_hour" in data:
+            stats["consultations_this_hour"] = data["consultations_this_hour"]
+        return "healthy", stats
+    except Exception:
+        return "down", {}
 
 
 def check_port(ip, port, timeout=3, retries=3):
@@ -402,6 +482,7 @@ def check_stale_tasks():
                     alerts.append(f"IDLE EXECUTOR: {pending_count} pending task(s), last completion: {last_completed}")
 
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
     except Exception as e:
         # DB down is caught by port check — don't double-alert
@@ -453,6 +534,262 @@ def reset_zombie_tasks():
     return reset_tasks
 
 
+def get_service_pid(systemd_name):
+    """Get the MainPID of a systemd service. Returns int or None."""
+    try:
+        result = subprocess.run(
+            ["systemctl", "show", systemd_name, "--property=MainPID"],
+            capture_output=True, text=True, timeout=5
+        )
+        line = result.stdout.strip()
+        if "=" in line:
+            pid = int(line.split("=", 1)[1])
+            return pid if pid > 0 else None
+    except (subprocess.TimeoutExpired, ValueError, FileNotFoundError):
+        pass
+    return None
+
+
+def read_rss_kb(pid):
+    """Read VmRSS from /proc/<pid>/status. Returns RSS in KB or None."""
+    try:
+        with open(f"/proc/{pid}/status") as f:
+            for line in f:
+                if line.startswith("VmRSS:"):
+                    # Format: "VmRSS:    123456 kB"
+                    return int(line.split()[1])
+    except (FileNotFoundError, PermissionError, IndexError, ValueError):
+        pass
+    return None
+
+
+def load_rss_history(max_age_hours=None):
+    """Load RSS history from CSV. Optionally filter to max_age_hours."""
+    rows = []
+    if not os.path.exists(RSS_HISTORY_FILE):
+        return rows
+    cutoff = None
+    if max_age_hours is not None:
+        cutoff = (datetime.now() - timedelta(hours=max_age_hours)).isoformat()
+    try:
+        with open(RSS_HISTORY_FILE, 'r', newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if cutoff and row.get("timestamp", "") < cutoff:
+                    continue
+                rows.append(row)
+    except (FileNotFoundError, csv.Error):
+        pass
+    return rows
+
+
+def append_rss_readings(readings):
+    """Append RSS readings to history CSV. Creates file with header if needed."""
+    os.makedirs(os.path.dirname(RSS_HISTORY_FILE), exist_ok=True)
+    write_header = not os.path.exists(RSS_HISTORY_FILE) or os.path.getsize(RSS_HISTORY_FILE) == 0
+    try:
+        with open(RSS_HISTORY_FILE, 'a', newline='') as f:
+            writer = csv.writer(f)
+            if write_header:
+                writer.writerow(["timestamp", "service_name", "pid", "rss_kb"])
+            for r in readings:
+                writer.writerow([r["timestamp"], r["service_name"], r["pid"], r["rss_kb"]])
+    except OSError:
+        pass
+
+
+def prune_rss_history(max_age_hours=168):
+    """Prune RSS history older than max_age_hours (default 7 days).
+
+    Rewrites the CSV keeping only recent entries.
+    """
+    rows = load_rss_history(max_age_hours=max_age_hours)
+    if not rows:
+        return
+    try:
+        with open(RSS_HISTORY_FILE, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(["timestamp", "service_name", "pid", "rss_kb"])
+            for row in rows:
+                writer.writerow([row["timestamp"], row["service_name"], row["pid"], row["rss_kb"]])
+    except OSError:
+        pass
+
+
+def check_rss_growth(current_readings):
+    """Check if any service RSS has grown >20% from its 24h baseline.
+
+    Baseline = first reading for that service+pid in the 24h window.
+    Returns list of alert strings.
+    """
+    alerts = []
+    history = load_rss_history(max_age_hours=RSS_WINDOW_HOURS)
+
+    # Build baselines: first reading per (service, pid) in window
+    baselines = {}
+    for row in history:
+        key = (row["service_name"], row["pid"])
+        if key not in baselines:
+            try:
+                baselines[key] = int(row["rss_kb"])
+            except (ValueError, KeyError):
+                pass
+
+    for reading in current_readings:
+        key = (reading["service_name"], str(reading["pid"]))
+        baseline = baselines.get(key)
+        if baseline is None or baseline == 0:
+            continue  # no baseline yet, skip
+        current_rss = reading["rss_kb"]
+        growth = (current_rss - baseline) / baseline
+        if growth > RSS_GROWTH_THRESHOLD:
+            growth_pct = growth * 100
+            alerts.append(
+                f"RSS GROWTH: {reading['service_name']} grew {growth_pct:.0f}% "
+                f"({baseline} KB -> {current_rss} KB, pid {reading['pid']}) "
+                f"over {RSS_WINDOW_HOURS}h window"
+            )
+    return alerts
+
+
+def collect_rss_readings():
+    """Collect current RSS readings for all monitored services.
+
+    Returns list of dicts: {timestamp, service_name, pid, rss_kb}
+    """
+    readings = []
+    now = datetime.now().isoformat()
+    for name, systemd_unit in RSS_MONITORED_SERVICES.items():
+        pid = get_service_pid(systemd_unit)
+        if pid is None:
+            continue
+        rss_kb = read_rss_kb(pid)
+        if rss_kb is None:
+            continue
+        readings.append({
+            "timestamp": now,
+            "service_name": name,
+            "pid": pid,
+            "rss_kb": rss_kb,
+        })
+    return readings
+
+
+def send_rss_alert(alert_msg):
+    """Send RSS growth alert via alert_manager (Slack primary, Telegram fallback)."""
+    try:
+        sys.path.insert(0, '/ganuda/lib')
+        from alert_manager import alert_medium
+        alert_medium(
+            "Memory Growth Detected",
+            alert_msg,
+            source='fire_guard',
+            alert_type='rss_growth_' + hashlib.md5(alert_msg.encode()).hexdigest()[:8]
+        )
+    except Exception as e:
+        print(f"  RSS alert send failed: {e}")
+
+
+def generate_memory_report():
+    """Generate a markdown summary of RSS trends over the past 7 days.
+
+    Compatible with owl-debt-reckoning consumption.
+    """
+    history = load_rss_history(max_age_hours=RSS_REPORT_DAYS * 24)
+    if not history:
+        return "# Fire Guard Memory Report\n\nNo RSS data available.\n"
+
+    # Organize by service
+    from collections import defaultdict
+    by_service = defaultdict(list)
+    for row in history:
+        try:
+            by_service[row["service_name"]].append({
+                "timestamp": row["timestamp"],
+                "pid": row["pid"],
+                "rss_kb": int(row["rss_kb"]),
+            })
+        except (ValueError, KeyError):
+            continue
+
+    now = datetime.now()
+    report_start = (now - timedelta(days=RSS_REPORT_DAYS)).strftime("%Y-%m-%d")
+    report_end = now.strftime("%Y-%m-%d")
+
+    lines = [
+        f"# Fire Guard Memory Report",
+        f"",
+        f"Period: {report_start} to {report_end}",
+        f"Generated: {now.strftime('%Y-%m-%d %H:%M')} CT",
+        f"",
+    ]
+
+    if not by_service:
+        lines.append("No RSS data collected during this period.")
+        return "\n".join(lines) + "\n"
+
+    lines.append("## Service RSS Summary")
+    lines.append("")
+    lines.append("| Service | Samples | Min (KB) | Max (KB) | Current (KB) | Growth | PIDs |")
+    lines.append("|---------|---------|----------|----------|--------------|--------|------|")
+
+    for svc in sorted(by_service.keys()):
+        entries = by_service[svc]
+        rss_values = [e["rss_kb"] for e in entries]
+        pids_seen = sorted(set(e["pid"] for e in entries))
+        min_rss = min(rss_values)
+        max_rss = max(rss_values)
+        first_rss = rss_values[0]
+        last_rss = rss_values[-1]
+        if first_rss > 0:
+            growth_pct = ((last_rss - first_rss) / first_rss) * 100
+            growth_str = f"{growth_pct:+.1f}%"
+        else:
+            growth_str = "N/A"
+        pid_str = ", ".join(str(p) for p in pids_seen)
+        lines.append(
+            f"| {svc} | {len(entries)} | {min_rss:,} | {max_rss:,} | {last_rss:,} | {growth_str} | {pid_str} |"
+        )
+
+    lines.append("")
+
+    # Flag services with restarts (PID changes)
+    restarts = []
+    for svc, entries in by_service.items():
+        pids = [e["pid"] for e in entries]
+        unique_pids = list(dict.fromkeys(pids))  # preserves order
+        if len(unique_pids) > 1:
+            restarts.append(f"- **{svc}**: {len(unique_pids)} PIDs observed ({', '.join(str(p) for p in unique_pids)})")
+    if restarts:
+        lines.append("## Service Restarts Detected")
+        lines.append("")
+        lines.extend(restarts)
+        lines.append("")
+
+    # Flag services with >20% growth
+    growth_alerts = []
+    for svc, entries in by_service.items():
+        # Only check within same PID
+        pid_groups = defaultdict(list)
+        for e in entries:
+            pid_groups[e["pid"]].append(e["rss_kb"])
+        for pid, values in pid_groups.items():
+            if len(values) < 2 or values[0] == 0:
+                continue
+            growth = (values[-1] - values[0]) / values[0]
+            if growth > RSS_GROWTH_THRESHOLD:
+                growth_alerts.append(
+                    f"- **{svc}** (pid {pid}): {growth*100:.0f}% growth ({values[0]:,} KB -> {values[-1]:,} KB)"
+                )
+    if growth_alerts:
+        lines.append("## Growth Alerts (>{:.0f}% in window)".format(RSS_GROWTH_THRESHOLD * 100))
+        lines.append("")
+        lines.extend(growth_alerts)
+        lines.append("")
+
+    return "\n".join(lines) + "\n"
+
+
 def run_checks():
     results = {"local": [], "remote": [], "timers": [], "timestamp": datetime.now().isoformat()}
     alerts = []
@@ -469,11 +806,28 @@ def run_checks():
         for ip, port, label in checks:
             if label == "PostgreSQL":
                 up = check_postgres_db(ip, port)
+                results["remote"].append({"node": node, "label": label, "port": port, "up": up})
+                if not up:
+                    alerts.append(f"REMOTE DOWN: {node}/{label} ({ip}:{port})")
+            elif label == "ConsultationRing":
+                status, stats = check_consultation_ring_health(ip, port)
+                entry = {"node": node, "label": label, "port": port, "up": status == "healthy", "status": status}
+                entry.update(stats)
+                results["remote"].append(entry)
+                if status == "down":
+                    alerts.append(f"REMOTE DOWN: {node}/{label} ({ip}:{port})")
+                # "disabled" is intentional — not an alert
+            elif label == "Ollama":
+                alive, model_count, models = check_ollama_health(ip, port)
+                detail = f"{model_count} models loaded" if alive else "NOT RESPONDING"
+                results["remote"].append({"node": node, "label": label, "port": port, "up": alive, "model_count": model_count, "models": models})
+                if not alive:
+                    alerts.append(f"REMOTE DOWN: {node}/{label} ({ip}:{port})")
             else:
                 up = check_port(ip, port)
-            results["remote"].append({"node": node, "label": label, "port": port, "up": up})
-            if not up:
-                alerts.append(f"REMOTE DOWN: {node}/{label} ({ip}:{port})")
+                results["remote"].append({"node": node, "label": label, "port": port, "up": up})
+                if not up:
+                    alerts.append(f"REMOTE DOWN: {node}/{label} ({ip}:{port})")
 
     # Timer freshness
     for timer, max_age in TIMER_MAX_AGE.items():
@@ -496,6 +850,7 @@ def run_checks():
         if row and row[0]:
             queue_metrics["last_completed"] = str(row[0])[:16]
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
     except Exception:
         pass
@@ -521,7 +876,24 @@ def render_html(results):
     for check in results["remote"]:
         c = "#4a7" if check["up"] else "#d44"
         i = "&#10003;" if check["up"] else "&#10007;"
-        remote_html += f'<div class="svc"><span style="color:{c}">{i}</span> {check["node"]}/{check["label"]} :{check["port"]}</div>\n'
+        extra = ""
+        if check["label"] == "ConsultationRing":
+            cr_status = check.get("status", "down")
+            if cr_status == "disabled":
+                c = "#888"
+                i = "&#8212;"  # em dash for disabled
+                extra = " (disabled)"
+            elif cr_status == "healthy":
+                stats_parts = []
+                if "consultations_today" in check:
+                    stats_parts.append(f"{check['consultations_today']} today")
+                if "consultations_this_hour" in check:
+                    stats_parts.append(f"{check['consultations_this_hour']} this hour")
+                if stats_parts:
+                    extra = f' ({", ".join(stats_parts)})'
+        elif check["label"] == "Ollama" and check["up"] and check.get("model_count", 0) > 0:
+            extra = f' ({check["model_count"]} models)'
+        remote_html += f'<div class="svc"><span style="color:{c}">{i}</span> {check["node"]}/{check["label"]} :{check["port"]}{extra}</div>\n'
 
     timer_html = ""
     for t in results["timers"]:
@@ -630,7 +1002,15 @@ if __name__ == "__main__":
                         help="Emergency brake: on=engage, off=disengage, status=report")
     parser.add_argument("--brake-reason", default="Manual engagement by Partner",
                         help="Reason for engaging brake (used with --brake on)")
+    parser.add_argument("--memory-report", action="store_true",
+                        help="Generate markdown RSS memory report (7 days) for owl-debt-reckoning")
     args = parser.parse_args()
+
+    # Handle memory report CLI immediately
+    if args.memory_report:
+        report = generate_memory_report()
+        print(report)
+        sys.exit(0)
 
     # Handle brake CLI commands immediately (no DB needed)
     if args.brake == "on":
@@ -686,6 +1066,24 @@ if __name__ == "__main__":
     check_auto_disengage()
 
     results = run_checks()
+
+    # ── RSS Memory Tracking ──
+    try:
+        rss_readings = collect_rss_readings()
+        if rss_readings:
+            # Check for growth before appending (so current reading doesn't skew baseline)
+            rss_alerts = check_rss_growth(rss_readings)
+            # Append current readings to history
+            append_rss_readings(rss_readings)
+            # Send alerts for any RSS growth detected
+            for rss_alert in rss_alerts:
+                send_rss_alert(rss_alert)
+                results["alerts"].append(rss_alert)
+                print(f"  ! {rss_alert}")
+        # Prune old data once per run (cheap — only rewrites if needed)
+        prune_rss_history(max_age_hours=RSS_REPORT_DAYS * 24)
+    except Exception as e:
+        print(f"  RSS tracking error (non-fatal): {e}")
 
     # ── Emergency Brake: threshold checks ──
     threshold_breaches = check_emergency_thresholds()

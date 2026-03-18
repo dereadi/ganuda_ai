@@ -312,6 +312,7 @@ def main():
             print(f"  {status}: {count}")
 
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
     print("\nFor Seven Generations")

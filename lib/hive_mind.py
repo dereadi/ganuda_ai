@@ -99,6 +99,7 @@ def load_or_create_macro_agent() -> MaynardCrossLearner:
                 })
             return MaynardCrossLearner(num_actions=10)
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -175,6 +176,7 @@ WE ARE ONE MIND LEARNING THROUGH MANY BODIES.
 ══════════════════════════════════════════════════════════════
 """
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -224,6 +226,7 @@ def observe_siblings(agent_id: str) -> List[Dict]:
                 results.append({'sibling': r['agent_id'], **payload})
             return results
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -278,6 +281,7 @@ def calculate_emergence_metrics() -> Dict[str, Any]:
             'interpretation': interp
         }
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

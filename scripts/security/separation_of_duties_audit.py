@@ -118,6 +118,7 @@ def main():
     print(f"Summary: {critical} critical, {warnings} warnings, {len(all_findings)} total findings")
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
 

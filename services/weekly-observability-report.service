@@ -1,0 +1,12 @@
+[Unit]
+Description=Weekly Observability Report — BSM Leg 3
+After=network.target postgresql.service
+
+[Service]
+Type=oneshot
+User=dereadi
+WorkingDirectory=/ganuda
+ExecStart=/ganuda/venv/bin/python scripts/weekly_observability_report.py
+Environment=PYTHONPATH=/ganuda
+StandardOutput=journal
+StandardError=journal

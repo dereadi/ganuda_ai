@@ -44,6 +44,7 @@ def migrate():
     print(f"elisi_state table ready ({len(rows)} rows)")
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
 

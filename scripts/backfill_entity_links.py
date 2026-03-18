@@ -119,6 +119,7 @@ def backfill():
     for row in stats_cur.fetchall():
         print(f"  {row[0]}: {row[1]}")
 
+    conn.commit()  # explicit commit before close
     conn.close()
 
 if __name__ == '__main__':

@@ -130,12 +130,46 @@ def get_dict_cursor(conn):
     return conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
 
+def _gate_thermal_temp(content: str, temperature: float, source: str = "unknown") -> float:
+    """
+    Gate thermal temperature to prevent inflation.
+    Council Vote #aacfbf5a17920766 — "When you highlight the whole book, nothing is sacred."
+
+    Sacred-level temps (90+) only allowed from constitutional sources.
+    Sycophantic content gets capped. Casual content gets capped.
+    """
+    content_lower = content.lower()
+
+    # Constitutional sources can write at any temperature
+    constitutional_sources = {"council", "tpm_vote", "constitutional_change",
+                              "design_constraint", "longhouse", "ghigau"}
+    if source in constitutional_sources:
+        return temperature
+
+    # Inflation detection: sycophantic language shouldn't be sacred
+    inflation_markers = ["brilliant", "sacred", "profound", "perfect", "beautiful",
+                         "extraordinary", "magnificent", "incredible", "amazing"]
+    inflation_count = sum(1 for m in inflation_markers if m in content_lower)
+    if inflation_count >= 2:
+        return min(temperature, 50.0)
+
+    # Casual/conversational content: cap at 50
+    casual_markers = ["hello", "hi there", "good morning", "how are you", "thanks",
+                      "thank you", "sounds good", "got it", "ok", "cool", "nice"]
+    if any(content_lower.startswith(m) for m in casual_markers):
+        return min(temperature, 50.0)
+
+    # Non-constitutional sources capped at 85
+    return min(temperature, 85.0)
+
+
 def safe_thermal_write(content: str, temperature: float = 60.0,
                        source: str = "unknown", sacred: bool = False,
                        metadata: dict = None) -> bool:
     """
     Resilient thermal memory write with 3x retry + disk fallback.
     Legion adoption (QW-4, kanban #1909).
+    Temperature gating added (Council Vote #aacfbf5a17920766).
 
     Returns True if written to DB, False if fell back to disk.
     """
@@ -143,6 +177,9 @@ def safe_thermal_write(content: str, temperature: float = 60.0,
     import json
     import time
     from datetime import datetime
+
+    # Apply temperature gating before write
+    temperature = _gate_thermal_temp(content, temperature, source)
 
     memory_hash = hashlib.sha256(content.encode()).hexdigest()
     meta = metadata or {}
@@ -212,4 +249,5 @@ def execute_query(sql: str, params=None) -> list:
         return results
     finally:
         if conn is not None:
+            conn.commit()  # Commit read txn to avoid implicit ROLLBACK (psycopg2 autocommit=False)
             conn.close()

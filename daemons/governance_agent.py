@@ -90,13 +90,21 @@ ALERT_RULES = {
     },
     'sacred_memory_count_change': {
         'condition': lambda m: (
-            m.get('sacred_count', 0) < m.get('expected_sacred_count', 0)
+            'sacred_count' in m
+            and m.get('sacred_count', 0) < m.get('expected_sacred_count', 0)
         ),
         'severity': 'CRITICAL',
         'message': 'Sacred memory count DECREASED: expected {expected}, got {actual}',
         'value_key': 'sacred_count',
         'cooldown_hours': 1,
         'escalate_after': 1,
+    },
+    'memory_metrics_unavailable': {
+        'condition': lambda m: 'sacred_count' not in m and 'expected_sacred_count' in m,
+        'severity': 'WARNING',
+        'message': 'Memory metrics collection failed — sacred count not available this cycle',
+        'cooldown_hours': 4,
+        'escalate_after': 6,
     },
     'circuit_breaker_open': {
         'condition': lambda m: m.get('open_breakers', 0) > 0,
@@ -277,12 +285,20 @@ def collect_memory_metrics(cur, run_integrity_check=False):
 
 
 def collect_circuit_breaker_metrics():
-    """Collect circuit breaker states from drift detection module."""
+    """Collect circuit breaker states from drift detection module.
+
+    Structural dissenters (turtle, raven, coyote) in OPEN state are tracked
+    separately — their role IS to raise concerns, so OPEN is expected and
+    should not trigger alerts.
+    """
+    STRUCTURAL_DISSENTERS = {'turtle', 'raven', 'coyote'}
+
     metrics = {
         'open_breakers': 0,
         'half_open_breakers': 0,
         'closed_breakers': 0,
         'open_specialists': [],
+        'role_open_specialists': [],
     }
 
     try:
@@ -293,12 +309,20 @@ def collect_circuit_breaker_metrics():
 
         for specialist, state in states.items():
             if state == 'OPEN':
-                metrics['open_breakers'] += 1
-                metrics['open_specialists'].append(specialist)
+                if specialist in STRUCTURAL_DISSENTERS:
+                    # Track separately — role-appropriate, not alertable
+                    metrics['role_open_specialists'].append(specialist)
+                else:
+                    metrics['open_breakers'] += 1
+                    metrics['open_specialists'].append(specialist)
             elif state == 'HALF_OPEN':
                 metrics['half_open_breakers'] += 1
             else:
                 metrics['closed_breakers'] += 1
+
+        if metrics['role_open_specialists']:
+            logger.info(f"Structural dissenters in expected OPEN state: {metrics['role_open_specialists']}")
+
     except ImportError:
         logger.warning("drift_detection module not available — skipping circuit breaker metrics")
     except Exception as e:
@@ -372,6 +396,7 @@ def collect_metrics():
 
     finally:
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -560,6 +585,7 @@ def store_metrics(metrics):
         conn.rollback()
     finally:
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

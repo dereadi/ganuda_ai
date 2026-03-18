@@ -209,12 +209,14 @@ def run_forgetting(dry_run=False):
     if dry_run:
         print("DRY RUN — no changes made")
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         return
 
     if not eligible:
         print("Nothing to forget. Memory is lean.")
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         return
 
@@ -283,6 +285,7 @@ def run_forgetting(dry_run=False):
         pass
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     print(f"\nDone in {duration:.1f}s")
 

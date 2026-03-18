@@ -47,6 +47,7 @@ def register_interview(elder_name: str, interview_date: str,
         logger.info("Registered interview #%d: %s with %s", interview_id, elder_name, interviewer)
         return interview_id
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -169,6 +170,7 @@ def approve_and_archive(interview_id: int, reviewed_by: str,
             "status": "archived",
         }
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -197,4 +199,5 @@ def get_queue(status: str = None, limit: int = 20) -> List[Dict]:
                 """, (limit,))
             return [dict(r) for r in cur.fetchall()]
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()

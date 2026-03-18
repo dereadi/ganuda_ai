@@ -118,6 +118,7 @@ def main():
     print(f"Concern quality: {'PASS' if report['concern_quality']['concerns_are_useful'] else 'FAIL'}")
     print(f"Consensus accuracy: {'PASS' if report['consensus_accuracy']['consensus_reliable'] else 'FAIL'}")
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
 if __name__ == "__main__":

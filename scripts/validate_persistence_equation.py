@@ -43,6 +43,7 @@ def fetch_memory_data():
     """)
 
     rows = cur.fetchall()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     temps = np.array([float(r[0]) for r in rows])

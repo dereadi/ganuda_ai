@@ -675,6 +675,7 @@ def main():
         sys.exit(1)
     finally:
         if conn:
+            conn.commit()  # explicit commit before close
             conn.close()
 
     # Output

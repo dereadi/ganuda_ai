@@ -422,6 +422,7 @@ def main():
         open_kanban = gather_open_kanban(conn)
         backlog = gather_research_backlog(conn)
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
     # Build context string for the council
@@ -484,6 +485,7 @@ def main():
         try:
             store_findings(conn, findings)
         finally:
+            conn.commit()  # explicit commit before close
             conn.close()
 
     # 5. Report

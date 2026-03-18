@@ -69,6 +69,7 @@ def send_heartbeat():
     else:
         print(f"WARNING: No node_id found for hostname '{hostname}' - check ganuda_view_nodes table")
 
+    conn.commit()  # explicit commit before close
     conn.close()
 
 if __name__ == '__main__':

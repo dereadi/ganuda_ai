@@ -73,6 +73,7 @@ def require_auth(f):
         row = cur.fetchone()
         if not row:
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
             return jsonify({"error": "invalid_token"}), 401
 
@@ -96,6 +97,7 @@ def check_rate_limit(user_id):
         WHERE user_id = %s AND created_at > NOW() - INTERVAL '1 hour'""", (user_id,))
     count = cur.fetchone()[0]
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     return count < RATE_LIMIT
 
@@ -181,6 +183,7 @@ def ring_undo():
 
     if not action:
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         return jsonify({"error": "action not found or undo window expired"}), 404
 
@@ -213,6 +216,7 @@ def ring_pending():
     drafts = cur.fetchall()
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     return jsonify({"drafts": drafts})

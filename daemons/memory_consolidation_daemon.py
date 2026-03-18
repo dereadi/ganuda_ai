@@ -212,6 +212,7 @@ def run_consolidation():
               f" (method: {'disagreement-aware' if USE_DISAGREEMENT_AWARE else 'naive'})")
 
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 def main():

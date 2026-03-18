@@ -13,6 +13,7 @@ import logging
 from toolsets.base import MAX_CONSECUTIVE_TOOL_CALLS
 from toolsets.thermal_toolset import ThermalToolSet
 from toolsets.kanban_toolset import KanbanToolSet
+from toolsets.skill_toolset import SkillToolSet
 
 logger = logging.getLogger("tool_executor")
 
@@ -20,6 +21,7 @@ logger = logging.getLogger("tool_executor")
 TOOLSETS = {
     "thermal": ThermalToolSet(),
     "kanban": KanbanToolSet(),
+    "skillrl": SkillToolSet(),
 }
 
 # Build combined tool list for LLM (read-only tools for auto-dispatch)
@@ -49,6 +51,8 @@ TOOL_TRIGGERS = [
     "completion rate", "sacred", "kanban", "status of", "thermal stats",
     "how many thermals", "pending tasks", "jr tasks", "work queue",
     "tell me about", "what is", "knowledge on", "search for",
+    "available skills", "apply skill", "skill method", "learned patterns",
+    "what skills", "use skill",
 ]
 
 

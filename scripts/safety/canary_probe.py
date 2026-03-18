@@ -269,6 +269,7 @@ def main():
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         log_to_thermal(conn, results, refusal_rate)
+        conn.commit()  # explicit commit before close
         conn.close()
     except Exception as e:
         print(f"[CANARY] DB connection failed: {e}")

@@ -69,6 +69,7 @@ def create_tables():
         print(f"[Checkpoint Migration] {table}: {count} rows")
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
 if __name__ == '__main__':

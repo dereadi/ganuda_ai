@@ -161,14 +161,20 @@ class JrTaskExecutor:
         if self._conn is None or self._conn.closed:
             self._conn = psycopg2.connect(**DB_CONFIG)
         else:
-            # Check if transaction is in error state and rollback if needed
+            # Only rollback if the connection is in an error state
+            # Previously this did unconditional rollback() which inflated
+            # pg_stat_database.xact_rollback on every poll cycle
             try:
-                self._conn.rollback()  # Safe even if no transaction
-            except:
+                if self._conn.info.transaction_status == psycopg2.extensions.TRANSACTION_STATUS_INERROR:
+                    self._conn.rollback()
+                elif self._conn.info.transaction_status == psycopg2.extensions.TRANSACTION_STATUS_INTRANS:
+                    # Commit any idle-in-transaction (e.g. prior SELECT without commit)
+                    self._conn.commit()
+            except Exception:
                 # Connection might be broken, recreate it
                 try:
                     self._conn.close()
-                except:
+                except Exception:
                     pass
                 self._conn = psycopg2.connect(**DB_CONFIG)
         return self._conn
@@ -285,6 +291,7 @@ class JrTaskExecutor:
                     LIMIT 1
                 """, (self.agent_id,))
                 result = cur.fetchall()
+                conn.commit()  # Commit read txn to avoid implicit ROLLBACK
                 return list(result)
         except Exception as e:
             print(f"[{self.agent_id}] Error fetching tasks: {e}")
@@ -317,6 +324,7 @@ class JrTaskExecutor:
                     LIMIT 1
                 """)
                 result = cur.fetchall()
+                conn.commit()  # Commit read txn to avoid implicit ROLLBACK
                 if result:
                     print(f"[{self.agent_id}] Found {len(result)} orphan task(s) waiting for assignment")
                 return list(result)

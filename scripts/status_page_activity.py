@@ -267,6 +267,7 @@ def publish_timeline(html_content):
         print(f"Published timeline to {SITE}{TIMELINE_PATH} ({len(html_content)} bytes)")
     finally:
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -285,6 +286,7 @@ def main():
         all_events.extend(fetch_dawn_mist_events(cur))
     finally:
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
     html = generate_timeline_html(all_events)

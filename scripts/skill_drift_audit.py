@@ -291,6 +291,7 @@ def main():
         report = run_audit(conn)
         print(json.dumps(report, indent=2))
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

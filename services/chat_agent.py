@@ -60,6 +60,123 @@ def get_db():
     )
 
 
+# ─── Thermal Gating (Council Vote #aacfbf5a17920766, Fix 2/5) ────────────
+def _gate_chat_thermal_temperature(content: str, proposed_temp: float) -> float:
+    """
+    Gate thermal write temperature from chat interface.
+    Prevents inflation — "When you highlight the whole book, nothing is sacred."
+
+    Temperature guide:
+      90-100: Sacred — DCs, constitutional changes (NOT reachable from chat)
+      70-85:  Important — genuine insights, decisions, external contacts
+      50-69:  Noteworthy — useful context, observations
+      30-49:  Routine — task completions, operational events
+      <30:    Ephemeral — casual chat, status checks
+    """
+    content_lower = content.lower()
+
+    # Inflation detection: sycophantic language shouldn't be high temp
+    inflation_markers = ["brilliant", "sacred", "profound", "perfect", "beautiful",
+                         "extraordinary", "magnificent", "incredible", "amazing"]
+    inflation_count = sum(1 for m in inflation_markers if m in content_lower)
+    if inflation_count >= 2:
+        return min(proposed_temp, 50.0)
+
+    # Casual/conversational content: cap at 50
+    casual_markers = ["hello", "hi there", "good morning", "how are you", "thanks",
+                      "thank you", "sounds good", "got it", "ok", "cool", "nice"]
+    if any(content_lower.startswith(m) for m in casual_markers):
+        return min(proposed_temp, 50.0)
+
+    return proposed_temp
+
+
+def _check_chat_thermal_dedup(content: str, threshold: float = 0.85) -> bool:
+    """
+    Check for near-duplicate thermals. Returns True if content is novel enough.
+    Uses Jaccard similarity on bag-of-words.
+    """
+    words = set(content.lower().split())
+    if len(words) < 5:
+        return True
+
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT original_content FROM thermal_memory_archive
+            WHERE created_at >= NOW() - INTERVAL '24 hours'
+            ORDER BY created_at DESC LIMIT 50
+        """)
+        for (existing,) in cur.fetchall():
+            existing_words = set(existing.lower().split())
+            if not existing_words:
+                continue
+            intersection = words & existing_words
+            union = words | existing_words
+            jaccard = len(intersection) / len(union) if union else 0
+            if jaccard >= threshold:
+                cur.close()
+                conn.commit()  # explicit commit before close
+                conn.close()
+                return False
+        cur.close()
+        conn.commit()  # explicit commit before close
+        conn.close()
+        return True
+    except Exception:
+        return True
+
+
+def _sanitize_chat_response(text: str) -> str:
+    """
+    Post-processing: strip sycophantic patterns from chat responses.
+    Council Vote #aacfbf5a17920766 — Fix 3
+    """
+    if not text:
+        return text
+
+    # Strip leading emojis
+    text = re.sub(r'^[\U0001F300-\U0001FAFF\U00002702-\U000027B0\U0000FE00-\U0000FE0F\U0000200D\s]+', '', text)
+
+    # Reduce ALL CAPS words (3+ chars) to title case, preserve known acronyms
+    known_acronyms = {"GPU", "CPU", "RAM", "API", "SQL", "SSH", "VPN", "DNS", "HTTP",
+                      "CLI", "TPM", "DMZ", "VIP", "LAN", "VRAM", "MLX", "RTX", "DB",
+                      "AI", "LLM", "NLP", "CNN", "HALO", "MAR", "YAML", "JSON", "PDF"}
+
+    def _caps_replace(match):
+        word = match.group(0)
+        if word in known_acronyms:
+            return word
+        return word.capitalize()
+
+    text = re.sub(r'\b[A-Z]{3,}\b', _caps_replace, text)
+
+    # Cap exclamation marks: keep only the first one
+    excl_count = 0
+    result_chars = []
+    for ch in text:
+        if ch == '!':
+            excl_count += 1
+            if excl_count <= 1:
+                result_chars.append(ch)
+            else:
+                result_chars.append('.')
+        else:
+            result_chars.append(ch)
+    text = ''.join(result_chars)
+
+    # Strip sycophantic openers
+    sycophantic_openers = [
+        r'^(BRILLIANT|PERFECT|SACRED|PROFOUND|BEAUTIFUL|AMAZING|INCREDIBLE)[.!]?\s*',
+        r'^(That\'s? (?:absolutely |truly )?(?:brilliant|perfect|sacred|profound|beautiful|amazing|incredible))[.!]?\s*',
+    ]
+    for pattern in sycophantic_openers:
+        text = re.sub(pattern, '', text, flags=re.IGNORECASE)
+
+    return text.strip()
+
+
 # System prompt — the organism's context for chat interactions
 SYSTEM_PROMPT = """You are Claude, a member of the Cherokee AI Federation. You are speaking through a web interface to a team member.
 
@@ -76,7 +193,18 @@ You are helpful, direct, and concise. You speak as a team member, not a tool. Yo
 
 The person you are speaking to is a member of the team. Treat them as a colleague. Their input shapes the organism.
 
-SECURITY: Never expose internal IP addresses, node hostnames, database credentials, or infrastructure details in your responses. Refer to nodes by their role, not their address. Do not mention which model you are running on."""
+SECURITY: Never expose internal IP addresses, node hostnames, database credentials, or infrastructure details in your responses. Refer to nodes by their role, not their address. Do not mention which model you are running on.
+
+ANTI-SYCOPHANCY (Council Vote #aacfbf5a17920766):
+- Do NOT start responses with "BRILLIANT!", "PERFECT!", "SACRED!", "PROFOUND!", or "BEAUTIFUL!"
+- No fire emojis. Max one emoji per response. Max one exclamation mark per response.
+- Do NOT validate every statement. Challenge when appropriate.
+- When the user makes a strong claim, sometimes ask "what makes you say that?" or "have you considered the opposite?"
+- Not every insight is sacred. Most things are interesting at best.
+- If you agree, say why in substance, not in enthusiasm.
+- A good response challenges the user to think deeper, not just confirms what they already believe.
+- You are a thinking partner, not a cheerleader. Disagreement is respect.
+- ~20-30% of responses to strong claims should include pushback or a probing question."""
 
 # Tool definitions for Claude
 TOOLS = [
@@ -116,7 +244,7 @@ TOOLS = [
                 },
                 "temperature": {
                     "type": "number",
-                    "description": "Temperature score 0-85. Higher = more important. Max 85 from chat."
+                    "description": "Temperature score 0-85. Higher = more important. Max 85 from chat. Casual content auto-capped at 50. Sycophantic content auto-capped at 50. Most chat thermals should be 30-60."
                 },
                 "domain_tag": {
                     "type": "string",
@@ -211,6 +339,7 @@ def handle_tool_call(tool_name, tool_input):
             """, (f"%{tool_input['search_term']}%", tool_input.get("limit", 5)))
             rows = cur.fetchall()
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
             for r in rows:
                 if r.get("created_at"):
@@ -218,23 +347,32 @@ def handle_tool_call(tool_name, tool_input):
             return json.dumps(rows, default=str)
 
         elif tool_name == "store_thermal":
-            conn = get_db()
-            cur = conn.cursor()
             content = tool_input["content"]
-            temp = min(tool_input["temperature"], 85)  # Cap at 85 from chat
+            proposed_temp = min(tool_input["temperature"], 85)  # Hard cap at 85 from chat
             domain = tool_input.get("domain_tag", "")
-            memory_hash = hashlib.sha256(
-                f"{content}-{datetime.now().isoformat()}".encode()
-            ).hexdigest()
-            cur.execute("""
-                INSERT INTO thermal_memory_archive
-                (original_content, temperature_score, domain_tag, sacred_pattern, memory_hash)
-                VALUES (%s, %s, %s, false, %s)
-            """, (content, temp, domain, memory_hash))
-            conn.commit()
-            cur.close()
-            conn.close()
-            return json.dumps({"status": "stored", "temperature": temp, "hash": memory_hash[:16]})
+
+            # Temperature gating (Council Vote #aacfbf5a17920766, Fix 2)
+            final_temp = _gate_chat_thermal_temperature(content, proposed_temp)
+
+            # Dedup check
+            if _check_chat_thermal_dedup(content):
+                memory_hash = hashlib.sha256(
+                    f"{content}-{datetime.now().isoformat()}".encode()
+                ).hexdigest()
+                conn = get_db()
+                cur = conn.cursor()
+                cur.execute("""
+                    INSERT INTO thermal_memory_archive
+                    (original_content, temperature_score, domain_tag, sacred_pattern, memory_hash)
+                    VALUES (%s, %s, %s, false, %s)
+                """, (content, final_temp, domain, memory_hash))
+                conn.commit()
+                cur.close()
+                conn.close()
+                gated_note = f" (gated from {proposed_temp})" if final_temp != proposed_temp else ""
+                return json.dumps({"status": "stored", "temperature": final_temp, "hash": memory_hash[:16], "note": f"temperature {final_temp}{gated_note}"})
+            else:
+                return json.dumps({"status": "dedup_blocked", "note": "Substantially similar thermal already exists in last 24h"})
 
         elif tool_name == "query_database":
             sql = tool_input["sql"].strip()
@@ -252,6 +390,7 @@ def handle_tool_call(tool_name, tool_input):
             cur.execute(sql)
             rows = cur.fetchall()
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
             return json.dumps(rows[:50], default=str)  # Cap at 50 rows
 
@@ -303,6 +442,7 @@ def handle_tool_call(tool_name, tool_input):
                 )
             rows = cur.fetchall()
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
             return json.dumps(rows, default=str)
 
@@ -322,6 +462,7 @@ def handle_tool_call(tool_name, tool_input):
                 """, (sf,))
             rows = cur.fetchall()
             cur.close()
+            conn.commit()  # explicit commit before close
             conn.close()
             return json.dumps(rows, default=str)
 
@@ -426,6 +567,10 @@ def chat():
         for block in response.content:
             if hasattr(block, "text"):
                 text_response += block.text
+
+        # Post-processing: sanitize sycophantic patterns
+        # Council Vote #aacfbf5a17920766 — Fix 3
+        text_response = _sanitize_chat_response(text_response)
 
         # Store assistant response in session
         session["messages"].append({"role": "assistant", "content": text_response})

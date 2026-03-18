@@ -68,6 +68,7 @@ def get_ring(ring_name: str) -> dict:
         FROM duplo_tool_registry WHERE tool_name = %s""", (ring_name,))
     row = cur.fetchone()
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     if not row:
         return None
@@ -89,6 +90,7 @@ def check_ring_budget() -> dict:
         WHERE ring_status = 'active' GROUP BY ring_type""")
     counts = dict(cur.fetchall())
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     total = sum(counts.values()) or 1
     temp_pct = (counts.get("temp", 0) / total) * 100
@@ -108,6 +110,7 @@ def outbound_scrub(payload: str, ring_name: str = "all") -> list:
         WHERE active = true AND (applies_to = 'all' OR applies_to = %s)""", (ring_name,))
     rules = cur.fetchall()
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     violations = []
@@ -168,6 +171,7 @@ def list_rings(ring_type: str = None, status: str = "active") -> list:
     cur.execute(query, params)
     rows = cur.fetchall()
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     return [{"id": r[0], "name": r[1], "ring_type": r[2], "provider": r[3], "status": r[4]} for r in rows]
 

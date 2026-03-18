@@ -1,0 +1,9 @@
+[Unit]
+Description=Weekly Observability Report Timer (Wed 04:50, after db-query-report, before owl)
+
+[Timer]
+OnCalendar=Wed 04:50
+Persistent=true
+
+[Install]
+WantedBy=timers.target

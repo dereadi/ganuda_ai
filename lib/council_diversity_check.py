@@ -114,6 +114,7 @@ def compute_dcr(window: int = 20) -> Optional[DCRReport]:
             LIMIT %s
         """, (window,))
         rows = cur.fetchall()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         if len(rows) < 5:

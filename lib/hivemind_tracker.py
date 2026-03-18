@@ -397,6 +397,7 @@ class HiveMindTracker:
                     concern_novelty_rates=novelty_rates
                 )
         finally:
+            conn.commit()  # explicit commit before close
             conn.close()
 
     def store_shapley_values(self, result: ShapleyResult):

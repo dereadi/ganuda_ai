@@ -77,6 +77,7 @@ def load_embeddings():
 
     rows = cur.fetchall()
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     if not rows:

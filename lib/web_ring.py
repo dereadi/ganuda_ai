@@ -85,6 +85,7 @@ class WebRing(ABC):
         row = cur.fetchone()
         budget = float(row[0]) if row and row[0] else 999999
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         return {"calls_today": int(calls), "cost_today": float(cost),
                 "budget": budget, "within_budget": float(cost) < budget}

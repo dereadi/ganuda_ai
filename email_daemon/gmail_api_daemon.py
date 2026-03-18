@@ -124,11 +124,22 @@ class GmailAPIDaemon:
         body = email_data.get('body_text', '')[:1500]
         from_addr = email_data.get('from_address', '')
 
-        # Fast keyword pre-filter for obvious spam/noise
+        # High-value sender whitelist — bypass noise filter, send to LLM for real classification
+        jewel_senders = [
+            'substack.com',              # All Substack newsletters = potential market intelligence
+            'natesnewsletter',           # Nate Jones — AI product strategy, 121K subs
+            'slowai',                    # Dr. Sam Illingworth — critical AI literacy, mindful AI
+            'thestrategiclinguist',      # Rebecca Wicker — language, power, competitive advantage
+            'robotsatemyhomework',       # Mia Kiraki — AI systems with taste
+            'wfryer',                    # Wesley Fryer — education/tech
+        ]
+        combined_lower = (subject + ' ' + body + ' ' + from_addr).lower()
+        is_whitelisted = any(sender in combined_lower for sender in jewel_senders)
+
+        # Fast keyword pre-filter for obvious spam/noise (whitelisted senders skip this)
         noise_signals = ['unsubscribe', 'no-reply', 'noreply', 'donotreply',
                          'marketing', 'newsletter', 'promotional']
-        combined_lower = (subject + ' ' + body + ' ' + from_addr).lower()
-        if any(sig in combined_lower for sig in noise_signals):
+        if not is_whitelisted and any(sig in combined_lower for sig in noise_signals):
             return {
                 'priority_score': 5,
                 'action_required': False,

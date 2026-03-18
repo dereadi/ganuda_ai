@@ -121,6 +121,7 @@ def queue_batch(batch_num):
         print(f"  {row[0]}: {row[1]}")
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     print(f"\nBatch {batch_num} queued successfully.")

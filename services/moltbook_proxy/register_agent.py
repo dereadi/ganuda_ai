@@ -135,6 +135,7 @@ def main():
     else:
         print(f"  Profile update: {profile_result.get('status', 'unknown')}")
 
+    conn.commit()  # explicit commit before close
     conn.close()
 
     print("\n" + "=" * 60)

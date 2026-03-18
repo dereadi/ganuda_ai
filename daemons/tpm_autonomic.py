@@ -290,6 +290,7 @@ def main():
     if args.once:
         signals = run_cycle(conn)
         log.info(f"Single cycle complete. {len(signals)} basin signals.")
+        conn.commit()  # explicit commit before close
         conn.close()
         return
 

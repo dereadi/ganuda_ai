@@ -218,6 +218,7 @@ def store_extraction(
         logger.error(f"Failed to store extraction: {e}")
         if conn:
             conn.rollback()
+            conn.commit()  # explicit commit before close
             conn.close()
         return None
 

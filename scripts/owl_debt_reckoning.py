@@ -403,6 +403,7 @@ def main():
 
     if not tasks:
         print("[DONE] Nothing to reckon")
+        conn.commit()  # explicit commit before close
         conn.close()
         return
 
@@ -420,6 +421,29 @@ def main():
             print(f"  Checks run: {len(r['checks'])}")
         print()
 
+    # --- Observability Report (BSM Leg 3) ---
+    # Timer: weekly_observability_report runs at Wed 04:50, owl runs at Wed 05:00
+    # Read the pre-generated report if it exists, otherwise note absence
+    obs_report_path = "/ganuda/logs/weekly_observability_report.md"
+    obs_report_content = None
+    try:
+        if os.path.exists(obs_report_path):
+            with open(obs_report_path, "r") as f:
+                obs_report_content = f.read()
+            # Only include if it was generated today (fresh report)
+            report_mtime = datetime.fromtimestamp(
+                os.path.getmtime(obs_report_path), tz=timezone.utc
+            )
+            age_hours = (datetime.now(timezone.utc) - report_mtime).total_seconds() / 3600
+            if age_hours > 24:
+                print(f"[WARN] Observability report is {age_hours:.0f}h old — may be stale")
+            else:
+                print(f"[OK] Observability report loaded ({len(obs_report_content)} chars, {age_hours:.1f}h old)")
+        else:
+            print(f"[WARN] No observability report at {obs_report_path} — timer may not have run")
+    except Exception as e:
+        print(f"[WARN] Failed to read observability report: {e}")
+
     # Build report
     report = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -431,6 +455,7 @@ def main():
             "broken": sum(1 for r in reckonings if r["score"] == "BROKEN"),
         },
         "reckonings": reckonings,
+        "observability_report_available": obs_report_content is not None,
     }
 
     # Save JSON report
@@ -445,6 +470,7 @@ def main():
     else:
         print("[DRY RUN] Skipping thermal memory store")
 
+    conn.commit()  # explicit commit before close
     conn.close()
 
     # Print final summary
@@ -457,6 +483,15 @@ def main():
     print(f"  BROKEN:         {report['summary']['broken']}")
     print(f"  Report:         {REPORT_PATH}")
     print("=" * 60)
+
+    # --- BSM Leg 3: Observability Report Section ---
+    if obs_report_content:
+        print()
+        print("=" * 60)
+        print("OBSERVABILITY REPORT (BSM Leg 3)")
+        print("=" * 60)
+        print(obs_report_content)
+        print("=" * 60)
 
     # Exit non-zero if anything is broken
     if report["summary"]["broken"] > 0:

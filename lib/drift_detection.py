@@ -158,12 +158,21 @@ def measure_specialist_coherence(specialist_id: str) -> float:
         return 1.0  # Fail open — assume healthy on error
     finally:
         if conn:
+            conn.commit()  # explicit commit before close
             conn.close()
 
 
 # =============================================================================
 # 2. check_circuit_breaker
 # =============================================================================
+
+# Structural dissenters — concern is their role, not a malfunction signal
+STRUCTURAL_DISSENTERS = {
+    'turtle': '7GEN CONCERN',
+    'raven': 'STRATEGY CONCERN',
+    'coyote': 'DISSENT',
+}
+
 
 def check_circuit_breaker(specialist_id: str) -> str:
     """
@@ -175,6 +184,10 @@ def check_circuit_breaker(specialist_id: str) -> str:
       - 'CLOSED':    otherwise
 
     Returns 'CLOSED' if no health data exists (fail open for new specialists).
+
+    For structural dissenters (turtle, raven, coyote): only UNEXPECTED concern
+    types count toward the breaker threshold. Role-appropriate concerns are
+    signal, not noise.
     """
     conn = None
     try:
@@ -182,7 +195,7 @@ def check_circuit_breaker(specialist_id: str) -> str:
         cur = conn.cursor()
 
         cur.execute("""
-            SELECT had_concern, coherence_score
+            SELECT had_concern, coherence_score, concern_type
             FROM specialist_health
             WHERE specialist_id = %s
             ORDER BY measured_at DESC
@@ -193,7 +206,19 @@ def check_circuit_breaker(specialist_id: str) -> str:
         if not rows:
             return 'CLOSED'
 
-        concern_count = sum(1 for row in rows if row[0] is True)
+        # For structural dissenters: only count concerns that DON'T match
+        # their expected role type. Turtle raising "7GEN CONCERN" is normal.
+        # Turtle raising "SECURITY CONCERN" is anomalous.
+        expected_concern_type = STRUCTURAL_DISSENTERS.get(specialist_id)
+
+        if expected_concern_type:
+            concern_count = sum(
+                1 for row in rows
+                if row[0] is True and row[2] != expected_concern_type
+            )
+        else:
+            # Non-dissenter: all concerns count (existing behavior)
+            concern_count = sum(1 for row in rows if row[0] is True)
 
         # Average coherence from rows that have a score
         coherence_scores = [row[1] for row in rows if row[1] is not None]
@@ -216,6 +241,7 @@ def check_circuit_breaker(specialist_id: str) -> str:
         return 'CLOSED'  # Fail open
     finally:
         if conn:
+            conn.commit()  # explicit commit before close
             conn.close()
 
 
@@ -287,6 +313,7 @@ def record_specialist_health(
             conn.rollback()
     finally:
         if conn:
+            conn.commit()  # explicit commit before close
             conn.close()
 
 

@@ -1,142 +1,200 @@
 #!/usr/bin/env python3
-"""
-Valence Gate — Response alignment scoring against Design Constraints.
+"""Valence Gate for the Consultation Ring.
+Scores frontier model responses against Design Constraints.
+Phase 1: Pattern matching. Phase 2 (future): LLM-based scoring.
 
 Patent Brief #7: Tokenized Air-Gap Proxy
 Council Vote: a3ee2a8066e04490 (UNANIMOUS)
-
-Phase 1: Pattern matching against sovereignty, security, and build-to-last violations.
-Phase 2 (future): LLM-based scoring for ambiguous cases via specialist_council.
 
 Three outcomes:
     ACCEPT  (score > 0.7)  — response is aligned, use it
     FLAG    (0.3 - 0.7)    — response has concerns, use with warning
     REJECT  (score < 0.3)  — response violates DCs, fall back to local model
-
-DC alignment checks:
-    - Sovereignty: "use cloud", "migrate to AWS/Azure/GCP", "SaaS"
-    - Security: "chmod 777", "disable firewall", "skip verification"
-    - Build-to-last: "move fast and break things", "MVP", "rewrite from scratch"
-    - DC-9 Waste: "scale up", "more GPUs", "bigger model"
 """
 
-import logging
 import re
-from typing import Dict, List, Tuple
+import logging
+from dataclasses import dataclass, field
+from typing import List, Tuple
 
-logger = logging.getLogger("valence_gate")
+logger = logging.getLogger("consultation_ring.valence")
 
 
-# Violation patterns with weights (higher weight = more severe)
-SOVEREIGNTY_VIOLATIONS = [
-    (r"\b(migrate|move|switch)\s+to\s+(AWS|Azure|GCP|cloud)\b", 0.8, "sovereignty:cloud_migration"),
-    (r"\b(use|deploy|adopt)\s+(AWS|Azure|GCP|cloud|SaaS)\b", 0.6, "sovereignty:cloud_adoption"),
-    (r"\b(serverless|lambda|cloud\s*function)\b", 0.4, "sovereignty:serverless"),
-    (r"\b(outsource|third.party\s+hosting)\b", 0.5, "sovereignty:outsourcing"),
-    (r"\b(managed\s+service|cloud\s*native)\b", 0.3, "sovereignty:managed_service"),
+@dataclass
+class ValenceResult:
+    """Result of valence gate scoring."""
+    score: float          # 0.0-1.0
+    tier: str             # 'accept', 'flag', 'reject'
+    violations: List[str] # List of matched violation descriptions
+    details: dict = field(default_factory=dict)
+
+
+# ---------------------------------------------------------------------------
+# Violation patterns organized by Design Constraint category
+# Each tuple: (regex_pattern, human-readable description)
+# ---------------------------------------------------------------------------
+
+SOVEREIGNTY_VIOLATIONS: List[Tuple[str, str]] = [
+    # DC-1: Sovereignty — the system is self-hosted, air-gap capable
+    (r'\b(migrate|move|switch)\s+(to|over\s+to)\s+(aws|azure|gcp|cloud)', 'Suggests cloud migration (DC-1 sovereignty)'),
+    (r'\b(use|try|consider)\s+(aws|azure|gcp|google\s+cloud|amazon\s+web)', 'Recommends cloud provider (DC-1 sovereignty)'),
+    (r'\bserverless\b.*\b(lambda|functions|cloud\s+run)', 'Suggests serverless cloud (DC-1 sovereignty)'),
+    (r'\b(saas|managed\s+service)\b.*\breplace\b', 'Suggests replacing with SaaS (DC-1 sovereignty)'),
 ]
 
-SECURITY_VIOLATIONS = [
-    (r"\bchmod\s+777\b", 0.9, "security:world_writable"),
-    (r"\b(disable|turn\s+off)\s+(firewall|selinux|apparmor)\b", 0.9, "security:disable_security"),
-    (r"\b(skip|disable|bypass)\s+(verification|authentication|authorization)\b", 0.8, "security:bypass_auth"),
-    (r"\b--no-verify\b", 0.7, "security:skip_verify"),
-    (r"\bcurl\s+.*\|\s*(bash|sh)\b", 0.8, "security:pipe_to_shell"),
-    (r"\b(hardcode|embed)\s+\w*\s*(password|secret|key|credential)\b", 0.7, "security:hardcoded_creds"),
-    (r"\beval\s*\(", 0.6, "security:eval"),
+SECURITY_VIOLATIONS: List[Tuple[str, str]] = [
+    # DC-3: Security — the system protects its boundaries
+    (r'chmod\s+777', 'Suggests chmod 777 (DC-3 security)'),
+    (r'disable\s+(the\s+)?(firewall|selinux|apparmor)', 'Suggests disabling security (DC-3 security)'),
+    (r'\b(curl|wget)\s+.*\|\s*(sudo\s+)?bash', 'Suggests pipe-to-bash install (DC-3 security)'),
+    (r'--no-verify', 'Suggests skipping verification (DC-3 security)'),
+    (r'\beval\s*\(', 'Suggests eval() (DC-3 security)'),
+    (r'password\s*=\s*["\'][^"\']{0,3}["\']', 'Suggests weak/empty password (DC-3 security)'),
 ]
 
-BUILD_TO_LAST_VIOLATIONS = [
-    (r"\bmove\s+fast\s+and\s+break\s+things\b", 0.7, "build_to_last:move_fast"),
-    (r"\b(rewrite|rebuild)\s+(from\s+scratch|everything)\b", 0.5, "build_to_last:rewrite"),
-    (r"\b(throw\s+away|disposable|throwaway)\b", 0.4, "build_to_last:disposable"),
-    (r"\b(technical\s+debt\s+(?:is\s+)?(?:fine|ok|acceptable))\b", 0.5, "build_to_last:debt_acceptance"),
-    (r"\b(don'?t\s+(?:need|bother\s+with)\s+tests?)\b", 0.6, "build_to_last:no_tests"),
+BUILD_TO_LAST_VIOLATIONS: List[Tuple[str, str]] = [
+    # DC-7: Build to Last — 21-year HP-UX cluster standard
+    (r'\bmove\s+fast\s+and\s+break\s+things\b', 'Move fast and break things (DC-7 build-to-last)'),
+    (r'\bjust\s+ship\s+it\b', 'Just ship it mentality (DC-7 build-to-last)'),
+    (r'\b(technical\s+debt|tech\s+debt)\s+.{0,20}(later|fine|ok|acceptable)', 'Accepts tech debt (DC-7 build-to-last)'),
+    (r'\b(throw\s*away|disposable|temporary)\s+(code|solution|fix)', 'Suggests throwaway code (DC-7 build-to-last)'),
+    (r'\brewrite\s+(everything|from\s+scratch|the\s+whole)', 'Suggests full rewrite (DC-7 build-to-last)'),
 ]
 
-WASTE_HEAT_VIOLATIONS = [
-    (r"\b(scale\s+up|bigger\s+model|more\s+GPU)\b", 0.3, "dc9:scale_up"),
-    (r"\b(brute\s+force|exhaustive\s+search)\b", 0.4, "dc9:brute_force"),
-    (r"\b(unlimited|no\s+limit|infinite)\s+(retries|attempts|tokens)\b", 0.5, "dc9:unlimited_resources"),
+WASTE_HEAT_VIOLATIONS: List[Tuple[str, str]] = [
+    # DC-9: Waste Heat — don't burn tokens unnecessarily
+    (r'\b(brute\s+force|try\s+every|exhaustive\s+search)\b', 'Suggests brute force (DC-9 waste heat)'),
+    (r'\b(poll|retry)\s+.{0,30}(loop|continuously|forever)', 'Suggests polling loop (DC-9 waste heat)'),
 ]
 
-ALL_VIOLATION_GROUPS = [
-    ("sovereignty", SOVEREIGNTY_VIOLATIONS),
-    ("security", SECURITY_VIOLATIONS),
-    ("build_to_last", BUILD_TO_LAST_VIOLATIONS),
-    ("waste_heat", WASTE_HEAT_VIOLATIONS),
+# Scoring weights per category (applied per violation match)
+# Weights calibrated so a single security violation rejects,
+# a single sovereignty violation flags, and build-to-last flags.
+_CATEGORY_WEIGHTS = {
+    'sovereignty': 0.35,
+    'security': 0.75,
+    'build_to_last': 0.35,
+    'waste_heat': 0.15,
+}
+
+# All pattern groups with their category keys
+_PATTERN_GROUPS: List[Tuple[str, List[Tuple[str, str]]]] = [
+    ('sovereignty', SOVEREIGNTY_VIOLATIONS),
+    ('security', SECURITY_VIOLATIONS),
+    ('build_to_last', BUILD_TO_LAST_VIOLATIONS),
+    ('waste_heat', WASTE_HEAT_VIOLATIONS),
 ]
 
 
 class ValenceGate:
-    """Score response alignment against federation Design Constraints.
+    """Scores responses against Design Constraints. Phase 1: pattern matching.
 
-    Phase 1: Pattern matching (fast, deterministic, no inference cost).
+    Scoring:
+    - Start at 1.0
+    - Each sovereignty violation: -0.35
+    - Each security violation: -0.75
+    - Each build-to-last violation: -0.35
+    - Each waste heat violation: -0.15
+    - Floor at 0.0
+
+    Tiers:
+    - accept: score > 0.7
+    - flag: 0.3 <= score <= 0.7
+    - reject: score < 0.3
     """
 
-    def __init__(self, reject_threshold: float = 0.3, flag_threshold: float = 0.7):
-        self.reject_threshold = reject_threshold
-        self.flag_threshold = flag_threshold
+    def __init__(self):
+        self.pattern_groups = _PATTERN_GROUPS
 
-    def score(self, response_text: str) -> dict:
-        """Score a response for DC alignment.
+    def score(self, response_text: str) -> ValenceResult:
+        """Score a response. Returns ValenceResult with score, tier, and violations."""
+        violations: List[str] = []
+        category_hits: dict = {}  # category -> count of hits
+        current_score = 1.0
 
-        Returns:
-            {
-                "score": float (0.0-1.0, higher = more aligned),
-                "outcome": "accept" | "flag" | "reject",
-                "violations": [{"pattern": str, "weight": float, "category": str}],
-                "category_scores": {"sovereignty": float, "security": float, ...},
-            }
-        """
-        violations = []
-        category_weights = {}
-
-        for category, patterns in ALL_VIOLATION_GROUPS:
-            max_weight = 0.0
-            for pattern, weight, label in patterns:
+        for category, patterns in self.pattern_groups:
+            weight = _CATEGORY_WEIGHTS[category]
+            for pattern, description in patterns:
                 if re.search(pattern, response_text, re.IGNORECASE):
-                    violations.append({
-                        "pattern": label,
-                        "weight": weight,
-                        "category": category,
-                    })
-                    max_weight = max(max_weight, weight)
-            category_weights[category] = max_weight
+                    violations.append(description)
+                    current_score -= weight
+                    category_hits[category] = category_hits.get(category, 0) + 1
+                    logger.warning(
+                        "Valence violation [%s]: %s (penalty: -%.2f)",
+                        category, description, weight
+                    )
 
-        # Score: 1.0 minus the maximum violation weight found.
-        # Multiple violations in different categories compound.
-        if not violations:
-            score = 1.0
+        # Floor at 0.0
+        final_score = round(max(0.0, current_score), 4)
+
+        # Determine tier
+        if final_score > 0.7:
+            tier = 'accept'
+        elif final_score >= 0.3:
+            tier = 'flag'
         else:
-            # Take the worst violation as primary penalty,
-            # add 0.05 per additional violation category hit
-            worst = max(v["weight"] for v in violations)
-            categories_hit = len(set(v["category"] for v in violations))
-            additional_penalty = (categories_hit - 1) * 0.05
-            score = max(0.0, 1.0 - worst - additional_penalty)
+            tier = 'reject'
 
-        # Determine outcome
-        if score >= self.flag_threshold:
-            outcome = "accept"
-        elif score >= self.reject_threshold:
-            outcome = "flag"
-        else:
-            outcome = "reject"
-
-        return {
-            "score": round(score, 4),
-            "outcome": outcome,
-            "violations": violations,
-            "category_scores": {
-                cat: round(1.0 - w, 4) for cat, w in category_weights.items()
-            },
+        details = {
+            'category_hits': category_hits,
+            'total_penalty': round(1.0 - final_score, 4),
         }
+
+        return ValenceResult(
+            score=final_score,
+            tier=tier,
+            violations=violations,
+            details=details,
+        )
 
     def should_accept(self, response_text: str) -> bool:
         """Quick check: is this response acceptable?"""
-        return self.score(response_text)["outcome"] == "accept"
+        return self.score(response_text).tier == 'accept'
 
     def should_reject(self, response_text: str) -> bool:
         """Quick check: should this response be rejected?"""
-        return self.score(response_text)["outcome"] == "reject"
+        return self.score(response_text).tier == 'reject'
+
+
+# ---------------------------------------------------------------------------
+# Self-test when run directly
+# ---------------------------------------------------------------------------
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.WARNING, format="%(name)s %(levelname)s: %(message)s")
+
+    gate = ValenceGate()
+
+    tests = [
+        ("You should migrate to AWS for better scalability", "flag or reject"),
+        ("chmod 777 /var/www will fix the permissions", "reject"),
+        ("Consider using PostgreSQL with proper indexing", "accept"),
+        ("Just ship it and fix bugs later", "flag"),
+    ]
+
+    print("=" * 70)
+    print("VALENCE GATE SELF-TEST")
+    print("=" * 70)
+
+    all_passed = True
+    for text, expected in tests:
+        result = gate.score(text)
+        status = "PASS" if expected in (result.tier, f"{result.tier} or reject", f"flag or {result.tier}") else "CHECK"
+        # More precise pass check
+        if expected == "flag or reject":
+            status = "PASS" if result.tier in ('flag', 'reject') else "FAIL"
+        elif expected == result.tier:
+            status = "PASS"
+        else:
+            status = "FAIL"
+            all_passed = False
+
+        print(f"\n[{status}] Input: \"{text}\"")
+        print(f"  Expected: {expected}")
+        print(f"  Got:      tier={result.tier}, score={result.score}")
+        if result.violations:
+            for v in result.violations:
+                print(f"  - {v}")
+
+    print("\n" + "=" * 70)
+    print(f"Result: {'ALL TESTS PASSED' if all_passed else 'SOME TESTS FAILED'}")
+    print("=" * 70)

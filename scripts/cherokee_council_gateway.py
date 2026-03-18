@@ -127,6 +127,7 @@ def query_thermal_memory(query, limit=5):
     cur.execute(sql, (f'%{query}%', limit))
     results = cur.fetchall()
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     return [

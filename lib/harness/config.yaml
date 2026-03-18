@@ -134,3 +134,30 @@ claude_endpoint:
   max_tokens: 4096
   temperature: 0.7
   provider: "anthropic"
+
+# --- Consultation Ring ---
+# Patent Brief #7: Tokenized Air-Gap Proxy
+# Council Vote: a3ee2a8066e04490 (UNANIMOUS)
+# Multi-model consultation with tokenized air-gap proxy.
+# Token map NEVER crosses the security boundary.
+# Turtle's kill switch: set enabled: false → service returns 503.
+consultation_ring:
+  enabled: true
+  port: 9400
+  max_consultations_per_hour: 20
+  thermal_temperature: 60
+  providers:
+    anthropic:
+      enabled: true
+      model: claude-sonnet-4-6
+      max_tokens: 4096
+    openai:
+      enabled: false
+      model: gpt-4o
+    gemini:
+      enabled: false
+      model: gemini-pro
+    local:
+      enabled: true
+      backend: sasass2
+      model: qwen-72b

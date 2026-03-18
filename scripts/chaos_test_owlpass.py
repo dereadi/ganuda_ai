@@ -56,9 +56,11 @@ def check_fire_guard_detected(service_name):
         for row in cur.fetchall():
             if service_name.replace(".service", "") in row[0].lower():
                 cur.close()
+                conn.commit()  # explicit commit before close
                 conn.close()
                 return True
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
     except Exception:
         pass

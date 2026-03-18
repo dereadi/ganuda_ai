@@ -93,6 +93,7 @@ def update_device_status(online_ips):
         conn.rollback()
     finally:
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
 def run_daemon():

@@ -37,6 +37,7 @@ def get_recent_jewels(hours: int = 24) -> list:
         cols = [d[0] for d in cur.description]
         return [dict(zip(cols, r)) for r in cur.fetchall()]
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

@@ -89,6 +89,7 @@ def get_associated_thermals(
     try:
         return _fetch_associations(conn, thermal_id, max_hops, max_results, _depth=0)
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -229,6 +230,7 @@ def get_link_signature(source_id: int, dest_id: int) -> str:
             ts = int(time.time())
             return hashlib.sha256(f"{src[0]}:{dst[0]}:{ts}".encode()).hexdigest()
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -263,6 +265,7 @@ def verify_link(
                     return True
             return False
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 
@@ -298,6 +301,7 @@ def _test():
             print(f"  snippet: {snippet}")
             print()
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
     results = get_associated_thermals(tid, max_hops=1, max_results=3)

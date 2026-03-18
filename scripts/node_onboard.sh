@@ -154,6 +154,18 @@ else
     warn "No SSH keys configured. User should add their public key to $HOMEDIR/.ssh/authorized_keys"
 fi
 
+# --- Step 8: nftables Tailscale check ---
+echo "--- Step 8: Tailscale firewall ---"
+if command -v nft > /dev/null 2>&1; then
+    if nft list ruleset 2>/dev/null | grep -q '100.64.0.0/10'; then
+        ok "Tailscale CGNAT range allowed in nftables"
+    else
+        warn "Tailscale range 100.64.0.0/10 NOT in nftables. Remote Tailscale users may be blocked."
+    fi
+else
+    ok "No nftables on this node (open by default)"
+fi
+
 # --- Summary ---
 echo
 echo "========================================"

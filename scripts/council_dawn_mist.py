@@ -17,6 +17,7 @@ sys.path.insert(0, '/ganuda/lib')
 
 import json
 import logging
+import subprocess
 from datetime import datetime, timedelta
 
 from ganuda_db import get_connection, get_dict_cursor, safe_thermal_write
@@ -191,6 +192,99 @@ def partner_rhythm_report(cur) -> str:
         return ""
 
 
+def observability_health_summary(cur) -> str:
+    """
+    Observability health summary for the morning briefing.
+    BSM Leg 3 integration — keeps it SHORT for dawn mist.
+
+    Checks:
+      - Overnight fire-guard alerts (journald, last 12h)
+      - DB rollback rate (pg_stat_database)
+      - Key service status (systemd)
+    """
+    items = []
+
+    # --- 1. Overnight fire-guard alerts (last 12h) ---
+    alert_count = 0
+    try:
+        since = (datetime.now() - timedelta(hours=12)).strftime("%Y-%m-%d %H:%M:%S")
+        result = subprocess.run(
+            [
+                "journalctl", "-u", "fire-guard.service",
+                "--since", since,
+                "--no-pager", "-q", "--output", "cat",
+            ],
+            capture_output=True, text=True, timeout=10,
+        )
+        if result.returncode == 0:
+            for line in result.stdout.splitlines():
+                if "ALERT" in line or "DOWN" in line or "FAIL" in line:
+                    alert_count += 1
+    except Exception as e:
+        logger.warning(f"Fire-guard journal query failed: {e}")
+
+    if alert_count > 0:
+        items.append(f"  Fire-guard: {alert_count} alert(s) overnight — review needed")
+    else:
+        items.append(f"  Fire-guard: quiet overnight (0 alerts)")
+
+    # --- 2. DB rollback rate (pg_stat_database) ---
+    try:
+        cur.execute("""
+            SELECT datname,
+                   xact_commit,
+                   xact_rollback,
+                   CASE WHEN (xact_commit + xact_rollback) > 0
+                        THEN ROUND(100.0 * xact_rollback / (xact_commit + xact_rollback), 2)
+                        ELSE 0 END AS rollback_pct
+            FROM pg_stat_database
+            WHERE datname = 'zammad_production'
+        """)
+        row = cur.fetchone()
+        if row:
+            pct = float(row['rollback_pct'])
+            flag = " **!**" if pct > 5.0 else ""
+            items.append(f"  DB rollback rate: {pct}%{flag} ({row['datname']})")
+        else:
+            items.append(f"  DB rollback rate: no data")
+    except Exception as e:
+        logger.warning(f"Rollback rate query failed: {e}")
+        items.append(f"  DB rollback rate: query failed")
+
+    # --- 3. Service status summary ---
+    services = [
+        "llm-gateway.service",
+        "fire-guard.timer",
+        "consultation-ring.service",
+        "ganudabot.service",
+    ]
+    up = 0
+    down_list = []
+    for svc in services:
+        try:
+            result = subprocess.run(
+                ["systemctl", "is-active", svc],
+                capture_output=True, text=True, timeout=5,
+            )
+            state = result.stdout.strip()
+            if state in ("active", "activating"):
+                up += 1
+            else:
+                down_list.append(f"{svc}={state}")
+        except Exception:
+            down_list.append(f"{svc}=unknown")
+
+    if down_list:
+        items.append(f"  Services: {up}/{len(services)} up — DOWN: {', '.join(down_list)}")
+    else:
+        items.append(f"  Services: {up}/{len(services)} up — all green")
+
+    if not items:
+        return ""
+
+    return "OBSERVABILITY PULSE:\n" + "\n".join(items)
+
+
 def run_standup():
     """Gather items, run council vote, store results."""
     conn = None
@@ -204,11 +298,13 @@ def run_standup():
         pulse = health_pulse(cur)
         attractors = attractor_metrics(cur)
         rhythm = partner_rhythm_report(cur)
+        obs_health = observability_health_summary(cur)
 
         digest = (
             f"DAWN MIST STANDUP — {datetime.now().strftime('%A %B %d, %Y')}\n\n"
             f"{forward}\n\n{backward}\n\n{pulse}"
             f"{('\n\n' + attractors) if attractors else ''}"
+            f"{('\n\n' + obs_health) if obs_health else ''}"
             f"{('\n\n' + rhythm) if rhythm else ''}"
             "\n\nCouncil: Review this morning's standup. Flag anything that needs "
             "deeper attention today. Keep it brief — this is a standup, not a deliberation."
@@ -226,6 +322,7 @@ def run_standup():
             f"Council Vote: {result.audit_hash} (confidence: {result.confidence})\n"
             f"Recommendation: {result.recommendation}\n\n"
             f"{forward}\n\n{backward}\n\n{pulse}"
+            f"{('\n\n' + obs_health) if obs_health else ''}"
         )
 
         safe_thermal_write(
@@ -253,6 +350,7 @@ def run_standup():
         raise
     finally:
         if conn:
+            conn.commit()  # explicit commit before close
             conn.close()
 
 

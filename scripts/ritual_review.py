@@ -734,6 +734,7 @@ def run_ritual(mode="weekly"):
         }
 
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

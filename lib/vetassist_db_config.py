@@ -79,6 +79,7 @@ def get_non_pii_connection():
         conn = get_non_pii_connection()
         cur = conn.cursor()
         ...
+        conn.commit()  # explicit commit before close
         conn.close()
     """
     config = load_config()
@@ -104,6 +105,7 @@ def get_pii_connection():
         conn = get_pii_connection()
         cur = conn.cursor()
         ...
+        conn.commit()  # explicit commit before close
         conn.close()
     """
     config = load_config()
@@ -168,6 +170,7 @@ def validate_tables(db_type: str = 'non_pii') -> bool:
         return True
 
     finally:
+        conn.commit()  # explicit commit before close
         conn.close()
 
 

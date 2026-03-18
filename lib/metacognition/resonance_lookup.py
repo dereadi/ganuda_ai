@@ -80,6 +80,7 @@ def lookup_resonance(question: str, specialists: list = None, confidence: float 
         
         candidates = cur.fetchall()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         
         # Simple keyword match for fuzzy
@@ -136,6 +137,7 @@ def get_resonance_stats() -> Dict:
         
         stats = dict(cur.fetchone())
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
         
         return stats

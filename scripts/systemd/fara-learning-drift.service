@@ -1,0 +1,18 @@
+[Unit]
+Description=FARA Learning Drift Detector — Eagle Eye Canary
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=dereadi
+WorkingDirectory=/ganuda
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 /ganuda/scripts/fara_learning_drift.py
+Environment=HOME=/home/dereadi
+Environment=PYTHONPATH=/ganuda:/ganuda/lib
+EnvironmentFile=/ganuda/config/secrets.env
+TimeoutStartSec=120
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

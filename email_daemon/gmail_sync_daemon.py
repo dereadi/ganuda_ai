@@ -58,7 +58,7 @@ class EmailSyncDaemon:
             host=self.config['db_host'],
             database=self.config['db_name'],
             user=self.config['db_user'],
-            password=self.config['db_password']
+            password=self.config.get('db_password', os.environ.get('CHEROKEE_DB_PASS', ''))
         )
         logger.info(f"Connected to PostgreSQL at {self.config['db_host']}")
 

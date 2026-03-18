@@ -88,6 +88,7 @@ def sync_memories(hours=24):
         json.dump(sync_record, f, indent=2)
 
     print(f"[SHADOW] Sync complete: {len(memories)} memories, {len(context)} chars context")
+    conn.commit()  # explicit commit before close
     conn.close()
     return context
 
@@ -155,6 +156,7 @@ def compare_votes(sample_size=10, hours=72):
 
     if not votes:
         print("[SHADOW] No recent votes to compare")
+        conn.commit()  # explicit commit before close
         conn.close()
         return {"divergence_rate": 0, "comparisons": []}
 
@@ -259,6 +261,7 @@ def compare_votes(sample_size=10, hours=72):
         print(f"\n[SHADOW] {alert}")
         send_telegram(alert)
 
+    conn.commit()  # explicit commit before close
     conn.close()
     return result
 

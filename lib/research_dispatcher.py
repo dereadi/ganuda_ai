@@ -80,6 +80,7 @@ class ResearchDispatcher:
         """, (job_id,))
         row = cur.fetchone()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         if not row:
@@ -109,6 +110,7 @@ class ResearchDispatcher:
         """, (limit,))
         rows = cur.fetchall()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         return [{"job_id": r[0], "query": r[1], "max_steps": r[2],
@@ -138,6 +140,7 @@ class ResearchDispatcher:
 
         rows = cur.fetchall()
         cur.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         return [{"job_id": r[0], "query": r[1], "status": r[2],

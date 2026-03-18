@@ -35,4 +35,5 @@ count = cur.fetchone()[0]
 print(f"legal_register created with {count} seed items")
 
 cur.close()
+conn.commit()  # explicit commit before close
 conn.close()

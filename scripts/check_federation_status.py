@@ -104,6 +104,7 @@ def check_thermal_memory_bluefin():
         print(f"  Index Size: {index_size}")
 
         cursor.close()
+        conn.commit()  # explicit commit before close
         conn.close()
 
         print("\n✅ BLUEFIN thermal memory check: SUCCESS")

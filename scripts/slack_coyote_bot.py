@@ -81,6 +81,7 @@ def find_uncomfortable_question():
     stale_tickets = cur.fetchall()
 
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
 
     # Pick one from each category, weight toward most uncomfortable

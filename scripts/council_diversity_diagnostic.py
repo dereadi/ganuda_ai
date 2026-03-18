@@ -59,6 +59,7 @@ def fetch_council_votes(limit: int = 50):
     """, (limit,))
     rows = cur.fetchall()
     cur.close()
+    conn.commit()  # explicit commit before close
     conn.close()
     return rows
 
