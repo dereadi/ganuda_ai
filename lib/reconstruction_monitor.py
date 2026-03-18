@@ -48,7 +48,7 @@ class ReconstructionMonitor:
         self,
         db_host: str = "10.100.0.2",
         db_port: int = 5432,
-        db_name: str = "cherokee_identity",
+        db_name: str = "triad_federation",
         db_user: str = "claude",
         db_pass: Optional[str] = None,
     ):
@@ -125,7 +125,7 @@ class ReconstructionMonitor:
                 SELECT
                     original_query_hash,
                     COUNT(DISTINCT correlation_group) AS groups_seen
-                FROM triad_federation.consultation_exposure_log
+                FROM consultation_exposure_log
                 WHERE provider = %(provider)s
                   AND timestamp >= NOW() - %(days)s * INTERVAL '1 day'
                 GROUP BY original_query_hash
@@ -134,7 +134,7 @@ class ReconstructionMonitor:
                 SELECT
                     original_query_hash,
                     COUNT(DISTINCT correlation_group) AS total_groups
-                FROM triad_federation.consultation_exposure_log
+                FROM consultation_exposure_log
                 WHERE original_query_hash IN (
                     SELECT original_query_hash FROM provider_groups
                 )
@@ -217,7 +217,7 @@ class ReconstructionMonitor:
                 ARRAY_AGG(DISTINCT consultation_id) AS consultation_ids,
                 COUNT(*) AS claim_count,
                 ARRAY_AGG(DISTINCT claim_id) AS claim_ids
-            FROM triad_federation.consultation_exposure_log
+            FROM consultation_exposure_log
             WHERE provider = %(provider)s
               AND timestamp >= NOW() - %(days)s * INTERVAL '1 day'
             GROUP BY correlation_group
@@ -271,7 +271,7 @@ class ReconstructionMonitor:
             SELECT
                 provider,
                 COUNT(*) AS claim_count
-            FROM triad_federation.consultation_exposure_log
+            FROM consultation_exposure_log
             WHERE timestamp >= NOW() - %(days)s * INTERVAL '1 day'
             GROUP BY provider
             ORDER BY claim_count DESC
