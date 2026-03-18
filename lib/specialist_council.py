@@ -370,6 +370,7 @@ def query_thermal_memory_semantic(question: str, limit: int = 15, min_temperatur
                 # Append ripple results to primary results with activation as score
                 rows = list(rows) + ripple_results
                 print(f"[RAG] Ripple: +{len(ripple_results)} associated memories via spreading activation")
+            ripple_conn.commit()
             ripple_conn.close()
         except Exception as e:
             print(f"[RAG] Ripple retrieval skipped (non-fatal): {e}")
@@ -1958,6 +1959,7 @@ class SpecialistCouncil:
             try:
                 _emo_fb_conn = psycopg2.connect(**DB_CONFIG, connect_timeout=3)
                 update_emotions_from_vote(vote, _emo_fb_conn)
+                _emo_fb_conn.commit()
                 _emo_fb_conn.close()
                 print(f"[EMOTION] Post-vote emotion update applied")
             except Exception as e:
@@ -1965,6 +1967,7 @@ class SpecialistCouncil:
         # Close the shared emotion conn used during specialist queries
         if self._emotion_conn:
             try:
+                self._emotion_conn.commit()
                 self._emotion_conn.close()
             except Exception:
                 pass
