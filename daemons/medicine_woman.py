@@ -38,7 +38,7 @@ HISTORY_MAX = 96             # 24 hours at 15-min intervals
 DASHBOARD_PATH = "/ganuda/data/medicine_woman_latest.json"
 HISTORY_PATH = "/ganuda/data/medicine_woman_history.json"
 
-DB_HOST = os.environ.get("DB_HOST", "192.168.132.222")
+DB_HOST = os.environ.get("DB_HOST", "10.100.0.2")
 DB_PORT = int(os.environ.get("DB_PORT", "5432"))
 DB_NAME = os.environ.get("DB_NAME", "zammad_production")
 DB_USER = os.environ.get("DB_USER", "claude")

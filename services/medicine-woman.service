@@ -1,0 +1,24 @@
+[Unit]
+Description=Medicine Woman — The Observer Daemon
+After=network.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+WorkingDirectory=/ganuda
+ExecStart=/ganuda/venv/bin/python /ganuda/daemons/medicine_woman.py
+Environment=PYTHONPATH=/ganuda
+EnvironmentFile=/ganuda/config/secrets.env
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=medicine-woman
+
+# Graceful shutdown
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
