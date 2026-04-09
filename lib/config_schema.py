@@ -29,7 +29,7 @@ class InferenceConfig:
 
 @dataclass
 class DatabaseConfig:
-    host: str = "192.168.132.222"
+    host: str = os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')
     port: int = 5432
     database: str = "zammad_production"
     user: str = "claude"

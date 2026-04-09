@@ -9,7 +9,7 @@ import psycopg2
 from datetime import datetime
 
 
-DB_HOST = os.environ.get("CHEROKEE_DB_HOST", "192.168.132.222")
+DB_HOST = os.environ.get("CHEROKEE_DB_HOST", os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'))
 DB_NAME = os.environ.get("CHEROKEE_DB_NAME", "zammad_production")
 DB_USER = os.environ.get("CHEROKEE_DB_USER", "claude")
 DB_PASS = os.environ.get("CHEROKEE_DB_PASS", "")

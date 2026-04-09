@@ -14,7 +14,7 @@ import redis
 import os
 
 # Configuration - can be overridden by environment variables
-REDIS_HOST = os.environ.get('REDIS_HOST', '192.168.132.222')
+REDIS_HOST = os.environ.get('REDIS_HOST', os.environ.get('REDIS_HOST', '10.100.0.2'))
 REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
 REDIS_MAX_CONNECTIONS = int(os.environ.get('REDIS_MAX_CONNECTIONS', 10))
 

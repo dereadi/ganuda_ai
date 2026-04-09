@@ -185,7 +185,7 @@ class EmailTriageWire:
     def _get_connection(self):
         """Create a new DB connection from config."""
         return psycopg2.connect(
-            host=self.db_config.get("host", "192.168.132.222"),
+            host=self.db_config.get("host", "10.100.0.2"),
             port=self.db_config.get("port", 5432),
             dbname=self.db_config.get("database", "zammad_production"),
             user=self.db_config.get("user", "claude"),

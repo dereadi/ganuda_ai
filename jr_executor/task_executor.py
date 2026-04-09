@@ -432,7 +432,21 @@ class TaskExecutor:
 
         # Check allowed directories
         if not any(path.startswith(prefix) for prefix in self.ALLOWED_PATH_PREFIXES):
-            return False, f"Path not in allowed directories: {self.ALLOWED_PATH_PREFIXES}"
+            # DC-18: Try prepending /ganuda/ before rejecting
+            # Jrs hallucinate bare paths like /content/ or /papers/ instead of /ganuda/content/
+            ganuda_resolved = f"/ganuda{path}"
+            if os.path.exists(ganuda_resolved) or os.path.exists(os.path.dirname(ganuda_resolved)):
+                print(f"[DC-18] Bare path '{path}' -> '{ganuda_resolved}'")
+                path = ganuda_resolved
+            else:
+                # Try creating parent directory under /ganuda if it's a reasonable path
+                parent = os.path.dirname(ganuda_resolved)
+                if len(parent.split('/')) <= 5 and not any(c in parent for c in ['..', '~', '$']):
+                    os.makedirs(parent, exist_ok=True)
+                    print(f"[DC-18] Bare path '{path}' -> '{ganuda_resolved}' (dir created)")
+                    path = ganuda_resolved
+                else:
+                    return False, f"Path not in allowed directories: {self.ALLOWED_PATH_PREFIXES}"
 
         # Reject directory traversal
         if '..' in path:
@@ -1024,6 +1038,13 @@ class TaskExecutor:
                 retriever.close()
             except Exception as e:
                 print(f"[EXPERIENCE] Retrieval failed (non-blocking): {e}")
+
+        # SkillRL: Inject trace-distilled skill context (#1451, Trace2Skill validated)
+        _skill_context = task.get('_skill_context')
+        if _skill_context:
+            instructions = instructions + "\n\n<RELEVANT_SKILLS>\n" + _skill_context + "\n</RELEVANT_SKILLS>\n"
+            skill_ids = task.get('_skill_ids', [])
+            print(f"[SKILLRL] Injected {len(skill_ids)} trace-distilled skills into context")
 
         # Phase 8: Check if task should use Research Executor (web research)
         if RESEARCH_EXECUTOR_AVAILABLE and is_research_task(task, instructions):

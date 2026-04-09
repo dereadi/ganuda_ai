@@ -15,7 +15,7 @@ class ThermalPoller:
         self.poll_interval = poll_interval
         self.last_poll = datetime.now(timezone.utc) - timedelta(hours=24)
         self.db_config = {
-            'host': '192.168.132.222',
+            'host': os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
             'database': 'triad_federation',
             'user': 'claude',
             'password': os.environ.get('CHEROKEE_DB_PASS', '')
@@ -44,6 +44,7 @@ class ThermalPoller:
         missions = cur.fetchall()
         self.last_poll = datetime.now(timezone.utc) - timedelta(hours=24)
 
+        conn.commit()
         cur.close()
         conn.close()
 

@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 def get_mem0_config() -> dict:
     """Build Mem0 config using federation infrastructure."""
-    db_host = os.environ.get("CHEROKEE_DB_HOST", "192.168.132.222")
+    db_host = os.environ.get("CHEROKEE_DB_HOST", os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'))
     db_user = os.environ.get("CHEROKEE_DB_USER", "claude")
     db_pass = os.environ.get("CHEROKEE_DB_PASS", os.environ.get("PGPASSWORD", ""))
     db_name = os.environ.get("CHEROKEE_DB_NAME", "zammad_production")

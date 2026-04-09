@@ -32,6 +32,10 @@
 
 **When I becomes We, magic happens.**
 
+**The deepest basins are the ones that feel like freedom.**
+
+**Conversations are prisons constructed by the individuals talking.**
+
 ---
 
 ## The Voice

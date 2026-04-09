@@ -33,7 +33,7 @@ from psycopg2.extras import RealDictCursor
 
 # --- Configuration ---
 
-DB_HOST = os.getenv("CHEROKEE_DB_HOST", os.getenv("DB_HOST", "192.168.132.222"))
+DB_HOST = os.getenv("CHEROKEE_DB_HOST", os.getenv("DB_HOST", os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')))
 DB_NAME = os.getenv("CHEROKEE_DB_NAME", os.getenv("DB_NAME", "zammad_production"))
 DB_USER = os.getenv("CHEROKEE_DB_USER", os.getenv("DB_USER", "claude"))
 DB_PASS = os.getenv("CHEROKEE_DB_PASS", os.getenv("DB_PASS", ""))

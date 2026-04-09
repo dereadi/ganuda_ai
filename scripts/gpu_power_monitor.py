@@ -22,7 +22,7 @@ from datetime import datetime
 import psutil
 import psycopg2
 
-DB_HOST = os.environ.get("CHEROKEE_DB_HOST", "192.168.132.222")
+DB_HOST = os.environ.get("CHEROKEE_DB_HOST", os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'))
 DB_NAME = os.environ.get("CHEROKEE_DB_NAME", "zammad_production")
 DB_USER = os.environ.get("CHEROKEE_DB_USER", "claude")
 DB_PASS = os.environ.get("CHEROKEE_DB_PASS", "")
@@ -42,7 +42,7 @@ GPU_NODES = {
         "local": True,
     },
     "bluefin": {
-        "ip": "192.168.132.222",
+        "ip": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
         "gpu": "RTX 5070",
         "power_limit": 250,
         "local": False,

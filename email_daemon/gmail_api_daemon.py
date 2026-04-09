@@ -1,3 +1,4 @@
+```python
 #!/usr/bin/env python3
 """
 Cherokee Email Daemon - Gmail API Version
@@ -18,7 +19,7 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 
 class GmailAPIDaemon:
-    def __init__(self, config_path='/ganuda/email_daemon/config.json'):
+    def __init__(self, config_path: str = '/ganuda/email_daemon/config.json'):
         with open(config_path) as f:
             self.config = json.load(f)
         
@@ -32,7 +33,7 @@ class GmailAPIDaemon:
         self.service = None
         self.last_history_id = None
         
-    def connect_gmail(self):
+    def connect_gmail(self) -> None:
         """Connect to Gmail using OAuth token"""
         token_path = os.path.expanduser('~/.gmail_credentials/token.pickle')
         
@@ -56,13 +57,14 @@ class GmailAPIDaemon:
         self.last_history_id = profile.get('historyId')
         self.logger.info(f'Starting history ID: {self.last_history_id}')
         
-    def fetch_recent_emails(self, max_results=20):
-        """Fetch recent emails"""
+    def fetch_subscription_emails(self, max_results: int = 100, query: str = '"your payment" OR "subscription" OR "invoice" OR "receipt" OR "renewal" OR "billing" OR "you\'ve been charged" OR "auto-pay"') -> list:
+        """Fetch subscription-related emails"""
         emails = []
         
         results = self.service.users().messages().list(
             userId='me', 
             maxResults=max_results,
+            q=query,
             labelIds=['INBOX']
         ).execute()
         
@@ -116,59 +118,37 @@ class GmailAPIDaemon:
                 
         return emails
     
-    def analyze_email(self, email_data):
-        """LLM-backed email triage via federation gateway."""
+    def analyze_subscription_email(self, email_data: dict) -> dict:
+        """LLM-backed email triage for subscription emails."""
         import requests as http_req
 
         subject = email_data.get('subject', '')
         body = email_data.get('body_text', '')[:1500]
         from_addr = email_data.get('from_address', '')
 
-        # High-value sender whitelist — bypass noise filter, send to LLM for real classification
-        jewel_senders = [
-            'substack.com',              # All Substack newsletters = potential market intelligence
-            'natesnewsletter',           # Nate Jones — AI product strategy, 121K subs
-            'slowai',                    # Dr. Sam Illingworth — critical AI literacy, mindful AI
-            'thestrategiclinguist',      # Rebecca Wicker — language, power, competitive advantage
-            'robotsatemyhomework',       # Mia Kiraki — AI systems with taste
-            'wfryer',                    # Wesley Fryer — education/tech
-        ]
-        combined_lower = (subject + ' ' + body + ' ' + from_addr).lower()
-        is_whitelisted = any(sender in combined_lower for sender in jewel_senders)
-
-        # Fast keyword pre-filter for obvious spam/noise (whitelisted senders skip this)
-        noise_signals = ['unsubscribe', 'no-reply', 'noreply', 'donotreply',
-                         'marketing', 'newsletter', 'promotional']
-        if not is_whitelisted and any(sig in combined_lower for sig in noise_signals):
-            return {
-                'priority_score': 5,
-                'action_required': False,
-                'thermal_temp': 0.3,
-                'sentiment': 'neutral',
-                'classification': 'noise',
-                'ai_summary': subject[:200],
-                'action_deadline': None,
-            }
-
         # LLM classification via gateway
-        prompt = f"""Classify this email for triage. Respond in EXACTLY this format:
-CLASSIFICATION: [ACTIONABLE|JEWEL|NOISE]
-PRIORITY: [1-5] (1=respond today, 2=respond within 48h, 3=this week, 4=eventually, 5=ignore)
-ACTION_DEADLINE: [date/time if mentioned, or NONE]
-ACTION_REQUIRED: [one sentence describing what Chief needs to do, or NONE]
-SUMMARY: [one sentence summary]
+        prompt = f"""Analyze this email and extract subscription information.
+Return JSON:
+{{
+  "is_subscription": true/false,
+  "service_name": "Netflix",
+  "amount": 15.99,
+  "currency": "USD",
+  "frequency": "monthly",  // monthly, annual, quarterly, weekly
+  "charge_date": "2026-03-15",
+  "category": "entertainment",  // entertainment, productivity, cloud, fitness, news, shopping, finance, other
+  "confidence": 0.95
+}}
+If this is not a subscription charge, set is_subscription to false.
 
 Email from: {from_addr}
 Subject: {subject}
 Body: {body}
-
-ACTIONABLE means: scheduling a call, interview, meeting, deadline, someone waiting for a reply, calendar invite, payment due, contract to sign.
-JEWEL means: interesting article, industry news, networking opportunity, job posting worth considering — no immediate action needed.
-NOISE means: marketing, automated notifications, newsletters, spam, receipts."""
+"""
 
         try:
             resp = http_req.post(
-                'http://localhost:8080/v1/chat/completions',
+                'http://localhost:8000/v1/chat/completions',
                 json={
                     'model': 'qwen2.5-72b',
                     'messages': [{'role': 'user', 'content': prompt}],
@@ -181,76 +161,37 @@ NOISE means: marketing, automated notifications, newsletters, spam, receipts."""
             llm_text = resp.json()['choices'][0]['message']['content']
 
             # Parse LLM response
-            classification = 'noise'
-            priority = 5
-            action_required_text = None
-            action_deadline = None
-            summary = subject[:200]
-
-            for line in llm_text.strip().split('\n'):
-                line = line.strip()
-                if line.startswith('CLASSIFICATION:'):
-                    raw = line.split(':', 1)[1].strip().upper()
-                    if raw in ('ACTIONABLE', 'JEWEL', 'NOISE'):
-                        classification = raw.lower()
-                if line.startswith('PRIORITY:'):
-                    try:
-                        priority = int(line.split(':', 1)[1].strip()[0])
-                        priority = max(1, min(5, priority))
-                    except (ValueError, IndexError):
-                        pass
-                if line.startswith('ACTION_DEADLINE:'):
-                    val = line.split(':', 1)[1].strip()
-                    if val.upper() != 'NONE':
-                        action_deadline = val
-                if line.startswith('ACTION_REQUIRED:'):
-                    val = line.split(':', 1)[1].strip()
-                    if val.upper() != 'NONE':
-                        action_required_text = val
-                if line.startswith('SUMMARY:'):
-                    summary = line.split(':', 1)[1].strip()[:200]
+            classification = json.loads(llm_text)
+            if not isinstance(classification, dict):
+                self.logger.warning(f'LLM response not in expected format: {llm_text}')
+                classification = {
+                    'is_subscription': False,
+                    'service_name': '',
+                    'amount': 0.0,
+                    'currency': '',
+                    'frequency': '',
+                    'charge_date': '',
+                    'category': '',
+                    'confidence': 0.0
+                }
 
         except Exception as e:
-            self.logger.warning(f'LLM triage failed, falling back to keyword: {e}')
-            # Keyword fallback
-            classification = 'noise'
-            priority = 5
-            action_required_text = None
-            action_deadline = None
-            summary = subject[:200]
-            urgent_keywords = ['urgent', 'asap', 'immediately', 'deadline',
-                               'schedule', 'call', 'interview', 'meeting', 'calendar']
-            for kw in urgent_keywords:
-                if kw in combined_lower:
-                    classification = 'actionable'
-                    priority = 2
-                    action_required_text = f'Email contains keyword: {kw}'
-                    break
+            self.logger.warning(f'LLM triage failed, falling back to default: {e}')
+            classification = {
+                'is_subscription': False,
+                'service_name': '',
+                'amount': 0.0,
+                'currency': '',
+                'frequency': '',
+                'charge_date': '',
+                'category': '',
+                'confidence': 0.0
+            }
 
-        # Gmail label boost
-        labels = email_data.get('labels', [])
-        if 'IMPORTANT' in labels:
-            priority = min(priority, 3)
-        if 'STARRED' in labels:
-            priority = min(priority, 2)
-            if classification == 'noise':
-                classification = 'jewel'
-
-        thermal_temp = {1: 0.9, 2: 0.8, 3: 0.7, 4: 0.5, 5: 0.3}.get(priority, 0.5)
-
-        return {
-            'priority_score': priority,
-            'action_required': action_required_text is not None,
-            'action_required_text': action_required_text,
-            'thermal_temp': thermal_temp,
-            'sentiment': 'neutral',
-            'classification': classification,
-            'ai_summary': summary,
-            'action_deadline': action_deadline,
-        }
+        return classification
     
-    def store_email(self, email_data, analysis):
-        """Store to PostgreSQL"""
+    def store_subscription_email(self, email_data: dict, analysis: dict) -> None:
+        """Store subscription email to PostgreSQL"""
         conn = psycopg2.connect(
             host=self.config.get('db_host', 'localhost'),
             database=self.config.get('db_name', 'bmasass_spoke'),
@@ -260,13 +201,13 @@ NOISE means: marketing, automated notifications, newsletters, spam, receipts."""
         cur = conn.cursor()
         
         cur.execute("""
-            INSERT INTO emails (
+            INSERT INTO subscription_emails (
                 message_id, from_address, to_addresses, subject,
                 body_text, body_html, received_at,
-                thermal_temp, priority_score, sentiment,
-                action_required, ai_summary
+                is_subscription, service_name, amount, currency,
+                frequency, charge_date, category, confidence
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
             )
             ON CONFLICT (message_id) DO NOTHING
             RETURNING id
@@ -278,11 +219,14 @@ NOISE means: marketing, automated notifications, newsletters, spam, receipts."""
             email_data['body_text'],
             email_data.get('body_html'),
             email_data['received_at'],
-            analysis['thermal_temp'],
-            analysis['priority_score'],
-            analysis['sentiment'],
-            analysis['action_required'],
-            analysis['ai_summary']
+            analysis['is_subscription'],
+            analysis['service_name'],
+            analysis['amount'],
+            analysis['currency'],
+            analysis['frequency'],
+            analysis['charge_date'],
+            analysis['category'],
+            analysis['confidence']
         ))
         
         result = cur.fetchone()
@@ -291,76 +235,20 @@ NOISE means: marketing, automated notifications, newsletters, spam, receipts."""
         conn.close()
 
         is_new = result is not None
-        # Telegram alert for actionable emails
-        if is_new and analysis.get('classification') == 'actionable':
-            try:
-                from telegram_alerts import send_plain_alert
-                action = analysis.get('action_required_text', 'Action needed')
-                deadline = analysis.get('action_deadline', '')
-                deadline_str = f'\nDeadline: {deadline}' if deadline else ''
-                alert_msg = (
-                    f"ACTIONABLE EMAIL\n"
-                    f"From: {email_data.get('from_address', '?')}\n"
-                    f"Subject: {email_data.get('subject', '?')}\n"
-                    f"Action: {action}{deadline_str}\n"
-                    f"Priority: {analysis.get('priority_score', '?')}/5"
-                )
-                send_plain_alert(alert_msg)
-                self.logger.info(f'Telegram alert sent for: {email_data["subject"][:50]}')
-            except Exception as e:
-                self.logger.warning(f'Telegram alert failed: {e}')
+        if is_new:
+            self.logger.info(f'Stored subscription email: {email_data["subject"][:50]}')
 
-        return is_new
-    
-    def run(self, poll_interval=300):
-        """Main daemon loop"""
-        self.running = True
+    def run_subscription_scan(self, max_results: int = 100) -> None:
+        """Run a subscription scan and store results"""
         self.connect_gmail()
+        emails = self.fetch_subscription_emails(max_results)
         
-        while self.running:
-            try:
-                self.logger.info('Polling for emails...')
-                emails = self.fetch_recent_emails(max_results=20)
-                
-                new_count = 0
-                for email_data in emails:
-                    analysis = self.analyze_email(email_data)
-                    if self.store_email(email_data, analysis):
-                        new_count += 1
-                        self.logger.info(f'Stored: {email_data["subject"][:50]}')
-                
-                self.logger.info(f'Poll complete. {new_count} new emails stored.')
-                
-            except Exception as e:
-                self.logger.error(f'Daemon error: {e}')
-            
-            # Sleep with interrupt check
-            for _ in range(poll_interval):
-                if not self.running:
-                    break
-                time.sleep(1)
-    
-    def stop(self):
-        self.running = False
+        for email_data in emails:
+            analysis = self.analyze_subscription_email(email_data)
+            if analysis['is_subscription']:
+                self.store_subscription_email(email_data, analysis)
+                self.logger.info(f'Stored subscription: {email_data["subject"][:50]}')
+        
+        self.logger.info(f'Subscription scan complete. Processed {len(emails)} emails.')
 
-
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--config', default='/ganuda/email_daemon/config.json')
-    parser.add_argument('--poll-interval', type=int, default=120)
-    parser.add_argument('--once', action='store_true', help='Run once and exit')
-    args = parser.parse_args()
-    
-    daemon = GmailAPIDaemon(args.config)
-    
-    if args.once:
-        daemon.connect_gmail()
-        emails = daemon.fetch_recent_emails(20)
-        for email in emails:
-            analysis = daemon.analyze_email(email)
-            if daemon.store_email(email, analysis):
-                print(f'Stored: {email["subject"]}')
-        print(f'Done. Processed {len(emails)} emails.')
-    else:
-        daemon.run(args.poll_interval)
+if

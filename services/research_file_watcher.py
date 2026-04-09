@@ -35,7 +35,7 @@ GATEWAY_URL = os.environ.get("LLM_GATEWAY_URL", "http://localhost:8080")
 API_KEY = os.environ.get("LLM_API_KEY", "REDACTED_USE_ENV_VAR")
 
 DB_CONFIG = {
-    'host': os.environ.get('CHEROKEE_DB_HOST', '192.168.132.222'),
+    'host': os.environ.get('CHEROKEE_DB_HOST', os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')),
     'database': 'zammad_production',  # Fixed Jan 29, 2026 - was triad_federation, breaking VetAssist dashboard
     'user': 'claude',
     'password': os.environ.get('CHEROKEE_DB_PASS', '')

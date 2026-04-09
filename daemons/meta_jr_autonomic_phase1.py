@@ -82,7 +82,7 @@ class MetaJrAutonomic:
         "rapid_pattern_growth_threshold": 1.5,  # 50% growth rate = significant
 
         # Database connection
-        "db_host": "192.168.132.222",
+        "db_host": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
         "db_port": 5432,
         "db_name": "zammad_production",
         "db_user": "claude",

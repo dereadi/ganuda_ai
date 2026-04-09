@@ -31,7 +31,7 @@ except ImportError:
     _REFRACTORY_AVAILABLE = False
 
 
-DB_HOST = os.environ.get("CHEROKEE_DB_HOST", "192.168.132.222")
+DB_HOST = os.environ.get("CHEROKEE_DB_HOST", os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'))
 DB_NAME = os.environ.get("CHEROKEE_DB_NAME", "zammad_production")
 DB_USER = os.environ.get("CHEROKEE_DB_USER", "claude")
 DB_PASS = os.environ.get("CHEROKEE_DB_PASS", "")
@@ -77,7 +77,7 @@ LOCAL_SERVICES = [
 
 # Remote port checks
 REMOTE_CHECKS = {
-    "bluefin": [("192.168.132.222", 5432, "PostgreSQL"), ("192.168.132.222", 8090, "VLM")],
+    "bluefin": [("10.100.0.2", 5432, "PostgreSQL"), ("10.100.0.2", 8090, "VLM")],
     "greenfin": [("192.168.132.224", 8003, "Embedding")],
     "owlfin": [("192.168.132.170", 80, "Caddy")],
     "eaglefin": [("192.168.132.84", 80, "Caddy")],
@@ -85,6 +85,9 @@ REMOTE_CHECKS = {
     "sasass": [("192.168.132.241", 11434, "Ollama")],
     "sasass2": [("192.168.132.242", 11434, "Ollama")],
     "redfin_consultation": [("127.0.0.1", 9400, "ConsultationRing")],
+    # Camera health — Long Man Tribal Vision P-3 (MOCHA Apr 2 2026)
+    "camera_office": [("192.168.132.181", 554, "Camera_RTSP")],
+    "camera_traffic": [("192.168.132.182", 554, "Camera_RTSP")],
 }
 
 # Critical timers — check they fired within expected window
@@ -94,6 +97,10 @@ TIMER_MAX_AGE = {
 
 # Known-down state file — prevents repeated alerts for same service
 KNOWN_DOWN_FILE = "/ganuda/logs/fire_guard_known_down.json"
+
+# ── Sleep Schedule: skip checks for Mac nodes during overnight hours (CT) ──
+SLEEP_SCHEDULE_HOSTS = {"192.168.132.241", "192.168.132.242"}  # sasass, sasass2
+QUIET_HOURS = (22, 6)  # start hour, end hour (inclusive of start, exclusive of end)
 
 
 def load_brake_state():
@@ -395,10 +402,12 @@ def check_consultation_ring_health(host="127.0.0.1", port=9400, timeout=5):
 
 
 def check_port(ip, port, timeout=3, retries=3):
+    # Tailscale IPs (100.x.x.x) get longer timeout — mobile nodes have variable latency
+    effective_timeout = 5 if ip.startswith("100.") else timeout
     for attempt in range(retries):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(timeout)
+            s.settimeout(effective_timeout)
             s.connect((ip, port))
             s.close()
             return True
@@ -790,9 +799,22 @@ def generate_memory_report():
     return "\n".join(lines) + "\n"
 
 
+def is_quiet_hours():
+    """Check if current time (CT) is within quiet hours for sleep-scheduled hosts."""
+    hour = datetime.now().hour
+    start, end = QUIET_HOURS
+    if start > end:
+        # Wraps midnight: e.g. 22:00 - 06:00
+        return hour >= start or hour < end
+    else:
+        return start <= hour < end
+
+
 def run_checks():
     results = {"local": [], "remote": [], "timers": [], "timestamp": datetime.now().isoformat()}
     alerts = []
+    quiet = is_quiet_hours()
+    quiet_skipped = False
 
     # Local services
     for svc in LOCAL_SERVICES:
@@ -804,6 +826,13 @@ def run_checks():
     # Remote ports
     for node, checks in REMOTE_CHECKS.items():
         for ip, port, label in checks:
+            # Sleep schedule: skip Mac nodes during quiet hours
+            if quiet and ip in SLEEP_SCHEDULE_HOSTS:
+                if not quiet_skipped:
+                    print(f"  QUIET HOURS: skipping sleep-scheduled hosts ({', '.join(sorted(SLEEP_SCHEDULE_HOSTS))})")
+                    quiet_skipped = True
+                results["remote"].append({"node": node, "label": label, "port": port, "up": True, "status": "sleeping"})
+                continue
             if label == "PostgreSQL":
                 up = check_postgres_db(ip, port)
                 results["remote"].append({"node": node, "label": label, "port": port, "up": up})
@@ -893,6 +922,10 @@ def render_html(results):
                     extra = f' ({", ".join(stats_parts)})'
         elif check["label"] == "Ollama" and check["up"] and check.get("model_count", 0) > 0:
             extra = f' ({check["model_count"]} models)'
+        if check.get("status") == "sleeping":
+            c = "#888"
+            i = "&#9790;"  # crescent moon for sleeping
+            extra = " (quiet hours)"
         remote_html += f'<div class="svc"><span style="color:{c}">{i}</span> {check["node"]}/{check["label"]} :{check["port"]}{extra}</div>\n'
 
     timer_html = ""

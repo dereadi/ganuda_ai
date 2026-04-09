@@ -56,7 +56,7 @@ def get_db_connection():
                         db_password = line.strip().split("=", 1)[1]
                         break
     return psycopg2.connect(
-        host="192.168.132.222",
+        host=os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
         port=5432,
         dbname="zammad_production",
         user="claude",

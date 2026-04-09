@@ -23,7 +23,7 @@ except ImportError:
 
 # Database config
 DB_CONFIG = {
-    "host": "192.168.132.222",
+    "host": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
     "port": 5432,
     "user": "claude",
     "password": os.environ.get('CHEROKEE_DB_PASS', ''),
@@ -40,7 +40,7 @@ def get_current_node():
         ips = subprocess.getoutput("hostname -I")
         if "192.168.132.223" in ips:
             return "redfin"
-        elif "192.168.132.222" in ips:
+        elif os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2') in ips:
             return "bluefin"
         elif "192.168.132.224" in ips:
             return "greenfin"

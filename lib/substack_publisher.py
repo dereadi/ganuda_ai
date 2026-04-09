@@ -118,9 +118,9 @@ class SubstackPublisher:
         logger.info("Substack draft created: %s — '%s'", draft_id, clean_title)
         if _HAS_CHAIN:
             try:
-                meter_call("substack_publisher", cost_estimate=0.0)
-            except TypeError:
-                meter_call("substack_publisher")
+                meter_call(0, latency_ms=0.0, cost=0.0)
+            except Exception:
+                pass  # metering is non-critical
 
         return {
             "status": "draft_created",

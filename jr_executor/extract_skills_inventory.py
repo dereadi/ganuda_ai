@@ -81,6 +81,7 @@ def get_thermal_memories():
     """)
 
     memories = cur.fetchall()
+    conn.commit()
     cur.close()
     conn.close()
 

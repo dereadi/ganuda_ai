@@ -226,8 +226,33 @@ def post_task_reward_update(task_id: int, task_status: str, domain: str, db_conn
         from skill_selector import SkillSelector
 
         selector = SkillSelector(db_conn)
-        reward = 0.9 if task_status == "done" else 0.1
         success = task_status == "done"
+
+        # SkillRL KG Phase 0: Multi-signal reward (#1444)
+        # Replaces binary 0.9/0.1 with four-dimensional reward extraction
+        skill_ids = [row[0] for row in rows]
+        try:
+            from kg_reward_signals import KGRewardSignals
+            kg_signals = KGRewardSignals()
+            signals = kg_signals.compute_reward(task_id, task_status, db_conn, skill_ids)
+            reward = signals["composite"]
+
+            # Log full signal breakdown for audit
+            logger.info(
+                "KG reward for task %s: composite=%.3f (v=%.2f c=%.2f g=%.2f d=%.2f) %s",
+                task_id, reward,
+                signals["validity"], signals["continuity"],
+                signals["grounding"], signals["drift"],
+                "[DRIFT REVIEW]" if signals.get("drift_needs_review") else "",
+            )
+        except ImportError:
+            reward = 0.9 if success else 0.1
+            signals = None
+            logger.info("KG reward signals not available, using binary fallback: %.1f", reward)
+        except Exception as exc:
+            reward = 0.9 if success else 0.1
+            signals = None
+            logger.warning("KG reward computation failed, binary fallback: %s", exc)
 
         for row in rows:
             skill_id = row[0]

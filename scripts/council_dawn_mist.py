@@ -310,10 +310,26 @@ def run_standup():
             "deeper attention today. Keep it brief — this is a standup, not a deliberation."
         )
 
+        # Commit read queries before long-running council vote
+        conn.commit()
+
         logger.info("Dawn mist digest assembled, running council vote...")
 
         council = SpecialistCouncil(max_tokens=150)
         result = council.vote(digest)
+
+        # Reconnect if DB connection dropped during council vote (deep path can take 30s+)
+        try:
+            cur.execute("SELECT 1")
+            conn.commit()
+        except Exception:
+            logger.warning("[DAWN MIST] DB connection dropped during council vote, reconnecting")
+            try:
+                conn.close()
+            except Exception:
+                pass
+            conn = get_connection()
+            cur = get_dict_cursor(conn)
 
         paper_ids = []  # populated by forward_look if available
 
@@ -350,8 +366,14 @@ def run_standup():
         raise
     finally:
         if conn:
-            conn.commit()  # explicit commit before close
-            conn.close()
+            try:
+                conn.commit()
+            except Exception as e:
+                logger.warning(f"[DAWN MIST] conn.commit() in finally failed (non-fatal): {e}")
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 if __name__ == "__main__":

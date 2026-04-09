@@ -78,7 +78,7 @@ POLL_INTERVAL = 30  # seconds between task checks
 MAX_TASK_DURATION = 3600  # 1 hour timeout
 
 DB_CONFIG = {
-    'host': os.environ.get('CHEROKEE_DB_HOST', '192.168.132.222'),
+    'host': os.environ.get('CHEROKEE_DB_HOST', os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')),
     'database': os.environ.get('CHEROKEE_DB_NAME', 'zammad_production'),
     'user': os.environ.get('CHEROKEE_DB_USER', 'claude'),
     'password': os.environ.get('CHEROKEE_DB_PASS', '')

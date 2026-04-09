@@ -99,6 +99,10 @@ class JrOrchestrator:
         except Exception as e:
             self.logger.error(f"Health check error: {e}")
         finally:
+            try:
+                conn.commit()
+            except Exception:
+                pass
             conn.close()
 
     def _restart_worker(self, job_type: str) -> None:

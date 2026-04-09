@@ -21,7 +21,7 @@ VLLM_URL = "http://192.168.132.223:8000"
 
 # Node definitions for parallel operations
 FEDERATION_NODES = [
-    ("bluefin", "192.168.132.222"),
+    ("bluefin", os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')),
     ("redfin", "192.168.132.223"),
     ("greenfin", "192.168.132.224"),
     ("sasass", "192.168.132.241"),

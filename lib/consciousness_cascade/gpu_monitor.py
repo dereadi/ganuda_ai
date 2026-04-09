@@ -21,7 +21,7 @@ import os
 
 # Database configuration
 DB_CONFIG = {
-    'host': '192.168.132.222',
+    'host': os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
     'database': 'zammad_production',
     'user': 'claude',
     'password': os.environ.get('CHEROKEE_DB_PASS', '')

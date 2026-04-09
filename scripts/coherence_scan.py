@@ -55,7 +55,7 @@ def get_connection():
                 "Set the env var or check /ganuda/config/secrets.env."
             )
         return psycopg2.connect(
-            host='192.168.132.222',
+            host=os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
             dbname='zammad_production',
             user='claude',
             password=password,

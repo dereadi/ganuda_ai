@@ -15,7 +15,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-VLLM_URL = os.environ.get("VLLM_URL", "http://192.168.132.223:8000/v1/chat/completions")
+VLLM_URL = os.environ.get("VLLM_URL", "http://127.0.0.1:8000/v1/chat/completions")
 VLLM_MODEL = os.environ.get("VLLM_MODEL", "/ganuda/models/qwen2.5-72b-instruct-awq")
 EMBEDDING_URL = os.environ.get("EMBEDDING_URL", "http://192.168.132.224:8003/v1/embeddings")
 
@@ -39,7 +39,7 @@ def generate_hypothesis(query: str, max_tokens: int = 200) -> Optional[str]:
                 "max_tokens": max_tokens,
                 "temperature": 0.3,
             },
-            timeout=5,
+            timeout=15,
         )
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]["content"]

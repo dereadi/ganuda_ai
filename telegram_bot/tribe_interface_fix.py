@@ -11,7 +11,7 @@ class TribeInterface:
             "Content-Type": "application/json"
         }
         self.db_config = {
-            'host': '192.168.132.222',
+            'host': os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
             'database': 'zammad_production',
             'user': 'claude',
             'password': os.environ.get('CHEROKEE_DB_PASS', '')
@@ -24,6 +24,11 @@ class TribeInterface:
         try:
             conn = psycopg2.connect(**self.db_config)
             yield conn
+            conn.commit()
+        except Exception:
+            if conn:
+                conn.rollback()
+            raise
         finally:
             if conn:
                 conn.close()

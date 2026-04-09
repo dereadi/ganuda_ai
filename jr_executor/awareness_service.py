@@ -62,7 +62,7 @@ class AwarenessConfig:
         self.env_cache_ttl = 300       # 5 minutes
         self.social_cache_ttl = 300    # 5 minutes
         self.batch_size = 3            # Flush buffer after N pulses
-        self.db_host = '192.168.132.222'
+        self.db_host = os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')
         self.db_name = 'triad_federation'
         self.db_user = 'claude'
         self.db_password=os.environ.get('CHEROKEE_DB_PASS', '')

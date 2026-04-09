@@ -15,8 +15,17 @@ import signal
 import traceback
 from datetime import datetime
 
+sys.path.insert(0, '/ganuda/lib')
+
 from jr_queue_client import JrQueueClient
 from task_executor import TaskExecutor
+
+# SkillRL: Execution trace capture (#1451, Trace2Skill validated)
+try:
+    from execution_trace import ExecutionTrace
+    TRACE_CAPTURE_ENABLED = True
+except ImportError:
+    TRACE_CAPTURE_ENABLED = False
 
 # Configuration
 POLL_INTERVAL = 30  # seconds between queue checks
@@ -137,6 +146,31 @@ class JrQueueWorker:
                                 _tb.print_exc()
                             # If expansion failed, fall through to normal execution
 
+                        # SkillRL: Select relevant skills from distilled trace library (#1451)
+                        _selected_skills = []
+                        if TRACE_CAPTURE_ENABLED:
+                            try:
+                                from skill_selector import SkillSelector
+                                from ganuda_db import get_connection as _get_conn
+                                _skill_conn = _get_conn()
+                                _selector = SkillSelector(_skill_conn)
+                                _selected_skills = _selector.select_skills_semantic(
+                                    task.get('title', '') + ' ' + task.get('description', ''),
+                                    max_skills=3,
+                                )
+                                _skill_conn.close()
+                                if _selected_skills:
+                                    # Inject skill context into task for the executor
+                                    skill_context = "\n\n".join([
+                                        f"[Skill: {s['name']}] {s.get('intent', '')}\n{s.get('method', '')[:300]}"
+                                        for s in _selected_skills
+                                    ])
+                                    task['_skill_context'] = skill_context
+                                    task['_skill_ids'] = [s['skill_id'] for s in _selected_skills]
+                                    print(f"[{self.jr_name}] SkillRL: injected {len(_selected_skills)} skills (top: {_selected_skills[0]['name'][:40]}, sim={_selected_skills[0].get('semantic_similarity', 0):.3f})")
+                            except Exception as _skill_err:
+                                print(f"[{self.jr_name}] SkillRL selection failed (non-fatal): {_skill_err}")
+
                         result = self.executor.process_queue_task(task)
 
                         # P0 FIX Jan 27, 2026: Defense in depth - validate work was done
@@ -165,25 +199,79 @@ class JrQueueWorker:
                                     result['success'] = False
                                     result['error'] = 'No work performed (0 steps, 0 artifacts, 0 real files)'
 
+                        # Pre-flight completion gate (MOCHA Apr 3, 2026)
+                        # "Teach the pups so you can spend your time dreaming with me" — Partner
+                        if result.get('success'):
+                            try:
+                                from preflight_gate import run_preflight_checks
+                                gate = run_preflight_checks(task, result)
+                                if not gate['passed']:
+                                    print(f"[{self.jr_name}] PRE-FLIGHT FAILED: {gate['summary']}")
+                                    result['success'] = False
+                                    result['error'] = f"Pre-flight gate: {'; '.join(gate['failures'])}"
+                                else:
+                                    if gate['warnings']:
+                                        print(f"[{self.jr_name}] Pre-flight PASSED with warnings: {'; '.join(gate['warnings'])}")
+                                    else:
+                                        print(f"[{self.jr_name}] Pre-flight PASSED ({gate['checks_passed']}/{gate['checks_run']} checks)")
+                            except ImportError:
+                                print(f"[{self.jr_name}] Pre-flight gate not available (non-fatal)")
+                            except Exception as _gate_err:
+                                print(f"[{self.jr_name}] Pre-flight gate error (non-fatal): {_gate_err}")
+
                         if result.get('success'):
                             print(f"[{self.jr_name}] Task completed successfully")
+
+                            # SkillRL: Build execution trace from result (#1451)
+                            execution_trace = None
+                            if TRACE_CAPTURE_ENABLED:
+                                try:
+                                    steps = result.get('steps_executed', [])
+                                    trace = ExecutionTrace(
+                                        task_id=task['id'],
+                                        title=task.get('title', ''),
+                                        task_type=result.get('execution_mode', 'unknown'),
+                                    )
+                                    for s in steps:
+                                        action_type = s.get('type', 'UNKNOWN').upper()
+                                        target = s.get('args', {}).get('path', s.get('file_path'))
+                                        trace.start_step(
+                                            instruction=str(s.get('description', s.get('type', '')))[:500],
+                                            action_type=action_type,
+                                            target_file=target,
+                                        )
+                                        trace.end_step(
+                                            success=s.get('success', True),
+                                            output=str(s.get('output', ''))[:500] if s.get('output') else None,
+                                            error=s.get('error'),
+                                            artifact=target if s.get('type') == 'file' and s.get('success') else None,
+                                        )
+                                    execution_trace = trace.finalize()
+                                except Exception as trace_err:
+                                    print(f"[{self.jr_name}] Trace capture failed (non-fatal): {trace_err}")
+
                             # Mark as completed with meaningful summary
                             summary = self._generate_summary(task, result)
+                            result_data = {
+                                'summary': summary,
+                                'steps_executed': result.get('steps_executed', []),
+                                'completed_at': datetime.now().isoformat(),
+                                # Full result metadata (Jan 28, 2026)
+                                'execution_mode': result.get('execution_mode', 'unknown'),
+                                'files_created': result.get('files_created', 0),
+                                'success': result.get('success', True),
+                                'subtasks_completed': result.get('subtasks_completed', 0),
+                                'plan': result.get('plan'),
+                                'task_id': result.get('task_id'),
+                                'title': result.get('title'),
+                            }
+                            # Inject trace if captured
+                            if execution_trace:
+                                result_data['execution_trace'] = execution_trace
+
                             self.client.complete_task(
-                                task['id'],  # Use integer id, not varchar task_id
-                                result={
-                                    'summary': summary,
-                                    'steps_executed': result.get('steps_executed', []),
-                                    'completed_at': datetime.now().isoformat(),
-                                    # Full result metadata (Jan 28, 2026)
-                                    'execution_mode': result.get('execution_mode', 'unknown'),
-                                    'files_created': result.get('files_created', 0),
-                                    'success': result.get('success', True),
-                                    'subtasks_completed': result.get('subtasks_completed', 0),
-                                    'plan': result.get('plan'),
-                                    'task_id': result.get('task_id'),
-                                    'title': result.get('title')
-                                },
+                                task['id'],
+                                result=result_data,
                                 artifacts=result.get('artifacts', [])
                             )
                         else:

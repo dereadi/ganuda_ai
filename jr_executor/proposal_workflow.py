@@ -26,7 +26,7 @@ import psycopg2.extras
 
 def get_connection():
     return psycopg2.connect(
-        host=os.environ.get('CHEROKEE_SPOKE_HOST', '192.168.132.222'),
+        host=os.environ.get('CHEROKEE_SPOKE_HOST', os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')),
         database='triad_federation',
         user=os.environ.get('CHEROKEE_SPOKE_USER', 'claude'),
         password=os.environ.get('CHEROKEE_SPOKE_PASSWORD', '')

@@ -20,11 +20,9 @@ import time
 from datetime import datetime
 
 sys.path.insert(0, '/ganuda/lib')
+sys.path.insert(0, '/ganuda/config')
 
-DB_HOST = os.environ.get("CHEROKEE_DB_HOST", "192.168.132.222")
-DB_NAME = os.environ.get("CHEROKEE_DB_NAME", "zammad_production")
-DB_USER = os.environ.get("CHEROKEE_DB_USER", "claude")
-DB_PASS = os.environ.get("CHEROKEE_DB_PASS", "")
+from ganuda_db import get_connection
 
 # Forgetting criteria
 TEMP_THRESHOLD = 10          # below this = cold
@@ -34,20 +32,6 @@ REINDEX_THRESHOLD = 1000     # reindex HNSW if more than this many rows removed
 
 # Emergency brake check — respect the kill switch
 BRAKE_STATE_FILE = "/ganuda/state/emergency_brake.json"
-
-
-def load_secrets():
-    global DB_PASS
-    if not DB_PASS:
-        try:
-            with open("/ganuda/config/secrets.env") as f:
-                for line in f:
-                    m = re.match(r"^(\w+)=(.+)$", line.strip())
-                    if m:
-                        os.environ[m.group(1)] = m.group(2)
-            DB_PASS = os.environ.get("CHEROKEE_DB_PASS", "")
-        except FileNotFoundError:
-            pass
 
 
 def check_brake():
@@ -178,13 +162,11 @@ def run_forgetting(dry_run=False):
     """Execute the forgetting protocol."""
     import psycopg2
 
-    load_secrets()
     if check_brake():
         return
 
     start = time.time()
-    conn = psycopg2.connect(host=DB_HOST, port=5432, dbname=DB_NAME,
-                            user=DB_USER, password=DB_PASS, connect_timeout=10)
+    conn = get_connection()
     conn.autocommit = False
     cur = conn.cursor()
 

@@ -15,7 +15,7 @@ StandardOutput=append:/ganuda/logs/moltbook_proxy.log
 StandardError=append:/ganuda/logs/moltbook_proxy.log
 Environment=PYTHONPATH=/ganuda/lib:/ganuda/services/moltbook_proxy
 Environment=MOLTBOOK_API_URL=https://www.moltbook.com
-Environment=CHEROKEE_DB_HOST=192.168.132.222
+Environment=CHEROKEE_DB_HOST=10.100.0.2
 Environment=CHEROKEE_DB_NAME=zammad_production
 Environment=CHEROKEE_DB_USER=claude
 EnvironmentFile=/ganuda/config/secrets.env

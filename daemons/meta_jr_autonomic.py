@@ -70,7 +70,7 @@ class MetaJrAutonomic:
         "fragment_threshold_days": 14,     # Older memories to consolidate
 
         # Database connection
-        "db_host": "192.168.132.222",
+        "db_host": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
         "db_port": 5432,
         "db_name": "zammad_production",
         "db_user": "claude",

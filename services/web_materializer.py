@@ -20,7 +20,7 @@ import psycopg2
 import psycopg2.extras
 
 DB_CONFIG = {
-    "host": "192.168.132.222",
+    "host": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
     "port": 5432,
     "dbname": "zammad_production",
     "user": "claude",

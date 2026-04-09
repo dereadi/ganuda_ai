@@ -45,7 +45,7 @@ GROUP_CHAT_ID = os.environ.get('TELEGRAM_GROUP_CHAT_ID')
 
 # Database config
 DB_CONFIG = {
-    'host': os.environ.get('CHEROKEE_DB_HOST', '192.168.132.222'),
+    'host': os.environ.get('CHEROKEE_DB_HOST', os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')),
     'database': os.environ.get('CHEROKEE_DB_NAME', 'zammad_production'),
     'user': os.environ.get('CHEROKEE_DB_USER', 'claude'),
     'password': os.environ.get('CHEROKEE_DB_PASS', '')
@@ -72,6 +72,11 @@ class TribeInterface:
         try:
             conn = psycopg2.connect(**self.db_config)
             yield conn
+            conn.commit()
+        except Exception:
+            if conn:
+                conn.rollback()
+            raise
         finally:
             if conn:
                 conn.close()

@@ -17,9 +17,9 @@ from datetime import datetime
 from typing import Dict, Optional
 
 # Configuration
-PROMETHEUS_URL = "http://192.168.132.222:9090"
+PROMETHEUS_URL = "http://10.100.0.2:9090"
 DB_CONFIG = {
-    'host': '192.168.132.222',
+    'host': os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
     'database': 'zammad_production',
     'user': 'claude',
     'password': os.environ.get('CHEROKEE_DB_PASS', '')

@@ -23,7 +23,7 @@ EMBEDDING_URL = os.environ.get("EMBEDDING_URL", "http://192.168.132.224:8003/v1/
 EMBEDDING_MODEL = "bge-large-en-v1.5"
 
 # Database
-DB_HOST = os.environ.get("DB_HOST", "192.168.132.222")
+DB_HOST = os.environ.get("DB_HOST", os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'))
 DB_NAME = os.environ.get("DB_NAME", "zammad_production")
 DB_USER = os.environ.get("DB_USER", "claude")
 DB_PASS = os.environ["CHEROKEE_DB_PASS"]

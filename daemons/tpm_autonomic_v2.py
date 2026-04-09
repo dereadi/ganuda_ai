@@ -34,7 +34,7 @@ MAX_BUDGET_PER_TASK = float(os.environ.get("TPM_MAX_BUDGET", "2.00"))
 BASIN_CHECK_INTERVAL = int(os.environ.get("TPM_BASIN_INTERVAL", "300"))
 
 DB_PARAMS = {
-    "host": os.environ.get("DB_HOST", "192.168.132.222"),
+    "host": os.environ.get("DB_HOST", os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')),
     "dbname": os.environ.get("DB_NAME", "zammad_production"),
     "user": os.environ.get("DB_USER", "claude"),
     "password": os.environ.get("DB_PASS", ""),

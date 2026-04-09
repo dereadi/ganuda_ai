@@ -73,7 +73,7 @@ BACKENDS = {
         "timeout": 120,
     },
     "vlm": {
-        "url": "http://192.168.132.222:8092/v1/chat/completions",
+        "url": "http://10.100.0.2:8092/v1/chat/completions",
         "model": "Qwen2-VL-7B-Instruct-AWQ",
         "timeout": 30,
     },

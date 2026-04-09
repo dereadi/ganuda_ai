@@ -20,7 +20,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 EMBEDDING_URL = os.environ.get("EMBEDDING_URL", "http://192.168.132.224:8003/v1/embeddings")
-DB_HOST = os.environ.get("CHEROKEE_DB_HOST", "192.168.132.222")
+DB_HOST = os.environ.get("CHEROKEE_DB_HOST", os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'))
 DB_USER = os.environ.get("CHEROKEE_DB_USER", "claude")
 DB_PASS = os.environ.get("CHEROKEE_DB_PASS", os.environ.get("PGPASSWORD", ""))
 DB_NAME = os.environ.get("CHEROKEE_DB_NAME", "zammad_production")

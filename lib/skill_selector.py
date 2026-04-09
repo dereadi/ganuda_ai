@@ -23,6 +23,7 @@ import math
 from datetime import datetime
 
 import psycopg2.extras
+import requests
 
 from skill_proficiency import SkillProficiency
 
@@ -110,7 +111,7 @@ class SkillSelector:
                 # Unseen skill gets maximum exploration bonus
                 ucb_score = 1.0 + EXPLORATION_WEIGHT * math.sqrt(math.log(max(total_n, 1)))
             else:
-                mean_reward = skill["total_reward"] / n
+                mean_reward = float(skill["total_reward"]) / float(n)
                 ucb_score = mean_reward + EXPLORATION_WEIGHT * math.sqrt(
                     math.log(total_n) / n
                 )
@@ -132,6 +133,104 @@ class SkillSelector:
         # Sort by final_score descending, return top-k
         scored.sort(key=lambda s: s["final_score"], reverse=True)
         return scored[:max_skills]
+
+    def select_skills_semantic(self, task_description: str, max_skills: int = 5) -> list:
+        """
+        Select skills by embedding similarity to the task description.
+        Combines semantic relevance with UCB1 scoring.
+
+        This is the Trace2Skill-validated approach: match new tasks to
+        skills distilled from similar past execution traces using continuous
+        embeddings, not text matching.
+
+        Args:
+            task_description: The task to find skills for.
+            max_skills: Maximum number of skills to return.
+
+        Returns:
+            list[dict]: Selected skills sorted by combined score.
+        """
+        # Get task embedding
+        try:
+            resp = requests.post(
+                "http://192.168.132.224:8003/v1/embeddings",
+                json={"texts": [task_description[:2000]]},
+                timeout=10,
+            )
+            resp.raise_for_status()
+            task_embedding = resp.json()["embeddings"][0]
+        except Exception as e:
+            logger.warning(f"Semantic skill selection failed (embedding): {e}. Falling back to domain selection.")
+            return self.select_skills("general", task_description, max_skills)
+
+        # Find skills with closest method_embedding via pgvector
+        cur = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SET ivfflat.probes = 10")
+        cur.execute(
+            """
+            SELECT skill_id, name, intent, method, difficulty, tool_hints,
+                   domain, content_hash, total_uses, successful_uses,
+                   total_reward, avg_latency_ms, status, transferability, source_type,
+                   1 - (method_embedding <=> %s::vector) as semantic_similarity
+            FROM skill_library
+            WHERE status = 'active' AND method_embedding IS NOT NULL
+            ORDER BY method_embedding <=> %s::vector
+            LIMIT %s
+            """,
+            (str(task_embedding), str(task_embedding), max_skills * 3),  # Fetch 3x for UCB1 filtering
+        )
+        rows = cur.fetchall()
+        cur.close()
+
+        if not rows:
+            return self.select_skills("general", task_description, max_skills)
+
+        # Score with UCB1 + semantic similarity + transferability
+        total_n = sum(r["total_uses"] for r in rows)
+        if total_n == 0:
+            total_n = 1
+
+        scored = []
+        for row in rows:
+            skill = dict(row)
+            n = skill["total_uses"]
+            semantic_sim = float(skill.get("semantic_similarity", 0))
+            transferability = float(skill.get("transferability", 0))
+
+            if n == 0:
+                ucb_score = 1.0 + EXPLORATION_WEIGHT * math.sqrt(math.log(max(total_n, 1)))
+            else:
+                mean_reward = float(skill["total_reward"]) / float(n)
+                ucb_score = mean_reward + EXPLORATION_WEIGHT * math.sqrt(
+                    math.log(total_n) / n
+                )
+
+            # Combined score: semantic relevance × UCB1 × transferability boost
+            # Semantic similarity is the primary signal (Trace2Skill validated)
+            # UCB1 handles exploration/exploitation
+            # Transferability boosts generalizable skills
+            transfer_boost = 1.0 + (transferability * 0.5)
+            final_score = semantic_sim * ucb_score * transfer_boost
+
+            skill["ucb_score"] = ucb_score
+            skill["semantic_similarity"] = semantic_sim
+            skill["transfer_boost"] = transfer_boost
+            skill["final_score"] = final_score
+            skill["selection_method"] = "semantic"
+
+            scored.append(skill)
+
+        scored.sort(key=lambda s: s["final_score"], reverse=True)
+        selected = scored[:max_skills]
+
+        if selected:
+            logger.info(
+                f"Semantic skill selection: {len(selected)} skills, "
+                f"top={selected[0]['name']} (sim={selected[0]['semantic_similarity']:.3f}, "
+                f"score={selected[0]['final_score']:.3f})"
+            )
+
+        return selected
 
     def update_reward(
         self,
@@ -250,7 +349,7 @@ class SkillSelector:
             if n == 0:
                 ucb_score = 1.0 + EXPLORATION_WEIGHT * math.sqrt(math.log(max(total_n, 1)))
             else:
-                mean_reward = skill["total_reward"] / n
+                mean_reward = float(skill["total_reward"]) / float(n)
                 ucb_score = mean_reward + EXPLORATION_WEIGHT * math.sqrt(
                     math.log(total_n) / n
                 )

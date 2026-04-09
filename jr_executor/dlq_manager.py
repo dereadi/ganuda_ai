@@ -109,6 +109,10 @@ def get_tasks_ready_for_retry() -> list:
         )
         return cur.fetchall()
     finally:
+        try:
+            conn.commit()
+        except Exception:
+            pass
         conn.close()
 
 
@@ -153,4 +157,8 @@ def get_dlq_summary() -> dict:
             'resolved': row[4]
         }
     finally:
+        try:
+            conn.commit()
+        except Exception:
+            pass
         conn.close()

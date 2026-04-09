@@ -29,7 +29,7 @@ logging.basicConfig(
 logger = logging.getLogger('governance_agent')
 
 DB_HOST_PRIMARY = os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')    # WireGuard (reliable)
-DB_HOST_FALLBACK = '192.168.132.222'                                   # LAN (flaky)
+DB_HOST_FALLBACK = os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')                                   # LAN (flaky)
 
 DB_CONFIG = {
     'host': DB_HOST_PRIMARY,

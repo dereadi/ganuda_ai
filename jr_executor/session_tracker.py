@@ -111,6 +111,7 @@ class SessionTracker:
         cur = conn.cursor()
         cur.execute("SELECT * FROM jr_execution_sessions WHERE session_id = %s", (session_id,))
         row = cur.fetchone()
+        conn.commit()
         cur.close()
         conn.close()
         if row:

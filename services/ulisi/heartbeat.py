@@ -25,7 +25,7 @@ logging.basicConfig(
 logger = logging.getLogger('elisi_heartbeat')
 
 DB_CONFIG = {
-    "host": "192.168.132.222",
+    "host": "10.100.0.2",
     "port": 5432,
     "dbname": "zammad_production",
     "user": "claude",

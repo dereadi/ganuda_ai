@@ -87,7 +87,7 @@ _bmasass_8801_url = _resolve_bmasass_url(8801)
 BMASASS_BACKEND = {
     "url": _bmasass_8800_url,
     "model": "Qwen/Qwen3-30B-A3B-MLX-4bit",
-    "timeout": 120,
+    "timeout": 180,
     "description": "Deep path — Qwen3-30B-A3B dual-mode on bmasass M4 Max",
     "extra_body": {"chat_template_kwargs": {"enable_thinking": False}},  # Suppress <think> chain
 }
@@ -95,7 +95,7 @@ BMASASS_BACKEND = {
 LLAMA_BACKEND = {
     "url": _bmasass_8801_url,
     "model": "mlx-community/Llama-3.3-70B-Instruct-4bit",
-    "timeout": 120,
+    "timeout": 240,
     "description": "Llama path — Llama-3.3-70B direct on bmasass M4 Max"
 }
 
@@ -2648,6 +2648,20 @@ class SpecialistCouncil:
 
             conn.commit()
             conn.close()
+
+            # ── Concern Eval Extraction (Ultrathink Gap 7) ──
+            # Council concerns become persistent, machine-readable evals
+            if vote.concerns:
+                try:
+                    from concern_eval_engine import extract_evals_from_vote, store_evals
+                    evals = extract_evals_from_vote(vote.audit_hash)
+                    if evals:
+                        inserted = store_evals(evals)
+                        if inserted > 0:
+                            print(f"[CONCERN_EVAL] Vote {vote.audit_hash}: {inserted} new eval(s) persisted")
+                except Exception as eval_err:
+                    print(f"[CONCERN_EVAL] Extraction failed (non-fatal): {eval_err}")
+
         except Exception as e:
             print(f"DB logging error: {e}")
 

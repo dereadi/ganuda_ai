@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from typing import List, Tuple
 
 DB_PASS = os.environ.get('CHEROKEE_DB_PASS', '')
-DB_HOST = '192.168.132.222'
+DB_HOST = os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')
 DB_NAME = 'zammad_production'
 DB_USER = 'claude'
 STALE_DAYS = 14

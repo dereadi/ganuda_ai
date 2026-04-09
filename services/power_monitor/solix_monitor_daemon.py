@@ -44,7 +44,7 @@ ANKER_USER = os.getenv("ANKERUSER")
 ANKER_PASS = os.getenv("ANKERPASSWORD")
 ANKER_COUNTRY = os.getenv("ANKERCOUNTRY", "US")
 
-DB_HOST = os.getenv("CHEROKEE_DB_HOST", "192.168.132.222")
+DB_HOST = os.getenv("CHEROKEE_DB_HOST", os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'))
 DB_USER = os.getenv("CHEROKEE_DB_USER", "claude")
 DB_PASS = os.getenv("CHEROKEE_DB_PASS", os.getenv("PGPASSWORD", ""))
 DB_NAME = os.getenv("CHEROKEE_DB_NAME", "zammad_production")

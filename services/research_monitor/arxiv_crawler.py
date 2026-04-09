@@ -21,7 +21,7 @@ GATEWAY_URL = "http://localhost:8080"
 API_KEY = "REDACTED_USE_ENV_VAR"
 
 DB_CONFIG = {
-    "host": "192.168.132.222",
+    "host": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
     "port": 5432,
     "user": "claude",
     "password": os.environ.get('CHEROKEE_DB_PASS', ''),

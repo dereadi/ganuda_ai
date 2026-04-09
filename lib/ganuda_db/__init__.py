@@ -20,7 +20,7 @@ __version__ = "1.3.0"
 logger = logging.getLogger(__name__)
 
 DB_CONFIG = {
-    "host": "192.168.132.222",
+    "host": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
     "dbname": "zammad_production",
     "user": "claude",
 }
@@ -115,6 +115,34 @@ def get_connection(retries: int = 3):
                 logger.warning("ganuda_db: connection attempt %d failed (%s), retrying in %.1fs", attempt + 1, e, wait)
                 time.sleep(wait)
     raise last_err
+
+
+def managed_connection(retries: int = 3):
+    """
+    Context manager that guarantees commit on success, rollback on exception.
+
+    Usage:
+        from ganuda_db import managed_connection
+        with managed_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT ...")
+            # Auto-commits on clean exit, auto-rollbacks on exception
+    """
+    from contextlib import contextmanager
+
+    @contextmanager
+    def _ctx():
+        conn = get_connection(retries=retries)
+        try:
+            yield conn
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    return _ctx()
 
 
 def get_dict_cursor(conn):

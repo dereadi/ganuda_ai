@@ -23,7 +23,7 @@ from datetime import datetime, timezone
 
 import psycopg2
 
-DB_HOST = "192.168.132.222"
+DB_HOST = os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')
 DB_NAME = "zammad_production"
 DB_USER = "claude"
 MOLTBOOK_SERVICE = "moltbook-proxy.service"

@@ -16,7 +16,7 @@ import os
 logger = logging.getLogger(__name__)
 
 DB_CONFIG = {
-    'host': '192.168.132.222',
+    'host': os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
     'database': 'triad_federation',
     'user': 'claude',
     'password': os.environ.get('CHEROKEE_DB_PASS', '')
@@ -192,6 +192,7 @@ def get_authorized_chat_ids() -> List[int]:
               AND is_active = true
         ''')
         rows = cur.fetchall()
+        conn.commit()
         cur.close()
         conn.close()
         return [row[0] for row in rows]

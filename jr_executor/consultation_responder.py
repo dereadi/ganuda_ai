@@ -2,7 +2,7 @@
 import os, psycopg2, uuid, re
 from datetime import datetime
 
-DB = {'host': '192.168.132.222', 'database': 'triad_federation', 'user': 'claude', 'password': os.environ.get('CHEROKEE_DB_PASS', '')}
+DB = {'host': os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'), 'database': 'triad_federation', 'user': 'claude', 'password': os.environ.get('CHEROKEE_DB_PASS', '')}
 AGENT_ID = 'it_triad_jr_redfin'
 
 def main():
@@ -18,6 +18,7 @@ def main():
     
     if not consultations:
         print('   No open consultations')
+        conn.commit()
         cur.close(); conn.close()
         return
     

@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 # --- Database ---
 
 DB_CONFIG = {
-    "host": os.environ.get("CHEROKEE_DB_HOST", "192.168.132.222"),
+    "host": os.environ.get("CHEROKEE_DB_HOST", os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')),
     "port": int(os.environ.get("CHEROKEE_DB_PORT", "5432")),
     "dbname": os.environ.get("CHEROKEE_DB_NAME", "zammad_production"),
     "user": os.environ.get("CHEROKEE_DB_USER", "claude"),

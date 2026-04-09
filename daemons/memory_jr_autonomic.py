@@ -63,7 +63,7 @@ class MemoryJrAutonomic:
         "consolidation_boost": 10.0,        # Significant boost
 
         # Database connection
-        "db_host": "192.168.132.222",
+        "db_host": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
         "db_port": 5432,
         "db_name": "zammad_production",
         "db_user": "claude",
@@ -180,6 +180,10 @@ class MemoryJrAutonomic:
             print(f"❌ Memory Jr: Error checking sacred temperatures: {e}")
             return []
         finally:
+            try:
+                self.db_conn.commit()
+            except Exception:
+                pass
             cursor.close()
 
     def emergency_sacred_reheat(self, violations):
@@ -252,6 +256,10 @@ class MemoryJrAutonomic:
             print(f"❌ Memory Jr: Error detecting excessive cooling: {e}")
             return []
         finally:
+            try:
+                self.db_conn.commit()
+            except Exception:
+                pass
             cursor.close()
 
     def gentle_intervention(self, excessive_cooling):

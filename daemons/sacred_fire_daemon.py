@@ -44,7 +44,7 @@ class SacredFireDaemon:
         "max_emergency_per_hour": 12,       # Alert if >12 emergencies/hour
 
         # Database connection (bluefin - Peace Chief)
-        "db_host": "192.168.132.222",
+        "db_host": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
         "db_port": 5432,
         "db_name": "zammad_production",
         "db_user": "claude",

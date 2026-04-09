@@ -32,7 +32,7 @@ PRIMARY_MODEL = "Qwen/Qwen2.5-72B-Instruct-AWQ"
 SHADOW_MLX = "http://192.168.132.21:8800/v1/chat/completions"
 SHADOW_MODEL = "mlx-community/DeepSeek-R1-Distill-Llama-70B-4bit"
 DB_CONFIG = {
-    "host": "192.168.132.222",
+    "host": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
     "dbname": "zammad_production",
     "user": "claude",
     "password": os.environ.get("CHEROKEE_DB_PASS", "")

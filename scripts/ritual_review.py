@@ -60,7 +60,7 @@ def get_db_connection():
     """Connect to zammad_production on bluefin"""
     secrets = load_secrets()
     return psycopg2.connect(
-        host=secrets.get("CHEROKEE_DB_HOST", "192.168.132.222"),
+        host=secrets.get("CHEROKEE_DB_HOST", os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')),
         dbname=secrets.get("CHEROKEE_DB_NAME", "zammad_production"),
         user=secrets.get("CHEROKEE_DB_USER", "claude"),
         password=secrets.get("CHEROKEE_DB_PASS", ""),

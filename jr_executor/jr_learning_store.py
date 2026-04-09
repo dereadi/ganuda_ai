@@ -101,6 +101,10 @@ class JrLearningStore:
                     for row in rows
                 ]
         finally:
+            try:
+                conn.commit()
+            except Exception:
+                pass
             conn.close()
 
     def apply_learnings_to_prompt(self, task: Dict, base_prompt: str) -> str:

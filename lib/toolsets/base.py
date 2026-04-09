@@ -20,7 +20,7 @@ MAX_CONSECUTIVE_TOOL_CALLS = 5
 def _get_db_config() -> dict:
     """Load DB config from secrets.env."""
     config = {
-        "host": "192.168.132.222",
+        "host": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
         "port": 5432,
         "dbname": "zammad_production",
         "user": "claude",

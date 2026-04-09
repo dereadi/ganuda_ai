@@ -28,7 +28,7 @@ import psycopg2.extras
 SPECIALISTS = ["Deer", "Turtle", "Coyote", "Raven", "Bear", "Owl", "Spider"]
 
 DB_CONFIG = {
-    "host": "192.168.132.222",
+    "host": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
     "dbname": "zammad_production",
     "user": "claude",
     "password": os.environ.get("CHEROKEE_DB_PASS", ""),

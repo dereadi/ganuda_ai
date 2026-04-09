@@ -38,7 +38,7 @@ except ImportError:
 
 # Configuration
 DB_CONFIG = {
-    'host': os.environ.get('CHEROKEE_DB_HOST', '192.168.132.222'),
+    'host': os.environ.get('CHEROKEE_DB_HOST', os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2')),
     'database': os.environ.get('CHEROKEE_DB_NAME', 'zammad_production'),
     'user': os.environ.get('CHEROKEE_DB_USER', 'claude'),
     'password': os.environ.get('CHEROKEE_DB_PASS', '')
@@ -55,24 +55,112 @@ def get_cam_password(cam_key=None):
         return os.environ.get(env_map[cam_key], '')
     return os.environ.get('CHEROKEE_DB_PASS', '')
 
-CAMERAS = {
-    'office_pii': {
-        'name': 'Office PII Monitor',
-        'ip': '192.168.132.181',
-        'rtsp': f'rtsp://admin:{get_cam_password("office_pii")}@192.168.132.181:554/cam/realmonitor?channel=1&subtype=0',  # Main stream for face recognition
-        'purpose': 'security',
-        'alert_classes': ['person'],  # Alert on people entering PII area
-        'specialist': 'crawdad'
-    },
-    'traffic': {
-        'name': 'Traffic Monitor',
-        'ip': '192.168.132.182',
-        'rtsp': f'rtsp://admin:{get_cam_password("traffic")}@192.168.132.182:554/cam/realmonitor?channel=1&subtype=1',  # Sub-stream OK for vehicles
-        'purpose': 'vehicle_identification',
-        'track_classes': ['car', 'truck', 'bus', 'motorcycle'],
-        'specialist': 'eagle_eye'
+def load_cameras_from_registry(registry_path='/ganuda/config/camera_registry.yaml'):
+    """Load camera config from YAML registry instead of hardcoded dict.
+    Falls back to hardcoded if registry unavailable.
+    MOCHA refactor Apr 2 2026 — Long Man Tribal Vision P-3."""
+    try:
+        import yaml
+        with open(registry_path, 'r') as f:
+            registry = yaml.safe_load(f)
+        cameras = {}
+        for cam_key, cam_cfg in registry.get('cameras', {}).items():
+            password = get_cam_password(cam_key)
+            rtsp_main = cam_cfg.get('rtsp_main', '').replace('{password}', password)
+            rtsp_sub = cam_cfg.get('rtsp_sub', '').replace('{password}', password)
+            cameras[cam_key] = {
+                'name': cam_cfg.get('location', cam_key),
+                'ip': cam_cfg.get('ip', ''),
+                'rtsp': rtsp_main or rtsp_sub,
+                'purpose': cam_cfg.get('purpose', 'general'),
+                'specialist': cam_cfg.get('specialist', ''),
+                'alert_classes': ['person'] if cam_cfg.get('purpose') == 'security' else [],
+                'track_classes': ['car', 'truck', 'bus', 'motorcycle'] if cam_cfg.get('purpose') != 'security' else [],
+                'has_microphone': cam_cfg.get('has_microphone', False),
+            }
+        if cameras:
+            logger.info(f"Loaded {len(cameras)} cameras from registry: {registry_path}")
+            return cameras
+    except Exception as e:
+        logger.warning(f"Failed to load camera registry ({e}), using hardcoded fallback")
+
+    # Hardcoded fallback — original config
+    return {
+        'office_pii': {
+            'name': 'Office PII Monitor',
+            'ip': '192.168.132.181',
+            'rtsp': f'rtsp://admin:{get_cam_password("office_pii")}@192.168.132.181:554/cam/realmonitor?channel=1&subtype=0',
+            'purpose': 'security',
+            'alert_classes': ['person'],
+            'specialist': 'crawdad'
+        },
+        'traffic': {
+            'name': 'Traffic Monitor',
+            'ip': '192.168.132.182',
+            'rtsp': f'rtsp://admin:{get_cam_password("traffic")}@192.168.132.182:554/cam/realmonitor?channel=1&subtype=1',
+            'purpose': 'vehicle_identification',
+            'track_classes': ['car', 'truck', 'bus', 'motorcycle'],
+            'specialist': 'eagle_eye'
+        }
     }
-}
+
+CAMERAS = load_cameras_from_registry()
+
+# Face recognition consent gate — Crawdad/Otter requirement (Council vote #b1efc617188dd932)
+# Disabled by default. Enable ONLY with explicit consent documentation.
+FACE_RECOGNITION_CONSENT = os.environ.get('TRIBAL_VISION_FACE_CONSENT', 'false').lower() == 'true'
+
+# Encrypted local storage for detection frames
+ENCRYPT_STORED_FRAMES = os.environ.get('TRIBAL_VISION_ENCRYPT_FRAMES', 'true').lower() == 'true'
+_FERNET_KEY = None
+
+def get_fernet():
+    """Get or create Fernet encryption key for stored frames.
+    MOCHA Long Man P-3 — encrypted local storage."""
+    global _FERNET_KEY
+    if _FERNET_KEY:
+        return _FERNET_KEY
+    try:
+        from cryptography.fernet import Fernet
+        key_path = '/ganuda/config/.vision_frame_key'
+        if os.path.exists(key_path):
+            with open(key_path, 'rb') as f:
+                key = f.read().strip()
+        else:
+            key = Fernet.generate_key()
+            os.makedirs(os.path.dirname(key_path), exist_ok=True)
+            with open(key_path, 'wb') as f:
+                f.write(key)
+            os.chmod(key_path, 0o600)
+            logger.info(f"Generated new frame encryption key at {key_path}")
+        _FERNET_KEY = Fernet(key)
+        return _FERNET_KEY
+    except ImportError:
+        logger.warning("cryptography not installed — frames stored unencrypted")
+        return None
+    except Exception as e:
+        logger.warning(f"Encryption init failed ({e}) — frames stored unencrypted")
+        return None
+
+
+def send_alert_webhook(alert: Dict, webhook_url: str = None):
+    """Send detection alert via webhook (Slack, Telegram, or generic).
+    MOCHA refactor Apr 2 2026 — Long Man Tribal Vision P-3."""
+    if not webhook_url:
+        webhook_url = os.environ.get('TRIBAL_VISION_WEBHOOK_URL', '')
+    if not webhook_url:
+        return  # No webhook configured, skip silently
+
+    try:
+        import requests
+        payload = {
+            'text': f"[TRIBAL VISION] {alert.get('type', 'ALERT')}: {alert.get('message', '')}",
+            'alert': alert,
+        }
+        requests.post(webhook_url, json=payload, timeout=5)
+        logger.info(f"Alert webhook sent: {alert.get('type')}")
+    except Exception as e:
+        logger.warning(f"Alert webhook failed: {e}")
 
 # YOLOv8 class names for vehicles and people
 VEHICLE_CLASSES = {2: 'car', 3: 'motorcycle', 5: 'bus', 7: 'truck'}
@@ -102,12 +190,15 @@ class TribalVision:
         self.output_dir = Path('/ganuda/data/vision')
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Face recognition
+        # Face recognition — gated by consent flag (Crawdad/Otter, Council #b1efc617)
         self.known_faces = {}
         self.mtcnn = None
         self.facenet = None
-        if FACE_RECOGNITION_AVAILABLE:
+        if FACE_RECOGNITION_AVAILABLE and FACE_RECOGNITION_CONSENT:
             self._init_face_recognition()
+        elif FACE_RECOGNITION_AVAILABLE and not FACE_RECOGNITION_CONSENT:
+            logger.info("Face recognition DISABLED — TRIBAL_VISION_FACE_CONSENT not set. "
+                       "Enable only with explicit consent documentation per council vote.")
 
     def _init_face_recognition(self):
         """Initialize face recognition models and load known faces."""
@@ -275,6 +366,7 @@ class TribalVision:
                         'timestamp': detections['timestamp']
                     }
                     detections['alerts'].append(alert)
+                    send_alert_webhook(alert)
                     logger.warning(f"[CRAWDAD ALERT] UNKNOWN person in PII area (conf: {conf:.2f})")
                 else:
                     logger.info(f"[CRAWDAD] {identity} detected in office (conf: {conf:.2f})")
@@ -325,8 +417,22 @@ class TribalVision:
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
             frame_path = self.output_dir / f"{camera_id}_{timestamp}.jpg"
-            cv2.imwrite(str(frame_path), frame)
-            logger.info(f"Saved annotated frame: {frame_path}")
+            if ENCRYPT_STORED_FRAMES:
+                fernet = get_fernet()
+                if fernet:
+                    # Encode frame to JPEG bytes, encrypt, save as .enc
+                    _, buf = cv2.imencode('.jpg', frame)
+                    encrypted = fernet.encrypt(buf.tobytes())
+                    enc_path = self.output_dir / f"{camera_id}_{timestamp}.jpg.enc"
+                    with open(enc_path, 'wb') as f:
+                        f.write(encrypted)
+                    logger.info(f"Saved encrypted frame: {enc_path}")
+                else:
+                    cv2.imwrite(str(frame_path), frame)
+                    logger.info(f"Saved frame (unencrypted fallback): {frame_path}")
+            else:
+                cv2.imwrite(str(frame_path), frame)
+                logger.info(f"Saved annotated frame: {frame_path}")
 
         # Log to database
         if self.conn:
