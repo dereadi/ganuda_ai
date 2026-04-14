@@ -1,0 +1,20 @@
+[Unit]
+Description=Fiber Fabric IP Assignment (redfin enp5s0f1 -> 10.200.0.10/24)
+Documentation=/ganuda/docs/council/CDR-FIBER-BRINGUP-APR11-2026.md
+After=network-online.target
+Wants=network-online.target
+# Fabric link is up regardless, but we want NM running first
+After=NetworkManager.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Ensure the interface is up at L2 before we assign an address
+ExecStart=/usr/sbin/ip link set enp5s0f1 up
+# Idempotent IP assignment - exit 0 even if address already exists
+ExecStart=/bin/sh -c 'ip addr show enp5s0f1 | grep -q "10.200.0.10/24" || ip addr add 10.200.0.10/24 dev enp5s0f1'
+# Clean removal on stop
+ExecStop=/bin/sh -c 'ip addr del 10.200.0.10/24 dev enp5s0f1 2>/dev/null || true'
+
+[Install]
+WantedBy=multi-user.target

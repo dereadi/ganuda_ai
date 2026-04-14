@@ -92,6 +92,17 @@
       "action": "disengaged",
       "at": "2026-04-08T10:25:49.209484",
       "by": "auto_disengage"
+    },
+    {
+      "action": "engaged",
+      "at": "2026-04-11T13:19:11.030539",
+      "by": "coyote_circuit_breaker",
+      "reason": "Coyote circuit breaker: 3 subsystems anomalous in 300s (local_service, remote_node, timer)"
+    },
+    {
+      "action": "disengaged",
+      "at": "2026-04-11T13:49:14.986987",
+      "by": "auto_disengage"
     }
   ]
 }

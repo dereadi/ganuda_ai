@@ -1,0 +1,49 @@
+# ganuda-harness configuration
+# Governance proxy for any LLM endpoint
+# For Seven Generations — Cherokee AI Federation
+
+[server]
+host = "0.0.0.0"
+port = 9200
+
+[upstream]
+url = "http://localhost:8000/v1/chat/completions"
+# api_key = "your-key-here"  # Uncomment for API-key-protected endpoints
+timeout_secs = 120
+# model = "qwen2.5-72b"  # Optional: override model name in requests
+
+[governance]
+mandatory_dissent = true
+sycophancy_detection = true
+autonomy_tier = 1
+
+[governance.chiral_validation]
+enabled = false
+# secondary_url = "http://localhost:8001/v1/chat/completions"
+max_divergence = 0.3
+
+# Design Constraints — add your governance rules here
+[[governance.design_constraints]]
+id = "DC-15"
+description = "Model Agnosticism — governance works on ANY LLM"
+violation_patterns = ["only works with (GPT|Claude|Gemini)"]
+action = "warn"
+
+[[governance.design_constraints]]
+id = "DC-17"
+description = "Stochastic Governance — adversarial dissent = error correction"
+violation_patterns = []
+action = "warn"
+
+# Boundary declarations (Markov blankets)
+# [[governance.boundaries]]
+# name = "pii_boundary"
+# internal = ["user_preferences", "session_state"]
+# external = ["social_security", "credit_card", "medical_records"]
+# action = "block"
+
+[audit]
+enabled = true
+log_path = "./audit.jsonl"
+hash_algorithm = "sha256"
+include_payloads = false

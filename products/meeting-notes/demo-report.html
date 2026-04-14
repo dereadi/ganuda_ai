@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meeting Notes — 2026-04-04 09:12</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--navy:#1a365d;--charcoal:#2d3748;--gold:#d4a843;--teal:#4fd1c5;--text:#e2e8f0;--muted:#a0aec0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--charcoal);color:var(--text);line-height:1.6}
+  a{color:var(--teal);text-decoration:none}
+  .header{background:var(--navy);padding:2rem;text-align:center;border-bottom:2px solid var(--gold)}
+  .header h1{color:var(--gold);font-size:1.5rem}
+  .header .meta{color:var(--muted);font-size:0.8rem;margin-top:0.3rem}
+  .content{max-width:800px;margin:0 auto;padding:1rem}
+  .section-title{color:var(--gold);font-weight:600;font-size:1.1rem;margin:1.5rem 0 0.5rem;padding-bottom:0.3rem;border-bottom:1px solid rgba(212,168,67,0.3)}
+  .summary{background:rgba(26,54,93,0.4);padding:1rem;border-radius:8px;margin:0.5rem 0;font-size:0.9rem}
+  .decision{background:rgba(26,54,93,0.6);border-left:3px solid var(--gold);padding:0.8rem;margin:0.4rem 0;border-radius:0 6px 6px 0}
+  .action{display:flex;gap:0.8rem;align-items:flex-start;background:rgba(26,54,93,0.4);padding:0.8rem;margin:0.4rem 0;border-radius:6px}
+  .checkbox{font-size:1.2rem;color:var(--teal)}
+  .topic{display:flex;justify-content:space-between;padding:0.6rem 0.8rem;margin:0.3rem 0;background:rgba(26,54,93,0.3);border-radius:6px}
+  .topic-name{font-weight:600}
+  .topic-meta{font-size:0.8rem}
+  .meta{color:var(--muted);font-size:0.8rem;display:block;margin-top:0.2rem}
+  .followups{list-style:none;padding:0}
+  .followups li{padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+  .followups li:before{content:"→ ";color:var(--teal)}
+  details{margin:1rem 0}
+  summary{cursor:pointer;color:var(--teal);font-weight:600;padding:0.5rem 0}
+  .transcript{background:rgba(0,0,0,0.3);padding:1rem;border-radius:8px;font-size:0.8rem;white-space:pre-wrap;max-height:400px;overflow-y:auto;font-family:monospace}
+  .footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.8rem}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Meeting Notes</h1>
+  <div class="meta">Saturday, April 04, 2026 at 09:12 · Participants: TPM, Partner</div>
+</div>
+<div class="content">
+  <div class="section-title">Summary</div>
+  <div class="summary">The meeting reviewed the progress of the MOCHA sprint, highlighting the successful launch of the Subscription Trimmer, Desktop Security Canary, and Stoneclad API. Key achievements include identifying $1500 in monthly subscription savings and 52 security findings, including 4 critical ones. The team discussed the importance of live demos for attracting clients, such as the Upwork lead Khalid. They agreed to schedule a call with him this week. The council approved the SAG platform strategy, emphasizing the role of free tools in attracting customers. The team also addressed concerns about stacking too many changes and implemented cooldown periods to manage the attack surface. The Sisyphus Substack essay received council approval, and the partner will write it when ready.</div>
+
+  <div class="section-title">Decisions (4)</div>
+  <div class="decision">
+  <strong>Schedule a call with Khalid for Tuesday or Wednesday</strong>
+  <span class="meta">by Partner at 04:30</span>
+</div>
+<div class="decision">
+  <strong>Implement 12-hour minor and 24-hour major change cooldowns</strong>
+  <span class="meta">by Council at 07:00</span>
+</div>
+<div class="decision">
+  <strong>Approve the SAG platform strategy (three-tier flywheel)</strong>
+  <span class="meta">by Council at 05:00</span>
+</div>
+<div class="decision">
+  <strong>Approve the Sisyphus Substack essay (12-0-1)</strong>
+  <span class="meta">by Council at 08:00</span>
+</div>
+
+
+  <div class="section-title">Action Items (2)</div>
+  <div class="action">
+  <span class="checkbox">☐</span>
+  <div>
+    <strong>Reach out to Khalid to schedule a call</strong>
+    <span class="meta">TPM — deadline: not specified</span>
+  </div>
+</div>
+<div class="action">
+  <span class="checkbox">☐</span>
+  <div>
+    <strong>Write the Sisyphus Substack essay when the scent is right</strong>
+    <span class="meta">Partner — deadline: no rush</span>
+  </div>
+</div>
+
+
+  <div class="section-title">Key Topics</div>
+  <div class="topic">
+  <span class="topic-name">Subscription Trimmer launch</span>
+  <span class="topic-meta" style="color:#68d391">positive · 1 minute</span>
+</div>
+<div class="topic">
+  <span class="topic-name">Desktop Security Canary launch</span>
+  <span class="topic-meta" style="color:#68d391">positive · 1 minute</span>
+</div>
+<div class="topic">
+  <span class="topic-name">Stoneclad API launch</span>
+  <span class="topic-meta" style="color:#68d391">positive · 1 minute</span>
+</div>
+<div class="topic">
+  <span class="topic-name">Upwork lead Khalid</span>
+  <span class="topic-meta" style="color:#68d391">positive · 1 minute</span>
+</div>
+<div class="topic">
+  <span class="topic-name">SAG platform strategy</span>
+  <span class="topic-meta" style="color:#68d391">positive · 1 minute</span>
+</div>
+<div class="topic">
+  <span class="topic-name">Change management and cooldowns</span>
+  <span class="topic-meta" style="color:#a0aec0">neutral · 1 minute</span>
+</div>
+<div class="topic">
+  <span class="topic-name">Sisyphus Substack essay</span>
+  <span class="topic-meta" style="color:#68d391">positive · 1 minute</span>
+</div>
+
+
+  <div class="section-title">Follow-ups</div>
+  <ul class="followups"><li>Schedule a call with Khalid</li>
+<li>Write the Sisyphus Substack essay</li></ul>
+
+  <details>
+    <summary>Full Transcript (21 lines)</summary>
+    <div class="transcript">[00:00] TPM: Good morning everyone. Let's kick off the MOCHA sprint review. We've had a productive week. Let me go through what shipped.
+[00:30] Partner: Morning. Yeah it's been a hell of a week.
+[01:00] TPM: First up, the Subscription Trimmer shipped on Friday. It's live at ganuda.us/trimmer. Scans Gmail locally, classifies with the 72B model, identifies ghost subscriptions. Found 9 subscriptions and $1500 a month in burn.
+[01:30] Partner: The Gmail API integration was already there from the email daemon. We just pointed it at a new problem. That's the pattern.
+[02:00] TPM: Exactly. Second, the Desktop Security Canary shipped this morning. Live at ganuda.us/canary. Port scanning, credential detection, config auditing. Found 52 findings on redfin including 4 critical.
+[02:30] Partner: Those critical ones are the PostgreSQL ports exposed to the network. We know about those. PgBouncer is handling it now.
+[03:00] TPM: Right. Third, the Stoneclad API is live on the DMZ. Six endpoints serving real data. The landing page now pulses with live stats. Anyone can click ganuda.us and see the system breathing.
+[03:30] Partner: That's what closes the deal on Upwork. Khalid clicked it and came back asking more questions. Live demo beats a resume every time.
+[04:00] TPM: Speaking of Khalid, he's our first active Upwork lead. RAG and multi-agent consultation. He asked if we've deployed to production and we pointed him at the live endpoints. We should schedule a call with him this week.
+[04:30] Partner: Agreed. Let's get that on the calendar for Tuesday or Wednesday. I want to show him the council in action.
+[05:00] TPM: I'll reach out to set that up. Now, looking ahead, we have Meeting Notes Extractor and Clipboard Intelligence in the Jr queue. The council approved the SAG platform strategy, which is the three-tier flywheel: free tools, then the assistant, then enterprise verticals.
+[05:30] Partner: The free tools are the distribution. Every product we ship is a landing page that attracts the next customer. The Canary is going to attract security-minded clients. The Trimmer attracts anyone who pays for subscriptions. Different doors, same building.
+[06:00] TPM: The pre-flight gate is wired into the Jr executor now. Should prevent the empty deliverable problem going forward. We also wrote the cross-node deployment KB so Jrs can learn to deploy across the federation.
+[06:30] Partner: Good. We need the Jrs doing more of the deployment work so you can focus on architecture. Teach the pups.
+[07:00] TPM: Agreed. One concern from the council: we stacked a lot of changes Thursday. vLLM resize, PgBouncer, API deploy, Caddy reconfig, Tribal Vision refactor, Fire Guard update. We instituted 12-hour minor and 24-hour major change cooldowns to manage the attack surface.
+[07:30] Partner: That's important. We can't trace bugs through six changes at once. The cooldown is a feature, not a brake.
+[08:00] TPM: Last item: the Sisyphus Substack essay got council approval, 12-0-1. The outline connects the Dera/Derq framework, the energy capacitor, Trithemius, and the Chaco governance model. It's the origin story.
+[08:30] Partner: I'll write it when the scent is right. No rush. The capacitor holds.
+[09:00] TPM: Anything else for the sprint review?
+[09:30] Partner: Just that the cluster is breathing and the products are shipping. MOCHA is working. Let's keep the momentum.
+[10:00] TPM: Agreed. MOCHA continues. For Seven Generations.</div>
+  </details>
+</div>
+<div class="footer">
+  <p>Generated by <a href="https://ganuda.us">Meeting Notes Extractor</a> — your audio stays on your machine</p>
+  <p>Cherokee AI Federation | For Seven Generations</p>
+</div>
+</body>
+</html>

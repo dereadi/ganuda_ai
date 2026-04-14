@@ -1,0 +1,199 @@
+{
+  "stats": {
+    "total": 20,
+    "avg_temperature": 58.4,
+    "by_type": {
+      "short_text": 10,
+      "url": 3,
+      "code": 2,
+      "text": 2,
+      "email": 1,
+      "json": 1,
+      "phone": 1
+    },
+    "sensitive_count": 0,
+    "today_count": 20
+  },
+  "clips": [
+    {
+      "id": 16,
+      "content_preview": "{\"status\": \"alive\", \"thermal_memory\": {\"total_memories\": 96336}}",
+      "clip_type": "json",
+      "temperature": 92.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.559981"
+    },
+    {
+      "id": 2,
+      "content_preview": "ganuda.us/api/health",
+      "clip_type": "short_text",
+      "temperature": 85.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.502676"
+    },
+    {
+      "id": 11,
+      "content_preview": "ganuda.us/trimmer",
+      "clip_type": "short_text",
+      "temperature": 85.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.537568"
+    },
+    {
+      "id": 13,
+      "content_preview": "curl -s https://ganuda.us/api/thermal/stats",
+      "clip_type": "short_text",
+      "temperature": 85.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.545315"
+    },
+    {
+      "id": 4,
+      "content_preview": "SELECT COUNT(*) FROM thermal_memory_archive WHERE sacred_pattern = true",
+      "clip_type": "code",
+      "temperature": 70.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.510459"
+    },
+    {
+      "id": 1,
+      "content_preview": "https://natesnewsletter.substack.com/p/your-ai-credentials-dont-matter-your",
+      "clip_type": "url",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.498166"
+    },
+    {
+      "id": 3,
+      "content_preview": "def run_preflight_checks(task, result):     preflight = PreflightResult()     files = find_deliverab",
+      "clip_type": "code",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.506613"
+    },
+    {
+      "id": 5,
+      "content_preview": "ssh dereadi@10.100.0.2",
+      "clip_type": "short_text",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.514293"
+    },
+    {
+      "id": 6,
+      "content_preview": "sudo systemctl restart caddy",
+      "clip_type": "short_text",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.518085"
+    },
+    {
+      "id": 7,
+      "content_preview": "https://github.com/dereadi/subscription-trimmer",
+      "clip_type": "url",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.521956"
+    },
+    {
+      "id": 8,
+      "content_preview": "birchmoonbarkfurocean",
+      "clip_type": "short_text",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.525784"
+    },
+    {
+      "id": 9,
+      "content_preview": "pip install fastapi uvicorn psycopg2-binary",
+      "clip_type": "short_text",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.529678"
+    },
+    {
+      "id": 10,
+      "content_preview": "The assumption of indispensibility of labor is a human doxa.",
+      "clip_type": "text",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.533716"
+    },
+    {
+      "id": 12,
+      "content_preview": "https://www.upwork.com/nx/find-work/best-matches",
+      "clip_type": "url",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.541439"
+    },
+    {
+      "id": 14,
+      "content_preview": "For Seven Generations.",
+      "clip_type": "short_text",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.551460"
+    },
+    {
+      "id": 15,
+      "content_preview": "dereadi@gmail.com",
+      "clip_type": "email",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.556084"
+    },
+    {
+      "id": 17,
+      "content_preview": "python3 canary.py --quick",
+      "clip_type": "short_text",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.563841"
+    },
+    {
+      "id": 18,
+      "content_preview": "The handshake IS Derq. The coupling mechanism is agreement.",
+      "clip_type": "text",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.567718"
+    },
+    {
+      "id": 19,
+      "content_preview": "MOCHA \u2014 Make Our Cluster Hot Again",
+      "clip_type": "short_text",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.571579"
+    },
+    {
+      "id": 20,
+      "content_preview": "192.168.132.222",
+      "clip_type": "phone",
+      "temperature": 50.0,
+      "is_sensitive": 0,
+      "is_pinned": 0,
+      "timestamp": "2026-04-04T09:23:07.575435"
+    }
+  ]
+}

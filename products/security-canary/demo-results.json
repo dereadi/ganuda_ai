@@ -1,0 +1,585 @@
+{
+  "scan_date": "2026-04-13T07:16:16.703733",
+  "hostname": "redfin.cherokee.local",
+  "platform": "linux",
+  "sections": {
+    "ports": {
+      "title": "Listening Ports",
+      "findings": [
+        {
+          "port": 5432,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "PostgreSQL",
+          "severity": "critical",
+          "risk": "Database. Verify access controls."
+        },
+        {
+          "port": 5432,
+          "address": "[::]",
+          "exposed": true,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "PostgreSQL",
+          "severity": "critical",
+          "risk": "Database. Verify access controls."
+        },
+        {
+          "port": 22,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "port-22",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 22,
+          "address": "[::]",
+          "exposed": true,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "port-22",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 111,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "port-111",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 111,
+          "address": "[::]",
+          "exposed": true,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "port-111",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 3000,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "next-server",
+          "pid": "2043",
+          "service": "port-3000",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 4000,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "python3",
+          "pid": "2054",
+          "service": "port-4000",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 5201,
+          "address": "*",
+          "exposed": true,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "port-5201",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 5555,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "python3",
+          "pid": "4650",
+          "service": "port-5555",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 5556,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "python",
+          "pid": "2047",
+          "service": "port-5556",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 8000,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "python",
+          "pid": "1132585",
+          "service": "port-8000",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 8001,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "python",
+          "pid": "2666",
+          "service": "port-8001",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 8002,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "python3",
+          "pid": "2672",
+          "service": "port-8002",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 8003,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "python",
+          "pid": "2025",
+          "service": "port-8003",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 8081,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "python",
+          "pid": "2047",
+          "service": "port-8081",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 9001,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "python3",
+          "pid": "2049",
+          "service": "port-9001",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 9100,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "python",
+          "pid": "1134296",
+          "service": "port-9100",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 9400,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "uvicorn",
+          "pid": "2661",
+          "service": "port-9400",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 9500,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "python3",
+          "pid": "4440",
+          "service": "port-9500",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 33961,
+          "address": "*",
+          "exposed": true,
+          "process": "VLLM::EngineCor",
+          "pid": "1132948",
+          "service": "port-33961",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 35917,
+          "address": "*",
+          "exposed": true,
+          "process": "VLLM::EngineCor",
+          "pid": "1134524",
+          "service": "port-35917",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 57129,
+          "address": "*",
+          "exposed": true,
+          "process": "VLLM::EngineCor",
+          "pid": "2844137",
+          "service": "port-57129",
+          "severity": "warning",
+          "risk": "Exposed to network"
+        },
+        {
+          "port": 53,
+          "address": "127.0.0.54",
+          "exposed": false,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "DNS",
+          "severity": "info",
+          "risk": "DNS resolver. Verify it's intentional."
+        },
+        {
+          "port": 53,
+          "address": "127.0.0.53%lo",
+          "exposed": false,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "DNS",
+          "severity": "info",
+          "risk": "DNS resolver. Verify it's intentional."
+        },
+        {
+          "port": 443,
+          "address": "100.116.27.89",
+          "exposed": false,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "port-443",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 443,
+          "address": "[fd7a:115c:a1e0::1001:1b6b]",
+          "exposed": false,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "port-443",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 631,
+          "address": "127.0.0.1",
+          "exposed": false,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "port-631",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 631,
+          "address": "[::1]",
+          "exposed": false,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "port-631",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 8080,
+          "address": "0.0.0.0",
+          "exposed": true,
+          "process": "python",
+          "pid": "2048",
+          "service": "HTTP-Alt",
+          "severity": "info",
+          "risk": "Alternative HTTP. Verify intentional."
+        },
+        {
+          "port": 34421,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "2844137",
+          "service": "port-34421",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 36535,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "2844137",
+          "service": "port-36535",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 36683,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "1134524",
+          "service": "port-36683",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 36725,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "1134524",
+          "service": "port-36725",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 37823,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "2844137",
+          "service": "port-37823",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 38411,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "1134524",
+          "service": "port-38411",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 40417,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "1132948",
+          "service": "port-40417",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 41293,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "1132948",
+          "service": "port-41293",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 42435,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "1132948",
+          "service": "port-42435",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 42691,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "2844137",
+          "service": "port-42691",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 43143,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "2844137",
+          "service": "port-43143",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 43655,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "1134524",
+          "service": "port-43655",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 43763,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "2844137",
+          "service": "port-43763",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 43995,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "1132948",
+          "service": "port-43995",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 44555,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "1134524",
+          "service": "port-44555",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 45065,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "1132948",
+          "service": "port-45065",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 45487,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "1134524",
+          "service": "port-45487",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 45641,
+          "address": "192.168.132.223",
+          "exposed": false,
+          "process": "VLLM::EngineCor",
+          "pid": "1132948",
+          "service": "port-45641",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 47956,
+          "address": "100.116.27.89",
+          "exposed": false,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "port-47956",
+          "severity": "info",
+          "risk": "Local only"
+        },
+        {
+          "port": 49263,
+          "address": "[fd7a:115c:a1e0::1001:1b6b]",
+          "exposed": false,
+          "process": "unknown",
+          "pid": "unknown",
+          "service": "port-49263",
+          "severity": "info",
+          "risk": "Local only"
+        }
+      ]
+    },
+    "credentials": {
+      "title": "Credential Exposure",
+      "findings": [
+        {
+          "type": "ssh_key_no_passphrase",
+          "location": "/home/dereadi/.ssh/ganuda_github",
+          "severity": "critical",
+          "description": "SSH private key WITHOUT passphrase encryption",
+          "fix": "ssh-keygen -p -f /home/dereadi/.ssh/ganuda_github  # Add a passphrase"
+        },
+        {
+          "type": "ssh_key_no_passphrase",
+          "location": "/home/dereadi/.ssh/id_ed25519",
+          "severity": "critical",
+          "description": "SSH private key WITHOUT passphrase encryption",
+          "fix": "ssh-keygen -p -f /home/dereadi/.ssh/id_ed25519  # Add a passphrase"
+        },
+        {
+          "type": "generic_password",
+          "location": "~/.bash_history:128",
+          "severity": "warning",
+          "description": "Hardcoded password",
+          "fix": "Remove or rotate the credential at ~/.bash_history line 128"
+        },
+        {
+          "type": "bearer_token",
+          "location": "~/.bash_history:407",
+          "severity": "warning",
+          "description": "Bearer token",
+          "fix": "Remove or rotate the credential at ~/.bash_history line 407"
+        },
+        {
+          "type": "bearer_token",
+          "location": "~/.bash_history:408",
+          "severity": "warning",
+          "description": "Bearer token",
+          "fix": "Remove or rotate the credential at ~/.bash_history line 408"
+        }
+      ]
+    },
+    "config": {
+      "title": "System Configuration",
+      "findings": [
+        {
+          "check": "ssh_password_auth",
+          "severity": "warning",
+          "description": "SSH PasswordAuthentication not explicitly set (defaults may vary)"
+        },
+        {
+          "check": "sudo_nopasswd",
+          "severity": "warning",
+          "description": "1 NOPASSWD sudo rules found",
+          "fix": "Review: sudo -l \u2014 ensure only necessary commands have NOPASSWD"
+        },
+        {
+          "check": "disk_encryption",
+          "severity": "warning",
+          "description": "No disk encryption detected",
+          "fix": "Consider enabling LUKS full-disk encryption"
+        },
+        {
+          "check": "auto_updates",
+          "severity": "info",
+          "description": "Unattended security upgrades enabled"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "critical": 4,
+    "warning": 27,
+    "info": 28,
+    "total": 59
+  }
+}

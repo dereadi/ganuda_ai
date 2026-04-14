@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What Am I Paying For? — Subscription Trimmer</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --navy: #1a365d;
+    --charcoal: #2d3748;
+    --gold: #d4a843;
+    --teal: #4fd1c5;
+    --red: #fc8181;
+    --amber: #f6ad55;
+    --green: #68d391;
+    --warm: #f7fafc;
+    --text: #e2e8f0;
+    --muted: #a0aec0;
+    --dark: #1a202c;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background:var(--charcoal); color:var(--text); line-height:1.6; }
+  a { color:var(--teal); text-decoration:none; }
+
+  .header { background:var(--navy); padding:2rem; text-align:center; border-bottom:2px solid var(--gold); }
+  .header h1 { color:var(--gold); font-size:1.8rem; }
+  .header p { color:var(--muted); font-size:0.9rem; margin-top:0.3rem; }
+
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1rem; max-width:800px; margin:2rem auto; padding:0 1rem; }
+  .stat { background:rgba(26,54,93,0.6); border:1px solid rgba(212,168,67,0.3); border-radius:8px; padding:1rem; text-align:center; }
+  .stat .num { font-size:2rem; font-weight:700; }
+  .stat .label { font-size:0.75rem; color:var(--muted); margin-top:0.2rem; }
+  .stat.burn .num { color:var(--red); }
+  .stat.save .num { color:var(--green); }
+  .stat.count .num { color:var(--gold); }
+  .stat.ghost .num { color:var(--amber); }
+
+  .scan-btn { display:block; max-width:300px; margin:1.5rem auto; padding:0.8rem 2rem; background:var(--teal); color:var(--dark); font-weight:700; font-size:1rem; border:none; border-radius:8px; cursor:pointer; text-align:center; }
+  .scan-btn:hover { opacity:0.9; }
+  .scan-btn:disabled { opacity:0.5; cursor:wait; }
+  .scan-status { text-align:center; color:var(--muted); font-size:0.85rem; margin:0.5rem 0; min-height:1.2rem; }
+
+  .subs { max-width:800px; margin:1rem auto; padding:0 1rem; }
+  .sub-card { display:flex; justify-content:space-between; align-items:center; padding:1rem; margin:0.5rem 0; background:rgba(26,54,93,0.4); border-radius:8px; border-left:3px solid var(--teal); }
+  .sub-card.ghost { border-left-color:var(--amber); background:rgba(246,173,85,0.1); }
+  .sub-card .left { flex:1; }
+  .sub-card .service { font-weight:600; font-size:1rem; }
+  .sub-card .meta { color:var(--muted); font-size:0.8rem; margin-top:0.2rem; }
+  .sub-card .right { text-align:right; }
+  .sub-card .amount { font-size:1.3rem; font-weight:700; color:var(--gold); }
+  .sub-card .freq { font-size:0.75rem; color:var(--muted); }
+  .sub-card .ghost-badge { display:inline-block; background:var(--amber); color:var(--dark); font-size:0.7rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:4px; margin-top:0.3rem; }
+
+  .footer { text-align:center; padding:2rem; color:var(--muted); font-size:0.8rem; }
+  .footer a { color:var(--teal); }
+
+  .empty { text-align:center; padding:3rem; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>What Am I Paying For?</h1>
+  <p>Scans your email locally. No data leaves your machine. Sovereign.</p>
+</div>
+
+<div class="stats">
+  <div class="stat burn"><div class="num" id="s-monthly">—</div><div class="label">Monthly Burn</div></div>
+  <div class="stat save"><div class="num" id="s-savings">—</div><div class="label">Potential Savings</div></div>
+  <div class="stat count"><div class="num" id="s-count">—</div><div class="label">Subscriptions</div></div>
+  <div class="stat ghost"><div class="num" id="s-ghosts">—</div><div class="label">Ghost Subscriptions</div></div>
+</div>
+
+<button class="scan-btn" id="scan-btn" onclick="startScan()">Scan My Email</button>
+<div class="scan-status" id="scan-status"></div>
+
+<div class="subs" id="sub-list">
+  <div class="empty" id="empty-state">Click "Scan My Email" to find your subscriptions, or <a href="#" onclick="loadDemo(); return false;">view demo results</a>.</div>
+</div>
+
+<div class="footer">
+  <p>Built by <a href="https://ganuda.us">Cherokee AI Federation</a> — sovereign, no cloud, no third-party APIs</p>
+  <p style="margin-top:0.5rem;">Your email is processed locally using on-premise AI. Nothing is sent anywhere.</p>
+</div>
+
+<script>
+let pollInterval = null;
+
+function $(id) { return document.getElementById(id); }
+
+function renderResults(data) {
+  $('s-monthly').textContent = '$' + data.total_monthly.toFixed(2);
+  $('s-savings').textContent = '$' + data.potential_savings.toFixed(2);
+  $('s-count').textContent = data.subscription_count;
+  $('s-ghosts').textContent = data.ghost_count;
+
+  const list = $('sub-list');
+  list.innerHTML = '';
+
+  if (!data.subscriptions || data.subscriptions.length === 0) {
+    list.innerHTML = '<div class="empty">No subscriptions found.</div>';
+    return;
+  }
+
+  data.subscriptions.forEach(sub => {
+    const card = document.createElement('div');
+    card.className = 'sub-card' + (sub.is_ghost ? ' ghost' : '');
+    card.innerHTML = `
+      <div class="left">
+        <div class="service">${sub.service_name || sub.service || 'Unknown'}</div>
+        <div class="meta">${sub.category || ''} · Last charged: ${sub.charge_date || sub.last_charge || '?'}</div>
+        ${sub.is_ghost ? '<span class="ghost-badge">GHOST — not used in 30+ days</span>' : ''}
+      </div>
+      <div class="right">
+        <div class="amount">$${(sub.amount || 0).toFixed(2)}</div>
+        <div class="freq">${sub.frequency || 'monthly'}</div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+async function loadDemo() {
+  $('scan-status').textContent = 'Loading demo results...';
+  try {
+    const resp = await fetch('/demo');
+    const data = await resp.json();
+    if (data.error) {
+      $('scan-status').textContent = data.error;
+    } else {
+      $('scan-status').textContent = 'Showing demo results.';
+      renderResults(data);
+    }
+  } catch(e) {
+    $('scan-status').textContent = 'Failed to load demo: ' + e;
+  }
+}
+
+async function startScan() {
+  const btn = $('scan-btn');
+  btn.disabled = true;
+  btn.textContent = 'Scanning...';
+  $('scan-status').textContent = 'Connecting to Gmail...';
+
+  try {
+    const resp = await fetch('/scan', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({months_back: 6, max_results: 200})
+    });
+    const data = await resp.json();
+    const jobId = data.job_id;
+
+    // Poll for results
+    pollInterval = setInterval(async () => {
+      try {
+        const r = await fetch('/results/' + jobId);
+        const j = await r.json();
+        $('scan-status').textContent = j.progress || j.status || 'Working...';
+
+        if (j.status === 'complete') {
+          clearInterval(pollInterval);
+          btn.disabled = false;
+          btn.textContent = 'Scan Again';
+          $('scan-status').textContent = 'Scan complete!';
+          renderResults(j.result);
+        } else if (j.status === 'error') {
+          clearInterval(pollInterval);
+          btn.disabled = false;
+          btn.textContent = 'Scan My Email';
+          $('scan-status').textContent = 'Error: ' + j.error;
+        }
+      } catch(e) {
+        $('scan-status').textContent = 'Polling error: ' + e;
+      }
+    }, 2000);
+
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Scan My Email';
+    $('scan-status').textContent = 'Scan failed: ' + e;
+  }
+}
+</script>
+
+</body>
+</html>

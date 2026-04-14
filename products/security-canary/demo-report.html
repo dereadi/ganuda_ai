@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security Canary Report — redfin.cherokee.local</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --navy:#1a365d; --charcoal:#2d3748; --gold:#d4a843; --teal:#4fd1c5; --text:#e2e8f0; --muted:#a0aec0; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--charcoal); color:var(--text); line-height:1.6; }
+  a { color:var(--teal); text-decoration:none; }
+  .header { background:var(--navy); padding:2rem; text-align:center; border-bottom:2px solid var(--gold); }
+  .header h1 { color:var(--gold); font-size:1.5rem; }
+  .header .score { font-size:2rem; font-weight:700; color:#fc8181; margin-top:0.5rem; }
+  .header .meta { color:var(--muted); font-size:0.8rem; margin-top:0.3rem; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:1rem; max-width:700px; margin:1.5rem auto; padding:0 1rem; }
+  .stat { background:rgba(26,54,93,0.6); border:1px solid rgba(212,168,67,0.3); border-radius:8px; padding:0.8rem; text-align:center; }
+  .stat .num { font-size:1.5rem; font-weight:700; }
+  .stat .label { font-size:0.7rem; color:var(--muted); }
+  .section-title { max-width:700px; margin:1.5rem auto 0.5rem; padding:0 1rem; color:var(--gold); font-weight:600; font-size:1.1rem; }
+  .finding { max-width:700px; margin:0.4rem auto; padding:0.8rem; background:rgba(26,54,93,0.4); border-left:3px solid var(--muted); border-radius:0 6px 6px 0; }
+  .finding-header { display:flex; justify-content:space-between; font-size:0.85rem; }
+  .finding-type { color:var(--muted); font-size:0.75rem; }
+  .finding-desc { margin-top:0.3rem; font-size:0.85rem; }
+  .finding-location { color:var(--muted); font-size:0.75rem; margin-top:0.2rem; }
+  .finding-fix { color:var(--teal); font-size:0.8rem; margin-top:0.3rem; }
+  .finding-fix code { background:rgba(0,0,0,0.3); padding:0.1rem 0.4rem; border-radius:3px; font-size:0.75rem; }
+  .footer { text-align:center; padding:2rem; color:var(--muted); font-size:0.8rem; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Desktop Security Canary</h1>
+  <div class="score">CRITICAL</div>
+  <div class="meta">redfin.cherokee.local | 2026-04-13T07:16:16 | linux</div>
+</div>
+<div class="stats">
+  <div class="stat"><div class="num" style="color:#fc8181">4</div><div class="label">Critical</div></div>
+  <div class="stat"><div class="num" style="color:#f6ad55">27</div><div class="label">Warning</div></div>
+  <div class="stat"><div class="num" style="color:#68d391">28</div><div class="label">Info</div></div>
+  <div class="stat"><div class="num" style="color:var(--gold)">59</div><div class="label">Total</div></div>
+</div>
+<div class="section-title">Listening Ports</div>
+<div class="finding" style="border-left-color:#fc8181">
+  <div class="finding-header">
+    <span>&#x1F534; <strong>CRITICAL</strong></span>
+    <span class="finding-type">PostgreSQL</span>
+  </div>
+  <div class="finding-desc">Database. Verify access controls.</div>
+  <div class='finding-location'>Location: :5432 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#fc8181">
+  <div class="finding-header">
+    <span>&#x1F534; <strong>CRITICAL</strong></span>
+    <span class="finding-type">PostgreSQL</span>
+  </div>
+  <div class="finding-desc">Database. Verify access controls.</div>
+  <div class='finding-location'>Location: :5432 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-22</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :22 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-22</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :22 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-111</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :111 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-111</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :111 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-3000</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :3000 (next-server)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-4000</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :4000 (python3)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-5201</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :5201 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-5555</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :5555 (python3)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-5556</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :5556 (python)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-8000</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :8000 (python)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-8001</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :8001 (python)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-8002</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :8002 (python3)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-8003</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :8003 (python)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-8081</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :8081 (python)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-9001</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :9001 (python3)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-9100</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :9100 (python)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-9400</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :9400 (uvicorn)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-9500</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :9500 (python3)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-33961</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :33961 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-35917</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :35917 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">port-57129</span>
+  </div>
+  <div class="finding-desc">Exposed to network</div>
+  <div class='finding-location'>Location: :57129 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">DNS</span>
+  </div>
+  <div class="finding-desc">DNS resolver. Verify it's intentional.</div>
+  <div class='finding-location'>Location: :53 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">DNS</span>
+  </div>
+  <div class="finding-desc">DNS resolver. Verify it's intentional.</div>
+  <div class='finding-location'>Location: :53 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-443</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :443 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-443</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :443 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-631</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :631 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-631</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :631 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">HTTP-Alt</span>
+  </div>
+  <div class="finding-desc">Alternative HTTP. Verify intentional.</div>
+  <div class='finding-location'>Location: :8080 (python)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-34421</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :34421 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-36535</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :36535 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-36683</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :36683 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-36725</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :36725 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-37823</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :37823 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-38411</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :38411 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-40417</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :40417 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-41293</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :41293 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-42435</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :42435 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-42691</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :42691 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-43143</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :43143 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-43655</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :43655 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-43763</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :43763 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-43995</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :43995 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-44555</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :44555 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-45065</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :45065 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-45487</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :45487 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-45641</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :45641 (VLLM::EngineCor)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-47956</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :47956 (unknown)</div>
+  
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">port-49263</span>
+  </div>
+  <div class="finding-desc">Local only</div>
+  <div class='finding-location'>Location: :49263 (unknown)</div>
+  
+</div>
+<div class="section-title">Credential Exposure</div>
+<div class="finding" style="border-left-color:#fc8181">
+  <div class="finding-header">
+    <span>&#x1F534; <strong>CRITICAL</strong></span>
+    <span class="finding-type">ssh_key_no_passphrase</span>
+  </div>
+  <div class="finding-desc">SSH private key WITHOUT passphrase encryption</div>
+  <div class='finding-location'>Location: /home/dereadi/.ssh/ganuda_github</div>
+  <div class='finding-fix'>Fix: <code>ssh-keygen -p -f /home/dereadi/.ssh/ganuda_github  # Add a passphrase</code></div>
+</div>
+<div class="finding" style="border-left-color:#fc8181">
+  <div class="finding-header">
+    <span>&#x1F534; <strong>CRITICAL</strong></span>
+    <span class="finding-type">ssh_key_no_passphrase</span>
+  </div>
+  <div class="finding-desc">SSH private key WITHOUT passphrase encryption</div>
+  <div class='finding-location'>Location: /home/dereadi/.ssh/id_ed25519</div>
+  <div class='finding-fix'>Fix: <code>ssh-keygen -p -f /home/dereadi/.ssh/id_ed25519  # Add a passphrase</code></div>
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">generic_password</span>
+  </div>
+  <div class="finding-desc">Hardcoded password</div>
+  <div class='finding-location'>Location: ~/.bash_history:128</div>
+  <div class='finding-fix'>Fix: <code>Remove or rotate the credential at ~/.bash_history line 128</code></div>
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">bearer_token</span>
+  </div>
+  <div class="finding-desc">Bearer token</div>
+  <div class='finding-location'>Location: ~/.bash_history:407</div>
+  <div class='finding-fix'>Fix: <code>Remove or rotate the credential at ~/.bash_history line 407</code></div>
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">bearer_token</span>
+  </div>
+  <div class="finding-desc">Bearer token</div>
+  <div class='finding-location'>Location: ~/.bash_history:408</div>
+  <div class='finding-fix'>Fix: <code>Remove or rotate the credential at ~/.bash_history line 408</code></div>
+</div>
+<div class="section-title">System Configuration</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">ssh_password_auth</span>
+  </div>
+  <div class="finding-desc">SSH PasswordAuthentication not explicitly set (defaults may vary)</div>
+  
+  
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">sudo_nopasswd</span>
+  </div>
+  <div class="finding-desc">1 NOPASSWD sudo rules found</div>
+  
+  <div class='finding-fix'>Fix: <code>Review: sudo -l — ensure only necessary commands have NOPASSWD</code></div>
+</div>
+<div class="finding" style="border-left-color:#f6ad55">
+  <div class="finding-header">
+    <span>&#x1F7E1; <strong>WARNING</strong></span>
+    <span class="finding-type">disk_encryption</span>
+  </div>
+  <div class="finding-desc">No disk encryption detected</div>
+  
+  <div class='finding-fix'>Fix: <code>Consider enabling LUKS full-disk encryption</code></div>
+</div>
+<div class="finding" style="border-left-color:#68d391">
+  <div class="finding-header">
+    <span>&#x1F7E2; <strong>INFO</strong></span>
+    <span class="finding-type">auto_updates</span>
+  </div>
+  <div class="finding-desc">Unattended security upgrades enabled</div>
+  
+  
+</div>
+
+<div class="footer">
+  <p>Scanned locally by <a href="https://ganuda.us">Desktop Security Canary</a> — no data left this machine</p>
+  <p style="margin-top:0.5rem;">Cherokee AI Federation | For Seven Generations</p>
+</div>
+</body>
+</html>

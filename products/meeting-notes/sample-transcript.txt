@@ -1,0 +1,21 @@
+TPM: Good morning everyone. Let's kick off the MOCHA sprint review. We've had a productive week. Let me go through what shipped.
+Partner: Morning. Yeah it's been a hell of a week.
+TPM: First up, the Subscription Trimmer shipped on Friday. It's live at ganuda.us/trimmer. Scans Gmail locally, classifies with the 72B model, identifies ghost subscriptions. Found 9 subscriptions and $1500 a month in burn.
+Partner: The Gmail API integration was already there from the email daemon. We just pointed it at a new problem. That's the pattern.
+TPM: Exactly. Second, the Desktop Security Canary shipped this morning. Live at ganuda.us/canary. Port scanning, credential detection, config auditing. Found 52 findings on redfin including 4 critical.
+Partner: Those critical ones are the PostgreSQL ports exposed to the network. We know about those. PgBouncer is handling it now.
+TPM: Right. Third, the Stoneclad API is live on the DMZ. Six endpoints serving real data. The landing page now pulses with live stats. Anyone can click ganuda.us and see the system breathing.
+Partner: That's what closes the deal on Upwork. Khalid clicked it and came back asking more questions. Live demo beats a resume every time.
+TPM: Speaking of Khalid, he's our first active Upwork lead. RAG and multi-agent consultation. He asked if we've deployed to production and we pointed him at the live endpoints. We should schedule a call with him this week.
+Partner: Agreed. Let's get that on the calendar for Tuesday or Wednesday. I want to show him the council in action.
+TPM: I'll reach out to set that up. Now, looking ahead, we have Meeting Notes Extractor and Clipboard Intelligence in the Jr queue. The council approved the SAG platform strategy, which is the three-tier flywheel: free tools, then the assistant, then enterprise verticals.
+Partner: The free tools are the distribution. Every product we ship is a landing page that attracts the next customer. The Canary is going to attract security-minded clients. The Trimmer attracts anyone who pays for subscriptions. Different doors, same building.
+TPM: The pre-flight gate is wired into the Jr executor now. Should prevent the empty deliverable problem going forward. We also wrote the cross-node deployment KB so Jrs can learn to deploy across the federation.
+Partner: Good. We need the Jrs doing more of the deployment work so you can focus on architecture. Teach the pups.
+TPM: Agreed. One concern from the council: we stacked a lot of changes Thursday. vLLM resize, PgBouncer, API deploy, Caddy reconfig, Tribal Vision refactor, Fire Guard update. We instituted 12-hour minor and 24-hour major change cooldowns to manage the attack surface.
+Partner: That's important. We can't trace bugs through six changes at once. The cooldown is a feature, not a brake.
+TPM: Last item: the Sisyphus Substack essay got council approval, 12-0-1. The outline connects the Dera/Derq framework, the energy capacitor, Trithemius, and the Chaco governance model. It's the origin story.
+Partner: I'll write it when the scent is right. No rush. The capacitor holds.
+TPM: Anything else for the sprint review?
+Partner: Just that the cluster is breathing and the products are shipping. MOCHA is working. Let's keep the momentum.
+TPM: Agreed. MOCHA continues. For Seven Generations.

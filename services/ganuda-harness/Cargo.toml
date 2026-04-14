@@ -1,0 +1,47 @@
+[package]
+name = "ganuda-harness"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Compiled governance harness for any LLM endpoint. Pre/post-inference governance, sycophancy detection, mandatory dissent, audit trail. Model-agnostic."
+license = "PolyForm-Small-Business-1.0.0"
+repository = "https://github.com/dereadi/ganuda-harness"
+keywords = ["governance", "llm", "proxy", "sycophancy", "audit"]
+
+[dependencies]
+# HTTP proxy + server
+axum = "0.8"
+hyper = { version = "1", features = ["full"] }
+tokio = { version = "1", features = ["full"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors", "trace"] }
+
+# HTTP client (forward to model endpoint)
+reqwest = { version = "0.12", features = ["json", "stream"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Config
+toml = "0.8"
+
+# Crypto (audit hashes)
+sha2 = "0.10"
+hex = "0.4"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# Pattern matching (sycophancy detection, DC validation)
+regex = "1"
+
+# Request tracking
+uuid = { version = "1", features = ["v4"] }

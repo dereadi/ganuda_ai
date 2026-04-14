@@ -1,0 +1,6383 @@
+[
+  {
+    "game_id": "ka59",
+    "seed": 345877006,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 80.3,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 791511355,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 84.5,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 1252293634,
+    "instance": 18,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      8374
+    ],
+    "game_overs": 86,
+    "won": false,
+    "elapsed": 86.1,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 383430291,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 86.6,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 625484141,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 87.2,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 845259486,
+    "instance": 15,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5440
+    ],
+    "game_overs": 107,
+    "won": false,
+    "elapsed": 88.8,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 296016576,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 91.2,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 443401214,
+    "instance": 5,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      2391
+    ],
+    "game_overs": 127,
+    "won": false,
+    "elapsed": 95.9,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 1367000975,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 97.7,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 905160046,
+    "instance": 17,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      6363
+    ],
+    "game_overs": 100,
+    "won": false,
+    "elapsed": 99.3,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 1285332265,
+    "instance": 2,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3079
+    ],
+    "game_overs": 122,
+    "won": false,
+    "elapsed": 100.9,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 1306314320,
+    "instance": 0,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      6022
+    ],
+    "game_overs": 102,
+    "won": false,
+    "elapsed": 103.1,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 712446599,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 103.5,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 1871226148,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 105.0,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 1912798660,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 107.6,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 1605031669,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 108.5,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 97305043,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 111.6,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 369746443,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 112.0,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 105047240,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 112.7,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 1850773804,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 113.1,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 872435221,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 115.0,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 1182861236,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 115.0,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 30632720,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 117.0,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 336439184,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 120.9,
+    "error": null
+  },
+  {
+    "game_id": "ls20",
+    "seed": 206464050,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 125.8,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 923581425,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 67.5,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 2129634348,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 79.4,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 2093438524,
+    "instance": 5,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 85.6,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 1785655139,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 83.7,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 1810270699,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 79.4,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 488276111,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 72.7,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 775734384,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 90.6,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 1721805963,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 86.8,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 1160783741,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 90.2,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 1642820117,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 92.1,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 462872099,
+    "instance": 15,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 81.9,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 102941872,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 90.0,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 27899333,
+    "instance": 18,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 85.7,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 991421011,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 84.3,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 706386006,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 77.2,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 710262182,
+    "instance": 5,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 79.5,
+    "error": null
+  },
+  {
+    "game_id": "ka59",
+    "seed": 1459528601,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 91.4,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 896049719,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 83.1,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 1539009678,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 83.1,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 344415404,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 83.9,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 1782407353,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 86.8,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 21629024,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 100.2,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 411716202,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 96.0,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 276232638,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 92.0,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 1658219856,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 96.7,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 588702859,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 76.7,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 467803076,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 90.8,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 1121348231,
+    "instance": 18,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 81.7,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 1745390206,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 95.0,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 2024859333,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 85.0,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 1704373943,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 97.2,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 2033388256,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 97.3,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 1159480436,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 94.7,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 895471155,
+    "instance": 15,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 93.9,
+    "error": null
+  },
+  {
+    "game_id": "wa30",
+    "seed": 752980332,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 101.8,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 109491776,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 90.2,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 326485493,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 103.9,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 1906190410,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 100.3,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 605319132,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 118.2,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 1722504428,
+    "instance": 5,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 111.4,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 1065693494,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 117.6,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 1367327269,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 114.2,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 149312295,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 100.2,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 1956680227,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 122.4,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 914514154,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 119.5,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 883635602,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 120.7,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 1876146847,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 123.4,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 207355230,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 105.5,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 1120774966,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 126.2,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 407232878,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 129.3,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 1940833152,
+    "instance": 15,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 107.3,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 1673558991,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 112.4,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 715527585,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 116.2,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 1091959315,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 123.5,
+    "error": null
+  },
+  {
+    "game_id": "re86",
+    "seed": 1657413700,
+    "instance": 18,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 99,
+    "won": false,
+    "elapsed": 135.1,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 2068892085,
+    "instance": 0,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      94
+    ],
+    "game_overs": 584,
+    "won": false,
+    "elapsed": 158.7,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 2145210826,
+    "instance": 5,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 531,
+    "won": false,
+    "elapsed": 150.8,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 1682191608,
+    "instance": 1,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      435
+    ],
+    "game_overs": 572,
+    "won": false,
+    "elapsed": 174.4,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 1337133192,
+    "instance": 0,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      72
+    ],
+    "game_overs": 222,
+    "won": false,
+    "elapsed": 76.4,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 928713045,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 576,
+    "won": false,
+    "elapsed": 148.5,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 862900545,
+    "instance": 3,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      217
+    ],
+    "game_overs": 292,
+    "won": false,
+    "elapsed": 65.1,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 956437950,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 579,
+    "won": false,
+    "elapsed": 158.5,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 1022030311,
+    "instance": 2,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      448
+    ],
+    "game_overs": 475,
+    "won": false,
+    "elapsed": 187.5,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 1629368792,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 581,
+    "won": false,
+    "elapsed": 170.8,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 70052576,
+    "instance": 1,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      40
+    ],
+    "game_overs": 222,
+    "won": false,
+    "elapsed": 90.9,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 1447146949,
+    "instance": 2,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      44
+    ],
+    "game_overs": 229,
+    "won": false,
+    "elapsed": 91.6,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 1091857564,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 583,
+    "won": false,
+    "elapsed": 161.0,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 2118733722,
+    "instance": 4,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      627
+    ],
+    "game_overs": 485,
+    "won": false,
+    "elapsed": 187.9,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 222716432,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 583,
+    "won": false,
+    "elapsed": 161.0,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 873511017,
+    "instance": 3,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      470
+    ],
+    "game_overs": 510,
+    "won": false,
+    "elapsed": 200.4,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 1141483541,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 324,
+    "won": false,
+    "elapsed": 78.2,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 42104962,
+    "instance": 11,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      495
+    ],
+    "game_overs": 488,
+    "won": false,
+    "elapsed": 187.1,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 2122928718,
+    "instance": 15,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      283
+    ],
+    "game_overs": 507,
+    "won": false,
+    "elapsed": 182.3,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 292016818,
+    "instance": 13,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      91
+    ],
+    "game_overs": 583,
+    "won": false,
+    "elapsed": 189.1,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 1127287512,
+    "instance": 14,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      50
+    ],
+    "game_overs": 585,
+    "won": false,
+    "elapsed": 191.1,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 617612722,
+    "instance": 12,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      47
+    ],
+    "game_overs": 505,
+    "won": false,
+    "elapsed": 193.2,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 1433888161,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 473,
+    "won": false,
+    "elapsed": 170.6,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 1612977447,
+    "instance": 5,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      141
+    ],
+    "game_overs": 255,
+    "won": false,
+    "elapsed": 87.8,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 530754667,
+    "instance": 8,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      80
+    ],
+    "game_overs": 224,
+    "won": false,
+    "elapsed": 69.4,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 882099534,
+    "instance": 17,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      524
+    ],
+    "game_overs": 568,
+    "won": false,
+    "elapsed": 185.5,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 698706518,
+    "instance": 18,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      356
+    ],
+    "game_overs": 574,
+    "won": false,
+    "elapsed": 180.8,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 639220626,
+    "instance": 6,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      14
+    ],
+    "game_overs": 224,
+    "won": false,
+    "elapsed": 81.7,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 1407994471,
+    "instance": 7,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      246
+    ],
+    "game_overs": 292,
+    "won": false,
+    "elapsed": 81.1,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 159551039,
+    "instance": 10,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      12
+    ],
+    "game_overs": 257,
+    "won": false,
+    "elapsed": 72.7,
+    "error": null
+  },
+  {
+    "game_id": "bp35",
+    "seed": 252774869,
+    "instance": 16,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      119
+    ],
+    "game_overs": 522,
+    "won": false,
+    "elapsed": 204.7,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 815974248,
+    "instance": 9,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      118
+    ],
+    "game_overs": 223,
+    "won": false,
+    "elapsed": 87.3,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 1905723877,
+    "instance": 11,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      19
+    ],
+    "game_overs": 244,
+    "won": false,
+    "elapsed": 84.0,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 394915488,
+    "instance": 19,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      220
+    ],
+    "game_overs": 258,
+    "won": false,
+    "elapsed": 73.8,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 1410680195,
+    "instance": 14,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      101
+    ],
+    "game_overs": 287,
+    "won": false,
+    "elapsed": 85.6,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 489475139,
+    "instance": 17,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      159
+    ],
+    "game_overs": 248,
+    "won": false,
+    "elapsed": 82.8,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 1472671926,
+    "instance": 13,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      139
+    ],
+    "game_overs": 275,
+    "won": false,
+    "elapsed": 87.2,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 1786952891,
+    "instance": 18,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      19
+    ],
+    "game_overs": 222,
+    "won": false,
+    "elapsed": 83.7,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 333311983,
+    "instance": 12,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      44
+    ],
+    "game_overs": 258,
+    "won": false,
+    "elapsed": 96.2,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 492315609,
+    "instance": 15,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      70
+    ],
+    "game_overs": 222,
+    "won": false,
+    "elapsed": 88.3,
+    "error": null
+  },
+  {
+    "game_id": "sp80",
+    "seed": 515118419,
+    "instance": 16,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      49
+    ],
+    "game_overs": 250,
+    "won": false,
+    "elapsed": 92.7,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 977126331,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 89.7,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 1296727252,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 79.4,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 754527607,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 75.5,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 459770241,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 80.2,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 600112639,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 74.1,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 1712240842,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 87.2,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 1955578992,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 84.5,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 1610998269,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 83.6,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 2065486924,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 94.2,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 387703619,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 95.5,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 1554480197,
+    "instance": 5,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 99.5,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 2075086079,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 97.7,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 1652391965,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 89.1,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 1904644807,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 96.7,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 493195372,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 90.7,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 948941109,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 81.3,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 1028589106,
+    "instance": 15,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 94.3,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 559758758,
+    "instance": 2,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      3121,
+      8113
+    ],
+    "game_overs": 156,
+    "won": false,
+    "elapsed": 80.8,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 2005784642,
+    "instance": 0,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      2797,
+      4107
+    ],
+    "game_overs": 100,
+    "won": false,
+    "elapsed": 89.2,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 1550041417,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 103.1,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 784532761,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 93.8,
+    "error": null
+  },
+  {
+    "game_id": "lf52",
+    "seed": 316665282,
+    "instance": 18,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 99.2,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 1655351026,
+    "instance": 1,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      191
+    ],
+    "game_overs": 232,
+    "won": false,
+    "elapsed": 105.4,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 827731434,
+    "instance": 4,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      176
+    ],
+    "game_overs": 233,
+    "won": false,
+    "elapsed": 101.1,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 741240745,
+    "instance": 3,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      4309
+    ],
+    "game_overs": 166,
+    "won": false,
+    "elapsed": 105.7,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 1927057262,
+    "instance": 5,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1669
+    ],
+    "game_overs": 211,
+    "won": false,
+    "elapsed": 104.8,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 1443198676,
+    "instance": 7,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      830
+    ],
+    "game_overs": 221,
+    "won": false,
+    "elapsed": 93.9,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 132033652,
+    "instance": 8,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      2712,
+      8550
+    ],
+    "game_overs": 169,
+    "won": false,
+    "elapsed": 94.4,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 21061182,
+    "instance": 6,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      821
+    ],
+    "game_overs": 225,
+    "won": false,
+    "elapsed": 108.3,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 120217055,
+    "instance": 13,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      235
+    ],
+    "game_overs": 231,
+    "won": false,
+    "elapsed": 85.0,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 714686967,
+    "instance": 10,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      392,
+      3015
+    ],
+    "game_overs": 121,
+    "won": false,
+    "elapsed": 100.4,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 231714917,
+    "instance": 9,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      202,
+      2586
+    ],
+    "game_overs": 118,
+    "won": false,
+    "elapsed": 109.1,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 1110462538,
+    "instance": 14,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      512
+    ],
+    "game_overs": 227,
+    "won": false,
+    "elapsed": 94.2,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 919835655,
+    "instance": 16,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      475,
+      5744
+    ],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 91.9,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 1290315812,
+    "instance": 15,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      2254,
+      6248
+    ],
+    "game_overs": 140,
+    "won": false,
+    "elapsed": 97.2,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 310553433,
+    "instance": 11,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1046
+    ],
+    "game_overs": 221,
+    "won": false,
+    "elapsed": 104.4,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 1190814671,
+    "instance": 12,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      173
+    ],
+    "game_overs": 234,
+    "won": false,
+    "elapsed": 109.6,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 427572102,
+    "instance": 17,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      36
+    ],
+    "game_overs": 235,
+    "won": false,
+    "elapsed": 106.2,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 901122010,
+    "instance": 19,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      925
+    ],
+    "game_overs": 220,
+    "won": false,
+    "elapsed": 100.0,
+    "error": null
+  },
+  {
+    "game_id": "ft09",
+    "seed": 1135841130,
+    "instance": 18,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      2356
+    ],
+    "game_overs": 197,
+    "won": false,
+    "elapsed": 107.1,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 1400818364,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 104.4,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 1472511817,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 112.9,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 1665874351,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 110.2,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 901420915,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 111.8,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 189678085,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 113.7,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 1812078249,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 107.1,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 1510881505,
+    "instance": 5,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 111.9,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 1513759352,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 93.3,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 646155414,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 110.1,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 582416037,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 112.4,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 869182256,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 118.8,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 1159335452,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 93.9,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 2019868116,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 114.1,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 1907407923,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 103.3,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 222095219,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 113.1,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 431928941,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 94.4,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 571993633,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 106.4,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 1732860277,
+    "instance": 18,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 104.9,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1274656816,
+    "instance": 3,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      152,
+      7314
+    ],
+    "game_overs": 33,
+    "won": false,
+    "elapsed": 84.6,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 1518806016,
+    "instance": 15,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 115.3,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 846243435,
+    "instance": 0,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      59
+    ],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 101.9,
+    "error": null
+  },
+  {
+    "game_id": "sb26",
+    "seed": 2070307553,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 113.9,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 585913718,
+    "instance": 1,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      107
+    ],
+    "game_overs": 35,
+    "won": false,
+    "elapsed": 102.4,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1797431969,
+    "instance": 2,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      136
+    ],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 105.4,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1757220624,
+    "instance": 7,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      154
+    ],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 82.9,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 2093111934,
+    "instance": 5,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      135
+    ],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 92.1,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 2135250705,
+    "instance": 6,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      219
+    ],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 89.8,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 445462321,
+    "instance": 4,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      211
+    ],
+    "game_overs": 38,
+    "won": false,
+    "elapsed": 107.9,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1730329915,
+    "instance": 11,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      246,
+      6227
+    ],
+    "game_overs": 33,
+    "won": false,
+    "elapsed": 79.1,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 649977415,
+    "instance": 10,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      192,
+      6781
+    ],
+    "game_overs": 33,
+    "won": false,
+    "elapsed": 79.8,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1912405065,
+    "instance": 8,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      199,
+      885
+    ],
+    "game_overs": 28,
+    "won": false,
+    "elapsed": 90.1,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1468503913,
+    "instance": 9,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      129,
+      7284
+    ],
+    "game_overs": 33,
+    "won": false,
+    "elapsed": 92.2,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1343512094,
+    "instance": 12,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      163
+    ],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 103.5,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1704490467,
+    "instance": 13,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      186
+    ],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 97.8,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 239607134,
+    "instance": 14,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      178,
+      8084
+    ],
+    "game_overs": 35,
+    "won": false,
+    "elapsed": 97.5,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 685362086,
+    "instance": 15,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      113
+    ],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 95.8,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 317688297,
+    "instance": 16,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      170
+    ],
+    "game_overs": 36,
+    "won": false,
+    "elapsed": 92.7,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 2107246544,
+    "instance": 17,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      93,
+      4121
+    ],
+    "game_overs": 29,
+    "won": false,
+    "elapsed": 94.3,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 973944868,
+    "instance": 19,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      225
+    ],
+    "game_overs": 37,
+    "won": false,
+    "elapsed": 83.2,
+    "error": null
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1514972540,
+    "instance": 18,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      121
+    ],
+    "game_overs": 35,
+    "won": false,
+    "elapsed": 97.2,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 29640976,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 94.3,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 2098181420,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 89.9,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 1769642339,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 74.5,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 769601422,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 79.5,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 1494984108,
+    "instance": 9,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      9526
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 96.1,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 367365947,
+    "instance": 1,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      9187
+    ],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 106.4,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 1569354292,
+    "instance": 0,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5071
+    ],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 112.2,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 1650771221,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 109.1,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 1601640982,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 108.5,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 37977565,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 127.9,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 613789675,
+    "instance": 5,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3002
+    ],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 124.9,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 1039392407,
+    "instance": 8,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      2449
+    ],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 110.5,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 874135490,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 123.6,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 1576451272,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 106.1,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 474943494,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 124.6,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 209715948,
+    "instance": 15,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      4184
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 196.2,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 542827376,
+    "instance": 0,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1630
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 242.9,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 2082284256,
+    "instance": 4,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1469
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 245.9,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 147948204,
+    "instance": 5,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      208
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 253.2,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 1494664461,
+    "instance": 3,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      696
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 258.3,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 2023797841,
+    "instance": 10,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1114
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 236.5,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 619850915,
+    "instance": 2,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      569
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 262.4,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 1487992626,
+    "instance": 12,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      291
+    ],
+    "game_overs": 64,
+    "won": false,
+    "elapsed": 238.4,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 50685526,
+    "instance": 16,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1461
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 223.5,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 1434951592,
+    "instance": 8,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      390
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 245.6,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 1789366988,
+    "instance": 7,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      298
+    ],
+    "game_overs": 64,
+    "won": false,
+    "elapsed": 260.5,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 8406829,
+    "instance": 11,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      716
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 254.6,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 1840927052,
+    "instance": 11,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      7081
+    ],
+    "game_overs": 49,
+    "won": false,
+    "elapsed": 104.1,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 1719293916,
+    "instance": 12,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      4596
+    ],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 112.9,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 1783322013,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 122.6,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 91177306,
+    "instance": 17,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      748
+    ],
+    "game_overs": 64,
+    "won": false,
+    "elapsed": 237.7,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 456934585,
+    "instance": 19,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1038
+    ],
+    "game_overs": 64,
+    "won": false,
+    "elapsed": 234.3,
+    "error": null
+  },
+  {
+    "game_id": "m0r0",
+    "seed": 230302903,
+    "instance": 18,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      392
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 253.2,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 1273941733,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 132.7,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 1838308112,
+    "instance": 17,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      7797
+    ],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 101.2,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 497325249,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 119.9,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 1660396506,
+    "instance": 15,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      4444
+    ],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 105.6,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 1523657206,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 73.6,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 1062407385,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 112.3,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 638921997,
+    "instance": 5,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      25
+    ],
+    "game_overs": 195,
+    "won": false,
+    "elapsed": 85.0,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 2015467092,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 80.9,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 277217484,
+    "instance": 16,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      9894
+    ],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 126.9,
+    "error": null
+  },
+  {
+    "game_id": "sk48",
+    "seed": 743003192,
+    "instance": 18,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 127.8,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 141671269,
+    "instance": 7,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      21
+    ],
+    "game_overs": 195,
+    "won": false,
+    "elapsed": 91.1,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 782415364,
+    "instance": 0,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      5,
+      43
+    ],
+    "game_overs": 131,
+    "won": false,
+    "elapsed": 123.9,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 1998887046,
+    "instance": 1,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      7,
+      106
+    ],
+    "game_overs": 131,
+    "won": false,
+    "elapsed": 124.6,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 98061085,
+    "instance": 2,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      21,
+      109
+    ],
+    "game_overs": 131,
+    "won": false,
+    "elapsed": 119.2,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 408366051,
+    "instance": 6,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      34,
+      247
+    ],
+    "game_overs": 132,
+    "won": false,
+    "elapsed": 109.8,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 683204665,
+    "instance": 4,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      13,
+      107
+    ],
+    "game_overs": 131,
+    "won": false,
+    "elapsed": 117.4,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 1640249428,
+    "instance": 16,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      28
+    ],
+    "game_overs": 195,
+    "won": false,
+    "elapsed": 77.3,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 885992739,
+    "instance": 15,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      12
+    ],
+    "game_overs": 195,
+    "won": false,
+    "elapsed": 83.6,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 1609567881,
+    "instance": 9,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      22,
+      502
+    ],
+    "game_overs": 133,
+    "won": false,
+    "elapsed": 126.5,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 1363067606,
+    "instance": 10,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      21,
+      210
+    ],
+    "game_overs": 131,
+    "won": false,
+    "elapsed": 122.8,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 828850811,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 81.1,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 1270847218,
+    "instance": 11,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      17,
+      216
+    ],
+    "game_overs": 131,
+    "won": false,
+    "elapsed": 128.9,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 638160404,
+    "instance": 14,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      18,
+      111
+    ],
+    "game_overs": 131,
+    "won": false,
+    "elapsed": 109.5,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 697888347,
+    "instance": 12,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      28,
+      173
+    ],
+    "game_overs": 131,
+    "won": false,
+    "elapsed": 125.8,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 601091047,
+    "instance": 13,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      8,
+      54
+    ],
+    "game_overs": 130,
+    "won": false,
+    "elapsed": 120.0,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 2449825,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 38,
+    "won": false,
+    "elapsed": 100.6,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 1245193180,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 24,
+    "won": false,
+    "elapsed": 104.2,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 1795733764,
+    "instance": 19,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      6,
+      44
+    ],
+    "game_overs": 131,
+    "won": false,
+    "elapsed": 111.9,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 216062608,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 47,
+    "won": false,
+    "elapsed": 95.5,
+    "error": null
+  },
+  {
+    "game_id": "vc33",
+    "seed": 1233979883,
+    "instance": 18,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      41,
+      186
+    ],
+    "game_overs": 131,
+    "won": false,
+    "elapsed": 123.7,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 424507421,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 28,
+    "won": false,
+    "elapsed": 114.3,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 1152294386,
+    "instance": 5,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 54,
+    "won": false,
+    "elapsed": 105.1,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 844186346,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 46,
+    "won": false,
+    "elapsed": 107.7,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 421993988,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 41,
+    "won": false,
+    "elapsed": 108.5,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 1285761622,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 29,
+    "won": false,
+    "elapsed": 104.3,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 502406677,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 38,
+    "won": false,
+    "elapsed": 116.1,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 1120998603,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 50,
+    "won": false,
+    "elapsed": 109.3,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 1923550846,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 21,
+    "won": false,
+    "elapsed": 119.1,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 1710381893,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 108,
+    "won": false,
+    "elapsed": 102.5,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 1815581535,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 26,
+    "won": false,
+    "elapsed": 113.6,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 1214758573,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 42,
+    "won": false,
+    "elapsed": 109.6,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 795919012,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 39,
+    "won": false,
+    "elapsed": 111.4,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 303141954,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 19,
+    "won": false,
+    "elapsed": 98.8,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 524701768,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 34,
+    "won": false,
+    "elapsed": 105.7,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 1675957588,
+    "instance": 18,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 45,
+    "won": false,
+    "elapsed": 105.7,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 1286461654,
+    "instance": 15,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 60,
+    "won": false,
+    "elapsed": 122.1,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1298888383,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 105.7,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1004309643,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 102.4,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1416550072,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 109.4,
+    "error": null
+  },
+  {
+    "game_id": "sc25",
+    "seed": 1682295755,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 108,
+    "won": false,
+    "elapsed": 117.2,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 312972598,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 83.8,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1407275319,
+    "instance": 5,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 96.1,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1424089102,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 103.2,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 772623714,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 99.7,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1319877876,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 114.9,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1651832567,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 95.3,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1400479769,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 93.4,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 863977629,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 102.5,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1353408164,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 114.4,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 63304728,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 105.2,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1033951749,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 93.2,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1868132357,
+    "instance": 18,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 87.5,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node 'f0eb2015d5eccb6d2dee2b33499d64e1'\n"
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1212551244,
+    "instance": 0,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      2616
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 80.2,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1522643419,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 103.0,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 315744816,
+    "instance": 15,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 100.2,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 2044381960,
+    "instance": 1,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      798
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 81.8,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 987595180,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 91.7,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 1374203816,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 100.5,
+    "error": null
+  },
+  {
+    "game_id": "g50t",
+    "seed": 2012298192,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 103.4,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1937784614,
+    "instance": 3,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      982
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 80.5,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1139680125,
+    "instance": 2,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1924
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 94.2,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 64255594,
+    "instance": 5,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1054
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 85.7,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1604447277,
+    "instance": 9,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      343
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 76.5,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1628969318,
+    "instance": 6,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      815
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 87.0,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1945592302,
+    "instance": 4,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      418
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 99.4,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1204803649,
+    "instance": 7,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      2018
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 91.8,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 112520952,
+    "instance": 8,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1326
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 92.3,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1651572293,
+    "instance": 10,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      293
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 90.6,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1377408210,
+    "instance": 13,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      63
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 77.5,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1694586263,
+    "instance": 12,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      272
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 90.8,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1820400567,
+    "instance": 11,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      236
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 95.5,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 2030272738,
+    "instance": 14,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      4306
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 87.7,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1906442886,
+    "instance": 15,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1594
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 86.6,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1527806511,
+    "instance": 16,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      695
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 86.0,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 444157861,
+    "instance": 18,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      678
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 82.0,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 451352927,
+    "instance": 17,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      451
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 92.9,
+    "error": null
+  },
+  {
+    "game_id": "cn04",
+    "seed": 1358848932,
+    "instance": 19,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      2235
+    ],
+    "game_overs": 65,
+    "won": false,
+    "elapsed": 95.4,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 8440542,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 95.9,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 1993779313,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 98.2,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 929887059,
+    "instance": 7,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5623
+    ],
+    "game_overs": 335,
+    "won": false,
+    "elapsed": 91.7,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 985491541,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 98.6,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 2145210361,
+    "instance": 5,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 100.8,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 1080131714,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 105.9,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 682606124,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 103.6,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 1743170008,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 104.7,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 1279215407,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 88.4,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 1616376652,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 81.7,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 1893390677,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 96.4,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 1286848956,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 109.3,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 1687717796,
+    "instance": 15,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 86.8,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 1869686118,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 101.9,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 429986174,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 96.0,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 1756123350,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 104.2,
+    "error": null
+  },
+  {
+    "game_id": "dc22",
+    "seed": 381237817,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 82.5,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 1432337657,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 100.2,
+    "error": null
+  },
+  {
+    "game_id": "tu93",
+    "seed": 849235706,
+    "instance": 0,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 4.6,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '5725874bdface61626fc86871d52d5cc'\n"
+  },
+  {
+    "game_id": "r11l",
+    "seed": 174939610,
+    "instance": 18,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 95.6,
+    "error": null
+  },
+  {
+    "game_id": "tu93",
+    "seed": 1804799069,
+    "instance": 2,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 5.0,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '20238d5603fb490389717087ea61ef05'\n"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 964074837,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 87,
+    "won": false,
+    "elapsed": 87.1,
+    "error": null
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1318974502,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 77.4,
+    "error": null
+  },
+  {
+    "game_id": "r11l",
+    "seed": 1527133493,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 104.4,
+    "error": null
+  },
+  {
+    "game_id": "tu93",
+    "seed": 2117711551,
+    "instance": 3,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 9.0,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '783c4e252b190827d96c080500320449'\n"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1486733908,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 92.6,
+    "error": null
+  },
+  {
+    "game_id": "tu93",
+    "seed": 1544088988,
+    "instance": 1,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 13.5,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node 'cd641857ce297a1800b1b6dcef455583'\n"
+  },
+  {
+    "game_id": "tu93",
+    "seed": 1531813788,
+    "instance": 6,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 6.5,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node 'ec22d31213b25c5d9492f588951a7a11'\n"
+  },
+  {
+    "game_id": "r11l",
+    "seed": 278152933,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 163,
+    "won": false,
+    "elapsed": 99.1,
+    "error": null
+  },
+  {
+    "game_id": "tu93",
+    "seed": 1193189714,
+    "instance": 5,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 10.6,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '69728f16949ae44f6deb004d29bab52b'\n"
+  },
+  {
+    "game_id": "tu93",
+    "seed": 1260429139,
+    "instance": 8,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 10.6,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '049ad8cfccf6d6fe8eb8dce6ae5bd5b5'\n"
+  },
+  {
+    "game_id": "tu93",
+    "seed": 688479799,
+    "instance": 7,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 13.3,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node 'ad210fe32f4fd8ac3ad2551ef930a591'\n"
+  },
+  {
+    "game_id": "tu93",
+    "seed": 577139288,
+    "instance": 13,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 8.1,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '5725874bdface61626fc86871d52d5cc'\n"
+  },
+  {
+    "game_id": "tu93",
+    "seed": 173041896,
+    "instance": 14,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 7.1,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '03a05a3d41e022ad67ba872e88cbabea'\n"
+  },
+  {
+    "game_id": "tu93",
+    "seed": 6736512,
+    "instance": 15,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 4.6,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '1fac74874c045c852a8bb09edcd5edfd'\n"
+  },
+  {
+    "game_id": "tu93",
+    "seed": 979696828,
+    "instance": 9,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 14.1,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '4c1ebee07ca2f9afd7ba5d46faafddce'\n"
+  },
+  {
+    "game_id": "tu93",
+    "seed": 732024076,
+    "instance": 4,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 20.5,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '39b49f47e414adc345bb9456e5a93e07'\n"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1762406014,
+    "instance": 5,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 88,
+    "won": false,
+    "elapsed": 84.3,
+    "error": null
+  },
+  {
+    "game_id": "tu93",
+    "seed": 1341902896,
+    "instance": 18,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 6.6,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '2b9222badd174c287fcccd61c70cd9f7'\n"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 702538821,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 90,
+    "won": false,
+    "elapsed": 85.9,
+    "error": null
+  },
+  {
+    "game_id": "tu93",
+    "seed": 258252054,
+    "instance": 10,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 20.3,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '7be5bfa869dc3662e59198d03ad61de7'\n"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1425621230,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 73.8,
+    "error": null
+  },
+  {
+    "game_id": "dc22",
+    "seed": 351495224,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 82,
+    "won": false,
+    "elapsed": 95.8,
+    "error": null
+  },
+  {
+    "game_id": "tu93",
+    "seed": 1980589596,
+    "instance": 16,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 15.0,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '6afb4ca9ff1f936e26b13a1fb67ed7c8'\n"
+  },
+  {
+    "game_id": "tu93",
+    "seed": 1425697428,
+    "instance": 17,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 18.1,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '39b49f47e414adc345bb9456e5a93e07'\n"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1088552891,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 88,
+    "won": false,
+    "elapsed": 88.6,
+    "error": null
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1121920121,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 92.9,
+    "error": null
+  },
+  {
+    "game_id": "tu93",
+    "seed": 1146627884,
+    "instance": 19,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 22.9,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '0a88726897743a4b88843df4d8fbcca6'\n"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 258623338,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 90,
+    "won": false,
+    "elapsed": 90.9,
+    "error": null
+  },
+  {
+    "game_id": "tu93",
+    "seed": 1434158001,
+    "instance": 11,
+    "levels": 0,
+    "actions": 0,
+    "elapsed": 37.7,
+    "error": "^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/ganuda/services/arc_agi_3/graph_explorer.py\", line 387, in choose_edge\n    raise ValueError(\nValueError: No edges at all from node '7be5bfa869dc3662e59198d03ad61de7'\n"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1090326707,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 89,
+    "won": false,
+    "elapsed": 93.2,
+    "error": null
+  },
+  {
+    "game_id": "dc22",
+    "seed": 424071731,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 87,
+    "won": false,
+    "elapsed": 92.2,
+    "error": null
+  },
+  {
+    "game_id": "dc22",
+    "seed": 553493504,
+    "instance": 15,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 83.7,
+    "error": null
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1186367828,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 89.3,
+    "error": null
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1456664856,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 80.0,
+    "error": null
+  },
+  {
+    "game_id": "dc22",
+    "seed": 526464766,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 90,
+    "won": false,
+    "elapsed": 98.4,
+    "error": null
+  },
+  {
+    "game_id": "dc22",
+    "seed": 852118534,
+    "instance": 18,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 85.7,
+    "error": null
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1385538657,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 88,
+    "won": false,
+    "elapsed": 91.5,
+    "error": null
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1453113944,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 90,
+    "won": false,
+    "elapsed": 98.4,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 1843639721,
+    "instance": 1,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      222
+    ],
+    "game_overs": 68,
+    "won": false,
+    "elapsed": 78.3,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 1494151050,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 70.9,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 678433509,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 85.3,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 171221242,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 83.8,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 627211357,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 85.7,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 906060661,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 84.7,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 144158838,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 84.5,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 671504643,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 72.5,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 587966440,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 78.8,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 1457121310,
+    "instance": 5,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 87.7,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 2145370820,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 77.0,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 1279674614,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 88.6,
+    "error": null
+  },
+  {
+    "game_id": "tu93",
+    "seed": 571163227,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 113.4,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 2019098502,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 77.5,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 1274500723,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 75.9,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 317313785,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 83.1,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 1642678989,
+    "instance": 18,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 76.7,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 737395501,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 84.4,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 626555525,
+    "instance": 15,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      609
+    ],
+    "game_overs": 73,
+    "won": false,
+    "elapsed": 91.1,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 1128547213,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 196,
+    "won": false,
+    "elapsed": 83.1,
+    "error": null
+  },
+  {
+    "game_id": "s5i5",
+    "seed": 1303715333,
+    "instance": 12,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      100
+    ],
+    "game_overs": 66,
+    "won": false,
+    "elapsed": 100.2,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1041342343,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 82.8,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 773364819,
+    "instance": 1,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3441
+    ],
+    "game_overs": 134,
+    "won": false,
+    "elapsed": 93.9,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 811025653,
+    "instance": 2,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      1162,
+      1471
+    ],
+    "game_overs": 78,
+    "won": false,
+    "elapsed": 103.9,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1117862377,
+    "instance": 3,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1044
+    ],
+    "game_overs": 129,
+    "won": false,
+    "elapsed": 95.2,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1390188510,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 87.4,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1468540404,
+    "instance": 5,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      3270,
+      7615
+    ],
+    "game_overs": 119,
+    "won": false,
+    "elapsed": 88.1,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 795604641,
+    "instance": 10,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      8593
+    ],
+    "game_overs": 148,
+    "won": false,
+    "elapsed": 81.8,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1079754945,
+    "instance": 6,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      8587
+    ],
+    "game_overs": 148,
+    "won": false,
+    "elapsed": 89.3,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1673930275,
+    "instance": 11,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      7703
+    ],
+    "game_overs": 145,
+    "won": false,
+    "elapsed": 83.0,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 2007905355,
+    "instance": 7,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      2484
+    ],
+    "game_overs": 133,
+    "won": false,
+    "elapsed": 91.1,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1673494622,
+    "instance": 12,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      1439,
+      7402
+    ],
+    "game_overs": 113,
+    "won": false,
+    "elapsed": 89.0,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1443327311,
+    "instance": 19,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3531
+    ],
+    "game_overs": 134,
+    "won": false,
+    "elapsed": 81.0,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 2130139127,
+    "instance": 8,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      628
+    ],
+    "game_overs": 130,
+    "won": false,
+    "elapsed": 98.8,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1255087505,
+    "instance": 17,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5166
+    ],
+    "game_overs": 139,
+    "won": false,
+    "elapsed": 85.7,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 304484946,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 153,
+    "won": false,
+    "elapsed": 88.2,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1387931183,
+    "instance": 9,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      2261,
+      6241
+    ],
+    "game_overs": 109,
+    "won": false,
+    "elapsed": 99.9,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 1908216865,
+    "instance": 3,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5797
+    ],
+    "game_overs": 220,
+    "won": false,
+    "elapsed": 71.9,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1768806153,
+    "instance": 13,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      848,
+      6435
+    ],
+    "game_overs": 106,
+    "won": false,
+    "elapsed": 98.9,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 969628853,
+    "instance": 14,
+    "levels": 2,
+    "actions": 10000,
+    "level_up_actions": [
+      2103,
+      6583
+    ],
+    "game_overs": 110,
+    "won": false,
+    "elapsed": 101.5,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1107517044,
+    "instance": 15,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      832
+    ],
+    "game_overs": 129,
+    "won": false,
+    "elapsed": 100.8,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 1311601363,
+    "instance": 2,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      4148
+    ],
+    "game_overs": 194,
+    "won": false,
+    "elapsed": 82.0,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 1820321851,
+    "instance": 0,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      6100
+    ],
+    "game_overs": 225,
+    "won": false,
+    "elapsed": 89.0,
+    "error": null
+  },
+  {
+    "game_id": "ar25",
+    "seed": 831211014,
+    "instance": 18,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1056
+    ],
+    "game_overs": 130,
+    "won": false,
+    "elapsed": 103.2,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 736254198,
+    "instance": 1,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      6749
+    ],
+    "game_overs": 234,
+    "won": false,
+    "elapsed": 93.9,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 1816390637,
+    "instance": 4,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3642
+    ],
+    "game_overs": 189,
+    "won": false,
+    "elapsed": 88.9,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 192424358,
+    "instance": 5,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5404
+    ],
+    "game_overs": 214,
+    "won": false,
+    "elapsed": 90.7,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 809066204,
+    "instance": 6,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5945
+    ],
+    "game_overs": 222,
+    "won": false,
+    "elapsed": 98.8,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 1629967751,
+    "instance": 8,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5097
+    ],
+    "game_overs": 211,
+    "won": false,
+    "elapsed": 82.7,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 464534213,
+    "instance": 7,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5545
+    ],
+    "game_overs": 217,
+    "won": false,
+    "elapsed": 89.8,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 538771564,
+    "instance": 9,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3241
+    ],
+    "game_overs": 183,
+    "won": false,
+    "elapsed": 84.2,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 87362989,
+    "instance": 13,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5276
+    ],
+    "game_overs": 211,
+    "won": false,
+    "elapsed": 85.3,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 1986314709,
+    "instance": 10,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3140
+    ],
+    "game_overs": 179,
+    "won": false,
+    "elapsed": 92.4,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 364595151,
+    "instance": 11,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      2397
+    ],
+    "game_overs": 171,
+    "won": false,
+    "elapsed": 91.4,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 1949631330,
+    "instance": 14,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5303
+    ],
+    "game_overs": 213,
+    "won": false,
+    "elapsed": 86.9,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 384955090,
+    "instance": 15,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5437
+    ],
+    "game_overs": 214,
+    "won": false,
+    "elapsed": 84.1,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 1683110079,
+    "instance": 12,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3332
+    ],
+    "game_overs": 185,
+    "won": false,
+    "elapsed": 94.6,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 965667151,
+    "instance": 17,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      4299
+    ],
+    "game_overs": 199,
+    "won": false,
+    "elapsed": 86.5,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 1130925238,
+    "instance": 16,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      7625
+    ],
+    "game_overs": 246,
+    "won": false,
+    "elapsed": 87.9,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 1077228665,
+    "instance": 19,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5143
+    ],
+    "game_overs": 210,
+    "won": false,
+    "elapsed": 93.8,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 178725347,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 91.3,
+    "error": null
+  },
+  {
+    "game_id": "su15",
+    "seed": 167333754,
+    "instance": 18,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      6074
+    ],
+    "game_overs": 225,
+    "won": false,
+    "elapsed": 96.8,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 312031271,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 80.4,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 186708960,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 93.0,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 1426783486,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 94.5,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 1044252932,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 106.3,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 318126081,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 98.6,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 34088613,
+    "instance": 5,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      4621
+    ],
+    "game_overs": 160,
+    "won": false,
+    "elapsed": 97.9,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 1433995837,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 106.9,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 1012335728,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 93.4,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 239888259,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 93.6,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 1810024810,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 87.4,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 91524664,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 94.0,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 1289617778,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 100.0,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 2060824279,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 99.8,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 2119525011,
+    "instance": 15,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 85.3,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 219368775,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 98.5,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 29212474,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 92.4,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 429248404,
+    "instance": 16,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 96.0,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 1751498709,
+    "instance": 19,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 91.4,
+    "error": null
+  },
+  {
+    "game_id": "tn36",
+    "seed": 1027245795,
+    "instance": 18,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 161,
+    "won": false,
+    "elapsed": 97.6,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 1308933301,
+    "instance": 0,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 115.2,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 2062703171,
+    "instance": 2,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 111.0,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 1065810087,
+    "instance": 5,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 103.2,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 27413938,
+    "instance": 1,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 121.4,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 1394807675,
+    "instance": 4,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 117.5,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 1494577498,
+    "instance": 3,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 122.4,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 1106369817,
+    "instance": 12,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 109.0,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 737213935,
+    "instance": 9,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 115.4,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 177797856,
+    "instance": 7,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 122.4,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 1535811959,
+    "instance": 6,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 123.8,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 457111536,
+    "instance": 10,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 119.6,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 33600946,
+    "instance": 13,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 122.8,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 1158694700,
+    "instance": 14,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 119.6,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 1427080765,
+    "instance": 8,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 135.9,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 1802799922,
+    "instance": 0,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      115
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 88.1,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 961968934,
+    "instance": 11,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 139.3,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 594039102,
+    "instance": 15,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 134.9,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 618202587,
+    "instance": 3,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      618
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 84.8,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 1464162448,
+    "instance": 16,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1283
+    ],
+    "game_overs": 76,
+    "won": false,
+    "elapsed": 112.3,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 477230805,
+    "instance": 1,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1632
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 90.7,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 1612716478,
+    "instance": 2,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3243
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 92.3,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 349345283,
+    "instance": 17,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 114.8,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 906247151,
+    "instance": 19,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3667
+    ],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 113.1,
+    "error": null
+  },
+  {
+    "game_id": "tr87",
+    "seed": 1066531938,
+    "instance": 18,
+    "levels": 0,
+    "actions": 10000,
+    "level_up_actions": [],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 116.0,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 398806667,
+    "instance": 4,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1423
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 97.2,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 2130770451,
+    "instance": 6,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      6274
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 76.9,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 43238393,
+    "instance": 5,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      6169
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 82.4,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 459974872,
+    "instance": 8,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1419
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 71.2,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 776901202,
+    "instance": 7,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3348
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 83.3,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 345025797,
+    "instance": 10,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      5765
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 67.3,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 642094727,
+    "instance": 13,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      2025
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 64.6,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 1602799190,
+    "instance": 11,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1529
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 70.8,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 2099724875,
+    "instance": 9,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      2330
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 78.0,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 198309560,
+    "instance": 12,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      4152
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 77.6,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 1487591655,
+    "instance": 15,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      1038
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 72.6,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 1156237759,
+    "instance": 17,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3845
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 65.8,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 1178458643,
+    "instance": 14,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      3952
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 75.3,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 1805572056,
+    "instance": 16,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      2031
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 70.8,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 544331035,
+    "instance": 18,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      4656
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 70.1,
+    "error": null
+  },
+  {
+    "game_id": "cd82",
+    "seed": 1411890787,
+    "instance": 19,
+    "levels": 1,
+    "actions": 10000,
+    "level_up_actions": [
+      722
+    ],
+    "game_overs": 98,
+    "won": false,
+    "elapsed": 65.0,
+    "error": null
+  }
+]

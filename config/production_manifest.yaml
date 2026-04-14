@@ -1,0 +1,346 @@
+# Cherokee AI Federation — Production Manifest
+# PURPOSE: Machine-readable guardrail. Jr executor MUST check this before destructive actions.
+# Created: March 23, 2026 (Ultrathink Gap 3 — Nate Jones Memory Wall Analysis)
+# Authority: TPM + Partner. Changes require council vote.
+#
+# RULE: Any Jr task that targets a resource listed here with a destructive action
+#       (DROP, TRUNCATE, DELETE, rm, systemctl stop/disable, ALTER TABLE DROP)
+#       MUST require elevated approval (council vote or Partner confirm).
+
+# ═══════════════════════════════════════════
+# DATABASES
+# ═══════════════════════════════════════════
+databases:
+  zammad_production:
+    host: 10.100.0.2  # bluefin via WireGuard
+    port: 5432
+    user: claude
+    classification: PRODUCTION
+    note: "Primary federation database. Contains thermal memory (the organism's brain), council votes, Jr pipeline, VetAssist non-PII."
+
+  vetassist_pii:
+    host: 192.168.20.10  # goldfin VLAN 20 Sanctum
+    port: 5432
+    classification: SACRED
+    smoke_test_skip: true  # Isolated by design — unreachable from redfin (Crawdad requirement)
+    note: "Veteran PII data. Crawdad jurisdiction. NEVER expose outside VLAN 20."
+
+# ═══════════════════════════════════════════
+# SACRED TABLES — NEVER DROP, TRUNCATE, or bulk DELETE
+# ═══════════════════════════════════════════
+sacred_tables:
+  # The organism's memory
+  - table: thermal_memory_archive
+    db: zammad_production
+    classification: SACRED
+    note: "94K+ thermals. The organism's persistent memory. APPEND-ONLY. Losing this = lobotomy."
+    allowed_operations: [SELECT, INSERT, UPDATE]
+    forbidden_operations: [DROP, TRUNCATE, "DELETE without WHERE clause"]
+
+  - table: observational_memory_archive
+    db: zammad_production
+    classification: SACRED
+    note: "Compressed observations from thermals."
+
+  # Governance
+  - table: council_votes
+    db: zammad_production
+    classification: SACRED
+    note: "Every council vote ever cast. Governance audit trail."
+
+  - table: longhouse_sessions
+    db: zammad_production
+    classification: SACRED
+    note: "Outer council governance records."
+
+  - table: council_prediction_outcomes
+    db: zammad_production
+    classification: PRODUCTION
+    note: "Vote accuracy tracking. Calibration data."
+
+  # Jr pipeline
+  - table: jr_work_queue
+    db: zammad_production
+    classification: PRODUCTION
+    note: "Active Jr task queue."
+
+  - table: jr_task_completions
+    db: zammad_production
+    classification: PRODUCTION
+    note: "Jr task completion records."
+
+  - table: jr_task_bids
+    db: zammad_production
+    classification: PRODUCTION
+    note: "Jr task bidding history."
+
+  - table: jr_step_rewards
+    db: zammad_production
+    classification: PRODUCTION
+    note: "Step-level execution tracking."
+
+  - table: jr_task_checkpoints
+    db: zammad_production
+    classification: PRODUCTION
+    note: "Resume-from-failure checkpoints."
+
+  - table: jr_failed_tasks_dlq
+    db: zammad_production
+    classification: PRODUCTION
+    note: "Dead letter queue. Forensic evidence."
+
+  # Kanban
+  - table: kanban_tasks
+    db: triad_federation
+    classification: PRODUCTION
+    note: "Project board. All open/closed work items."
+
+  - table: kanban_boards
+    db: triad_federation
+    classification: PRODUCTION
+    note: "Board definitions."
+
+  # Elisi
+  - table: elisi_state
+    db: zammad_production
+    classification: PRODUCTION
+    note: "Phase 2 valence signal persistence."
+
+  # VetAssist
+  - table: vetassist_wizard_sessions
+    db: zammad_production
+    classification: PRODUCTION
+    note: "Active veteran claim sessions."
+
+  - table: vetassist_cfr_conditions
+    db: zammad_production
+    classification: PRODUCTION
+    note: "CFR condition database for veterans."
+
+  - table: vetassist_encrypted_records
+    db: vetassist_pii
+    classification: SACRED
+    note: "Veteran PII. Crawdad jurisdiction."
+
+  # CMDB
+  - table: cmdb_configuration_items
+    db: zammad_production
+    classification: PRODUCTION
+    note: "Configuration management database."
+
+  - table: cmdb_service_dependencies
+    db: zammad_production
+    classification: PRODUCTION
+    note: "Service dependency map."
+
+  - table: council_concern_evals
+    db: zammad_production
+    classification: PRODUCTION
+    note: "Persistent eval rules extracted from council concerns. Gap 7 — wisdom compounds, not decays."
+
+# ═══════════════════════════════════════════
+# SACRED FILES — NEVER delete or overwrite without backup
+# ═══════════════════════════════════════════
+sacred_files:
+  - path: /ganuda/config/secrets.env
+    classification: SACRED
+    note: "All credentials. Deletion = cluster goes dark."
+
+  - path: /ganuda/state/emergency_brake.json
+    classification: SACRED
+    note: "Emergency brake state. Corruption = safety system offline."
+
+  - path: /ganuda/docs/PAINTED_ON_THE_WALLS.md
+    classification: SACRED
+    note: "Culture rules, design constraints. The constitution."
+
+  - path: /ganuda/config/production_manifest.yaml
+    classification: SACRED
+    note: "This file. Self-referential protection."
+
+  - path: /ganuda/config/camera_registry.yaml
+    classification: PRODUCTION
+    note: "Camera fleet configuration."
+
+  - path: /ganuda/config/council_principles.yaml
+    classification: PRODUCTION
+    note: "Council governance rules."
+
+  - path: /ganuda/config/rlm_protected_paths.yaml
+    classification: PRODUCTION
+    note: "RLM blacklist/whitelist."
+
+# ═══════════════════════════════════════════
+# PRODUCTION SERVICES — NEVER stop without council vote or Partner approval
+# ═══════════════════════════════════════════
+services:
+  # Tier 0: Life support — organism dies without these
+  tier_0_life_support:
+    - name: fire-guard.timer
+      node: redfin
+      note: "Watchdog. Every 2 min. The heartbeat."
+    - name: medicine-woman.service
+      node: redfin
+      note: "The Observer. If she stops watching, nobody's watching."
+    - name: elisi-observer.service
+      node: redfin
+      note: "The Grandmother. Valence signaling."
+    - name: ganudabot.service
+      node: redfin
+      note: "Partner's phone link to the cluster."
+    - name: vllm-elisi.service
+      node: redfin
+      note: "Elisi's brain. Qwen2.5-7B on GPU."
+
+  # Tier 1: Core function — organism impaired without these
+  tier_1_core:
+    - name: vllm.service
+      node: redfin
+      port: 8000
+      note: "Main inference. Qwen2.5-72B."
+    - name: llm-gateway.service
+      node: redfin
+      port: 8080
+      note: "All LLM traffic routes through here."
+    - name: consultation-ring.service
+      node: redfin
+      port: 9400
+      note: "Multi-model consultation."
+    - name: jr-executor.service
+      node: redfin
+      note: "Jr task execution."
+    - name: jr-orchestrator.service
+      node: redfin
+      note: "Priority queue management."
+
+  # Tier 2: Value delivery — serves users/veterans
+  tier_2_value:
+    - name: vetassist-backend.service
+      node: redfin
+      port: 8001
+      note: "VetAssist API. Serves veterans."
+    - name: vetassist-frontend.service
+      node: redfin
+      port: 3000
+      note: "VetAssist web UI."
+    - name: tribal-vision.service
+      node: redfin
+      note: "Camera intelligence pipeline."
+    - name: speed-detector.service
+      node: redfin
+      note: "Speed detection on garage cam."
+
+  # Tier 3: Governance — organism drifts without these
+  tier_3_governance:
+    - name: council-dawn-mist.timer
+      node: redfin
+      note: "Daily standup. 6:15 AM."
+    - name: safety-canary.timer
+      node: redfin
+      note: "Red team probe. Daily 3 AM."
+    - name: credential-scanner.timer
+      node: redfin
+      note: "Secret scanner. Sat 2 AM."
+    - name: owl-debt-reckoning.timer
+      node: redfin
+      note: "Tech debt check. Wed 5 AM."
+    - name: ritual-review.timer
+      node: redfin
+      note: "Behavioral reinforcement. Sun 4 AM."
+    - name: body-report.timer
+      node: redfin
+      note: "Organism health digest. Every 6h."
+
+# ═══════════════════════════════════════════
+# PRODUCTION PORTS — NEVER reassign without manifest update
+# ═══════════════════════════════════════════
+ports:
+  redfin:
+    - port: 8000
+      service: vllm
+      note: "Qwen2.5-72B inference"
+    - port: 8001
+      service: vetassist-backend
+      note: "VetAssist API"
+    - port: 8002
+      service: vllm-cherokee
+      note: "Constitutional model"
+    - port: 8080
+      service: llm-gateway
+      note: "All LLM traffic"
+    - port: 3000
+      service: vetassist-frontend
+      note: "VetAssist web"
+    - port: 9400
+      service: consultation-ring
+      note: "Multi-model consultation"
+    - port: 8888
+      service: searxng
+      note: "Meta search (podman)"
+
+  bluefin:
+    - port: 5432
+      service: postgresql
+      note: "Primary database. THE brain."
+    - port: 8090
+      service: vlm
+      note: "Vision language model"
+
+  bmasass:
+    - port: 8800
+      service: qwen3-30b
+      note: "MLX Qwen3-30B-A3B"
+    - port: 8801
+      service: llama-70b
+      note: "Llama-3.3-70B (pending)"
+
+  owlfin:
+    - port: 80
+      service: caddy
+      note: "DMZ web. keepalived MASTER."
+
+  eaglefin:
+    - port: 80
+      service: caddy
+      note: "DMZ web. keepalived BACKUP."
+
+  greenfin:
+    - port: 8003
+      service: embedding
+      note: "Embedding service"
+
+# ═══════════════════════════════════════════
+# EMERGENCY BRAKE THRESHOLDS — NEVER weaken without council vote
+# ═══════════════════════════════════════════
+emergency_brake:
+  jr_failure_rate_threshold: 0.50
+  thermal_writes_per_min_max: 100
+  cpu_sustained_max: 0.95
+  disk_usage_max: 0.95
+  pg_connections_max: 90
+  coyote_anomaly_count: 3
+  coyote_window_seconds: 300
+  auto_disengage_minutes: 30
+
+# ═══════════════════════════════════════════
+# DESTRUCTIVE ACTIONS — Always require pre-flight check against this manifest
+# ═══════════════════════════════════════════
+destructive_actions:
+  database:
+    - DROP TABLE
+    - DROP DATABASE
+    - TRUNCATE
+    - "DELETE FROM (without WHERE)"
+    - ALTER TABLE DROP COLUMN
+  filesystem:
+    - "rm -rf"
+    - "rm -f on sacred paths"
+    - "mv or rename of sacred files"
+  services:
+    - "systemctl stop (tier 0 or tier 1)"
+    - "systemctl disable (any production)"
+    - "systemctl mask (any production)"
+  network:
+    - "Changing CHEROKEE_DB_HOST"
+    - "Modifying WireGuard config"
+    - "Changing firewall rules"

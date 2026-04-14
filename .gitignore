@@ -259,3 +259,5 @@ security/dependency_audit/
 logs/security/
 docs/api_keys/
 longhouse/
+services/larql/
+services/ganuda-harness/target/

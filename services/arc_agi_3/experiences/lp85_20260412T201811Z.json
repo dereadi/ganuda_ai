@@ -1,0 +1,41 @@
+{
+  "signature": {
+    "game_id": "lp85",
+    "timestamp": "2026-04-12T20:18:11.323563+00:00",
+    "outcome": "unknown",
+    "action_type": "unknown",
+    "action_count": 300,
+    "levels_completed": 1,
+    "unique_states": 0,
+    "frame_characteristics": {
+      "dominant_colors": [],
+      "object_count_range": [
+        0,
+        0
+      ],
+      "grid_size": [
+        0,
+        0
+      ],
+      "has_grid_pattern": false
+    },
+    "cwm": {
+      "transitions_collected": 0,
+      "synthesis_attempts": 0,
+      "synthesis_successes": 0,
+      "model_ready": false,
+      "accuracy": 0.0
+    },
+    "goal_hypotheses": [],
+    "level_up_patterns": []
+  },
+  "content": "ARC-AGI-3 GAME EXPERIENCE \u2014 lp85\nTimestamp: 2026-04-12T20:18:11.323563+00:00\nOutcome: unknown\n\n== GAME SIGNATURE ==\nAction Type: unknown\nTotal Actions: 300\nLevels Completed: 1\nUnique States Discovered: 0\n\n== FRAME CHARACTERISTICS ==\nDominant Colors: \nObject Count Range: [0, 0]\nGrid Size: [0, 0]\nHas Grid Pattern: False\n\n== CWM (CODE WORLD MODEL) ==\nTransitions Collected: 0\nSynthesis Attempts: 0\nSynthesis Successes: 0\nModel Ready: False\nAccuracy: N/A\n\n== GOAL HYPOTHESES ==\n  No hypotheses generated.\n\n== LEVEL-UP PATTERNS ==\n  No level-ups recorded.\n\n== STRATEGY NOTES ==\n  - Averaged 300 actions per level.\n  - High action count per level \u2014 game may require extensive exploration.\n  - Only 0 transitions collected \u2014 not enough for CWM synthesis. Game may have few distinct states.",
+  "tags": [
+    "arc_agi_3",
+    "game_experience",
+    "game_lp85",
+    "action_unknown",
+    "unknown"
+  ],
+  "stored_at": "20260412T201811Z"
+}
