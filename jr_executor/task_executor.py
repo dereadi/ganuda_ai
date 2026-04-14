@@ -741,10 +741,33 @@ class TaskExecutor:
                 merged_lines[insert_pos:insert_pos] = insert_block
                 print(f"[PartialEdit] insert_after at line {insert_pos} (anchor={anchor})")
             else:
-                # Fallback: append at end
-                print(f"[PartialEdit] Could not find anchor '{anchor}', appending at end")
-                append_block = ['\n'] + [line + '\n' for line in new_lines] + ['\n']
-                merged_lines.extend(append_block)
+                # Fix: DON'T blindly append at EOF — try harder to find insertion point
+                # 1. Try fuzzy anchor match (partial string matching)
+                fuzzy_pos = self._fuzzy_find_anchor(existing_lines, anchor)
+                if fuzzy_pos is not None:
+                    # Infer indentation from surrounding context
+                    new_lines = self._fix_indentation(new_lines, existing_lines, fuzzy_pos)
+                    insert_block = ['\n'] + [line + '\n' for line in new_lines] + ['\n']
+                    merged_lines[fuzzy_pos:fuzzy_pos] = insert_block
+                    print(f"[PartialEdit] Fuzzy anchor match at line {fuzzy_pos} (anchor={anchor})")
+                elif line_hint:
+                    # 2. Use line_hint with indentation inference
+                    pos = min(line_hint, len(existing_lines))
+                    new_lines = self._fix_indentation(new_lines, existing_lines, pos)
+                    insert_block = ['\n'] + [line + '\n' for line in new_lines] + ['\n']
+                    merged_lines[pos:pos] = insert_block
+                    print(f"[PartialEdit] Used line_hint {line_hint} as fallback (anchor '{anchor}' not found)")
+                else:
+                    # 3. Last resort: FAIL instead of appending broken code at EOF
+                    print(f"[PartialEdit] REFUSING to append at EOF — anchor '{anchor}' not found, no line_hint")
+                    print(f"[PartialEdit] This prevents IndentationError from blind appending")
+                    if os.path.exists(backup_path):
+                        shutil.copy2(backup_path, filepath)
+                    return {
+                        'success': False,
+                        'error': f"Could not find anchor '{anchor}' and no line_hint provided. Refusing to append at EOF.",
+                        'blocked_by': 'anchor_not_found'
+                    }
 
         elif mode == 'replace_method':
             # Replace an existing method/function with new version
@@ -761,10 +784,30 @@ class TaskExecutor:
                 merged_lines[start:end] = new_method_lines
                 print(f"[PartialEdit] replace_method '{anchor}' lines {start}-{end} with {len(new_method_lines)} lines")
             else:
-                # Method not found - insert after line hint or append
-                print(f"[PartialEdit] Method '{anchor}' not found for replace, appending")
-                append_block = ['\n'] + [line + '\n' for line in new_lines] + ['\n']
-                merged_lines.extend(append_block)
+                # Method not found — try fuzzy match, then line_hint, then FAIL
+                fuzzy_range = self._fuzzy_find_method(existing_lines, anchor)
+                if fuzzy_range:
+                    start, end = fuzzy_range
+                    new_lines = self._fix_indentation(new_lines, existing_lines, start)
+                    new_method_lines = [line + '\n' for line in new_lines]
+                    new_method_lines.append('\n')
+                    merged_lines[start:end] = new_method_lines
+                    print(f"[PartialEdit] Fuzzy method match '{anchor}' at lines {start}-{end}")
+                elif line_hint:
+                    pos = min(line_hint, len(existing_lines))
+                    new_lines = self._fix_indentation(new_lines, existing_lines, pos)
+                    insert_block = ['\n'] + [line + '\n' for line in new_lines] + ['\n']
+                    merged_lines[pos:pos] = insert_block
+                    print(f"[PartialEdit] Method '{anchor}' not found, used line_hint {line_hint}")
+                else:
+                    print(f"[PartialEdit] REFUSING to append method at EOF — '{anchor}' not found")
+                    if os.path.exists(backup_path):
+                        shutil.copy2(backup_path, filepath)
+                    return {
+                        'success': False,
+                        'error': f"Method '{anchor}' not found and no line_hint. Refusing to append at EOF.",
+                        'blocked_by': 'method_not_found'
+                    }
 
         else:
             # Full write mode - delegate to safe_file_write
@@ -925,6 +968,156 @@ class TaskExecutor:
             end = j + 1
 
         return (start, end)
+
+    def _fuzzy_find_anchor(self, lines: list, anchor: Optional[str]) -> Optional[int]:
+        """
+        Fuzzy anchor matching — finds insertion point when exact match fails.
+
+        Strategies:
+        1. Search for anchor as a substring in any line (not just def/class)
+        2. Search for anchor words individually
+        3. Search for similar function names (edit distance)
+        """
+        if not anchor:
+            return None
+
+        anchor_clean = anchor.strip().rstrip('()').strip('`"\'')
+        if not anchor_clean:
+            return None
+
+        # Strategy 1: Exact substring match in any line
+        for i, line in enumerate(lines):
+            if anchor_clean in line:
+                # Found the anchor text — insert after this line
+                return i + 1
+
+        # Strategy 2: Case-insensitive substring match
+        anchor_lower = anchor_clean.lower()
+        for i, line in enumerate(lines):
+            if anchor_lower in line.lower():
+                return i + 1
+
+        # Strategy 3: Match individual words from anchor in def/class lines
+        anchor_words = set(re.findall(r'[a-zA-Z_]\w+', anchor_clean))
+        if anchor_words:
+            best_match = None
+            best_score = 0
+            for i, line in enumerate(lines):
+                stripped = line.strip()
+                if stripped.startswith('def ') or stripped.startswith('class '):
+                    line_words = set(re.findall(r'[a-zA-Z_]\w+', stripped))
+                    overlap = len(anchor_words & line_words)
+                    if overlap > best_score:
+                        best_score = overlap
+                        best_match = i
+            if best_match is not None and best_score >= 1:
+                # Find end of this function/method
+                indent = len(lines[best_match]) - len(lines[best_match].lstrip())
+                end_pos = best_match + 1
+                for j in range(best_match + 1, len(lines)):
+                    stripped = lines[j].strip()
+                    if stripped and not stripped.startswith('#'):
+                        j_indent = len(lines[j]) - len(lines[j].lstrip())
+                        if j_indent <= indent and stripped:
+                            end_pos = j
+                            break
+                        end_pos = j + 1
+                print(f"[PartialEdit] Fuzzy word match: anchor '{anchor_clean}' → line {best_match} (score={best_score})")
+                return end_pos
+
+        return None
+
+    def _fuzzy_find_method(self, lines: list, anchor: Optional[str]) -> Optional[tuple]:
+        """
+        Fuzzy method range finding — tries partial name matching when exact fails.
+        """
+        if not anchor:
+            return None
+
+        anchor_clean = anchor.strip().rstrip('()').strip('`"\'')
+        if not anchor_clean:
+            return None
+
+        # Try substring match on function names
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if stripped.startswith('def '):
+                func_name_match = re.search(r'def\s+(\w+)', stripped)
+                if func_name_match:
+                    func_name = func_name_match.group(1)
+                    # Check if anchor is a substring of func_name or vice versa
+                    if anchor_clean.lower() in func_name.lower() or func_name.lower() in anchor_clean.lower():
+                        # Found it — now find the end
+                        indent = len(line) - len(line.lstrip())
+                        end = i + 1
+                        for j in range(i + 1, len(lines)):
+                            s = lines[j].strip()
+                            if not s:
+                                end = j + 1
+                                continue
+                            j_indent = len(lines[j]) - len(lines[j].lstrip())
+                            if j_indent <= indent and (s.startswith('def ') or
+                                                        s.startswith('class ') or
+                                                        s.startswith('@')):
+                                end = j
+                                break
+                            end = j + 1
+                        print(f"[PartialEdit] Fuzzy method match: '{anchor_clean}' → '{func_name}' at lines {i}-{end}")
+                        return (i, end)
+
+        return None
+
+    def _fix_indentation(self, new_lines: list, existing_lines: list,
+                          insert_pos: int) -> list:
+        """
+        Fix indentation of new code to match the context at the insertion point.
+
+        Looks at the indentation of lines near insert_pos and adjusts
+        new_lines to match. Prevents IndentationError from mismatched indentation.
+        """
+        if not new_lines or not existing_lines:
+            return new_lines
+
+        # Find the indentation level at the insertion point
+        context_indent = 0
+        # Look at lines around insert_pos to determine expected indentation
+        for offset in range(0, 10):
+            for idx in [insert_pos - 1 - offset, insert_pos + offset]:
+                if 0 <= idx < len(existing_lines):
+                    line = existing_lines[idx]
+                    stripped = line.strip()
+                    if stripped and not stripped.startswith('#') and not stripped.startswith('"""'):
+                        context_indent = len(line) - len(line.lstrip())
+                        break
+            if context_indent > 0:
+                break
+
+        # Find the indentation of the first non-empty line in new code
+        new_indent = 0
+        for line in new_lines:
+            stripped = line.strip()
+            if stripped:
+                new_indent = len(line) - len(line.lstrip())
+                break
+
+        # If the new code starts at a different indentation, adjust all lines
+        indent_diff = context_indent - new_indent
+        if indent_diff == 0:
+            return new_lines
+
+        adjusted = []
+        for line in new_lines:
+            if not line.strip():
+                adjusted.append(line)
+            elif indent_diff > 0:
+                adjusted.append(' ' * indent_diff + line)
+            else:
+                # Remove indentation (but don't go negative)
+                remove = min(abs(indent_diff), len(line) - len(line.lstrip()))
+                adjusted.append(line[remove:])
+
+        print(f"[PartialEdit] Indentation fix: adjusted {indent_diff:+d} spaces (context={context_indent}, new={new_indent})")
+        return adjusted
 
     def _preflight_hash_check(self, steps: List[Dict]) -> List[Dict]:
         """
