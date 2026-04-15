@@ -997,6 +997,59 @@ Write the complete document now:"""
 
         return ""
 
+    def _detect_append_mode(self, task_content: str, instruction_content: str) -> tuple:
+        """Detect if this task should APPEND to an existing file rather than overwrite.
+
+        Returns (is_append, target_path, existing_content).
+        Triggers when instruction contains append/modify signals AND a target file exists.
+
+        Fix for token truncation bug: when LLM generates full-file output for large
+        files, it hits max_tokens and produces truncated code that overwrites the
+        original. Append mode only generates the NEW code, then appends it.
+        """
+        combined = (task_content + ' ' + instruction_content).lower()
+
+        # Detect append signals in instruction
+        append_signals = [
+            'append only', 'append to', 'add to the bottom',
+            'add below', 'do not modify existing', 'do not change existing',
+            'add after', 'extend the file', 'add the following',
+        ]
+        has_append_signal = any(s in combined for s in append_signals)
+
+        if not has_append_signal:
+            return False, None, None
+
+        # Find the target file path
+        # Look for "File to Modify" or similar patterns in instruction
+        import re as _re
+        path_patterns = [
+            r'[Ff]ile[s]?\s+to\s+[Mm]odify[:\s]+[`"]?(/\S+\.py)',
+            r'[Aa]ppend\s+to\s+[`"]?(/\S+\.py)',
+            r'[Aa]dd\s+to\s+[`"]?(/\S+\.py)',
+            r'[Mm]odify\s+[`"]?(/\S+\.py)',
+        ]
+        target_path = None
+        for pattern in path_patterns:
+            match = _re.search(pattern, task_content + ' ' + instruction_content)
+            if match:
+                target_path = match.group(1)
+                break
+
+        if not target_path or not os.path.exists(target_path):
+            return False, None, None
+
+        # Read existing file
+        try:
+            with open(target_path, 'r') as f:
+                existing_content = f.read()
+            existing_lines = len(existing_content.splitlines())
+            print(f"[{self.agent_id}] APPEND MODE detected: {target_path} ({existing_lines} lines)")
+            return True, target_path, existing_content
+        except Exception as e:
+            print(f"[{self.agent_id}] APPEND MODE: could not read {target_path}: {e}")
+            return False, None, None
+
     def _execute_code_task(self, task: dict) -> Tuple[bool, str]:
         """Execute code task - implements templates or generates code."""
         task_content = task['task_content']
@@ -1005,10 +1058,17 @@ Write the complete document now:"""
         # Read instruction file if referenced (KB-JR-EXECUTOR-INSTR-001)
         instruction_content = self._read_instruction_file(task_content)
 
+        # --- APPEND MODE DETECTION (token truncation fix) ---
+        is_append, append_target, existing_content = self._detect_append_mode(
+            task_content, instruction_content
+        )
+
         # Determine mode: Template (has instruction file) or Generation (no template)
         template_mode = bool(instruction_content)
 
-        if template_mode:
+        if is_append:
+            print(f"[{self.agent_id}] APPEND MODE: Will generate ONLY new code to append")
+        elif template_mode:
             print(f"[{self.agent_id}] TEMPLATE MODE: Using instruction file as blueprint")
         else:
             print(f"[{self.agent_id}] GENERATION MODE: Creating from scratch")
@@ -1026,7 +1086,34 @@ Write the complete document now:"""
         few_shot = self._get_few_shot_examples(language)
 
         # Build prompt based on mode (ULTRATHINK-JR-EXECUTOR-TEMPLATE-ARCHITECTURE-JAN24-2026)
-        if template_mode:
+        if is_append:
+            # APPEND MODE PROMPT — only generate the NEW code to add
+            # Show the last 30 lines of existing file for context, ask for additions only
+            existing_lines = existing_content.splitlines()
+            tail_context = '\n'.join(existing_lines[-30:])
+            prompt = f"""You are a code APPENDER for Cherokee AI Federation.
+
+CRITICAL INSTRUCTION - READ CAREFULLY:
+You are APPENDING new code to an EXISTING file. The file already has {len(existing_lines)} lines of working code.
+DO NOT reproduce the existing code. DO NOT output the full file.
+Output ONLY the NEW code that should be appended to the end of the file.
+
+=== LAST 30 LINES OF EXISTING FILE (for context only — do NOT repeat these) ===
+{tail_context}
+
+=== INSTRUCTION FOR WHAT TO ADD ===
+{instruction_content if instruction_content else task_content}
+
+=== OUTPUT RULES ===
+1. Output ONLY the NEW code to append — not the existing file
+2. Start with a blank line separator, then the new code
+3. NO markdown, NO backticks, NO explanations
+4. Include necessary imports at the top of your output (they'll be appended, which is valid Python)
+5. The code must be syntactically valid ON ITS OWN as an addition
+6. Do not repeat any existing functions or classes
+
+Output the new code to append now:"""
+        elif template_mode:
             # TEMPLATE-FIRST PROMPT - emphasize implementing the template
             prompt = f"""You are a code IMPLEMENTER for Cherokee AI Federation.
 
@@ -1129,7 +1216,10 @@ Generate the {language} code now. Output ONLY code, starting immediately:"""
             print(f"[{self.agent_id}] CODE_REVIEW_APPROVED: {review_feedback[:100]}")
 
         # Determine output path
-        output_path = self._extract_code_output_path(task_content, language)
+        if is_append:
+            output_path = append_target  # Already known from append detection
+        else:
+            output_path = self._extract_code_output_path(task_content, language)
 
         if output_path and not self._is_code_safe_write_path(output_path):
             return False, f"Output path not allowed: {output_path}"
@@ -1138,12 +1228,46 @@ Generate the {language} code now. Output ONLY code, starting immediately:"""
         if output_path:
             try:
                 os.makedirs(os.path.dirname(output_path), exist_ok=True)
-                with open(output_path, 'w') as f:
-                    f.write(clean_code)
-                # Log success with prompt size for optimization research
-                print(f"[{self.agent_id}] PROMPT_SIZE_OK: {prompt_chars} chars, output: {len(clean_code)} chars")
-                review_status = "reviewed" if "APPROVE" in review_feedback.upper() else review_feedback
-                return True, f"Code generated and saved to {output_path} [{review_status}]"
+
+                if is_append:
+                    # APPEND MODE: add new code to existing file
+                    # Safety check: ensure existing file hasn't been modified since we read it
+                    with open(output_path, 'r') as f:
+                        current_content = f.read()
+                    if current_content != existing_content:
+                        return False, f"APPEND ABORTED: {output_path} was modified by another process during execution"
+
+                    combined = existing_content.rstrip('\n') + '\n\n' + clean_code.strip() + '\n'
+                    with open(output_path, 'w') as f:
+                        f.write(combined)
+                    new_lines = len(combined.splitlines())
+                    old_lines = len(existing_content.splitlines())
+                    print(f"[{self.agent_id}] APPEND_OK: {output_path} {old_lines} → {new_lines} lines (+{new_lines - old_lines})")
+                    review_status = "reviewed" if "APPROVE" in review_feedback.upper() else review_feedback
+                    return True, f"Code appended to {output_path} ({old_lines}→{new_lines} lines) [{review_status}]"
+                else:
+                    # OVERWRITE MODE: write full file
+                    # Safety check: reject if generated code is shorter than existing file
+                    # (likely token truncation)
+                    if os.path.exists(output_path):
+                        with open(output_path, 'r') as f:
+                            existing = f.read()
+                        existing_len = len(existing.splitlines())
+                        generated_len = len(clean_code.splitlines())
+                        if existing_len > 50 and generated_len < existing_len * 0.7:
+                            print(f"[{self.agent_id}] TRUNCATION_GUARD: generated {generated_len} lines < 70% of existing {existing_len} lines — REJECTING write")
+                            return False, (
+                                f"TRUNCATION GUARD: Generated code ({generated_len} lines) is significantly "
+                                f"shorter than existing file ({existing_len} lines). This likely indicates "
+                                f"token limit truncation. Use append mode or increase max_tokens."
+                            )
+
+                    with open(output_path, 'w') as f:
+                        f.write(clean_code)
+                    # Log success with prompt size for optimization research
+                    print(f"[{self.agent_id}] PROMPT_SIZE_OK: {prompt_chars} chars, output: {len(clean_code)} chars")
+                    review_status = "reviewed" if "APPROVE" in review_feedback.upper() else review_feedback
+                    return True, f"Code generated and saved to {output_path} [{review_status}]"
             except Exception as e:
                 return False, f"Could not save code: {e}"
         else:

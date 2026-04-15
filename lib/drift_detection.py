@@ -12,7 +12,7 @@ Provides:
 Embedding model: all-MiniLM-L6-v2 (sentence-transformers)
 Already used in the RAG pipeline — small, fast, deterministic.
 
-DB: specialist_health table on bluefin (192.168.132.222)
+DB: specialist_health table on bluefin (10.100.0.2 fiber/WireGuard)
     Created by JR-DRIFT-PHASE1A-SQL migration.
 
 Cherokee AI Federation — For the Seven Generations
