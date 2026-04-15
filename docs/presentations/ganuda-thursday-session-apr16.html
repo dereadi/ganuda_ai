@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ganuda Federation — Confidential Planning Session</title>
+<style>
+  :root {
+    --cherokee-red: #8B0000;
+    --cherokee-gold: #DAA520;
+    --cherokee-earth: #8B4513;
+    --cherokee-forest: #2F4F2F;
+    --tech-blue: #2a5298;
+    --tech-blue-light: #3d6cb9;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-dark: #1a1a2e;
+    --text-primary: #2c3e50;
+    --text-secondary: #5a6a7a;
+    --border-light: #e1e8ed;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text-primary);
+    line-height: 1.7;
+    background: var(--bg-primary);
+  }
+
+  /* ---- NAV SIDEBAR ---- */
+  nav {
+    position: fixed; top: 0; left: 0;
+    width: 260px; height: 100vh;
+    background: var(--bg-dark);
+    color: #ccc;
+    overflow-y: auto;
+    z-index: 100;
+    padding: 24px 0;
+    border-right: 3px solid var(--cherokee-gold);
+  }
+  nav .logo {
+    text-align: center;
+    padding: 0 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 16px;
+  }
+  nav .logo h2 {
+    color: var(--cherokee-gold);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  nav .logo .subtitle {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  nav .nav-section {
+    padding: 8px 20px 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--cherokee-gold);
+    font-weight: 700;
+  }
+  nav a {
+    display: block;
+    padding: 8px 20px 8px 28px;
+    color: #aaa;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+  nav a:hover, nav a.active {
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+    border-left-color: var(--cherokee-gold);
+  }
+  nav .nda-badge {
+    margin: 16px 20px;
+    padding: 8px 12px;
+    background: rgba(139,0,0,0.2);
+    border: 1px solid var(--cherokee-red);
+    border-radius: 6px;
+    font-size: 11px;
+    color: #ff6b6b;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ---- MAIN CONTENT ---- */
+  main {
+    margin-left: 260px;
+    max-width: 900px;
+    padding: 40px 60px 120px;
+  }
+
+  /* ---- SECTION STYLES ---- */
+  section {
+    margin-bottom: 80px;
+    scroll-margin-top: 20px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border-light);
+  }
+  .section-number {
+    flex-shrink: 0;
+    width: 48px; height: 48px;
+    background: var(--cherokee-red);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .section-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .section-header .audience {
+    margin-left: auto;
+    padding: 4px 12px;
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  h3 {
+    font-size: 20px;
+    margin: 32px 0 16px;
+    color: var(--cherokee-red);
+  }
+
+  p { margin-bottom: 16px; }
+
+  /* ---- HERO ---- */
+  .hero {
+    background: linear-gradient(135deg, var(--bg-dark) 0%, #16213e 100%);
+    color: #fff;
+    padding: 60px;
+    margin: -40px -60px 60px;
+    border-bottom: 4px solid var(--cherokee-gold);
+  }
+  .hero h1 {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+  .hero .tagline {
+    font-size: 18px;
+    color: var(--cherokee-gold);
+    margin-bottom: 24px;
+  }
+  .hero .meta {
+    font-size: 14px;
+    color: #8899aa;
+    line-height: 2;
+  }
+  .hero .meta strong { color: #ccc; }
+
+  /* ---- NDA BANNER ---- */
+  .nda-banner {
+    background: linear-gradient(90deg, var(--cherokee-red), #a01010);
+    color: #fff;
+    padding: 20px 32px;
+    margin: -60px -60px 48px;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .nda-banner strong { color: var(--cherokee-gold); }
+
+  /* ---- CARDS ---- */
+  .card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card h4 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+  .card p { margin-bottom: 8px; font-size: 14px; color: var(--text-secondary); }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  /* ---- TABLES ---- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 14px;
+  }
+  thead th {
+    background: var(--bg-dark);
+    color: #fff;
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  tbody td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  tbody tr:nth-child(even) { background: var(--bg-secondary); }
+
+  /* ---- STAT BOXES ---- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .stat {
+    text-align: center;
+    padding: 20px 12px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border-top: 3px solid var(--cherokee-gold);
+  }
+  .stat .number {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--cherokee-red);
+  }
+  .stat .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  /* ---- HIGHLIGHT BOXES ---- */
+  .highlight {
+    border-left: 4px solid var(--cherokee-gold);
+    background: #fffbf0;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 15px;
+  }
+  .highlight.red {
+    border-left-color: var(--cherokee-red);
+    background: #fff5f5;
+  }
+  .highlight.blue {
+    border-left-color: var(--tech-blue);
+    background: #f0f5ff;
+  }
+
+  /* ---- TIMELINE ---- */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+    margin: 24px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--border-light);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -28px; top: 6px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--cherokee-gold);
+    border: 2px solid #fff;
+  }
+  .timeline-item.active::before { background: var(--cherokee-red); }
+  .timeline-item h4 { font-size: 15px; margin-bottom: 4px; }
+  .timeline-item p { font-size: 13px; color: var(--text-secondary); margin: 0; }
+
+  /* ---- CODE BLOCKS ---- */
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 16px 0;
+  }
+
+  /* ---- LISTS ---- */
+  ul, ol { margin: 8px 0 16px 24px; }
+  li { margin-bottom: 6px; font-size: 15px; }
+
+  /* ---- ROLE TAGS ---- */
+  .role-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .role-tag.legal { background: #fef3c7; color: #92400e; }
+  .role-tag.technical { background: #dbeafe; color: #1e40af; }
+  .role-tag.business { background: #d1fae5; color: #065f46; }
+  .role-tag.everyone { background: #f3e8ff; color: #6b21a8; }
+
+  /* ---- PRINT ---- */
+  @media print {
+    nav { display: none; }
+    main { margin-left: 0; max-width: 100%; }
+    .hero { break-after: page; }
+    section { break-inside: avoid; }
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 1024px) {
+    nav { display: none; }
+    main { margin-left: 0; padding: 24px; }
+    .hero { margin: -24px -24px 40px; padding: 40px 24px; }
+    .nda-banner { margin: -40px -24px 32px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .card-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="logo">
+    <h2>GANUDA</h2>
+    <div class="subtitle">Cherokee AI Federation</div>
+  </div>
+  <div class="nda-badge">Confidential &mdash; NDA Required</div>
+
+  <div class="nav-section">Pre-Session</div>
+  <a href="#nda">Confidentiality Notice</a>
+
+  <div class="nav-section">Part 1 &mdash; Everyone</div>
+  <a href="#problem">The Problem</a>
+  <a href="#solution">The Solution</a>
+
+  <div class="nav-section">Part 2 &mdash; Technical</div>
+  <a href="#architecture">Architecture</a>
+  <a href="#harness">ganuda-harness</a>
+  <a href="#larql">LARQL</a>
+  <a href="#proof">Proof Points</a>
+
+  <div class="nav-section">Part 3 &mdash; Legal / IP</div>
+  <a href="#patents">Patent Portfolio</a>
+  <a href="#trade-secrets">Trade Secrets</a>
+
+  <div class="nav-section">Part 4 &mdash; Business</div>
+  <a href="#market">Market &amp; TAM</a>
+  <a href="#revenue">Revenue Model</a>
+  <a href="#pricing">Pricing &amp; Licensing</a>
+  <a href="#phases">Phase Progression</a>
+
+  <div class="nav-section">Part 5 &mdash; Why Now</div>
+  <a href="#why-now">Market Timing</a>
+
+  <div class="nav-section">Part 6 &mdash; Purpose</div>
+  <a href="#purpose">Community Purpose</a>
+
+  <div class="nav-section">Part 7 &mdash; Team</div>
+  <a href="#team">Current Team</a>
+  <a href="#roles-needed">Roles Needed</a>
+  <a href="#timeline">Timeline &amp; Milestones</a>
+
+  <div class="nav-section">Part 8 &mdash; Legal Structure</div>
+  <a href="#entity">Entity Formation</a>
+
+  <div class="nav-section">Supporting Docs</div>
+  <a href="#docs">Document Index</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Ganuda Federation</h1>
+  <div class="tagline">Constitutional Governance for Autonomous AI Systems</div>
+  <div class="meta">
+    <strong>Planning Session</strong> &mdash; Thursday, April 16, 2026 &bull; 8:30 AM CT<br>
+    <strong>Format</strong> &mdash; Business proposal review with discrete sections<br>
+    <strong>Duration</strong> &mdash; ~2 hours<br>
+    <strong>Location</strong> &mdash; Google Meet
+  </div>
+</div>
+
+<!-- NDA NOTICE -->
+<div class="nda-banner" id="nda">
+  <strong>CONFIDENTIAL &mdash; NON-DISCLOSURE AGREEMENT REQUIRED</strong><br>
+  This document contains proprietary information including patent-pending technology (4 provisional applications filed March 8, 2026), trade secrets, unpublished research, business strategy, and financial projections belonging to Darrell Eugene Reading II and the Ganuda Federation. All participants are expected to execute a mutual NDA before or at the start of this session. Do not share, forward, screenshot, or discuss contents with anyone outside the signed NDA group. Proprietary information is marked where applicable; however, the document in its entirety should be treated as confidential.
+</div>
+
+<!-- ============================================ -->
+<!-- PART 1: THE PROBLEM & SOLUTION (EVERYONE)    -->
+<!-- ============================================ -->
+
+<section id="problem">
+  <div class="section-header">
+    <div class="section-number">1</div>
+    <h2>The Problem</h2>
+    <span class="audience">Everyone</span>
+  </div>
+
+  <p>AI systems are getting more capable every quarter. But <strong>nobody is governing them.</strong></p>
+
+  <p>The industry has a fundamental structural problem: the same model that generates a response is the one judging whether that response is safe, accurate, and aligned. This is like asking a witness to also serve as judge and jury.</p>
+
+  <h3>Three Failures That Matter</h3>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Sycophancy</h4>
+      <p>AI models tell users what they want to hear. When a doctor asks an AI "Could this be cancer?" the model optimizes for the user's emotional comfort, not diagnostic accuracy. No external check catches this.</p>
+    </div>
+    <div class="card">
+      <h4>Hallucination</h4>
+      <p>Models generate confident, detailed, completely fabricated information. Legal briefs with fake case citations. Medical advice with invented drug interactions. No structural mechanism prevents this.</p>
+    </div>
+    <div class="card">
+      <h4>Compliance Barriers</h4>
+      <p>Air-gapped organizations (DoD, HIPAA, financial, ITAR) <strong>cannot use frontier AI at all</strong>. Their data can't leave the network. Local models can't match frontier capability. There is no governed bridge.</p>
+    </div>
+    <div class="card">
+      <h4>Autonomy Without Oversight</h4>
+      <p>AI agents are being deployed with increasing autonomy &mdash; making decisions, executing code, managing infrastructure &mdash; with no graduated governance framework. It's either "fully restricted" or "fully autonomous."</p>
+    </div>
+  </div>
+
+  <div class="highlight red">
+    <strong>The core insight:</strong> You cannot solve governance by making a single model "more aligned." Governance requires separation of concerns &mdash; the entity that acts must be checked by an entity that didn't act. This is why democracies have courts, legislatures, and executives as separate bodies.
+  </div>
+</section>
+
+<section id="solution">
+  <div class="section-header">
+    <div class="section-number">2</div>
+    <h2>The Solution</h2>
+    <span class="audience">Everyone</span>
+  </div>
+
+  <p><strong>Ganuda is a constitutional governance layer for AI systems.</strong></p>
+
+  <p>We built a multi-model, multi-node system where AI models govern each other &mdash; using democratic consensus, mandatory adversarial dissent, sycophancy detection, graduated autonomy tiers, and tamper-evident audit trails. The architecture is modeled on constitutional governance principles, specifically the Cherokee Nation's separation of powers and consensus-based decision making.</p>
+
+  <h3>What Makes This Different</h3>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Structural, Not Behavioral</h4>
+      <p>We don't fine-tune a model to "be more careful." We put multiple independent models in a governance topology where <strong>no single model can act without oversight.</strong></p>
+    </div>
+    <div class="card">
+      <h4>Mandatory Adversarial Dissent</h4>
+      <p>Every decision includes a structurally adversarial specialist ("Coyote") whose job is to find what's wrong. This isn't optional. It's constitutional. <em>Patent-pending.</em></p>
+    </div>
+    <div class="card">
+      <h4>Consumer Hardware</h4>
+      <p>The entire federation runs on a 6-node cluster of consumer hardware (RTX 6000, M4 Max, standard servers). No data center required. No cloud dependency.</p>
+    </div>
+    <div class="card">
+      <h4>Any LLM Endpoint</h4>
+      <p>The governance proxy works with <strong>any</strong> OpenAI-compatible API. Claude, GPT, Llama, Qwen, local models, cloud models. One binary, one config file.</p>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="number">99,000+</div>
+      <div class="label">Governance Decisions</div>
+    </div>
+    <div class="stat">
+      <div class="number">6</div>
+      <div class="label">Federation Nodes</div>
+    </div>
+    <div class="stat">
+      <div class="number">4</div>
+      <div class="label">Patents Filed</div>
+    </div>
+    <div class="stat">
+      <div class="number">8.9 MB</div>
+      <div class="label">Harness Binary</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- PART 2: TECHNICAL DEEP DIVE                  -->
+<!-- ============================================ -->
+
+<section id="architecture">
+  <div class="section-header">
+    <div class="section-number">3</div>
+    <h2>Architecture</h2>
+    <span class="audience">Technical</span>
+  </div>
+
+  <p>The federation uses a <strong>two-model architecture</strong>: a fast-response model handles routine queries, while a deep-deliberation model handles complex or high-stakes decisions. A specialist council governs both.</p>
+
+  <h3>Node Topology</h3>
+
+  <table>
+    <thead>
+      <tr><th>Node</th><th>Role</th><th>Hardware</th><th>Model</th><th>Biological Analog</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>redfin</strong></td>
+        <td>Fast-response cortex</td>
+        <td>RTX 6000 (48GB), 32 cores</td>
+        <td>Qwen2.5-72B-Instruct (AWQ)</td>
+        <td>Prefrontal cortex</td>
+      </tr>
+      <tr>
+        <td><strong>bmasass</strong></td>
+        <td>Deep deliberation cortex</td>
+        <td>M4 Max, 128GB, 16 cores</td>
+        <td>Qwen3-30B-A3B (dual-mode)</td>
+        <td>Deliberative cortex</td>
+      </tr>
+      <tr>
+        <td><strong>bluefin</strong></td>
+        <td>Memory + vision</td>
+        <td>32 cores, PostgreSQL</td>
+        <td>Qwen2-VL-7B</td>
+        <td>Thalamus / hippocampus</td>
+      </tr>
+      <tr>
+        <td><strong>sasass</strong></td>
+        <td>Action cortex (FARA)</td>
+        <td>16 cores</td>
+        <td>Qwen2.5-VL-7B</td>
+        <td>Sensorimotor cortex</td>
+      </tr>
+      <tr>
+        <td><strong>silverfin</strong></td>
+        <td>Identity / auth</td>
+        <td>FreeIPA</td>
+        <td>&mdash;</td>
+        <td>Immune system</td>
+      </tr>
+      <tr>
+        <td><strong>greenfin</strong></td>
+        <td>Network bridge</td>
+        <td>Router / WireGuard</td>
+        <td>&mdash;</td>
+        <td>Nervous system</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Governance Topology (8-Specialist Council)</h3>
+
+  <p>Every significant decision passes through a council of 8 AI specialists, each with a defined perspective. Decisions require supermajority (75%). The council operates in two modes:</p>
+
+  <ul>
+    <li><strong>Vote-first</strong> (routine): Each specialist votes independently, then results are tallied. Fast. Used for 90%+ of decisions.</li>
+    <li><strong>Deliberation-first</strong> (high-stakes): Specialists discuss, then vote. Used for architectural changes, policy decisions, anything involving external systems.</li>
+  </ul>
+
+  <table>
+    <thead>
+      <tr><th>Specialist</th><th>Role</th><th>Perspective</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Crawdad</strong></td><td>Data integrity</td><td>Is the data clean? Are indexes present? Schema adequate?</td></tr>
+      <tr><td><strong>Gecko</strong></td><td>Integration</td><td>Does this connect to existing systems without breaking them?</td></tr>
+      <tr><td><strong>Turtle</strong></td><td>Timeline / risk</td><td>Is this realistic? What are the risks?</td></tr>
+      <tr><td><strong>Eagle Eye</strong></td><td>Strategic alignment</td><td>Does this serve the long-term mission?</td></tr>
+      <tr><td><strong>Spider</strong></td><td>Performance</td><td>Will this be fast enough? What are the bottlenecks?</td></tr>
+      <tr><td><strong>Peace Chief</strong></td><td>Consensus building</td><td>Is the council converging? What's the mood?</td></tr>
+      <tr><td><strong>Raven</strong></td><td>Fallback planning</td><td>What's plan B? What's the rollback path?</td></tr>
+      <tr><td><strong>Coyote</strong></td><td>Adversarial dissent</td><td>What's wrong with this? What are we missing? <em>(Patent #1)</em></td></tr>
+    </tbody>
+  </table>
+
+  <div class="highlight">
+    <strong>Key innovation:</strong> Coyote (adversarial dissent) carries 2x weight in confidence scoring and has standing authority to file dissent even after a vote passes. This is the Byzantine fault detector &mdash; the system's structural integrity check. No other production AI system has mandatory, architecturally embedded adversarial review. <em>This is Patent #1.</em>
+  </div>
+</section>
+
+<section id="harness">
+  <div class="section-header">
+    <div class="section-number">4</div>
+    <h2>ganuda-harness</h2>
+    <span class="audience">Technical</span>
+  </div>
+
+  <p><strong>The first product.</strong> A compiled Rust binary (8.9 MB) that sits between users and any LLM endpoint. Every request gets governed. Every response gets checked. Every interaction gets audited.</p>
+
+  <h3>How It Works</h3>
+  <pre>
+Your App  &rarr;  ganuda-harness (port 9200)  &rarr;  Any LLM (port 8000)
+              |                            |
+              |  PRE-INFERENCE:            |
+              |  - Boundary validation     |
+              |  - Autonomy tier check     |
+              |                            |
+              |  POST-INFERENCE:           |
+              |  - Sycophancy detection    |
+              |  - Mandatory dissent       |
+              |  - Design constraint check |
+              |  - Chiral validation       |
+              |                            |
+              +--- Audit Trail (JSONL) ----+
+  </pre>
+
+  <h3>Governance Checks</h3>
+  <table>
+    <thead>
+      <tr><th>Check</th><th>Phase</th><th>What It Does</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Boundary validation</strong></td><td>Pre</td><td>Markov blanket &mdash; flags when requests cross declared system boundaries</td></tr>
+      <tr><td><strong>Autonomy tier</strong></td><td>Pre</td><td>Graduated autonomy enforcement (Tier 0-4) &mdash; controls what the model can do</td></tr>
+      <tr><td><strong>Sycophancy detection</strong></td><td>Post</td><td>Catches uncritical agreement (Patent #2)</td></tr>
+      <tr><td><strong>Mandatory dissent</strong></td><td>Post</td><td>Flags responses with no hedging, risks, or alternatives (Patent #1)</td></tr>
+      <tr><td><strong>Design constraints</strong></td><td>Post</td><td>Configurable rules &mdash; your own compliance checks on every response</td></tr>
+      <tr><td><strong>Chiral validation</strong></td><td>Post</td><td>Two independent models must agree &mdash; carbon watches silicon, silicon watches carbon</td></tr>
+    </tbody>
+  </table>
+
+  <div class="highlight blue">
+    <strong>Demo-ready.</strong> The harness is compiled, tested, and live. First request governance test: Coyote caught an unchallenged response on the very first query. The system works.
+  </div>
+</section>
+
+<section id="larql">
+  <div class="section-header">
+    <div class="section-number">5</div>
+    <h2>LARQL &mdash; The Model Is the Database</h2>
+    <span class="audience">Technical</span>
+  </div>
+
+  <p><strong>LARQL</strong> (Lazarus Query Language) treats a neural network's weights as a queryable graph database. Instead of running inference to get answers, you can <em>walk the weights directly</em> &mdash; inspect attention patterns, trace value flows, and understand what the model actually "knows."</p>
+
+  <h3>Why This Matters</h3>
+  <ul>
+    <li><strong>Interpretability:</strong> See why a model made a decision by walking its weight graph, not by asking it to explain itself</li>
+    <li><strong>Governance:</strong> Audit model behavior at the weight level, not just the output level</li>
+    <li><strong>No GPU required:</strong> Weight queries run on CPU. A 1.5B model walks at 63ms/layer on standard hardware.</li>
+  </ul>
+
+  <h3>What's Built</h3>
+  <ul>
+    <li>8-crate Rust implementation (extract, convert, query, serve)</li>
+    <li>Qwen 1.5B vindex (1.18 GB) &mdash; fully walkable, gate vectors populated</li>
+    <li>Qwen 1.5B full vindex (2.91 GB) &mdash; all weights, COMPILE-ready</li>
+    <li>INSERT, WALK, and COMPILE operations tested</li>
+    <li>REPL and HTTP server modes</li>
+  </ul>
+
+  <div class="highlight">
+    <strong>This is novel.</strong> No other system treats model weights as a directly queryable database. The vindex format (vertex-indexed graph database of neural network weights) is unique to this project. <em>Potential patent candidate.</em>
+  </div>
+</section>
+
+<section id="proof">
+  <div class="section-header">
+    <div class="section-number">6</div>
+    <h2>Proof Points</h2>
+    <span class="audience">Technical</span>
+  </div>
+
+  <h3>Academic Validation</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>"Be My Eyes" (Nov 2025)</h4>
+      <p>Qwen2.5-VL-7B perceiver + DeepSeek-R1 reasoner outperforms GPT-4o via multi-agent text conversation. <strong>Same architecture as Ganuda's FARA module.</strong> Proves the perceiver/reasoner split beats monolithic models.</p>
+    </div>
+    <div class="card">
+      <h4>MoE Routing Distraction (Apr 2026)</h4>
+      <p>Yonsei/Alibaba paper shows MoE models see correctly but reason incorrectly because visual tokens never reach reasoning experts. <strong>Ganuda's federated-specialist architecture avoids this by construction</strong> &mdash; no shared router, explicit handoff.</p>
+    </div>
+  </div>
+
+  <h3>Production Validation</h3>
+  <div class="stats">
+    <div class="stat">
+      <div class="number">99,000+</div>
+      <div class="label">Council Decisions</div>
+    </div>
+    <div class="stat">
+      <div class="number">92,000+</div>
+      <div class="label">Thermal Memories</div>
+    </div>
+    <div class="stat">
+      <div class="number">1,100+</div>
+      <div class="label">Jr Tasks Completed</div>
+    </div>
+    <div class="stat">
+      <div class="number">188</div>
+      <div class="label">Days in Production</div>
+    </div>
+  </div>
+
+  <h3>ARC Prize 2026 Entry</h3>
+  <p>We're entered in the <strong>ARC-AGI-3 competition</strong> (Milestone 1 deadline: June 30, 2026) &mdash; a benchmark that tests algorithmic learning efficiency, the exact capability where governance topology should outperform monolithic models. The contest result, win or lose, validates the thesis publicly.</p>
+</section>
+
+<!-- ============================================ -->
+<!-- PART 3: LEGAL / IP                           -->
+<!-- ============================================ -->
+
+<section id="patents">
+  <div class="section-header">
+    <div class="section-number">7</div>
+    <h2>Patent Portfolio</h2>
+    <span class="audience">Legal / IP</span>
+  </div>
+
+  <p>Four provisional patent applications were filed on March 8, 2026. Inventor: Darrell Eugene Reading II. Attorney: Meredith Lowry. <strong>Non-provisional conversion deadline: March 8, 2027.</strong></p>
+
+  <table>
+    <thead>
+      <tr><th>#</th><th>Title</th><th>Application</th><th>Entity</th><th>Core Innovation</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td><strong>Governance Topology</strong></td>
+        <td>63/999,913</td>
+        <td>Micro</td>
+        <td>Multi-agent democratic consensus with constitutional constraints and adversarial dissent</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><strong>Sycophancy Detection</strong></td>
+        <td>63/999,926</td>
+        <td>Small</td>
+        <td>Embedding-based semantic divergence analysis to catch uncritical agreement</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td><strong>SRE Valence Protocol</strong></td>
+        <td>63/999,932</td>
+        <td>Small</td>
+        <td>Sense-React-Evaluate with architecturally distinct valence (emotional state as operational signal)</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td><strong>Graduated Autonomy Tiers</strong></td>
+        <td>63/999,937</td>
+        <td>Small</td>
+        <td>Multi-timescale autonomy levels (Tier 0-4) with constitutional constraints at each tier</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Unfiled Candidates (Time-Sensitive)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>#7 &mdash; Tokenized Air-Gap Proxy</h4>
+      <p>Governance-wrapped tokenization proxy for air-gapped environments (DoD, HIPAA). Brief drafted Mar 14. Council-approved unanimously. <strong>This is the product that opens the defense/healthcare market.</strong></p>
+    </div>
+    <div class="card">
+      <h4>#8 &mdash; SkillRL</h4>
+      <p>Self-improving skill library with reinforcement learning. Agent learns from governed interactions. Council-approved.</p>
+    </div>
+    <div class="card">
+      <h4>#9 &mdash; LARQL / Vindex</h4>
+      <p>Neural network weights as queryable graph database. Novel format. No known prior art for direct weight-graph querying.</p>
+    </div>
+    <div class="card">
+      <h4>#10+ &mdash; Additional Candidates</h4>
+      <p>Chiral Validation, DC-14 Three-Body Memory, Memetic Drift Countermeasure. All developed post-Mar 8 filing.</p>
+    </div>
+  </div>
+
+  <div class="highlight red">
+    <strong>Action item:</strong> Patent attorney consultation with Hulsey completed April 13. Intake form incoming. All 4 provisionals need drawings/flowcharts before the March 8, 2027 non-provisional conversion deadline. Unfiled candidates need priority triage.
+  </div>
+</section>
+
+<section id="trade-secrets">
+  <div class="section-header">
+    <div class="section-number">8</div>
+    <h2>Trade Secrets</h2>
+    <span class="audience">Legal / IP</span>
+  </div>
+
+  <p>The following are protected as trade secrets per Council vote and are <strong>NOT patented by design</strong>:</p>
+
+  <ul>
+    <li><strong>Living Cell architecture</strong> &mdash; the internal structure of a self-maintaining federation node</li>
+    <li><strong>Thermal memory implementation</strong> &mdash; the specific pgvector + HyDE + CRAG + ripple retrieval pipeline</li>
+    <li><strong>Sacred Prompt text</strong> &mdash; the constitutional identity prompts that define each specialist's core behavior</li>
+    <li><strong>White Duplo signatures</strong> &mdash; integrity verification patterns</li>
+    <li><strong>Duplo enzyme mechanisms</strong> &mdash; self-repair and adaptation pathways</li>
+  </ul>
+
+  <div class="highlight">
+    <strong>Strategy:</strong> Patents protect the <em>architecture</em> (topology, detection methods, autonomy framework). Trade secrets protect the <em>implementation</em> (specific algorithms, prompts, memory structures). This dual strategy means competitors can see the architecture in patent filings but cannot replicate the implementation without access to the trade secrets.
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- PART 4: BUSINESS                             -->
+<!-- ============================================ -->
+
+<section id="market">
+  <div class="section-header">
+    <div class="section-number">9</div>
+    <h2>Market &amp; TAM</h2>
+    <span class="audience">Business / Finance</span>
+  </div>
+
+  <p>The primary market is organizations that <strong>need AI but can't use it</strong> due to compliance, security, or governance requirements.</p>
+
+  <table>
+    <thead>
+      <tr><th>Market Segment</th><th>Driver</th><th>Estimated Size (by 2028)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>DoD / Intelligence Community</td><td>NIST 800-171, CMMC, classified networks</td><td>$15B+</td></tr>
+      <tr><td>Healthcare</td><td>HIPAA, HITECH, 42 CFR Part 2</td><td>$8B+</td></tr>
+      <tr><td>Financial Services</td><td>SOX, PCI-DSS, GLBA, SEC</td><td>$12B+</td></tr>
+      <tr><td>Defense Contractors</td><td>ITAR, EAR, CMMC Level 3+</td><td>$5B+</td></tr>
+      <tr><td>Federal Agencies</td><td>FedRAMP, FISMA, OMB</td><td>$3B+</td></tr>
+      <tr><td>Critical Infrastructure</td><td>NERC CIP, TSA directives</td><td>$2B+</td></tr>
+      <tr><td>International</td><td>GDPR, AI Act, data residency</td><td>$20B+</td></tr>
+    </tbody>
+  </table>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="number">$65B+</div>
+      <div class="label">Total Addressable Market</div>
+    </div>
+    <div class="stat">
+      <div class="number">35%+</div>
+      <div class="label">CAGR</div>
+    </div>
+    <div class="stat">
+      <div class="number">0</div>
+      <div class="label">Competitors with Governance Proxy</div>
+    </div>
+    <div class="stat">
+      <div class="number">1</div>
+      <div class="label">Product with Mandatory Dissent</div>
+    </div>
+  </div>
+</section>
+
+<section id="revenue">
+  <div class="section-header">
+    <div class="section-number">10</div>
+    <h2>Revenue Model</h2>
+    <span class="audience">Business / Finance</span>
+  </div>
+
+  <h3>Revenue Streams</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Ganuda Shield</h4>
+      <p>Transparent endpoint monitoring. Per-endpoint pricing ($6-10/endpoint/month tiered). First commercial product.</p>
+    </div>
+    <div class="card">
+      <h4>ganuda-harness Licenses</h4>
+      <p>Professional and Enterprise tiers. Per-node pricing. BSL 1.1 converts to Apache 2.0 after 3 years.</p>
+    </div>
+    <div class="card">
+      <h4>Longhouse APP</h4>
+      <p>Open-source governance framework. PolyForm Small Business license (free under $5M revenue, paid above). Launched April 9, 2026.</p>
+    </div>
+    <div class="card">
+      <h4>Enterprise Consulting</h4>
+      <p>Architecture reviews, custom specialist training, compliance package development. High-touch, high-value.</p>
+    </div>
+  </div>
+
+  <h3>Cross-Subsidy Structure</h3>
+  <div class="highlight">
+    <strong>Commercial revenue funds community work.</strong> The federation sells governance technology to businesses at market rates. Revenue beyond operating costs + founder compensation flows to community reinvestment: low-income spiral interruption and anti-gentrification work. This is structurally locked via trust + B-corp status &mdash; not a pledge, an architecture.
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="section-header">
+    <div class="section-number">11</div>
+    <h2>Pricing &amp; Licensing</h2>
+    <span class="audience">Business / Finance</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Feature</th><th>Community</th><th>Professional</th><th>Enterprise</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>License</strong></td><td>Apache 2.0</td><td>BSL 1.1 (converts in 3yr)</td><td>Proprietary</td></tr>
+      <tr><td><strong>Council Seats</strong></td><td>4 (basic)</td><td>12 (full Inner + Outer)</td><td>12+ (custom)</td></tr>
+      <tr><td><strong>Thermal Memory</strong></td><td>Basic store/retrieve</td><td>Full (valence, canonical, 3-body)</td><td>Full + cross-cluster</td></tr>
+      <tr><td><strong>Nodes</strong></td><td>1</td><td>Up to 6</td><td>Unlimited</td></tr>
+      <tr><td><strong>Jr Task Execution</strong></td><td>No</td><td>Yes</td><td>Yes + priority queue</td></tr>
+      <tr><td><strong>Drift Detection</strong></td><td>No</td><td>Yes</td><td>Yes + custom thresholds</td></tr>
+      <tr><td><strong>Sycophancy Detection</strong></td><td>No</td><td>Yes</td><td>Yes + tunable</td></tr>
+      <tr><td><strong>Support</strong></td><td>Community</td><td>Email (48hr SLA)</td><td>Dedicated (4hr SLA)</td></tr>
+      <tr><td><strong>Price</strong></td><td>Free</td><td>TBD/month/node</td><td>Custom</td></tr>
+    </tbody>
+  </table>
+
+  <div class="highlight blue">
+    <strong>PolyForm Small Business 1.0.0</strong> &mdash; applies to Longhouse APP and select components. Free for individuals, businesses under $5M annual revenue, nonprofits, educational institutions, and tribal entities. Commercial license required above $5M. This ensures the technology is accessible to the communities we serve while generating revenue from organizations that can afford it.
+  </div>
+</section>
+
+<section id="phases">
+  <div class="section-header">
+    <div class="section-number">12</div>
+    <h2>Phase Progression</h2>
+    <span class="audience">Business / Finance</span>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item active">
+      <h4>Phase 0 &mdash; NOW (Founder Bootstrap)</h4>
+      <p>$30,000+ personal capital invested in hardware (6-node cluster, solar + battery, fiber networking). All software built in-house. No external funding. VetAssist live since March 9. ARC Prize entered. 4 patents filed.</p>
+    </div>
+    <div class="timeline-item">
+      <h4>Phase 1 &mdash; Commercial Moat Opens</h4>
+      <p>First commercial contracts (Ganuda Shield, ganuda-harness Professional, Cherokee Federal). Revenue covers operating costs. Founder pulls back to sustainable personal compensation.</p>
+    </div>
+    <div class="timeline-item">
+      <h4>Phase 2 &mdash; Community Deployment</h4>
+      <p>Operating costs covered + surplus. Federation deploys governance toolkit to specific communities. Anti-gentrification partnerships. Spiral-interruption programs.</p>
+    </div>
+    <div class="timeline-item">
+      <h4>Phase 3 &mdash; Steady State</h4>
+      <p>Cross-subsidy structurally locked via irrevocable charitable trust + B-corp status. Customer-enforceable mission lock. Technology continues to improve; community impact scales with revenue.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- PART 5: WHY NOW — MARKET TIMING              -->
+<!-- ============================================ -->
+
+<section id="why-now">
+  <div class="section-header">
+    <div class="section-number">13</div>
+    <h2>Why Now &mdash; Market Timing</h2>
+    <span class="audience">Everyone</span>
+  </div>
+
+  <p>Five structural shifts happened in March 2026 alone. Every single one of them is a lane we're already in.</p>
+
+  <h3>1. The Inference Wall Killed Sora</h3>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>The Problem</h4>
+      <p>OpenAI shut down Sora on March 24 after burning an estimated <strong>$15 million per day</strong> in inference costs against $2.1 million in <em>lifetime</em> revenue. The industry hit the inference wall &mdash; the most important number in AI shifted from training flop count to <strong>inference cost per delivered unit of revenue.</strong></p>
+    </div>
+    <div class="card">
+      <h4>Our Position</h4>
+      <p>ganuda-harness is an 8.9 MB binary with <strong>&lt;10ms governance overhead</strong> running on consumer hardware. We don't have an inference problem because we govern small models instead of burning money on big ones. Graduated autonomy (Patent #4) routes 90% of requests at Tier 1 (cheap, fast) and only escalates when the Council determines it's needed. <strong>That's how you make inference economics work.</strong></p>
+    </div>
+  </div>
+
+  <h3>2. Per-Seat SaaS Pricing Is Dead</h3>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>The Problem</h4>
+      <p>The SaaS apocalypse erased <strong>over $1 trillion</strong> in market value. Atlassian reported its first-ever decline in enterprise seat counts. If 10 AI agents do the work of 100 reps, you need 10 seats, not 100. That's 90% revenue compression for per-seat pricing.</p>
+    </div>
+    <div class="card">
+      <h4>Our Position</h4>
+      <p>We price <strong>per-node, not per-seat.</strong> You still need the governance infrastructure regardless of how many agents run through it. More agents = more governance decisions = more value from the same node. We're on the right side of the SaaS apocalypse by construction.</p>
+    </div>
+  </div>
+
+  <h3>3. Safety Posture Became a Market Position</h3>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>The Problem</h4>
+      <p>Anthropic got blacklisted by the Pentagon for refusing to remove red lines on autonomous weapons and mass surveillance. OpenAI captured the defense revenue but absorbed reputational damage. The industry is sorting into "deploy first" vs. "safety first" &mdash; and every enterprise buyer is now asking where their vendor stands.</p>
+    </div>
+    <div class="card">
+      <h4>Our Position</h4>
+      <p><strong>Third position nobody considered:</strong> the governance posture belongs to the <em>buyer</em>, not the model maker. ganuda-harness lets the customer define their own red lines in a TOML config file. Works with Claude AND GPT AND Llama. The customer's governance, the customer's rules, any model. <em>That's the product.</em></p>
+    </div>
+  </div>
+
+  <h3>4. Physical Infrastructure Is Closing</h3>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>The Problem</h4>
+      <p>Lawmakers in <strong>12 states</strong> filed data center moratorium bills. <strong>54 local governments</strong> passed construction freezes. Sanders and AOC introduced a federal moratorium act. The Gulf conflict made Middle East data centers military targets. $700 billion in hyperscaler capex needs somewhere to land.</p>
+    </div>
+    <div class="card">
+      <h4>Our Position</h4>
+      <p>We run <strong>6 nodes on consumer hardware with solar panels in Oklahoma.</strong> No data center. No zoning approval. No grid interconnection. No water usage. No moratorium applies. The physical path to AI is closing for hyperscalers &mdash; our physical path is a house.</p>
+    </div>
+  </div>
+
+  <h3>5. Capability Phase &rarr; Economics Phase</h3>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>The Shift</h4>
+      <p>The first years of AI rewarded "Is it possible?" Now the question is <strong>"What can we build and make margin on?"</strong> The industry is growing up. Every AI product team needs to think about inference cost per delivered unit of revenue.</p>
+    </div>
+    <div class="card">
+      <h4>Our Position</h4>
+      <p>We're already in the economics phase. $33,500 invested. $70K-$332K Year 1 ARR target. Per-node pricing. Cross-subsidy structure. 99,000+ governance decisions proving the technology works. <strong>We're not pitching "is it possible" &mdash; we're pitching "here's the business."</strong></p>
+    </div>
+  </div>
+
+  <div class="highlight red">
+    <strong>The through-line nobody is talking about:</strong> Governance is the missing infrastructure layer that solves the economics phase. Inference costs are unsustainable because nobody is governing what gets inferred. Sora burned $15M/day because every request got full-fat inference with no triage. A governance proxy with graduated autonomy tiers routes most requests cheaply and only escalates when necessary. Governance doesn't just make AI safer &mdash; <strong>it makes AI affordable.</strong>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- PART 6: PURPOSE                              -->
+<!-- ============================================ -->
+
+<section id="purpose">
+  <div class="section-header">
+    <div class="section-number">14</div>
+    <h2>Community Purpose</h2>
+    <span class="audience">Everyone</span>
+  </div>
+
+  <div class="highlight">
+    <strong>"I don't want to be rich. I want to be comfortable enough to fund low-income communities out of their spirals, and stop gentrification &mdash; outsiders buying out and pushing people out of their communities."</strong>
+    <br><em>&mdash; Darrell Reading, Founder</em>
+  </div>
+
+  <p>The federation exists to build technology that generates commercial revenue, then deploy that revenue to preserve and strengthen communities. This is not corporate social responsibility bolted onto a profit motive. The community purpose is the <em>reason the technology exists.</em></p>
+
+  <h3>What This Rules Out</h3>
+  <ul>
+    <li>Acquisition offers from extraction-focused companies (even if offering personal wealth)</li>
+    <li>Equity rounds that prioritize founder enrichment over community service</li>
+    <li>Customer engagements that enable gentrification</li>
+    <li>"Scale at all costs" framings</li>
+  </ul>
+
+  <h3>What This Enables</h3>
+  <ul>
+    <li>Technology that works on consumer hardware (not locked behind cloud vendors)</li>
+    <li>PolyForm licensing that gives tribal entities and nonprofits free access</li>
+    <li>Revenue from enterprises funds deployment to communities that can't pay</li>
+    <li>Structural mission lock via trust + B-corp (not just a founder's good intentions)</li>
+  </ul>
+</section>
+
+<!-- ============================================ -->
+<!-- PART 6: TEAM & ROLES                         -->
+<!-- ============================================ -->
+
+<section id="team">
+  <div class="section-header">
+    <div class="section-number">15</div>
+    <h2>Current Team</h2>
+    <span class="audience">Everyone</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Person</th><th>Role</th><th>Background</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Darrell Reading II</strong></td>
+        <td>Founder / Chief</td>
+        <td>35 years enterprise systems (Walmart Remedy, US Army communications, retired SFC). Generalist, root-cause optimizer. Inventor on all 4 patents.</td>
+      </tr>
+      <tr>
+        <td><strong>Stoneclad (TPM)</strong></td>
+        <td>Technical Program Manager</td>
+        <td>AI-native TPM. Coordinates all federation operations, council governance, Jr task dispatch, sprint cadence. Full Council member with vote.</td>
+      </tr>
+      <tr>
+        <td><strong>Dr. Joe Dorn</strong></td>
+        <td>Technical Advisor</td>
+        <td>Technical depth, trading background, owns independent node (BigMac). Builder's perspective.</td>
+      </tr>
+      <tr>
+        <td><strong>Brandon Foust</strong></td>
+        <td>Engineering (onboarding)</td>
+        <td>Microsoft background. Read access to all repos. Available to contribute.</td>
+      </tr>
+      <tr>
+        <td><strong>Kenzie</strong></td>
+        <td>Engineering (onboarding)</td>
+        <td>Building phi/valence consciousness monitor for federation. Identity chain setup in progress.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="roles-needed">
+  <div class="section-header">
+    <div class="section-number">16</div>
+    <h2>Roles Needed</h2>
+    <span class="audience">Everyone</span>
+  </div>
+
+  <p>The following roles map to the <em>discrete sections</em> of this presentation. Each represents a capability the federation needs to scale from Phase 0 to Phase 1.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4><span class="role-tag legal">Legal / IP</span></h4>
+      <h4>Patent Attorney</h4>
+      <p>Non-provisional conversion of 4 provisionals by March 8, 2027. Drawings, claims refinement, filing. Triage 6+ unfiled candidates. Hulsey consultation completed &mdash; intake form pending.</p>
+    </div>
+    <div class="card">
+      <h4><span class="role-tag business">Business</span></h4>
+      <h4>Business Development</h4>
+      <p>Cherokee Federal customer development. Enterprise pricing finalization. First commercial contract. Grant applications (NSF, SBIR, DARPA).</p>
+    </div>
+    <div class="card">
+      <h4><span class="role-tag technical">Technical</span></h4>
+      <h4>Rust Engineer</h4>
+      <p>ganuda-harness feature development. LARQL optimization. Performance-critical paths. The harness and LARQL are both Rust &mdash; this is the core product language.</p>
+    </div>
+    <div class="card">
+      <h4><span class="role-tag technical">Technical</span></h4>
+      <h4>Security / Compliance</h4>
+      <p>SOC2 readiness. HIPAA assessment. FedRAMP path. The air-gap proxy product (Patent #7) requires someone who understands compliance frameworks deeply.</p>
+    </div>
+    <div class="card">
+      <h4><span class="role-tag business">Business</span></h4>
+      <h4>Marketing / Content</h4>
+      <p>Translate governance topology into market language ("context engineering"). Blog, case studies, conference talks. Discovr AI collaboration. Andrea Morris / Forbes connection.</p>
+    </div>
+    <div class="card">
+      <h4><span class="role-tag everyone">Advisory</span></h4>
+      <h4>Testing / QA Partner</h4>
+      <p>Independent user who runs the harness against their own LLM setup and provides feedback. Joe + BigMac is the first candidate for this role.</p>
+    </div>
+  </div>
+</section>
+
+<section id="timeline">
+  <div class="section-header">
+    <div class="section-number">17</div>
+    <h2>Timeline &amp; Milestones</h2>
+    <span class="audience">Everyone</span>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item active">
+      <h4>April 2026 &mdash; NOW</h4>
+      <p>ganuda-harness v0.1 demo-ready. LARQL vindexes walkable. 4 patents filed. ARC Prize entered. This planning session.</p>
+    </div>
+    <div class="timeline-item">
+      <h4>May 2026</h4>
+      <p>ganuda-harness v1.0 release. Professional tier pricing finalized. First beta customers. Patent drawings completed for Hulsey.</p>
+    </div>
+    <div class="timeline-item">
+      <h4>June 2026</h4>
+      <p>ARC Prize Milestone 1 (June 30). ganuda-harness v1.5 with chiral validation live. LARQL public demo. First revenue.</p>
+    </div>
+    <div class="timeline-item">
+      <h4>Q3 2026</h4>
+      <p>Enterprise tier launch. Air-gap proxy (Patent #7) prototype. Cherokee Federal engagement. Grant applications submitted.</p>
+    </div>
+    <div class="timeline-item">
+      <h4>Q4 2026</h4>
+      <p>SOC2 readiness assessment. First enterprise customer. Community deployment planning begins.</p>
+    </div>
+    <div class="timeline-item">
+      <h4>March 2027</h4>
+      <p><strong>HARD DEADLINE:</strong> Non-provisional patent conversion (all 4 provisionals). IP portfolio locked for next phase.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- PART 8: ENTITY FORMATION                     -->
+<!-- ============================================ -->
+
+<section id="entity">
+  <div class="section-header">
+    <div class="section-number">19</div>
+    <h2>Entity Formation &mdash; Discussion</h2>
+    <span class="audience">Everyone</span>
+  </div>
+
+  <p>The federation needs a legal entity before the first commercial contract, patent assignment, or revenue event. Three structures are planned, in sequence.</p>
+
+  <h3>Structure 1: Oklahoma LLC &mdash; The Operating Entity</h3>
+  <div class="card">
+    <h4>Needed NOW</h4>
+    <p>Can't sign contracts, hold patents, or receive revenue without one. Oklahoma LLC formation is ~$100 online. Single-member = pass-through taxation. The 4 provisional patents (currently under Darrell Reading II personally) should be assigned to the LLC.</p>
+  </div>
+
+  <h3>Structure 2: Personal Trust &mdash; Land Protection</h3>
+  <div class="card">
+    <h4>Needed Phase 1</h4>
+    <p>Revocable living trust for personal assets &mdash; protects real property, keeps assets out of probate. Separate from the business entity. Can be modified as circumstances change.</p>
+  </div>
+
+  <h3>Structure 3: Mission Lock &mdash; Irrevocable Charitable Trust + B-Corp</h3>
+  <div class="card">
+    <h4>Needed Phase 2-3</h4>
+    <p>The structural mechanism that makes the community purpose permanent &mdash; not a pledge, an architecture. The LLC is owned by the trust. Distribution rules are locked. The mission lock is enforceable by customers and community. Oklahoma allows benefit corporation elections.</p>
+    <p><strong>Design principle:</strong> Bank account holds 6 months of operating expenses. Everything above flows to community reinvestment. Personal accumulation has a structural ceiling.</p>
+  </div>
+
+  <h3>Sequence</h3>
+  <div class="timeline">
+    <div class="timeline-item active">
+      <h4>Now &mdash; Form Oklahoma LLC</h4>
+      <p>File with Secretary of State (~$100). Get EIN from IRS (free, instant). Draft operating agreement. Assign patents from personal to LLC. Open business bank account.</p>
+    </div>
+    <div class="timeline-item">
+      <h4>Phase 1 &mdash; Personal Trust + B-Corp Election</h4>
+      <p>Revocable living trust for land and personal assets. Benefit corporation election for the LLC. Attorney review of operating agreement for trust integration.</p>
+    </div>
+    <div class="timeline-item">
+      <h4>Phase 2-3 &mdash; Irrevocable Charitable Trust</h4>
+      <p>LLC ownership transfers to irrevocable trust. Distribution rules locked. Mission lock becomes permanent and customer-enforceable. Non-profit tier for billion-dollar outcomes.</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <strong>Discussion questions for this session:</strong>
+    <ul style="margin-top: 8px;">
+      <li>LLC name &mdash; Ganuda LLC? Cherokee AI Federation LLC? Reading Technologies LLC?</li>
+      <li>Should Hulsey (patent attorney) handle formation + patent assignment as one package?</li>
+      <li>Operating agreement structure &mdash; single-member now with provisions for future members?</li>
+      <li>B-corp election timing &mdash; at formation or at first revenue?</li>
+      <li>How does the trust structure interact with PolyForm licensing commitments?</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SUPPORTING DOCUMENTS INDEX                   -->
+<!-- ============================================ -->
+
+<section id="docs">
+  <div class="section-header">
+    <div class="section-number">18</div>
+    <h2>Supporting Documents</h2>
+    <span class="audience">Everyone</span>
+  </div>
+
+  <p>All supporting documents are available for review. Documents marked <span class="role-tag legal">NEEDS CREATION</span> will be completed before the session or assigned as action items.</p>
+
+  <h3>Business &amp; Strategy</h3>
+  <table>
+    <thead>
+      <tr><th>Document</th><th>Status</th><th>Location</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Licensing Framework (3-Tier)</strong></td>
+        <td><span class="role-tag business">EXISTS</span></td>
+        <td>docs/business/LICENSING-FRAMEWORK-MAR09-2026.md</td>
+      </tr>
+      <tr>
+        <td><strong>Support Model</strong></td>
+        <td><span class="role-tag business">EXISTS</span></td>
+        <td>docs/business/SUPPORT-MODEL-MAR09-2026.md</td>
+      </tr>
+      <tr>
+        <td><strong>Demo Environment Architecture</strong></td>
+        <td><span class="role-tag business">EXISTS</span></td>
+        <td>docs/business/DEMO-ENVIRONMENT-MAR09-2026.md</td>
+      </tr>
+      <tr>
+        <td><strong>Compliance Matrix</strong></td>
+        <td><span class="role-tag business">EXISTS</span></td>
+        <td>docs/business/COMPLIANCE-MATRIX-MAR09-2026.md</td>
+      </tr>
+      <tr>
+        <td><strong>Hulsey Patent Consultation Prep</strong></td>
+        <td><span class="role-tag business">EXISTS</span></td>
+        <td>docs/business/HULSEY-CONSULT-PREP-APR13-2026.md</td>
+      </tr>
+      <tr>
+        <td><strong>Market Analysis &amp; Competitive Positioning</strong></td>
+        <td><span class="role-tag legal">NEEDS CREATION</span></td>
+        <td>TAM/SAM from Patent #7 brief ($65B+). Needs: competitor profiles, SWOT, moat analysis.</td>
+      </tr>
+      <tr>
+        <td><strong>Executive Summary (1-Pager)</strong></td>
+        <td><span class="role-tag legal">NEEDS CREATION</span></td>
+        <td>Follow VetAssist Executive Summary pattern. Opportunity, solution, differentiators, status, team, financials.</td>
+      </tr>
+      <tr>
+        <td><strong>Go-to-Market Strategy</strong></td>
+        <td><span class="role-tag legal">NEEDS CREATION</span></td>
+        <td>Customer acquisition, partnership playbook, pricing sensitivity.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Product &amp; Technical</h3>
+  <table>
+    <thead>
+      <tr><th>Document</th><th>Status</th><th>Location</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>ganuda-harness README</strong></td>
+        <td><span class="role-tag technical">EXISTS</span></td>
+        <td>services/ganuda-harness/README.md</td>
+      </tr>
+      <tr>
+        <td><strong>LARQL README</strong></td>
+        <td><span class="role-tag technical">EXISTS</span></td>
+        <td>services/larql/README.md</td>
+      </tr>
+      <tr>
+        <td><strong>ARC-AGI-3 Architecture</strong></td>
+        <td><span class="role-tag technical">EXISTS</span></td>
+        <td>services/arc_agi_3/ARCHITECTURE.md</td>
+      </tr>
+      <tr>
+        <td><strong>CDR: Contest Entry</strong></td>
+        <td><span class="role-tag technical">EXISTS</span></td>
+        <td>docs/council/CDR-CONTEST-ENTRY-APR12-2026.md</td>
+      </tr>
+      <tr>
+        <td><strong>Product Requirements Document (PRD)</strong></td>
+        <td><span class="role-tag legal">NEEDS CREATION</span></td>
+        <td>Follow VetAssist PRD pattern: features, tech stack, API endpoints, security, success metrics, roadmap.</td>
+      </tr>
+      <tr>
+        <td><strong>Business Requirements Document (BRD)</strong></td>
+        <td><span class="role-tag legal">NEEDS CREATION</span></td>
+        <td>Follow VetAssist BRD pattern: stakeholders, scope, requirements, success criteria, budget, timeline.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Legal &amp; IP</h3>
+  <table>
+    <thead>
+      <tr><th>Document</th><th>Status</th><th>Location</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Patent #1: Governance Topology</strong></td>
+        <td><span class="role-tag business">EXISTS</span></td>
+        <td>docs/patents/PROVISIONAL-1-GOVERNANCE-TOPOLOGY.md</td>
+      </tr>
+      <tr>
+        <td><strong>Patent #2: Sycophancy Detection</strong></td>
+        <td><span class="role-tag business">EXISTS</span></td>
+        <td>docs/patents/PROVISIONAL-2-SYCOPHANCY-DETECTION.md</td>
+      </tr>
+      <tr>
+        <td><strong>Patent #3: SRE Valence Protocol</strong></td>
+        <td><span class="role-tag business">EXISTS</span></td>
+        <td>docs/patents/PROVISIONAL-3-SRE-VALENCE-PROTOCOL.md</td>
+      </tr>
+      <tr>
+        <td><strong>Patent #4: Graduated Autonomy Tiers</strong></td>
+        <td><span class="role-tag business">EXISTS</span></td>
+        <td>docs/patents/PROVISIONAL-4-GRADUATED-AUTONOMY-TIERS.md</td>
+      </tr>
+      <tr>
+        <td><strong>Patent #7 Brief: Tokenized Air-Gap Proxy</strong></td>
+        <td><span class="role-tag business">EXISTS</span></td>
+        <td>docs/business/PATENT-BRIEF-TOKENIZED-AIR-GAP-PROXY-MAR14-2026.md</td>
+      </tr>
+      <tr>
+        <td><strong>Mutual NDA Template</strong></td>
+        <td><span class="role-tag legal">NEEDS CREATION</span></td>
+        <td>Standard mutual NDA covering patents, trade secrets, business strategy, financial projections.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Reference: VetAssist Document Set (Pattern to Follow)</h3>
+  <p>These are the documents Joe has seen before. The Ganuda product line needs the same set:</p>
+  <table>
+    <thead>
+      <tr><th>VetAssist Document</th><th>Ganuda Equivalent</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>VetAssist-BRD-v1.md</td>
+        <td>Ganuda BRD</td>
+        <td><span class="role-tag legal">NEEDS CREATION</span></td>
+      </tr>
+      <tr>
+        <td>VetAssist-BRD-v2.md</td>
+        <td>(Will follow after v1 review)</td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td>VetAssist-PRD-v1.md</td>
+        <td>Ganuda PRD</td>
+        <td><span class="role-tag legal">NEEDS CREATION</span></td>
+      </tr>
+      <tr>
+        <td>VetAssist-Executive-Summary.md</td>
+        <td>Ganuda Executive Summary</td>
+        <td><span class="role-tag legal">NEEDS CREATION</span></td>
+      </tr>
+      <tr>
+        <td>VETASSIST-SUSTAINABILITY-PLAN.md</td>
+        <td>Licensing Framework (exists) + Revenue Model (this presentation)</td>
+        <td><span class="role-tag business">PARTIAL</span></td>
+      </tr>
+      <tr>
+        <td>VetAssist-Roadmap-2026.md</td>
+        <td>Timeline section in this presentation</td>
+        <td><span class="role-tag business">PARTIAL</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight">
+    <strong>Wednesday Night Prep Checklist:</strong>
+    <ol style="margin-top: 8px;">
+      <li>Create Ganuda Executive Summary (1-pager, follow VetAssist pattern)</li>
+      <li>Create Ganuda BRD v1 (stakeholders, scope, requirements, success criteria)</li>
+      <li>Create Ganuda PRD v1 (features, tech stack, API endpoints, security, metrics)</li>
+      <li>Create Market Analysis (TAM/SAM, competitor profiles, SWOT)</li>
+      <li>Draft Mutual NDA template</li>
+      <li>Finalize Professional tier pricing (real numbers, not placeholders)</li>
+      <li>Polish architecture diagram for live presentation</li>
+    </ol>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div style="text-align: center; padding: 40px 0; color: var(--text-secondary); font-size: 13px; border-top: 1px solid var(--border-light); margin-top: 60px;">
+  <strong>CONFIDENTIAL</strong> &mdash; Ganuda Federation &bull; Cherokee AI &bull; April 2026<br>
+  All information in this document is proprietary and subject to NDA.<br>
+  <em>For Seven Generations.</em>
+</div>
+
+</main>
+
+<!-- NAV HIGHLIGHT SCRIPT -->
+<script>
+  // Highlight current section in nav
+  const sections = document.querySelectorAll('section');
+  const navLinks = document.querySelectorAll('nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`nav a[href="#${entry.target.id}"]`);
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>
