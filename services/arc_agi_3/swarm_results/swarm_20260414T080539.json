@@ -1,0 +1,136 @@
+[
+  {
+    "game_id": "vc33",
+    "seed": 1470257210,
+    "instance": 2,
+    "levels": 1,
+    "actions": 1500,
+    "level_up_actions": [
+      105
+    ],
+    "game_overs": 28,
+    "won": false,
+    "elapsed": 160.4,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "vc33",
+    "seed": 394300276,
+    "instance": 1,
+    "levels": 1,
+    "actions": 1500,
+    "level_up_actions": [
+      6
+    ],
+    "game_overs": 28,
+    "won": false,
+    "elapsed": 163.7,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "vc33",
+    "seed": 645845479,
+    "instance": 0,
+    "levels": 2,
+    "actions": 1500,
+    "level_up_actions": [
+      12,
+      29
+    ],
+    "game_overs": 19,
+    "won": false,
+    "elapsed": 239.9,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1124819067,
+    "instance": 1,
+    "levels": 1,
+    "actions": 1500,
+    "level_up_actions": [
+      98
+    ],
+    "game_overs": 22,
+    "won": false,
+    "elapsed": 223.9,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1369699573,
+    "instance": 0,
+    "levels": 0,
+    "actions": 1500,
+    "level_up_actions": [],
+    "game_overs": 2,
+    "won": false,
+    "elapsed": 250.7,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "sp80",
+    "seed": 197862214,
+    "instance": 0,
+    "levels": 1,
+    "actions": 1500,
+    "level_up_actions": [
+      10
+    ],
+    "game_overs": 51,
+    "won": false,
+    "elapsed": 70.7,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "lp85",
+    "seed": 524974913,
+    "instance": 2,
+    "levels": 1,
+    "actions": 1500,
+    "level_up_actions": [
+      123
+    ],
+    "game_overs": 22,
+    "won": false,
+    "elapsed": 218.7,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "sp80",
+    "seed": 2111083232,
+    "instance": 1,
+    "levels": 1,
+    "actions": 1500,
+    "level_up_actions": [
+      54
+    ],
+    "game_overs": 56,
+    "won": false,
+    "elapsed": 98.3,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "sp80",
+    "seed": 167038802,
+    "instance": 2,
+    "levels": 1,
+    "actions": 1500,
+    "level_up_actions": [
+      42
+    ],
+    "game_overs": 51,
+    "won": false,
+    "elapsed": 64.6,
+    "error": null,
+    "node": "redfin"
+  }
+]

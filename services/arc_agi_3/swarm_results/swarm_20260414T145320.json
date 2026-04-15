@@ -1,0 +1,41 @@
+[
+  {
+    "game_id": "dc22",
+    "seed": 1606917076,
+    "instance": 1,
+    "levels": 0,
+    "actions": 3000,
+    "level_up_actions": [],
+    "game_overs": 23,
+    "won": false,
+    "elapsed": 223.1,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1178332309,
+    "instance": 2,
+    "levels": 0,
+    "actions": 3000,
+    "level_up_actions": [],
+    "game_overs": 23,
+    "won": false,
+    "elapsed": 223.8,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 663470574,
+    "instance": 0,
+    "levels": 0,
+    "actions": 3000,
+    "level_up_actions": [],
+    "game_overs": 23,
+    "won": false,
+    "elapsed": 236.3,
+    "error": null,
+    "node": "redfin"
+  }
+]

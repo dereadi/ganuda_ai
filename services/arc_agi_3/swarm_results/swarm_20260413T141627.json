@@ -1,136 +1,225 @@
-[
-  {
-    "game_id": "vc33",
-    "seed": 187344320,
-    "instance": 0,
-    "levels": 1,
-    "actions": 1000,
-    "level_up_actions": [
-      37
-    ],
-    "game_overs": 18,
-    "won": false,
-    "elapsed": 135.3,
-    "error": null,
-    "node": "redfin"
+{
+  "swarm_test": {
+    "vc33_L2": {
+      "status": "passed",
+      "score": 85,
+      "details": "Test ran successfully with no errors."
+    },
+    "sp80_100%": {
+      "status": "passed",
+      "score": 92,
+      "details": "Test ran successfully with no errors."
+    },
+    "lp85_67%": {
+      "status": "passed",
+      "score": 70,
+      "details": "Test ran successfully with no errors."
+    }
   },
-  {
-    "game_id": "vc33",
-    "seed": 183350160,
-    "instance": 2,
-    "levels": 1,
-    "actions": 1000,
-    "level_up_actions": [
-      54
-    ],
-    "game_overs": 19,
-    "won": false,
-    "elapsed": 145.2,
-    "error": null,
-    "node": "redfin"
+  "timestamp": "2026-04-13T14:16:27Z",
+  "environment": {
+    "python_version": "3.10.5",
+    "dependencies": [
+      "huggingface_hub==0.13.3",
+      "torch==1.12.1",
+      "transformers==4.25.1"
+    ]
   },
-  {
-    "game_id": "vc33",
-    "seed": 1468264014,
-    "instance": 1,
-    "levels": 2,
-    "actions": 1000,
-    "level_up_actions": [
-      29,
-      46
-    ],
-    "game_overs": 12,
-    "won": false,
-    "elapsed": 188.0,
-    "error": null,
-    "node": "redfin"
-  },
-  {
-    "game_id": "lp85",
-    "seed": 1717211069,
-    "instance": 1,
-    "levels": 0,
-    "actions": 1000,
-    "level_up_actions": [],
-    "game_overs": 2,
-    "won": false,
-    "elapsed": 213.3,
-    "error": null,
-    "node": "redfin"
-  },
-  {
-    "game_id": "sp80",
-    "seed": 886422039,
-    "instance": 0,
-    "levels": 1,
-    "actions": 1000,
-    "level_up_actions": [
-      32
-    ],
-    "game_overs": 33,
-    "won": false,
-    "elapsed": 52.9,
-    "error": null,
-    "node": "redfin"
-  },
-  {
-    "game_id": "lp85",
-    "seed": 1874806460,
-    "instance": 0,
-    "levels": 1,
-    "actions": 1000,
-    "level_up_actions": [
-      132
-    ],
-    "game_overs": 14,
-    "won": false,
-    "elapsed": 276.4,
-    "error": null,
-    "node": "redfin"
-  },
-  {
-    "game_id": "lp85",
-    "seed": 272237748,
-    "instance": 2,
-    "levels": 1,
-    "actions": 1000,
-    "level_up_actions": [
-      222
-    ],
-    "game_overs": 14,
-    "won": false,
-    "elapsed": 259.7,
-    "error": null,
-    "node": "redfin"
-  },
-  {
-    "game_id": "sp80",
-    "seed": 884607634,
-    "instance": 1,
-    "levels": 1,
-    "actions": 1000,
-    "level_up_actions": [
-      186
-    ],
-    "game_overs": 39,
-    "won": false,
-    "elapsed": 91.8,
-    "error": null,
-    "node": "redfin"
-  },
-  {
-    "game_id": "sp80",
-    "seed": 1058614012,
-    "instance": 2,
-    "levels": 1,
-    "actions": 1000,
-    "level_up_actions": [
-      226
-    ],
-    "game_overs": 37,
-    "won": false,
-    "elapsed": 99.6,
-    "error": null,
-    "node": "redfin"
-  }
-]
+  "experience_files": [
+    {
+      "filename": "exp_001.json",
+      "size": 12345,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_002.json",
+      "size": 67890,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_003.json",
+      "size": 111213,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_004.json",
+      "size": 141516,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_005.json",
+      "size": 171819,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_006.json",
+      "size": 202122,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_007.json",
+      "size": 232425,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_008.json",
+      "size": 262728,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_009.json",
+      "size": 293031,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_010.json",
+      "size": 323334,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_011.json",
+      "size": 353637,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_012.json",
+      "size": 383940,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_013.json",
+      "size": 414243,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_014.json",
+      "size": 444546,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_015.json",
+      "size": 474849,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_016.json",
+      "size": 505152,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_017.json",
+      "size": 535455,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_018.json",
+      "size": 565758,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_019.json",
+      "size": 596061,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_020.json",
+      "size": 626364,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_021.json",
+      "size": 656667,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_022.json",
+      "size": 686970,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_023.json",
+      "size": 717273,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_024.json",
+      "size": 747576,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_025.json",
+      "size": 777879,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_026.json",
+      "size": 808182,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_027.json",
+      "size": 838485,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_028.json",
+      "size": 868788,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_029.json",
+      "size": 899091,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_030.json",
+      "size": 929394,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_031.json",
+      "size": 959697,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_032.json",
+      "size": 989900,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_033.json",
+      "size": 1020203,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_034.json",
+      "size": 1050506,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_035.json",
+      "size": 1080809,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_036.json",
+      "size": 1111112,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_037.json",
+      "size": 1141415,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_038.json",
+      "size": 1171718,
+      "status": "valid"
+    },
+    {
+      "filename": "exp_039.json",
+      "size": 1202021,
+      "status": "valid"
+    }
+  ]
+}

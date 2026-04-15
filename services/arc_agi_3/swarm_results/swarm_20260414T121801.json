@@ -1,0 +1,262 @@
+[
+  {
+    "game_id": "vc33",
+    "seed": 909419788,
+    "instance": 2,
+    "levels": 0,
+    "actions": 3000,
+    "level_up_actions": [],
+    "game_overs": 57,
+    "won": false,
+    "elapsed": 14.6,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "vc33",
+    "seed": 1719612984,
+    "instance": 0,
+    "levels": 0,
+    "actions": 3000,
+    "level_up_actions": [],
+    "game_overs": 57,
+    "won": false,
+    "elapsed": 14.6,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "sp80",
+    "seed": 1951110178,
+    "instance": 2,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      66
+    ],
+    "game_overs": 77,
+    "won": false,
+    "elapsed": 15.0,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "vc33",
+    "seed": 314836927,
+    "instance": 1,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      32
+    ],
+    "game_overs": 56,
+    "won": false,
+    "elapsed": 15.1,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "sp80",
+    "seed": 1844595951,
+    "instance": 0,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      353
+    ],
+    "game_overs": 103,
+    "won": false,
+    "elapsed": 15.8,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "sp80",
+    "seed": 1653516834,
+    "instance": 1,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      170
+    ],
+    "game_overs": 108,
+    "won": false,
+    "elapsed": 15.8,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "ar25",
+    "seed": 561187159,
+    "instance": 1,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      1291
+    ],
+    "game_overs": 40,
+    "won": false,
+    "elapsed": 15.7,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "ar25",
+    "seed": 725126675,
+    "instance": 2,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      1191
+    ],
+    "game_overs": 40,
+    "won": false,
+    "elapsed": 15.6,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "ft09",
+    "seed": 1084846831,
+    "instance": 0,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      693
+    ],
+    "game_overs": 60,
+    "won": false,
+    "elapsed": 15.5,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "ar25",
+    "seed": 1307894100,
+    "instance": 0,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      359
+    ],
+    "game_overs": 38,
+    "won": false,
+    "elapsed": 16.1,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "ft09",
+    "seed": 1575154084,
+    "instance": 1,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      575
+    ],
+    "game_overs": 61,
+    "won": false,
+    "elapsed": 15.4,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "ft09",
+    "seed": 231344717,
+    "instance": 2,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      546
+    ],
+    "game_overs": 61,
+    "won": false,
+    "elapsed": 15.5,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1825742327,
+    "instance": 0,
+    "levels": 0,
+    "actions": 3000,
+    "level_up_actions": [],
+    "game_overs": 23,
+    "won": false,
+    "elapsed": 16.5,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1290523169,
+    "instance": 0,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      170
+    ],
+    "game_overs": 12,
+    "won": false,
+    "elapsed": 17.0,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1558418251,
+    "instance": 1,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      154
+    ],
+    "game_overs": 12,
+    "won": false,
+    "elapsed": 16.8,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 1759266353,
+    "instance": 1,
+    "levels": 0,
+    "actions": 3000,
+    "level_up_actions": [],
+    "game_overs": 23,
+    "won": false,
+    "elapsed": 16.2,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "lp85",
+    "seed": 1764631416,
+    "instance": 2,
+    "levels": 1,
+    "actions": 3000,
+    "level_up_actions": [
+      131
+    ],
+    "game_overs": 11,
+    "won": false,
+    "elapsed": 16.8,
+    "error": null,
+    "node": "redfin"
+  },
+  {
+    "game_id": "dc22",
+    "seed": 569348597,
+    "instance": 2,
+    "levels": 0,
+    "actions": 3000,
+    "level_up_actions": [],
+    "game_overs": 23,
+    "won": false,
+    "elapsed": 16.2,
+    "error": null,
+    "node": "redfin"
+  }
+]
