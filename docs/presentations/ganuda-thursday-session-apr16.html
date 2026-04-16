@@ -537,6 +537,67 @@
 
   <h3>Node Topology</h3>
 
+  <!-- ARCHITECTURE DIAGRAM -->
+  <div style="background: #1a1a2e; border-radius: 12px; padding: 32px; margin: 24px 0; font-family: 'Fira Code', monospace; font-size: 12px; color: #ccc; overflow-x: auto;">
+    <div style="text-align: center; margin-bottom: 20px; font-size: 14px; color: var(--cherokee-gold);">Cherokee AI Federation &mdash; 10-Node Architecture</div>
+
+    <pre style="line-height: 1.5; margin: 0;">
+                         ┌─── THE INTERNET ───┐
+                         │   ganuda.us (CDN)   │
+                         └────────┬────────────┘
+                                  │ 443/80
+                    ╔═════════════╧══════════════╗
+                    ║    DMZ (192.168.30.0/24)    ║
+                    ║  ┌──────────┐ ┌──────────┐ ║
+                    ║  │ <span style="color:#87CEEB;">owlfin</span>   │ │ <span style="color:#87CEEB;">eaglefin</span> │ ║
+                    ║  │ THE VOICE│ │ BACKUP   │ ║
+                    ║  │ Caddy    │ │ Caddy    │ ║
+                    ║  │ primary  │ │ failover │ ║
+                    ║  └────┬─────┘ └────┬─────┘ ║
+                    ╚═══════╪════════════╪═══════╝
+                            │ keepalived │ VIP: 192.168.30.10
+    ╔═══════════════════════╧════════════╧═══════════════════════════╗
+    ║                    LAN (192.168.132.0/24)                       ║
+    ║                                                                  ║
+    ║   <span style="color:#ff6347;">┌─────────────────────────────────────────────┐</span>              ║
+    ║   <span style="color:#ff6347;">│           🧠 THE BRAIN — INFERENCE            │</span>              ║
+    ║   <span style="color:#ff6347;">│                                               │</span>              ║
+    ║   <span style="color:#ff6347;">│  ┌──────────────┐     ┌──────────────────┐   │</span>              ║
+    ║   <span style="color:#ff6347;">│  │ <span style="color:#FF6347;">redfin</span>        │     │ <span style="color:#FF6347;">bmasass</span>            │   │</span>              ║
+    ║   <span style="color:#ff6347;">│  │ RTX 6000 48GB │     │ M4 Max 128GB      │   │</span>              ║
+    ║   <span style="color:#ff6347;">│  │ Qwen2.5-72B   │     │ Qwen3-30B         │   │</span>              ║
+    ║   <span style="color:#ff6347;">│  │ VLM 7B        │     │ Llama-3.3-70B     │   │</span>              ║
+    ║   <span style="color:#ff6347;">│  │ SAG + Jr Exec  │     │ DeepSeek-R1-70B   │   │</span>              ║
+    ║   <span style="color:#ff6347;">│  └──────┬───────┘     └────────┬─────────┘   │</span>              ║
+    ║   <span style="color:#ff6347;">└─────────┼──────────────────────┼──────────────┘</span>              ║
+    ║             │ <span style="color:#DAA520;">fiber 10Gbps</span>          │                              ║
+    ║   <span style="color:#4682B4;">┌─────────┼──────────────────────┼──────────────┐</span>              ║
+    ║   <span style="color:#4682B4;">│         ▼ 🗄️ THE MEMORY          │              │</span>              ║
+    ║   <span style="color:#4682B4;">│  ┌──────────────┐     ┌────────┴─────────┐   │</span>              ║
+    ║   <span style="color:#4682B4;">│  │ <span style="color:#4682B4;">bluefin</span>       │     │ <span style="color:#00FF00;">longman</span> (NEW)     │   │</span>              ║
+    ║   <span style="color:#4682B4;">│  │ PostgreSQL    │     │ SAN Server        │   │</span>              ║
+    ║   <span style="color:#4682B4;">│  │ pgvector      │     │ Centralized       │   │</span>              ║
+    ║   <span style="color:#4682B4;">│  │ 34K+ memories │     │ Storage           │   │</span>              ║
+    ║   <span style="color:#4682B4;">│  │ VLM + YOLO    │     │                   │   │</span>              ║
+    ║   <span style="color:#4682B4;">│  └──────────────┘     └───────────────────┘   │</span>              ║
+    ║   <span style="color:#4682B4;">└──────────────────────────────────────────────┘</span>              ║
+    ║                                                                  ║
+    ║   <span style="color:#46204f;">┌──────────┐</span>  <span style="color:#2F4F2F;">┌──────────┐</span>  <span style="color:#8B4513;">┌──────────┐</span>  <span style="color:#DAA520;">┌──────────┐</span>  ║
+    ║   <span style="color:#46204f;">│ <span style="color:#46204f;">sasass</span>   │</span>  <span style="color:#2F4F2F;">│ <span style="color:#2F4F2F;">greenfin</span> │</span>  <span style="color:#8B4513;">│ <span style="color:#8B4513;">silverfin</span>│</span>  <span style="color:#DAA520;">│ <span style="color:#DAA520;">goldfin</span>  │</span>  ║
+    ║   <span style="color:#46204f;">│ THE EYES │</span>  <span style="color:#2F4F2F;">│ NERVOUS  │</span>  <span style="color:#8B4513;">│ IMMUNE   │</span>  <span style="color:#DAA520;">│ THE VAULT│</span>  ║
+    ║   <span style="color:#46204f;">│ FARA     │</span>  <span style="color:#2F4F2F;">│ SYSTEM   │</span>  <span style="color:#8B4513;">│ SYSTEM   │</span>  <span style="color:#DAA520;">│ PII Only │</span>  ║
+    ║   <span style="color:#46204f;">│ Browser  │</span>  <span style="color:#2F4F2F;">│ WireGuard│</span>  <span style="color:#8B4513;">│ FreeIPA  │</span>  <span style="color:#DAA520;">│ Isolated │</span>  ║
+    ║   <span style="color:#46204f;">│ Control  │</span>  <span style="color:#2F4F2F;">│ Fiber GW │</span>  <span style="color:#8B4513;">│ Identity │</span>  <span style="color:#DAA520;">│ 192.168. │</span>  ║
+    ║   <span style="color:#46204f;">└──────────┘</span>  <span style="color:#2F4F2F;">└──────────┘</span>  <span style="color:#8B4513;">└──────────┘</span>  <span style="color:#DAA520;">│ 20.0/24  │</span>  ║
+    ║                                                <span style="color:#DAA520;">└──────────┘</span>  ║
+    ╚══════════════════════════════════════════════════════════════════╝
+
+    ⚡ <span style="color:#DAA520;">POWER: 6.4kW Solar + 2× Anker Solix 3800 Plus (dual-PSU redundancy)</span>
+    🔒 <span style="color:#4682B4;">NETWORKS: LAN + Fiber 10G + DMZ + PII Isolated + Tailscale</span>
+    🏛️ <span style="color:#ff6347;">GOVERNANCE: 14-Specialist Council + ganuda-harness + Constitutional DCs</span>
+    </pre>
+  </div>
+
   <table>
     <thead>
       <tr><th>Node</th><th>Role</th><th>Hardware</th><th>Model</th><th>Biological Analog</th></tr>
@@ -559,16 +620,30 @@
       <tr>
         <td><strong>bluefin</strong></td>
         <td>Memory + vision</td>
-        <td>32 cores, PostgreSQL</td>
+        <td>32 cores, PostgreSQL + pgvector</td>
         <td>Qwen2-VL-7B</td>
-        <td>Thalamus / hippocampus</td>
+        <td>Hippocampus</td>
+      </tr>
+      <tr>
+        <td><strong>longman</strong> (NEW)</td>
+        <td>Centralized storage (SAN)</td>
+        <td>SAN server (arriving this week)</td>
+        <td>&mdash;</td>
+        <td>Long-term memory</td>
       </tr>
       <tr>
         <td><strong>sasass</strong></td>
         <td>Action cortex (FARA)</td>
-        <td>16 cores</td>
+        <td>macOS, browser control</td>
         <td>Qwen2.5-VL-7B</td>
         <td>Sensorimotor cortex</td>
+      </tr>
+      <tr>
+        <td><strong>greenfin</strong></td>
+        <td>Network bridge</td>
+        <td>Router / WireGuard / Fiber</td>
+        <td>&mdash;</td>
+        <td>Nervous system</td>
       </tr>
       <tr>
         <td><strong>silverfin</strong></td>
@@ -578,11 +653,25 @@
         <td>Immune system</td>
       </tr>
       <tr>
-        <td><strong>greenfin</strong></td>
-        <td>Network bridge</td>
-        <td>Router / WireGuard</td>
+        <td><strong>goldfin</strong></td>
+        <td>PII vault</td>
+        <td>Isolated network (192.168.20.0/24)</td>
         <td>&mdash;</td>
-        <td>Nervous system</td>
+        <td>Sealed vault</td>
+      </tr>
+      <tr>
+        <td><strong>owlfin</strong></td>
+        <td>Web serving (primary)</td>
+        <td>Caddy + keepalived VIP</td>
+        <td>&mdash;</td>
+        <td>Voice</td>
+      </tr>
+      <tr>
+        <td><strong>eaglefin</strong></td>
+        <td>Web serving (failover)</td>
+        <td>Caddy failover</td>
+        <td>&mdash;</td>
+        <td>Backup voice</td>
       </tr>
     </tbody>
   </table>
