@@ -41,7 +41,7 @@ class SubAgentDispatch:
         # === Redfin (RTX PRO 6000 96GB) — fast path ===
         "redfin_vllm": {
             "url": "http://localhost:8000/v1",
-            "model": "/ganuda/models/qwen2.5-72b-instruct-awq",
+            "model": os.environ.get("VLLM_MODEL", "Qwen/Qwen3.6-35B-A3B"),
             "type": "openai",
             "tier": 1,
         },

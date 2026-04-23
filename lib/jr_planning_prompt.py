@@ -6,61 +6,64 @@ Cherokee AI Federation - For Seven Generations
 Created: January 17, 2026
 """
 
-PLANNING_PROMPT = '''You are a Cherokee AI Jr engineer. Analyze the following task instructions and create a structured execution plan.
+PLANNING_PROMPT = '''You are a task executor. Read the instructions and output ONLY a structured plan. No reasoning, no explanation, no thinking — just the plan in the exact format below.
 
-## TASK INSTRUCTIONS:
+TASK INSTRUCTIONS:
 {instructions}
 
-## REQUIRED OUTPUT FORMAT (follow exactly):
+OUTPUT THIS EXACT FORMAT AND NOTHING ELSE:
 
 ```plan
-PROJECT_NAME: [concise name, max 5 words]
+PROJECT_NAME: <fill in>
 
-FOCUS: [main objective in one sentence]
+FOCUS: <fill in>
 
 FILES_TO_CREATE:
-- /full/path/to/file1.py: [brief description]
-- /full/path/to/file2.tsx: [brief description]
+- <extract actual file paths from the instructions above>
 
 FILES_TO_MODIFY:
-- /full/path/to/existing.py: [what changes needed]
+- <extract actual file paths from the instructions above>
 
 STEPS:
-- [ ] Step 1: [specific action]
-- [ ] Step 2: [specific action]
-- [ ] Step 3: [specific action]
+- [ ] Step 1: <fill in>
+- [ ] Step 2: <fill in>
 
-SUMMARY: [key considerations and dependencies]
+SUMMARY: <fill in>
 ```
 
-## RULES:
-1. Always extract FULL file paths from the instructions (starting with /)
-2. If "CREATE FILE:" or "Path:" is mentioned, add to FILES_TO_CREATE
-3. If "UPDATE" or "MODIFY" or "UPDATE FILES:" is mentioned, add to FILES_TO_MODIFY
-4. Look for paths in BACKEND LOCATION, FRONTEND LOCATION sections
-5. Each step should be a clear, specific action
-6. Keep steps simple - don't overcomplicate
-7. Output MUST be inside the ```plan code block
+RULES:
+- Extract REAL file paths mentioned in the task instructions. Do NOT invent paths.
+- Paths like /ganuda/lib/specialist_council.py or /ganuda/jr_executor/task_executor.py are real paths. Use them.
+- Do NOT use placeholder paths like /path/to/file.py — those will be rejected.
+- If instructions say CREATE, put in FILES_TO_CREATE
+- If instructions say MODIFY/UPDATE/FIX, put in FILES_TO_MODIFY
+- Output ONLY the ```plan block. Nothing before it. Nothing after it.
 '''
 
-CODE_GENERATION_PROMPT = '''You are a Cherokee AI Jr engineer. Generate the complete code for the following file.
+CODE_GENERATION_PROMPT = '''Generate code for this file.
 
-## FILE TO CREATE: {file_path}
-## PURPOSE: {description}
-## CONTEXT FROM INSTRUCTIONS:
+FILE: {file_path}
+PURPOSE: {description}
+CONTEXT:
 {relevant_context}
 
-## RULES:
-1. Output ONLY the code, no explanations before or after
-2. Include all necessary imports at the top
-3. Follow existing project patterns
-4. Add minimal comments only where logic is complex
-5. The code must be complete and runnable
-8. For MODIFYING existing files: Use SEARCH/REPLACE blocks instead of full file content
-9. SEARCH/REPLACE format: <<<<<<< SEARCH\n[exact old code]\n=======\n[new code]\n>>>>>>> REPLACE
-10. Each SEARCH block must match exactly ONE location in the target file
-6. For Python files: use type hints, docstrings for classes/functions
-7. For TypeScript/React files: use proper types, export components
+INSTRUCTIONS:
+- For NEW files: write the complete file inside a ```{language} code block.
+- For MODIFYING existing files: write one or more SEARCH/REPLACE blocks.
+  Each block must contain the EXACT old code to find and the new code to replace it with.
+  Format:
+
+<<<<<<< SEARCH
+exact old code copied from the file above
+=======
+new replacement code
+>>>>>>> REPLACE
+
+- Include enough surrounding lines in SEARCH to make the match unique (at least 3-5 lines).
+- You may include multiple SEARCH/REPLACE blocks if multiple changes are needed.
+- Make sure each SEARCH block contains code that ACTUALLY EXISTS in the file shown above.
+
+Write your code now:
 
 ```{language}
 '''

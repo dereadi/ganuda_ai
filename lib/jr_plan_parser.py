@@ -14,6 +14,7 @@ from typing import Dict, List, Tuple
 def parse_planning_response(response: str) -> Dict:
     """
     Parse LLM response in structured plan format.
+    Multi-strategy: tries structured format first, falls back to path extraction.
 
     Returns:
         {
@@ -34,7 +35,11 @@ def parse_planning_response(response: str) -> Dict:
         'summary': ''
     }
 
-    # Extract content from ```plan block if present
+    # Strip think tags before parsing
+    from lib.llm_config import strip_think_tags
+    response = strip_think_tags(response)
+
+    # Strategy 1: Extract content from ```plan block if present
     plan_match = re.search(r'```plan\s*(.*?)\s*```', response, re.DOTALL)
     if plan_match:
         response = plan_match.group(1)
@@ -114,6 +119,32 @@ def parse_planning_response(response: str) -> Dict:
         # Summary continuation
         if current_section == 'summary' and line and not line.startswith(('PROJECT', 'FOCUS', 'FILES', 'STEPS', 'SUMMARY', '-')):
             result['summary'] += ' ' + line
+
+    # Strategy 2: If structured parsing found nothing, scan for /ganuda/ paths
+    if not result['files_to_create'] and not result['files_to_modify']:
+        # Find all /ganuda/... file paths mentioned anywhere
+        all_paths = re.findall(r'(/ganuda/[/\w\.\-_]+\.(?:py|tsx?|jsx?|sql|sh|yaml|json|md))', response)
+        # Deduplicate
+        seen = set()
+        unique_paths = []
+        for p in all_paths:
+            if p not in seen and '/path/to/' not in p:
+                seen.add(p)
+                unique_paths.append(p)
+
+        if unique_paths:
+            # Guess create vs modify based on context words near each path
+            for path in unique_paths:
+                # Search 100 chars before the path for create/modify keywords
+                idx = response.find(path)
+                context = response[max(0, idx-100):idx].lower() if idx >= 0 else ''
+                if any(w in context for w in ['create', 'new file', 'generate', 'write']):
+                    result['files_to_create'].append((path, 'Extracted from path scan'))
+                else:
+                    result['files_to_modify'].append((path, 'Extracted from path scan'))
+
+            if not result['steps']:
+                result['steps'] = [(1, f'Process {len(unique_paths)} file(s)')]
 
     return result
 

@@ -45,7 +45,7 @@ except ImportError as e:
 
 # Configuration for local vLLM
 VLLM_BASE_URL = "http://localhost:8000/v1"
-MODEL_NAME = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
+MODEL_NAME = os.environ.get('VLLM_MODEL', 'Qwen/Qwen3.6-35B-A3B')
 MAX_RECURSION_DEPTH = 3  # Prevent runaway recursion
 
 # Phase 9 Path Validation (Jan 23, 2026 - Council Vote 28d18d80e447505f)

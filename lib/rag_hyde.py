@@ -16,7 +16,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 VLLM_URL = os.environ.get("VLLM_URL", "http://127.0.0.1:8000/v1/chat/completions")
-VLLM_MODEL = os.environ.get("VLLM_MODEL", "/ganuda/models/qwen2.5-72b-instruct-awq")
+VLLM_MODEL = os.environ.get('VLLM_MODEL', 'Qwen/Qwen3.6-35B-A3B')
 EMBEDDING_URL = os.environ.get("EMBEDDING_URL", "http://192.168.132.224:8003/v1/embeddings")
 
 HYDE_PROMPT = """Write a short paragraph (3-5 sentences) that would be a good answer to the following question. Write it as if it were a factual document excerpt, not a conversational answer. Be specific and use technical terms where appropriate.

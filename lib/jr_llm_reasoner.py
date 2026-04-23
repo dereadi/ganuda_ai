@@ -30,16 +30,17 @@ from typing import Optional, Dict, List, Any
 PM_MODEL_URL = "http://localhost:11434/api/generate"
 PM_MODEL_NAME = "executive_jr"
 
-# Coder Model - vLLM on redfin (env-configured)
+# Central config — no hardcoded model names
 import os
-CODER_MODEL_URL = "http://localhost:8000/v1/chat/completions"
-CODER_MODEL_NAME = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
+from lib.llm_config import get_model, get_url, strip_think_tags, clean_response
+CODER_MODEL_URL = get_url("primary")
+CODER_MODEL_NAME = get_model("primary")
 
 # Legacy single-model config (used by existing methods)
-LLM_URL = "http://localhost:8000/v1/chat/completions"
-GATEWAY_URL = "http://localhost:8080"
+LLM_URL = get_url("primary")
+GATEWAY_URL = get_url("gateway")
 API_KEY = os.environ.get('LLM_GATEWAY_API_KEY', 'REDACTED_USE_ENV_VAR')
-DEFAULT_MODEL = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
+DEFAULT_MODEL = get_model("primary")
 
 
 class JrLLMReasoner:
@@ -51,6 +52,14 @@ class JrLLMReasoner:
         self.gateway_url = GATEWAY_URL
         self.api_key = API_KEY
 
+    # System prompt for executor — structured but not over-suppressed
+    EXECUTOR_SYSTEM_PROMPT = (
+        "You are a software engineer. Follow the output format specified in each prompt. "
+        "When asked for a ```plan block, produce the plan in the exact format shown. "
+        "When asked for code or SEARCH/REPLACE blocks, produce complete, working code. "
+        "Do not truncate code. Include enough context in SEARCH blocks to uniquely match."
+    )
+
     async def _call_llm(self, prompt: str, max_tokens: int = 1500, temperature: float = 0.3) -> str:
         """Call local LLM and return response text."""
         async with aiohttp.ClientSession() as session:
@@ -59,7 +68,10 @@ class JrLLMReasoner:
                     self.llm_url,
                     json={
                         "model": self.model,
-                        "messages": [{"role": "user", "content": prompt}],
+                        "messages": [
+                            {"role": "system", "content": self.EXECUTOR_SYSTEM_PROMPT},
+                            {"role": "user", "content": prompt}
+                        ],
                         "max_tokens": max_tokens,
                         "temperature": temperature
                     },
@@ -69,7 +81,7 @@ class JrLLMReasoner:
                         error_text = await resp.text()
                         raise Exception(f"LLM API error {resp.status}: {error_text}")
                     data = await resp.json()
-                    return data["choices"][0]["message"]["content"]
+                    return clean_response(data)
             except aiohttp.ClientError as e:
                 raise Exception(f"Failed to connect to LLM: {e}")
 
@@ -534,7 +546,7 @@ Return ONLY valid JSON:"""
         )
 
         if response.status_code == 200:
-            text = response.json()["choices"][0]["message"]["content"]
+            text = clean_response(response.json())
             json_match = re.search(r'\{[\s\S]*\}', text)
             if json_match:
                 try:
@@ -585,7 +597,7 @@ Generate the complete implementation:"""
         )
 
         if response.status_code == 200:
-            content = response.json()["choices"][0]["message"]["content"]
+            content = clean_response(response.json())
             return content
         else:
             return f"# Error: API returned {response.status_code}"

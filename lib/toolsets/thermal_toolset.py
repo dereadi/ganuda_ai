@@ -240,7 +240,7 @@ class ThermalToolSet(ToolSet):
             synth_resp = requests.post(
                 "http://localhost:8000/v1/chat/completions",
                 json={
-                    "model": "/ganuda/models/qwen2.5-72b-instruct-awq",
+                    "model": os.environ.get("VLLM_MODEL", "Qwen/Qwen3.6-35B-A3B"),
                     "messages": [
                         {
                             "role": "system",
