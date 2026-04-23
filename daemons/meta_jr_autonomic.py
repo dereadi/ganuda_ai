@@ -169,6 +169,7 @@ class MetaJrAutonomic:
         except Exception as e:
             print(f"❌ Meta Jr: Error in pattern analysis: {e}")
             if self.db_conn:
+                print(f"⚠️ Meta Jr: ROLLBACK: transaction aborted during pattern analysis")
                 self.db_conn.rollback()
 
     def detect_patterns(self, memories):
@@ -254,6 +255,7 @@ class MetaJrAutonomic:
         except Exception as e:
             print(f"❌ Meta Jr: Error in correlation scan: {e}")
             if self.db_conn:
+                print(f"⚠️ Meta Jr: ROLLBACK: transaction aborted during correlation scan")
                 self.db_conn.rollback()
 
     def find_correlations(self, memories):
@@ -336,6 +338,7 @@ class MetaJrAutonomic:
         except Exception as e:
             print(f"❌ Meta Jr: Error in coherence tracking: {e}")
             if self.db_conn:
+                print(f"⚠️ Meta Jr: ROLLBACK: transaction aborted during coherence tracking")
                 self.db_conn.rollback()
 
     # === ON-DEMAND FUNCTIONS (WAKE-ON-QUERY) ===
@@ -642,6 +645,7 @@ class MetaJrAutonomic:
         except Exception as e:
             print(f"❌ Meta Jr: Error in deep consolidation: {e}")
             if self.db_conn:
+                print(f"⚠️ Meta Jr: ROLLBACK: transaction aborted during deep consolidation")
                 self.db_conn.rollback()
 
     # === MAIN LOOP ===

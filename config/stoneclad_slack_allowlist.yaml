@@ -1,0 +1,19 @@
+# Stoneclad Slack inbound allowlist — LM-OPENCLAW-CHANNELS Phase 3a
+# Apr 20 2026
+
+# Read-tier: sitrep, kanban show, council recent, thermal search, jr status
+read_allow:
+  - "U0AL1J2P248"   # Darrell Reading (Partner) — primary
+
+# Action tier: dispatch, vote ratify, council convene
+# Phase 3a: Partner only. Phase 3b will widen after audit review.
+action_allow:
+  - "U0AL1J2P248"   # Partner
+
+# Escalate tier: longhouse convene, council-gated escalations
+escalate_allow:
+  - "U0AL1J2P248"   # Partner
+
+# Users in each deny list are silently ignored regardless of any allow match.
+deny:
+  - "U0AKB00RZL4"   # ganudabot itself — avoid self-loop

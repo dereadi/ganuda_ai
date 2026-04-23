@@ -582,6 +582,7 @@ def store_metrics(metrics):
 
     except Exception as e:
         logger.error(f"Failed to store metrics: {e}")
+        logger.warning("ROLLBACK: transaction aborted during governance metrics store")
         conn.rollback()
     finally:
         cur.close()

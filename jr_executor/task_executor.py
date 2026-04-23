@@ -168,7 +168,7 @@ class TaskExecutor:
     ]
 
     # SECURITY: Maximum file size Jr can write (50KB - Triad consensus)
-    MAX_FILE_SIZE = 50 * 1024
+    MAX_FILE_SIZE = 300 * 1024  # 300KB — allows modifying large files like specialist_council.py (150KB)
 
     # EFFICIENCY: File types Jr should escalate (require Chief approval)
     ESCALATE_FILE_TYPES = [
@@ -1551,6 +1551,9 @@ class TaskExecutor:
             print(f"[LLM] Planning failed: {e}, trying prose extraction")
             plan_response = ""
 
+        # Strip think tags from planning response
+        from lib.llm_config import strip_think_tags
+        plan_response = strip_think_tags(plan_response)
         print(f"[LLM] Planning response received ({len(plan_response)} chars)")
 
         # Parse the structured response
@@ -1570,6 +1573,13 @@ class TaskExecutor:
             plan['files_to_modify'] = [(f, 'Extracted from prose') for f in prose_files['files_to_modify']]
             print(f"[LLM] Prose extraction found: {len(plan['files_to_create'])} create, {len(plan['files_to_modify'])} modify")
 
+        # Fallback 2: if STILL no files, use SmartExtract target file
+        if not plan['files_to_create'] and not plan['files_to_modify']:
+            target = self._extract_target_file_from_header(instructions)
+            if target and os.path.exists(target):
+                plan['files_to_modify'] = [(target, plan.get('focus', 'Modify per instructions'))]
+                print(f"[LLM] SmartExtract fallback: using {target} as modify target")
+
         # Phase 2: Code generation for each file
         print("[LLM] Phase 2: Generating code for files...")
 
@@ -1578,7 +1588,8 @@ class TaskExecutor:
             code_prompt = get_code_generation_prompt(file_path, description, instructions)
 
             try:
-                code = reasoner.simple_completion(code_prompt)
+                code = reasoner.simple_completion(code_prompt, max_tokens=4000)
+                code = strip_think_tags(code)
 
                 # Extract code from markdown block if present
                 code_match = re.search(r'```\w*\n(.*?)```', code, re.DOTALL)
@@ -1614,17 +1625,78 @@ class TaskExecutor:
 
             context = instructions
             if existing_code:
-                context += f"\n\n## EXISTING CODE IN {file_path}:\n```\n{existing_code}\n```"
+                lines = existing_code.split('\n')
+                if len(lines) > 200:
+                    # File too large — chunk it. Find relevant section using keywords from description.
+                    keywords = [w.lower() for w in re.findall(r'\w{4,}', description) if w.lower() not in
+                                ('file', 'modify', 'update', 'change', 'this', 'that', 'with', 'from', 'into')]
+                    best_line = 0
+                    best_score = 0
+                    for i, line in enumerate(lines):
+                        score = sum(1 for kw in keywords if kw in line.lower())
+                        if score > best_score:
+                            best_score = score
+                            best_line = i
+                    # Extract ±75 lines around best match
+                    chunk_start = max(0, best_line - 75)
+                    chunk_end = min(len(lines), best_line + 75)
+                    chunk = '\n'.join(lines[chunk_start:chunk_end])
+                    context += f"\n\n## RELEVANT SECTION OF {file_path} (lines {chunk_start+1}-{chunk_end}, total {len(lines)} lines):\n```\n{chunk}\n```"
+                    context += f"\n\nNOTE: This is a CHUNK of the file. Use SEARCH/REPLACE blocks targeting the exact lines shown above."
+                    print(f"[LLM] Chunked {file_path}: {len(lines)} lines → lines {chunk_start+1}-{chunk_end} (keyword match at line {best_line+1})")
+                else:
+                    context += f"\n\n## EXISTING CODE IN {file_path}:\n```\n{existing_code}\n```"
 
             code_prompt = get_code_generation_prompt(file_path, description, context)
 
             try:
-                code = reasoner.simple_completion(code_prompt)
+                raw_response = reasoner.simple_completion(code_prompt, max_tokens=4000)
+                raw_response = strip_think_tags(raw_response)
+                print(f"[LLM] Raw response: {len(raw_response)} chars")
 
-                # Extract code from markdown block
-                code_match = re.search(r'```\w*\n(.*?)```', code, re.DOTALL)
-                if code_match:
-                    code = code_match.group(1)
+                # Strategy 1: Look for SEARCH/REPLACE blocks (preferred for modifications)
+                sr_blocks = re.findall(
+                    r'<<<<<<< SEARCH\n(.*?)\n=======\n(.*?)\n>>>>>>> REPLACE',
+                    raw_response, re.DOTALL)
+
+                if sr_blocks and existing_code:
+                    # Apply SEARCH/REPLACE blocks directly to existing file
+                    modified = existing_code
+                    applied = 0
+                    for old, new in sr_blocks:
+                        old_stripped = old.strip()
+                        if old_stripped in modified:
+                            modified = modified.replace(old_stripped, new.strip(), 1)
+                            applied += 1
+                        else:
+                            # Fuzzy: try matching with whitespace normalization
+                            import difflib
+                            old_lines = old_stripped.split('\n')
+                            file_lines = modified.split('\n')
+                            for j in range(len(file_lines) - len(old_lines) + 1):
+                                candidate = '\n'.join(file_lines[j:j+len(old_lines)])
+                                ratio = difflib.SequenceMatcher(None, old_stripped, candidate).ratio()
+                                if ratio > 0.85:
+                                    modified = modified.replace(candidate, new.strip(), 1)
+                                    applied += 1
+                                    print(f"[LLM] Fuzzy SR match at line {j+1} (ratio={ratio:.2f})")
+                                    break
+
+                    print(f"[LLM] Applied {applied}/{len(sr_blocks)} SEARCH/REPLACE blocks")
+
+                    if applied > 0 and modified != existing_code:
+                        code = modified  # Write the fully modified file
+                    else:
+                        code = None
+                        print(f"[WARN] No SR blocks matched the file content")
+                else:
+                    # Strategy 2: Extract LAST code block (model may reason before producing code)
+                    code_blocks = re.findall(r'```\w*\n(.*?)```', raw_response, re.DOTALL)
+                    if code_blocks:
+                        code = code_blocks[-1]  # Take the LAST code block
+                        print(f"[LLM] Using last of {len(code_blocks)} code block(s)")
+                    else:
+                        code = raw_response  # Use raw as fallback
 
                 if code and len(code.strip()) > 10:
                     steps.append({
@@ -1801,17 +1873,25 @@ REVISED_STEP_ORDER: <comma-separated step numbers in better order>
             latency_ms = int((time.time() - start) * 1000)
 
             response_text = response.strip() if response else ""
+            # Strip think tags and take only the LAST occurrence of ACTION:
+            # Qwen3.6 may produce reasoning before the final action
+            from lib.llm_config import strip_think_tags
+            response_text = strip_think_tags(response_text)
 
             action = "PASS"
             critique = ""
             revised_steps = None
 
-            if "ACTION: FLAG" in response_text:
+            # Find the LAST ACTION: line (model may reason before concluding)
+            action_matches = re.findall(r'ACTION:\s*(PASS|FLAG|MODIFY)', response_text)
+            final_action = action_matches[-1] if action_matches else None
+
+            if final_action == "FLAG":
                 action = "FLAG"
                 critique_match = re.search(r'CRITIQUE:\s*(.+)', response_text)
                 critique = critique_match.group(1).strip() if critique_match else "unspecified concern"
 
-            elif "ACTION: MODIFY" in response_text:
+            elif final_action == "MODIFY":
                 action = "MODIFY"
                 critique_match = re.search(r'CRITIQUE:\s*(.+)', response_text)
                 critique = critique_match.group(1).strip() if critique_match else "reorder needed"

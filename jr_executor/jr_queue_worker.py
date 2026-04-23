@@ -27,6 +27,20 @@ try:
 except ImportError:
     TRACE_CAPTURE_ENABLED = False
 
+# LM-OPENCLAW-OTEL Phase 3 O7 — Jr worker instrumentation (Council vote 84beb73ee61cf993, ratified 1c77b6e64c69ad3a)
+try:
+    import sys as _otel_sys
+    _otel_sys.path.insert(0, '/ganuda')
+    from lib.ganuda_otel import get_tracer, get_meter
+    _otel_tracer = get_tracer()
+    _otel_meter = get_meter()
+    _otel_task_counter = _otel_meter.create_counter("ganuda.jr.task.outcome")
+    _otel_task_duration_ms = _otel_meter.create_histogram("ganuda.jr.task.duration_ms")
+except Exception:
+    _otel_tracer = None
+    _otel_task_counter = None
+    _otel_task_duration_ms = None
+
 # Configuration
 POLL_INTERVAL = 30  # seconds between queue checks
 HEARTBEAT_INTERVAL = 60  # seconds between heartbeats
@@ -171,7 +185,55 @@ class JrQueueWorker:
                             except Exception as _skill_err:
                                 print(f"[{self.jr_name}] SkillRL selection failed (non-fatal): {_skill_err}")
 
+                        _otel_task_start = time.time()
+                        _task_span_cm = _otel_tracer.start_as_current_span("ganuda.jr.task") if _otel_tracer else None
+                        _task_span = _task_span_cm.__enter__() if _task_span_cm else None
+                        if _task_span:
+                            try:
+                                _task_span.set_attribute("jr.task_id", int(task.get('id', 0)))
+                                _task_span.set_attribute("jr.title", (task.get('title') or '')[:200])
+                                _task_span.set_attribute("jr.assigned_jr", task.get('assigned_jr') or '')
+                                _task_span.set_attribute("jr.source", task.get('source') or '')
+                                _task_span.set_attribute("jr.worker", self.jr_name)
+                            except Exception:
+                                pass
+
                         result = self.executor.process_queue_task(task)
+
+                        _otel_task_elapsed_ms = int((time.time() - _otel_task_start) * 1000)
+                        _otel_task_status = 'success' if result.get('success') else 'failed'
+                        if _otel_task_counter:
+                            try:
+                                _otel_task_counter.add(
+                                    1,
+                                    attributes={
+                                        "status": _otel_task_status,
+                                        "source": task.get('source') or 'unknown',
+                                        "assigned_jr": task.get('assigned_jr') or 'unknown',
+                                    },
+                                )
+                            except Exception:
+                                pass
+                        if _otel_task_duration_ms:
+                            try:
+                                _otel_task_duration_ms.record(
+                                    _otel_task_elapsed_ms,
+                                    attributes={"status": _otel_task_status},
+                                )
+                            except Exception:
+                                pass
+                        if _task_span:
+                            try:
+                                _task_span.set_attribute("jr.outcome", _otel_task_status)
+                                _task_span.set_attribute("jr.duration_ms", _otel_task_elapsed_ms)
+                                _task_span.set_attribute("jr.files_created", int(result.get('files_created', 0) or 0))
+                            except Exception:
+                                pass
+                        if _task_span_cm:
+                            try:
+                                _task_span_cm.__exit__(None, None, None)
+                            except Exception:
+                                pass
 
                         # P0 FIX Jan 27, 2026: Defense in depth - validate work was done
                         # Don't trust success flag alone if no actual work evidence
@@ -218,6 +280,35 @@ class JrQueueWorker:
                                 print(f"[{self.jr_name}] Pre-flight gate not available (non-fatal)")
                             except Exception as _gate_err:
                                 print(f"[{self.jr_name}] Pre-flight gate error (non-fatal): {_gate_err}")
+
+                        # LMC-11 Tier 1a: claim-vs-reality verification gate (Apr 21 2026)
+                        # Council audit 79e31f3b9cfd84ce. Catches hallucinated-success
+                        # (MIRAGE-Bench arxiv 2507.21017) that preflight_gate misses —
+                        # success=True + step_count>0 + zero artifacts/files = #1571 pattern.
+                        if result.get('success'):
+                            try:
+                                from jr_executor.claim_verifier import verify_jr_task_result
+                                verification = verify_jr_task_result(task, result)
+                                if not verification.verified:
+                                    if verification.hallucination_flag:
+                                        reason = (f"HALLUCINATION: success claimed with "
+                                                  f"{len(result.get('steps_executed', []) or [])} steps but "
+                                                  f"zero artifacts/files and zero verifiable claims")
+                                    else:
+                                        reason = (f"{verification.failed}/{verification.total_claims} claims failed: "
+                                                  f"{verification.mismatches[:3]}")
+                                    print(f"[{self.jr_name}] CLAIM-VERIFIER FAILED: {reason}")
+                                    result['success'] = False
+                                    result['error'] = f"Claim verifier: {reason}"
+                                    result['claim_verification'] = verification.as_dict()
+                                else:
+                                    print(f"[{self.jr_name}] Claim verifier PASSED "
+                                          f"({verification.passed}/{verification.total_claims} claims)")
+                                    result.setdefault('claim_verification', verification.as_dict())
+                            except ImportError:
+                                print(f"[{self.jr_name}] Claim verifier not available (non-fatal)")
+                            except Exception as _cv_err:
+                                print(f"[{self.jr_name}] Claim verifier error (non-fatal): {_cv_err}")
 
                         if result.get('success'):
                             print(f"[{self.jr_name}] Task completed successfully")

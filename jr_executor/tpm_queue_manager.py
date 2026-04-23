@@ -40,10 +40,13 @@ class TPMQueueManager:
         conn = self._get_connection()
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(query, params)
-            if fetch:
-                return cur.fetchall()
+            # Always commit — previous code only committed when fetch=False,
+            # which silently rolled back INSERT ... RETURNING id on connection
+            # close. Symptom: task IDs returned but rows never persisted,
+            # sequence advanced without rows. Fixed 2026-04-21.
+            result = cur.fetchall() if fetch else cur.rowcount
             conn.commit()
-            return cur.rowcount
+            return result
 
     def add_task(
         self,

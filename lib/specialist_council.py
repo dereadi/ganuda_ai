@@ -16,6 +16,18 @@ Deploy to: /ganuda/lib/specialist_council.py
 """
 
 import os
+from lib.llm_config import strip_think_tags, clean_response
+from lib.llm_config import strip_think_tags, clean_response
+from lib.llm_config import strip_think_tags, clean_response
+from lib.llm_config import strip_think_tags, clean_response
+from lib.llm_config import strip_think_tags, clean_response
+from lib.llm_config import strip_think_tags, clean_response
+from lib.llm_config import strip_think_tags, clean_response
+from lib.llm_config import strip_think_tags, clean_response
+from lib.llm_config import strip_think_tags, clean_response
+from lib.llm_config import strip_think_tags, clean_response
+from lib.llm_config import strip_think_tags, clean_response
+from lib.llm_config import strip_think_tags, clean_response
 import json
 import re
 import requests
@@ -34,6 +46,25 @@ try:
 except ImportError:
     _EMOTION_AVAILABLE = False
 
+# LM-OPENCLAW-OTEL Phase 3 (Council vote 84beb73ee61cf993): traces + metrics
+try:
+    from lib.ganuda_otel import get_tracer, get_meter, redact_sensitive
+    _otel_tracer = get_tracer()
+    _otel_meter = get_meter()
+    _otel_vote_counter = _otel_meter.create_counter("ganuda.council.specialist.vote")
+    _otel_vote_duration_ms = _otel_meter.create_histogram("ganuda.council.vote.duration_ms")
+    _otel_specialist_latency_ms = _otel_meter.create_histogram("ganuda.council.specialist.latency_ms")
+    # Apr 22 2026 — Eagle Eye's ask (3× Council-raised): observability on
+    # backend rerouting via the fallback chain (bmasass→greenfin→redfin).
+    _otel_reroute_counter = _otel_meter.create_counter("ganuda.council.specialist.reroute")
+except Exception:
+    _otel_tracer = None
+    _otel_meter = None
+    _otel_vote_counter = None
+    _otel_vote_duration_ms = None
+    _otel_specialist_latency_ms = None
+    _otel_reroute_counter = None
+
 # Council-Triad Wiring (Council Votes #722d822dd3bda167, #05ed7f5f4caa9c17)
 # Import frontier adapters for direct in-process consultation (no HTTP overhead)
 try:
@@ -50,19 +81,24 @@ except ImportError as _e:
     _TRIAD_AVAILABLE = False
     _consultation_cfg = {}
 
-# Configuration
-VLLM_URL = "http://localhost:8000/v1/chat/completions"
-VLLM_MODEL = os.environ.get('VLLM_MODEL', '/ganuda/models/qwen2.5-72b-instruct-awq')
+# Configuration — uses central config, no hardcoded model names
+from lib.llm_config import get_model, get_url, strip_think_tags, clean_response
+VLLM_URL = get_url("primary")
+VLLM_MODEL = get_model("primary")
 # Database config loaded from secrets - no hardcoded credentials
 from lib.secrets_loader import get_db_config
 DB_CONFIG = get_db_config()
 
 # Backend configuration — Long Man pattern (Council Vote #8486)
 QWEN_BACKEND = {
-    "url": "http://localhost:8000/v1/chat/completions",
-    "model": VLLM_MODEL,
+    "url": get_url("primary"),
+    "model": get_model("primary"),
     "timeout": 60,
-    "description": "Fast path — Qwen2.5-72B-Instruct on redfin RTX 6000"
+    "description": f"Fast path — {get_model('primary')} on redfin",
+    # Apr 21 2026 — suppress Qwen thinking-mode preamble ("Here's a thinking process:" leak).
+    # Parallel fix to BMASASS_BACKEND below. /no_think in system prompt alone was insufficient
+    # on redfin's vLLM server — chat_template_kwargs is the authoritative channel.
+    "extra_body": {"chat_template_kwargs": {"enable_thinking": False}},
 }
 
 # bmasass: LAN primary (192.168.132.21), Tailscale fallback (100.103.27.106)
@@ -99,26 +135,125 @@ LLAMA_BACKEND = {
     "description": "Llama path — Llama-3.3-70B direct on bmasass M4 Max"
 }
 
+# Greenfin — stationary Brain-B floor (Strix Halo, 115GB GTT, Vulkan).
+# llama-server.service :8900 serves Qwen3-30B-A3B-Q4_K_M (GGUF) via WireGuard.
+# Reached via 10.100.0.3 (WG) — LAN path (192.168.132.224) intermittently blocked.
+# Role: permanent fallback for bmasass primaries when Partner travels with bmasass,
+# so Council keeps model diversity (Qwen3-30B family) instead of collapsing all
+# specialists onto redfin's Qwen3.6 weights.
+GREENFIN_BACKEND = {
+    "url": "http://10.100.0.3:8900/v1/chat/completions",
+    "model": "qwen3-30b-a3b",  # llama-server alias
+    "timeout": 180,
+    "description": "Fallback path — Qwen3-30B-A3B GGUF/Vulkan on greenfin (stationary)",
+    "extra_body": {"chat_template_kwargs": {"enable_thinking": False}},
+}
+
 # Backward compat alias — routing code references this
 DEEPSEEK_BACKEND = BMASASS_BACKEND
 
 SPECIALIST_BACKENDS = {
-    "raven": BMASASS_BACKEND,
-    "turtle": LLAMA_BACKEND,
+    # Apr 20 2026 rebalance (kanban #2120, #1537):
+    # bmasass travels with Partner — cannot be load-bearing for Council quorum.
+    # Majority on redfin (stationary, reliable). Keep 3 specialists + turtle(Llama) on bmasass
+    # for model-diversity signal; presence probe (see probe_specialist_backend below)
+    # auto-reroutes bmasass specialists to redfin if unreachable, with flag in vote record.
+    # Redfin Qwen3.6 — quorum floor (9 specialists):
+    "raven": QWEN_BACKEND,
     "crawdad": QWEN_BACKEND,
     "gecko": QWEN_BACKEND,
     "eagle_eye": QWEN_BACKEND,
     "spider": QWEN_BACKEND,
     "peace_chief": QWEN_BACKEND,
-    "coyote": QWEN_BACKEND,
-    # Outer Council (Longhouse consensus 8cbfe8f8b804695a, Naming Ceremony March 2 2026)
-    # Blue Jay + Cardinal seated Longhouse #bc6e2104ac815908, March 17 2026
     "deer": QWEN_BACKEND,
-    "crane": QWEN_BACKEND,
     "otter": QWEN_BACKEND,
-    "blue_jay": QWEN_BACKEND,
     "cardinal": QWEN_BACKEND,
+    # Bmasass Qwen3-30B — opportunistic diversity (3 specialists):
+    "coyote": BMASASS_BACKEND,     # dissent voice — bmasass register when reachable
+    "crane": BMASASS_BACKEND,
+    "blue_jay": BMASASS_BACKEND,
+    # Bmasass Llama-3.3-70B — single specialist for model-diversity (1):
+    "turtle": LLAMA_BACKEND,
 }
+
+# Fallback routing — Apr 22 2026 greenfin wire-in:
+#   - bmasass primaries (BMASASS_BACKEND, LLAMA_BACKEND) fall to GREENFIN_BACKEND first
+#     so Council keeps Qwen3-30B family weights (model diversity preserved)
+#   - GREENFIN_BACKEND itself falls to QWEN_BACKEND as last resort
+#   - QWEN_BACKEND has no further fallback (it IS the quorum floor)
+BACKEND_FALLBACK_CHAIN = {
+    id(BMASASS_BACKEND): GREENFIN_BACKEND,
+    id(LLAMA_BACKEND): GREENFIN_BACKEND,
+    id(GREENFIN_BACKEND): QWEN_BACKEND,
+}
+# Legacy alias — some call sites reference FALLBACK_BACKEND directly for the
+# "everything dead, use quorum floor" case.
+FALLBACK_BACKEND = QWEN_BACKEND
+
+# Cache probe results for short TTL to avoid flooding backends on every vote
+_PROBE_CACHE = {}
+_PROBE_TTL_SEC = 30
+
+def probe_specialist_backend(specialist_id, backend):
+    """Presence + latency probe. Returns (reachable: bool, latency_ms: int|None).
+
+    Caches results for _PROBE_TTL_SEC to avoid redundant health calls.
+    If unreachable, the vote path should substitute FALLBACK_BACKEND and flag it
+    in the vote record's metadata.
+    """
+    import time
+    cache_key = backend["url"]
+    now = time.time()
+    cached = _PROBE_CACHE.get(cache_key)
+    if cached and (now - cached["ts"] < _PROBE_TTL_SEC):
+        return cached["reachable"], cached["latency_ms"]
+
+    health_url = backend["url"].replace("/v1/chat/completions", "/health")
+    t0 = time.time()
+    try:
+        r = requests.get(health_url, timeout=3)
+        latency_ms = int((time.time() - t0) * 1000)
+        reachable = r.status_code == 200
+    except Exception:
+        reachable = False
+        latency_ms = None
+    _PROBE_CACHE[cache_key] = {"reachable": reachable, "latency_ms": latency_ms, "ts": now}
+    return reachable, latency_ms
+
+
+def resolve_specialist_backend(specialist_id):
+    """Resolve specialist backend with presence probe + graduated fallback.
+
+    Returns (backend, rerouted: bool, probe_latency_ms: int|None).
+
+    Apr 22 2026 graduated fallback chain (see BACKEND_FALLBACK_CHAIN):
+        bmasass unreachable → try greenfin (preserves Qwen3-30B diversity)
+        greenfin unreachable → fall to redfin (quorum floor)
+        redfin unreachable → nothing to do; caller gets the error
+    """
+    primary = SPECIALIST_BACKENDS.get(specialist_id, FALLBACK_BACKEND)
+    # Walk the fallback chain until we find a reachable backend.
+    current = primary
+    rerouted = False
+    last_latency = None
+    visited = set()
+    while True:
+        if id(current) in visited:
+            # cycle guard — shouldn't happen, but don't loop forever
+            break
+        visited.add(id(current))
+        reachable, latency = probe_specialist_backend(specialist_id, current)
+        if reachable:
+            return current, rerouted, latency
+        last_latency = latency
+        # try the next hop in the chain
+        next_hop = BACKEND_FALLBACK_CHAIN.get(id(current))
+        if next_hop is None or next_hop is current:
+            # no further fallback — return the quorum floor with reroute flag
+            return FALLBACK_BACKEND, True, last_latency
+        current = next_hop
+        rerouted = True
+    return FALLBACK_BACKEND, True, last_latency
 
 # Which specialists belong to which council
 INNER_COUNCIL = {"crawdad", "gecko", "turtle", "eagle_eye", "spider", "peace_chief", "raven", "coyote"}
@@ -173,7 +308,7 @@ def _load_guidance(specialist_key: str) -> str:
     return ""
 
 
-def query_vllm_sync(system_prompt: str, user_message: str, max_tokens: int = 300) -> str:
+def query_vllm_sync(system_prompt: str, user_message: str, max_tokens: int = 5000) -> str:
     """
     Synchronous vLLM query - used by cascaded_council and other modules.
 
@@ -200,8 +335,8 @@ def query_vllm_sync(system_prompt: str, user_message: str, max_tokens: int = 300
             timeout=60
         )
         response.raise_for_status()
-        _raw = response.json()["choices"][0]["message"]["content"]
-        return re.sub(r'<think>.*?</think>', '', _raw, flags=re.DOTALL).strip()
+        _raw = clean_response(response.json())
+        return _raw
     except Exception as e:
         return f"[ERROR: {str(e)}]"
 
@@ -1059,6 +1194,41 @@ REASON: [At least two sentences. Name the specific assumption you are challengin
 If you vote APPROVE, you MUST explain why your adversarial search found nothing — that itself is noteworthy.
 """
 
+# LMC-13 (Apr 23 2026) — cluster-as-conductor systems-thinking pre-flight.
+# Invokable via council_systems_check(proposition). NOT a vote — architectural
+# mapping grouped by Hak three questions (state / feedback / deletion).
+# Per Council 11-0-2 Apr 23 2026 vote. Discover doc: lmc13_cluster_conductor_discover.md.
+SYSTEMS_PROMPT = """
+This is an ARCHITECTURAL PRE-FLIGHT — not a vote. Apply systems thinking.
+
+For the proposition below, answer three questions FROM YOUR SPECIALIST DOMAIN LENS:
+
+1. STATE — Where does state live for this proposition? Who owns the truth? What happens if two components think they own the same truth?
+
+2. FEEDBACK — Where does feedback live? How would we know this is working? How would we know if it silently fails?
+
+3. DELETION — What breaks if this is removed or bypassed? What is the blast radius?
+
+Be domain-specific. Cite concrete components, paths, nodes, or dependencies from your expertise. Do NOT vote. No APPROVE / REJECT / ABSTAIN tokens. Your job is architectural mapping, not decision.
+
+Format your answer as:
+STATE: [your domain-specific state-ownership observation]
+FEEDBACK: [your domain-specific feedback-loop observation]
+DELETION: [your domain-specific blast-radius observation]
+"""
+
+COYOTE_SYSTEMS_PROMPT = """
+This is an ARCHITECTURAL PRE-FLIGHT. Other specialists will map state, feedback, and deletion from their domains.
+
+Your job: find the blast-radius concern that NO other specialist will raise. The missed failure mode. The unnamed second-order effect. The assumption everyone will share and nobody will question.
+
+Do NOT vote. No APPROVE / REJECT / ABSTAIN tokens. Find the blind spot.
+
+Format your answer as:
+BLIND_SPOT: [the specific concern nobody else will name]
+WHY_MISSED: [why the other specialists won't see it — what domain perspective it falls between]
+"""
+
 
 @dataclass
 class SpecialistResponse:
@@ -1151,20 +1321,75 @@ class VoteFirstResult:
     vote_counts: Dict[str, int] = field(default_factory=dict)
 
 
+@dataclass
+class SystemsCheckResult:
+    """Result from a cluster-as-conductor systems-thinking pre-flight (LMC-13, Apr 23 2026).
+
+    Not a vote — architectural mapping. responses dict: specialist_id -> their raw
+    STATE/FEEDBACK/DELETION output (Coyote's is BLIND_SPOT/WHY_MISSED format).
+    """
+    proposition: str
+    responses: Dict[str, str]  # specialist_id -> raw response text
+    coyote_blind_spot: Optional[str] = None  # Coyote's identified blind spot, extracted
+    audit_hash: str = ""
+    timestamp: datetime = field(default_factory=datetime.now)
+    latency_ms: int = 0
+
+
 def parse_vote(response: str) -> tuple:
-    """Parse VOTE: and REASON: from response."""
+    """Parse VOTE: and REASON: from response.
+
+    Extracts the CONCLUSION, not the deliberation.
+    The model may reason for thousands of tokens before reaching its final answer.
+    We grab the LAST VOTE: and everything after it as the reason.
+    """
     vote = "ABSTAIN"
     reason = ""
 
-    for line in response.split("\n"):
-        if line.startswith("VOTE:"):
-            vote_text = line.replace("VOTE:", "").strip().upper()
-            if "APPROVE" in vote_text:
-                vote = "APPROVE"
-            elif "REJECT" in vote_text:
-                vote = "REJECT"
-        elif line.startswith("REASON:"):
-            reason = line.replace("REASON:", "").strip()
+    # Strip think tags first
+    response = strip_think_tags(response)
+
+    # Find ALL occurrences of VOTE: and take the LAST one
+    import re
+    vote_matches = list(re.finditer(r'VOTE:\s*(APPROVE|REJECT|ABSTAIN)', response, re.IGNORECASE))
+
+    if vote_matches:
+        last_match = vote_matches[-1]
+        vote = last_match.group(1).upper()
+
+        # Everything after the last VOTE: line is the conclusion
+        after_vote = response[last_match.end():].strip()
+
+        # Look for REASON: in the conclusion
+        reason_match = re.search(r'REASON:\s*(.+?)(?:\n\n|\Z)', after_vote, re.DOTALL)
+        if reason_match:
+            reason = reason_match.group(1).strip()[:500]
+        elif after_vote:
+            # Use the first substantive line after VOTE: as reason
+            for line in after_vote.split('\n'):
+                line = line.strip()
+                if len(line) > 20 and not line.startswith(('VOTE:', '-', '*', '#', '[')):
+                    reason = line[:500]
+                    break
+
+    # Fallback: if no VOTE: found, search for approve/reject keywords in last 500 chars
+    if vote == "ABSTAIN" and len(response) > 100:
+        tail = response[-500:].upper()
+        if 'APPROVE' in tail and 'REJECT' not in tail:
+            vote = "APPROVE"
+            reason = response[-300:].strip()
+        elif 'REJECT' in tail and 'APPROVE' not in tail:
+            vote = "REJECT"
+            reason = response[-300:].strip()
+
+    # Clean up reason — remove format instruction echoes
+    if reason:
+        # Remove lines that echo the prompt format instructions
+        bad_prefixes = ['[At least', 'Reference your', 'Do not use generic', 'Name the specific']
+        for prefix in bad_prefixes:
+            if reason.startswith(prefix):
+                reason = ""
+                break
 
     return vote, reason
 
@@ -1216,6 +1441,9 @@ def validate_vote_reasoning(specialist_id: str, reason: str) -> dict:
     Returns {"valid": bool, "flags": [...]}
     """
     flags = []
+
+    # Strip think tags before evaluating depth
+    reason = strip_think_tags(reason) if reason else ""
 
     # Check minimum length (2 sentences ~ 20 words minimum)
     word_count = len(reason.split())
@@ -1507,14 +1735,22 @@ def _log_triad_consultation(audit_hash, domain, called, succeeded, rejected,
 class SpecialistCouncil:
     """7-Specialist parallel query system with trail integration"""
 
-    def __init__(self, max_tokens: int = 150):
+    def __init__(self, max_tokens: int = 5000):
         self.max_tokens = max_tokens
 
     def _query_specialist(self, specialist_id: str, question: str, backend: dict = None) -> SpecialistResponse:
         """Query a single specialist via vLLM — Long Man routing (Council Vote #8486)
         Epigenetic modifier wiring: Council Vote #df0c89c9"""
         spec = SPECIALISTS[specialist_id]
-        b = backend or SPECIALIST_BACKENDS.get(specialist_id, QWEN_BACKEND)
+        # Apr 20 2026 (kanban #2120): presence probe + auto-fallback to redfin when bmasass unreachable
+        if backend is not None:
+            b = backend
+            rerouted = False
+            probe_latency_ms = None
+        else:
+            b, rerouted, probe_latency_ms = resolve_specialist_backend(specialist_id)
+            if rerouted:
+                print(f"[COUNCIL] {specialist_id} REROUTED to fallback (primary unreachable)")
         start_time = datetime.now()
         max_tokens = self.max_tokens
         if b == DEEPSEEK_BACKEND:
@@ -1560,10 +1796,12 @@ class SpecialistCouncil:
         print(f"[COUNCIL] {specialist_id} -> {b['description']}")
 
         try:
+            # Prepend /no_think to suppress thinking mode on Qwen3 models
+            no_think_prefix = "/no_think\n"
             payload = {
                 "model": b["model"],
                 "messages": [
-                    {"role": "system", "content": system_prompt},
+                    {"role": "system", "content": no_think_prefix + system_prompt},
                     {"role": "user", "content": question}
                 ],
                 "max_tokens": max_tokens,
@@ -1578,19 +1816,16 @@ class SpecialistCouncil:
                 timeout=b["timeout"]
             )
             response.raise_for_status()
-            resp_data = response.json()["choices"][0]["message"]
-            content = resp_data.get("content", "")
-            content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+            content = clean_response(response.json())
 
-            # DeepSeek R1: reasoning model puts chain-of-thought in 'reasoning' field
-            # If content is empty but reasoning exists, extract the conclusion
-            if b == DEEPSEEK_BACKEND and (not content or len(content.strip()) < 10):
-                reasoning = resp_data.get("reasoning", "")
+            # If content is still empty after clean_response, try reasoning field
+            if not content or len(content.strip()) < 10:
+                reasoning = response.json()["choices"][0]["message"].get("reasoning", "")
                 if reasoning and len(reasoning.strip()) > 20:
-                    # Use the last paragraph of reasoning as the response
                     paragraphs = [p.strip() for p in reasoning.split("\n\n") if p.strip()]
                     content = paragraphs[-1] if paragraphs else reasoning[-500:]
-                    print(f"[COUNCIL] {specialist_id} -> Extracted from DeepSeek reasoning ({len(reasoning)} chars)")
+                    content = strip_think_tags(content)
+                    print(f"[COUNCIL] {specialist_id} -> Extracted from reasoning ({len(reasoning)} chars)")
 
             # DeepSeek fallback: if STILL empty after reasoning extraction, retry on Qwen
             if b == DEEPSEEK_BACKEND and (not content or len(content.strip()) < 10):
@@ -1610,7 +1845,7 @@ class SpecialistCouncil:
                     timeout=fb["timeout"]
                 )
                 fb_resp.raise_for_status()
-                content = fb_resp.json()["choices"][0]["message"]["content"]
+                content = clean_response(fb_resp.json())
                 content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
 
             # Check for concern flags
@@ -1654,12 +1889,12 @@ class SpecialistCouncil:
                         {"role": "system", "content": INFRASTRUCTURE_CONTEXT + "You are Peace Chief. Synthesize these specialist opinions into a brief consensus recommendation (2-3 sentences max)."},
                         {"role": "user", "content": summary}
                     ],
-                    "max_tokens": 200,
+                    "max_tokens": 600,
                     "temperature": 0.5
                 },
                 timeout=60
             )
-            content = response.json()["choices"][0]["message"]["content"]
+            content = clean_response(response.json())
             return re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
         except:
             return "Consensus synthesis failed - review individual responses"
@@ -1990,35 +2225,92 @@ class SpecialistCouncil:
             # Prepend infrastructure context to vote-first prompt
             system_prompt = INFRASTRUCTURE_CONTEXT + prompt_override + _load_guidance(specialist_id)
 
-        # Token budget: explicit override > 200 for prompt_override > default
+        # Token budget: explicit override > specialist backend max > default
         if max_tokens_override:
             tokens = max_tokens_override
         elif prompt_override:
-            tokens = 200  # Increased from 100 — re-prompts and deliberation need room (Jr #1388)
+            tokens = 2000  # Enough for thinking + vote conclusion
         else:
             tokens = self.max_tokens
 
+        # Apr 20 2026 (kanban #2120): presence probe + auto-fallback path
+        b, rerouted, _probe_latency_ms = resolve_specialist_backend(specialist_id)
+        if rerouted:
+            primary = SPECIALIST_BACKENDS.get(specialist_id, FALLBACK_BACKEND)
+            print(f"[VOTE] {specialist_id} REROUTED to fallback (primary unreachable)")
+            if _otel_reroute_counter:
+                try:
+                    _otel_reroute_counter.add(
+                        1,
+                        attributes={
+                            "specialist_id": specialist_id,
+                            "from_model": primary.get("model", ""),
+                            "to_model": b.get("model", ""),
+                        },
+                    )
+                except Exception:
+                    pass
+
+        _spec_span_cm = _otel_tracer.start_as_current_span("ganuda.council.specialist") if _otel_tracer else None
+        _spec_span = _spec_span_cm.__enter__() if _spec_span_cm else None
+        if _spec_span:
+            try:
+                _spec_span.set_attribute("specialist_id", specialist_id)
+                _spec_span.set_attribute("backend_model", b.get("model", ""))
+                _spec_span.set_attribute("rerouted", bool(rerouted))
+                _spec_span.set_attribute("max_tokens", int(tokens))
+            except Exception:
+                pass
+
+        # Apr 21 2026 bugfix: _query_specialist_with_prompt was ignoring
+        # backend config's `extra_body` (silently dropped thinking-suppress
+        # chat_template_kwargs for bmasass) AND hardcoding timeout=60 despite
+        # BMASASS_BACKEND.timeout=180 / LLAMA_BACKEND.timeout=240. Result:
+        # bmasass Coyote/Turtle/Crane giving empty abstentions in high-stakes
+        # mode. Fix: merge extra_body into request + use backend's timeout.
+        _req_body = {
+            "model": b["model"],
+            "messages": [
+                {"role": "system", "content": "/no_think\n" + system_prompt},
+                {"role": "user", "content": question}
+            ],
+            "max_tokens": tokens,
+            "temperature": 0.7
+        }
+        if b.get("extra_body"):
+            _req_body.update(b["extra_body"])  # e.g. chat_template_kwargs for MLX
+        _req_timeout = int(b.get("timeout", 60))
+
         try:
-            response = requests.post(
-                VLLM_URL,
-                json={
-                    "model": VLLM_MODEL,
-                    "messages": [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": question}
-                    ],
-                    "max_tokens": tokens,
-                    "temperature": 0.7
-                },
-                timeout=60
-            )
+            response = requests.post(b["url"], json=_req_body, timeout=_req_timeout)
             response.raise_for_status()
-            content = response.json()["choices"][0]["message"]["content"]
+            content = clean_response(response.json())
             content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
             elapsed_ms = int((datetime.now() - start_time).total_seconds() * 1000)
 
+            if _spec_span:
+                try:
+                    _spec_span.set_attribute("latency_ms", elapsed_ms)
+                    _spec_span.set_attribute("response_len", len(content or ""))
+                except Exception:
+                    pass
+            if _spec_span_cm:
+                try:
+                    _spec_span_cm.__exit__(None, None, None)
+                except Exception:
+                    pass
             return content, elapsed_ms
         except Exception as e:
+            if _spec_span:
+                try:
+                    _spec_span.set_attribute("error", str(e)[:200])
+                except Exception:
+                    pass
+            if _spec_span_cm:
+                try:
+                    _spec_span_cm.__exit__(None, None, None)
+                except Exception:
+                    pass
             return f"Error: {str(e)}", 0
 
     def self_audit(self, days: int = 30, sample_size: int = 20) -> dict:
@@ -2233,6 +2525,17 @@ class SpecialistCouncil:
             high_stakes: Force deliberation-first mode (Turtle's wisdom)
         """
         votes = {}
+        _vote_start = datetime.now()
+        _vote_span_cm = _otel_tracer.start_as_current_span("ganuda.council.vote") if _otel_tracer else None
+        _vote_span = _vote_span_cm.__enter__() if _vote_span_cm else None
+        if _vote_span:
+            try:
+                _vote_span.set_attribute("ganuda.council.high_stakes", bool(high_stakes))
+                _vote_span.set_attribute("ganuda.council.threshold", int(threshold))
+                _vote_span.set_attribute("ganuda.council.specialist_count", len(SPECIALISTS))
+                _vote_span.set_attribute("ganuda.council.question_len", len(question or ""))
+            except Exception:
+                pass
 
         # Fetch thermal memory context once (RAG + ripple) for all specialists
         memory_context = ""
@@ -2243,11 +2546,24 @@ class SpecialistCouncil:
         except Exception as e:
             print(f"[VOTE-FIRST] Memory retrieval skipped (non-fatal): {e}")
 
+        # Apr 22 2026 fix: Qwen3.6-35B-A3B (post-Apr-17 redfin swap) has
+        # different system-prompt sensitivity than Qwen3-30B. Appending 4-7K
+        # chars of thermal memory to the system prompt dilutes the specialist
+        # persona — model pays attention to memory context over the role,
+        # producing generic reasons that fail validate_vote_reasoning's
+        # domain-term check. Measured flag rate: 56% with memory in system,
+        # 33% with memory in user message, 22% with no memory (baseline).
+        # Fix: keep VOTE_FIRST_PROMPT / COYOTE_VOTE_FIRST_PROMPT clean in the
+        # system channel; route thermal memory via the user message where
+        # persona weights survive.
         vote_prompt = VOTE_FIRST_PROMPT
         coyote_prompt = COYOTE_VOTE_FIRST_PROMPT
+        augmented_question = question
         if memory_context:
-            vote_prompt = VOTE_FIRST_PROMPT + f"\n\n## Thermal Memory Context\n{memory_context}"
-            coyote_prompt = COYOTE_VOTE_FIRST_PROMPT + f"\n\n## Thermal Memory Context\n{memory_context}"
+            augmented_question = (
+                f"## Thermal Memory Context\n{memory_context}\n\n"
+                f"## Question\n{question}"
+            )
 
         # === HIGH-STAKES: Deliberation-first mode (Jr #1388 Fix 3) ===
         # Each specialist writes their position BEFORE seeing others' votes.
@@ -2260,10 +2576,11 @@ class SpecialistCouncil:
 
         # Phase 1: Collect votes in parallel
         # Coyote gets a different prompt — must dissent by default (Jr #1388)
+        # Memory context travels with the question (user message), not the prompt (system)
         with ThreadPoolExecutor(max_workers=8) as executor:
             futures = {
                 executor.submit(
-                    self._query_specialist_with_prompt, sid, question,
+                    self._query_specialist_with_prompt, sid, augmented_question,
                     coyote_prompt if sid == "coyote" else vote_prompt
                 ): sid
                 for sid in SPECIALISTS.keys()
@@ -2290,6 +2607,27 @@ class SpecialistCouncil:
                 # Store anomaly flag on the response for logging
                 if coyote_anomaly:
                     votes[specialist_id]._coyote_anomaly = coyote_anomaly
+
+                # OTel: per-specialist vote counter + latency histogram
+                if _otel_vote_counter:
+                    try:
+                        _otel_vote_counter.add(
+                            1,
+                            attributes={
+                                "specialist_id": specialist_id,
+                                "vote_value": vote,
+                            },
+                        )
+                    except Exception:
+                        pass
+                if _otel_specialist_latency_ms and elapsed_ms:
+                    try:
+                        _otel_specialist_latency_ms.record(
+                            elapsed_ms,
+                            attributes={"specialist_id": specialist_id},
+                        )
+                    except Exception:
+                        pass
 
         # Phase 1.5: Validate reasoning quality (Council Deliberation Depth Fix)
         reasoning_flags = {}
@@ -2374,6 +2712,34 @@ class SpecialistCouncil:
         # Log to database
         self._log_vote_first(result)
 
+        # OTel finalize: emit duration histogram + decision attribute, close span
+        _vote_elapsed_ms = int((datetime.now() - _vote_start).total_seconds() * 1000)
+        if _otel_vote_duration_ms:
+            try:
+                _otel_vote_duration_ms.record(
+                    _vote_elapsed_ms,
+                    attributes={
+                        "decision": decision,
+                        "high_stakes": bool(high_stakes),
+                    },
+                )
+            except Exception:
+                pass
+        if _vote_span:
+            try:
+                _vote_span.set_attribute("ganuda.council.decision", decision)
+                _vote_span.set_attribute("ganuda.council.approvals", approvals)
+                _vote_span.set_attribute("ganuda.council.rejections", rejections)
+                _vote_span.set_attribute("ganuda.council.duration_ms", _vote_elapsed_ms)
+                _vote_span.set_attribute("ganuda.council.audit_hash", audit_hash)
+            except Exception:
+                pass
+        if _vote_span_cm:
+            try:
+                _vote_span_cm.__exit__(None, None, None)
+            except Exception:
+                pass
+
         return result
 
     def _run_deliberation_round(self, question: str, votes: Dict[str, VoteResponse],
@@ -2395,12 +2761,12 @@ class SpecialistCouncil:
                         {"role": "system", "content": INFRASTRUCTURE_CONTEXT + "You are Peace Chief. Deliberate on these contested votes and provide synthesis."},
                         {"role": "user", "content": vote_summary}
                     ],
-                    "max_tokens": 200,
+                    "max_tokens": 600,
                     "temperature": 0.6
                 },
                 timeout=60
             )
-            content = response.json()["choices"][0]["message"]["content"]
+            content = clean_response(response.json())
             return re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
         except Exception as e:
             return f"Deliberation failed: {str(e)}"
@@ -2463,14 +2829,21 @@ class SpecialistCouncil:
         This mirrors Chief's round-robin protocol with frontier AIs.
         """
         positions = {}
-        mem_suffix = f"\n\n## Thermal Memory Context\n{memory_context}" if memory_context else ""
-
+        # Apr 22 2026 fix: same persona-attention issue as vote_first —
+        # memory context in system prompt dilutes Qwen3.6's specialist
+        # persona. Route memory via user message (augmented_question)
+        # instead of prompt suffix. See project_qwen36_system_prompt_sensitivity_apr2026.
         deliberation_prompt = (
             "This is a HIGH-STAKES proposal requiring deliberation before voting. "
             "Write your position in 2-3 sentences from your specialist perspective. "
             "Do NOT vote yet — just state your position, concerns, and what you need to see addressed."
-            + mem_suffix
         )
+        augmented_question = question
+        if memory_context:
+            augmented_question = (
+                f"## Thermal Memory Context\n{memory_context}\n\n"
+                f"## Question\n{question}"
+            )
 
         # Phase 1: All specialists EXCEPT Coyote and Peace Chief write positions in parallel
         non_coyote_specialists = [
@@ -2481,7 +2854,7 @@ class SpecialistCouncil:
         with ThreadPoolExecutor(max_workers=8) as executor:
             futures = {
                 executor.submit(
-                    self._query_specialist_with_prompt, sid, question, deliberation_prompt
+                    self._query_specialist_with_prompt, sid, augmented_question, deliberation_prompt
                 ): sid
                 for sid in non_coyote_specialists
             }
@@ -2502,11 +2875,11 @@ class SpecialistCouncil:
             f"{other_positions}\n\n"
             "Your job: Find at least ONE concern that NO other specialist raised. "
             "Do not repeat their concerns. Find the blind spot. Write 2-3 sentences."
-            + mem_suffix
         )
         try:
+            # Memory context via augmented_question, not system-prompt suffix (Apr 22 2026 fix)
             response, _ = self._query_specialist_with_prompt(
-                "coyote", question, coyote_deliberation_prompt
+                "coyote", augmented_question, coyote_deliberation_prompt
             )
             positions["coyote"] = response
         except Exception as e:
@@ -2524,8 +2897,9 @@ class SpecialistCouncil:
             "for this proposal to proceed. Write 3-5 sentences."
         )
         try:
+            # Use augmented_question for consistency (memory context via user message)
             response, _ = self._query_specialist_with_prompt(
-                "peace_chief", question, synthesis_prompt
+                "peace_chief", augmented_question, synthesis_prompt
             )
             positions["peace_chief"] = response
         except Exception as e:
@@ -2540,6 +2914,83 @@ class SpecialistCouncil:
         output_lines.append(f"\n**Peace Chief (synthesis)**: {positions.get('peace_chief', '[no position]')}")
 
         return "\n".join(output_lines)
+
+    def systems_check(self, proposition: str) -> SystemsCheckResult:
+        """LMC-13 Apr 23 2026 — cluster-as-conductor architectural pre-flight.
+
+        Distributes a proposition to all 13 specialists using SYSTEMS_PROMPT
+        (COYOTE_SYSTEMS_PROMPT for coyote). Each specialist answers Hak's three
+        questions (state / feedback / deletion) from their domain lens.
+        Returns aggregated SystemsCheckResult. NOT a vote — no tally.
+
+        Per Council 11-0-2 Apr 23 2026 APPROVE. Discover doc:
+        /ganuda/docs/lmc13_cluster_conductor_discover.md.
+        """
+        start_time = datetime.now()
+        responses: Dict[str, str] = {}
+
+        # Memory context via user message (Apr 22 fix — project_qwen36_system_prompt_sensitivity)
+        memory_context = ""
+        try:
+            memory_context = query_thermal_memory_semantic(proposition, limit=3)
+        except Exception as e:
+            print(f"[SYSTEMS-CHECK] Memory retrieval skipped: {e}")
+
+        augmented_proposition = proposition
+        if memory_context:
+            augmented_proposition = (
+                f"## Thermal Memory Context\n{memory_context}\n\n"
+                f"## Proposition\n{proposition}"
+            )
+
+        # Parallel dispatch — all 13 specialists
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            futures = {
+                executor.submit(
+                    self._query_specialist_with_prompt,
+                    sid, augmented_proposition,
+                    COYOTE_SYSTEMS_PROMPT if sid == "coyote" else SYSTEMS_PROMPT
+                ): sid
+                for sid in SPECIALISTS.keys()
+            }
+            for future in as_completed(futures):
+                sid = futures[future]
+                try:
+                    response, _ = future.result()
+                    responses[sid] = response
+                except Exception as e:
+                    responses[sid] = f"[error: {e}]"
+
+        # Extract Coyote's blind spot specifically
+        coyote_response = responses.get("coyote", "")
+        coyote_blind_spot = None
+        if coyote_response and "BLIND_SPOT:" in coyote_response:
+            bs_match = re.search(r"BLIND_SPOT:\s*(.+?)(?=WHY_MISSED:|$)", coyote_response, re.DOTALL)
+            if bs_match:
+                coyote_blind_spot = bs_match.group(1).strip()
+
+        # OTel: emit systems-check counter
+        if _otel_meter:
+            try:
+                _otel_counter = _otel_meter.create_counter("ganuda.council.systems_check")
+                _otel_counter.add(1, attributes={"specialist_count": len(responses)})
+            except Exception:
+                pass
+
+        # Audit hash
+        audit_hash = hashlib.sha256(
+            f"systems_check:{proposition}:{start_time.isoformat()}".encode()
+        ).hexdigest()[:16]
+
+        latency_ms = int((datetime.now() - start_time).total_seconds() * 1000)
+        return SystemsCheckResult(
+            proposition=proposition,
+            responses=responses,
+            coyote_blind_spot=coyote_blind_spot,
+            audit_hash=audit_hash,
+            timestamp=start_time,
+            latency_ms=latency_ms,
+        )
 
     def _log_vote_first(self, result: VoteFirstResult):
         """Log vote-first result to database"""
@@ -2796,7 +3247,7 @@ class SpecialistCouncil:
 
 
 # Convenience functions
-def council_vote(question: str, max_tokens: int = 150, include_responses: bool = False) -> dict:
+def council_vote(question: str, max_tokens: int = 5000, include_responses: bool = False) -> dict:
     """Quick council vote - returns dict for API compatibility"""
     council = SpecialistCouncil(max_tokens=max_tokens)
     vote = council.vote(question, include_responses)
@@ -2815,7 +3266,7 @@ def council_vote(question: str, max_tokens: int = 150, include_responses: bool =
     }
 
 
-def council_vote_with_trails(question: str, max_tokens: int = 150, include_responses: bool = False) -> dict:
+def council_vote_with_trails(question: str, max_tokens: int = 5000, include_responses: bool = False) -> dict:
     """Council vote that leaves pheromone trails"""
     council = SpecialistCouncil(max_tokens=max_tokens)
     return council.vote_with_trails(question, include_responses)
@@ -2873,6 +3324,127 @@ def council_vote_first(question: str, threshold: int = 6, high_stakes: bool = Fa
         response["deliberation_quality"] = quality
 
     return response
+
+
+def council_systems_check(proposition: str) -> dict:
+    """LMC-13 (Apr 23 2026) — cluster-as-conductor architectural pre-flight.
+
+    Runs a 13-specialist systems-thinking pass on the proposition. Each
+    specialist answers Hak's three questions (state / feedback / deletion)
+    from their domain lens. Coyote specifically finds a blind spot no other
+    specialist raised. NOT a vote — architectural mapping.
+
+    Per Council 11-0-2 APPROVE Apr 23 2026.
+
+    Returns dict with serializable specialist responses + Coyote blind-spot.
+    Use format_systems_check(result) for markdown rendering.
+
+    Invocation pattern:
+        >>> from lib.specialist_council import council_systems_check
+        >>> r = council_systems_check("Should we enable the nightly Owl Pass on systemd timer?")
+        >>> print(r['coyote_blind_spot'])
+
+    Latency: ~60-90s for 13 parallel specialists.
+    Persistence: logged to council_votes with vote_mode='systems_check'.
+    """
+    council = SpecialistCouncil()
+    result = council.systems_check(proposition)
+
+    response = {
+        "proposition": result.proposition,
+        "mode": "systems_check",
+        "responses": result.responses,
+        "coyote_blind_spot": result.coyote_blind_spot,
+        "audit_hash": result.audit_hash,
+        "timestamp": result.timestamp.isoformat(),
+        "latency_ms": result.latency_ms,
+        "specialist_count": len(result.responses),
+    }
+
+    # Persist to council_votes table (vote_mode='systems_check', no-schema-change path)
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO council_votes (
+                audit_hash, question, recommendation, confidence,
+                concerns, responses, voted_at, vote_mode
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, NOW(), %s)
+        """, (
+            result.audit_hash,
+            proposition,
+            "SYSTEMS_CHECK_COMPLETE",
+            1.0,
+            json.dumps({"coyote_blind_spot": result.coyote_blind_spot}),
+            json.dumps(result.responses),
+            "systems_check",
+        ))
+        conn.commit()
+        conn.close()
+        response["persisted"] = True
+    except Exception as e:
+        response["persisted"] = False
+        response["persist_error"] = str(e)[:200]
+
+    return response
+
+
+def format_systems_check(result: dict) -> str:
+    """Render a council_systems_check() result as a markdown architectural pre-flight report.
+
+    Groups specialist responses by Hak question (state / feedback / deletion)
+    and surfaces Coyote's identified blind spot at the end.
+    """
+    lines = [
+        "# Council Systems-Check — Architectural Pre-flight",
+        "",
+        f"**Proposition:** {result.get('proposition', '(missing)')}",
+        f"**Audit:** `{result.get('audit_hash', 'n/a')}` · Latency: {result.get('latency_ms', 0)}ms · Specialists: {result.get('specialist_count', 0)}",
+        "",
+    ]
+
+    responses = result.get("responses", {}) or {}
+
+    def _extract(text: str, tag: str) -> str:
+        m = re.search(
+            rf"{tag}:\s*(.+?)(?=\n(?:STATE|FEEDBACK|DELETION|BLIND_SPOT|WHY_MISSED):|\Z)",
+            text or "", re.DOTALL | re.IGNORECASE
+        )
+        return m.group(1).strip() if m else "(no structured answer)"
+
+    # Group non-Coyote specialists by the three Hak questions
+    section_map = {
+        "STATE (who owns truth?)": "STATE",
+        "FEEDBACK (how do we know it works?)": "FEEDBACK",
+        "DELETION (blast radius if removed?)": "DELETION",
+    }
+    for section_title, tag in section_map.items():
+        lines.append(f"## {section_title}")
+        lines.append("")
+        for sid, text in sorted(responses.items()):
+            if sid == "coyote":
+                continue
+            name = SPECIALISTS.get(sid, {}).get("name", sid)
+            extracted = _extract(text, tag)
+            lines.append(f"- **{name}** ({sid}): {extracted}")
+        lines.append("")
+
+    # Coyote's blind spot at the end — specifically the concern the others missed
+    lines.append("## Coyote — Blind Spot (what the others missed)")
+    lines.append("")
+    coyote_bs = result.get("coyote_blind_spot")
+    if coyote_bs:
+        lines.append(coyote_bs)
+    else:
+        lines.append("*(Coyote did not return a parseable BLIND_SPOT. Raw response:)*")
+        lines.append("")
+        lines.append(responses.get("coyote", "(no coyote response)"))
+    lines.append("")
+
+    lines.append("---")
+    lines.append("*Generated by `council_systems_check()` — LMC-13 cluster-as-conductor discipline. Not a vote; architectural pre-flight.*")
+    return "\n".join(lines)
 
 
 # ============================================================================

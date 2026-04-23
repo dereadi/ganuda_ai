@@ -143,6 +143,7 @@ class MemoryJrAutonomic:
         except Exception as e:
             print(f"❌ Memory Jr: Error in thermal regulation: {e}")
             if self.db_conn:
+                print(f"⚠️ Memory Jr: ROLLBACK: transaction aborted during thermal regulation")
                 self.db_conn.rollback()
 
     def check_sacred_temperatures(self):
@@ -221,6 +222,7 @@ class MemoryJrAutonomic:
 
         except Exception as e:
             print(f"❌ Memory Jr: Error in emergency reheat: {e}")
+            print(f"⚠️ Memory Jr: ROLLBACK: transaction aborted during sacred emergency reheat")
             self.db_conn.rollback()
         finally:
             cursor.close()
@@ -287,6 +289,7 @@ class MemoryJrAutonomic:
 
         except Exception as e:
             print(f"❌ Memory Jr: Error in gentle intervention: {e}")
+            print(f"⚠️ Memory Jr: ROLLBACK: transaction aborted during gentle thermal intervention")
             self.db_conn.rollback()
         finally:
             cursor.close()
@@ -529,6 +532,7 @@ class MemoryJrAutonomic:
         except Exception as e:
             print(f"❌ Memory Jr: Error in consolidation: {e}")
             if self.db_conn:
+                print(f"⚠️ Memory Jr: ROLLBACK: transaction aborted during consolidation")
                 self.db_conn.rollback()
 
     # === MAIN LOOP ===

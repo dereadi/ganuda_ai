@@ -60,6 +60,9 @@ log = logging.getLogger("medicine_woman")
 # ── Globals ────────────────────────────────────────────────────
 _running = True
 _previous_state = None  # Track state transitions
+_last_alert_signature = None  # Dedup: tuple of sorted alerts last sent to Slack
+_last_alert_time = None  # When the last alert was sent
+ALERT_RE_ESCALATE_HOURS = 4  # Persistent criticals re-alert every N hours
 
 
 def handle_signal(signum, frame):
@@ -560,11 +563,29 @@ def maybe_speak(conn, health_data, partner_phase, phi):
         log.info("Spoke: %s", message)
     except Exception as e:
         log.error("Failed to write observation thermal: %s", e)
+        log.warning("ROLLBACK: transaction aborted during observation-thermal write")
         conn.rollback()
 
-    # Critical -> alert via Slack/Telegram
+    # Critical -> alert via Slack/Telegram, deduped by signature
     if health == "critical":
-        _send_alert(message)
+        global _last_alert_signature, _last_alert_time
+        alert_sig = tuple(sorted(health_data.get("alerts") or []))
+        now = datetime.now()
+        window_seconds = ALERT_RE_ESCALATE_HOURS * 3600
+        signature_changed = alert_sig != _last_alert_signature
+        re_escalate_due = (
+            _last_alert_time is None
+            or (now - _last_alert_time).total_seconds() > window_seconds
+        )
+        if signature_changed or re_escalate_due:
+            _send_alert(message)
+            _last_alert_signature = alert_sig
+            _last_alert_time = now
+        else:
+            log.info(
+                "Alert dedup: same signature, %.1fh until re-escalation",
+                (window_seconds - (now - _last_alert_time).total_seconds()) / 3600,
+            )
 
 
 def _send_alert(message):

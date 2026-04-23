@@ -1,0 +1,24 @@
+[Unit]
+Description=Ganuda Memory API - thermal memory via MemorySearchManager (LM-OPENCLAW-MEMORY-CORE)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=ganuda-dev
+WorkingDirectory=/ganuda/services/memory_api
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=/ganuda/config/secrets.env
+ExecStart=/home/dereadi/cherokee_venv/bin/uvicorn server:app --host 0.0.0.0 --port 8095 --workers 2
+Restart=on-failure
+RestartSec=15
+StandardOutput=append:/ganuda/logs/memory_api.log
+StandardError=append:/ganuda/logs/memory_api.log
+
+# Per Gecko Council amendment (813dbb85866e45e2): cgroup resource limits
+MemoryMax=2G
+CPUQuota=30%
+
+[Install]
+WantedBy=multi-user.target

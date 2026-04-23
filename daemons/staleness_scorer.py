@@ -161,6 +161,7 @@ def run_staleness_cycle():
 
     except Exception as e:
         logger.error(f"Staleness cycle failed: {e}")
+        logger.warning("ROLLBACK: transaction aborted during staleness-scoring cycle")
         conn.rollback()
         raise
     finally:

@@ -1,0 +1,24 @@
+[Unit]
+Description=Stoneclad Slack Inbound Handler (LM-OPENCLAW-CHANNELS Phase 3a)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=ganuda-dev
+WorkingDirectory=/ganuda/services/stoneclad_slack
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=/ganuda/config/secrets.env
+ExecStart=/home/dereadi/cherokee_venv/bin/python /ganuda/services/stoneclad_slack/handler.py
+Restart=on-failure
+RestartSec=15
+StandardOutput=append:/ganuda/logs/stoneclad_slack.log
+StandardError=append:/ganuda/logs/stoneclad_slack.log
+
+# cgroup limits — lightweight handler
+MemoryMax=512M
+CPUQuota=15%
+
+[Install]
+WantedBy=multi-user.target

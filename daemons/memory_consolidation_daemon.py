@@ -206,6 +206,7 @@ def run_consolidation():
                 print(f"[Consolidation] Created semantic memory #{new_id} from {len(group)} episodic memories")
             except Exception as e:
                 print(f"[Consolidation] Error consolidating group: {e}")
+                print(f"[Consolidation] ROLLBACK: transaction aborted during episodic-group consolidation")
                 conn.rollback()
 
         print(f"[Consolidation] Cycle complete: {consolidated_count} memories consolidated"

@@ -1,0 +1,25 @@
+[Unit]
+Description=OpenTelemetry Collector (Contrib) — Ganuda Federation Phase 3
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=ganuda-dev
+WorkingDirectory=/ganuda
+Environment=PYTHONUNBUFFERED=1
+# otel-collector-contrib binary path — O3 installs it. Fallback: /usr/local/bin
+ExecStartPre=/bin/mkdir -p /ganuda/logs/otel-collector
+ExecStart=/usr/local/bin/otelcol-contrib --config /ganuda/config/otel-collector-config.yaml
+Restart=on-failure
+RestartSec=15
+StandardOutput=append:/ganuda/logs/otel_collector.log
+StandardError=append:/ganuda/logs/otel_collector.log
+
+# Gecko Council amendment: cgroup resource isolation (prevent pgvector contention)
+MemoryMax=2G
+CPUQuota=25%
+
+[Install]
+WantedBy=multi-user.target

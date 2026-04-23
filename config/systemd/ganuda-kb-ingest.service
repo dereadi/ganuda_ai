@@ -1,0 +1,23 @@
+[Unit]
+Description=Ganuda KB Auto-Ingestion Worker (LM-SCAN-BEFORE-PLAN Bullet 1)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dereadi
+Group=ganuda-dev
+WorkingDirectory=/ganuda
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/dereadi/cherokee_venv/bin/python /ganuda/services/kb_ingestion/worker.py
+Restart=on-failure
+RestartSec=30
+StandardOutput=append:/ganuda/logs/kb_ingest.log
+StandardError=append:/ganuda/logs/kb_ingest.log
+
+# Per Gecko Council amendment (813dbb85866e45e2): cgroup resource limits
+MemoryMax=512M
+CPUQuota=15%
+
+[Install]
+WantedBy=multi-user.target
