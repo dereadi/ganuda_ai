@@ -1,0 +1,30 @@
+# KB Ingestion Redaction Rules
+# Per Council vote 813dbb85866e45e2 (Otter + Crawdad amendments)
+# Files/chunks matching these rules are NOT ingested into thermal_memory_archive
+
+skip_path_patterns:
+  - "/sacred/"
+  - "/secrets/"
+  - "/ganuda/config/secrets"
+
+file_name_prefixes_skip:
+  - "sacred_"
+
+frontmatter_skip_flags:
+  - "sacred_pattern: true"
+
+# Regex patterns - if chunk content matches, skip that chunk (log audit event)
+content_regex_skip_chunk:
+  - '-----BEGIN .*(PRIVATE KEY|CERTIFICATE)'
+  - 'password\s*[:=]\s*\S'
+  - 'token\s*[:=]\s*[''"][\w-]{20,}'
+  - 'api[_-]?key\s*[:=]\s*\S'
+  - 'secret\s*[:=]\s*\S'
+  - 'AKIA[0-9A-Z]{16}'               # AWS access keys
+  - 'xox[baprs]-[A-Za-z0-9-]{10,}'   # Slack tokens
+  - 'ghp_[A-Za-z0-9]{36}'            # GitHub personal tokens
+  - 'sk-[A-Za-z0-9]{20,}'            # OpenAI / Anthropic API key pattern
+
+# Lines between these markers are stripped from content before chunking
+strip_between_markers:
+  - ["<!-- DO-NOT-INGEST -->", "<!-- END-DO-NOT-INGEST -->"]
