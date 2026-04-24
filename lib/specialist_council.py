@@ -2577,11 +2577,16 @@ class SpecialistCouncil:
         # Phase 1: Collect votes in parallel
         # Coyote gets a different prompt — must dissent by default (Jr #1388)
         # Memory context travels with the question (user message), not the prompt (system)
+        # Apr 23 2026 fix: VOTE_FIRST_PROMPT/COYOTE_VOTE_FIRST_PROMPT are meta
+        # instructions (no persona content). Passing as prompt_override replaces the
+        # specialist's persona system prompt at line 2226, causing shallow/empty
+        # responses on Qwen3.6. Route meta via user message; preserve persona.
         with ThreadPoolExecutor(max_workers=8) as executor:
             futures = {
                 executor.submit(
-                    self._query_specialist_with_prompt, sid, augmented_question,
-                    coyote_prompt if sid == "coyote" else vote_prompt
+                    self._query_specialist_with_prompt, sid,
+                    f"{augmented_question}\n\n---\n{coyote_prompt if sid == 'coyote' else vote_prompt}",
+                    None, 2000
                 ): sid
                 for sid in SPECIALISTS.keys()
             }
@@ -2793,8 +2798,16 @@ class SpecialistCouncil:
                     vote=v.vote, reason=v.reason,
                     flags=", ".join(flags), domain_hint=domain_hint
                 )
+                # Apr 23 2026 fix: route re-prompt meta-instruction via user message,
+                # NOT as prompt_override. prompt_override replaces the specialist's
+                # persona system prompt entirely (line 2226), which strips persona
+                # anchor and caused 13/13 empty returns on LMC-14 DELIBERATE vote
+                # (audit 1e43924dffdbbe93). Apr 17 pattern: persona stays in system
+                # prompt; meta-context goes in user message.
+                augmented_question = f"{question}\n\n---\n{reprompt}"
                 futures[executor.submit(
-                    self._query_specialist_with_prompt, sid, question, reprompt
+                    self._query_specialist_with_prompt, sid, augmented_question,
+                    None, 2000  # no prompt_override; preserve persona + generous tokens
                 )] = sid
 
             for future in as_completed(futures):
@@ -2851,10 +2864,15 @@ class SpecialistCouncil:
             if sid not in ("coyote", "peace_chief")
         ]
 
+        # Apr 23 2026 fix: deliberation_prompt is meta-instruction (no persona).
+        # Passing it as prompt_override strips the specialist's persona system prompt
+        # and caused 11/13 empty responses on Qwen3.6. Route meta via user message;
+        # preserve persona via standard system prompt (same pattern as Apr 17 fix).
+        deliberation_user = f"{augmented_question}\n\n---\n{deliberation_prompt}"
         with ThreadPoolExecutor(max_workers=8) as executor:
             futures = {
                 executor.submit(
-                    self._query_specialist_with_prompt, sid, augmented_question, deliberation_prompt
+                    self._query_specialist_with_prompt, sid, deliberation_user, None, 2000
                 ): sid
                 for sid in non_coyote_specialists
             }
@@ -2877,9 +2895,10 @@ class SpecialistCouncil:
             "Do not repeat their concerns. Find the blind spot. Write 2-3 sentences."
         )
         try:
-            # Memory context via augmented_question, not system-prompt suffix (Apr 22 2026 fix)
+            # Apr 23 2026 fix: meta via user message to preserve Coyote persona
+            coyote_user = f"{augmented_question}\n\n---\n{coyote_deliberation_prompt}"
             response, _ = self._query_specialist_with_prompt(
-                "coyote", augmented_question, coyote_deliberation_prompt
+                "coyote", coyote_user, None, 2000
             )
             positions["coyote"] = response
         except Exception as e:
@@ -2897,9 +2916,10 @@ class SpecialistCouncil:
             "for this proposal to proceed. Write 3-5 sentences."
         )
         try:
-            # Use augmented_question for consistency (memory context via user message)
+            # Apr 23 2026 fix: meta via user message to preserve Peace Chief persona
+            synthesis_user = f"{augmented_question}\n\n---\n{synthesis_prompt}"
             response, _ = self._query_specialist_with_prompt(
-                "peace_chief", augmented_question, synthesis_prompt
+                "peace_chief", synthesis_user, None, 2000
             )
             positions["peace_chief"] = response
         except Exception as e:
