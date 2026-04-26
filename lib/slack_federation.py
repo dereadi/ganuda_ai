@@ -34,6 +34,8 @@ CHANNELS = {
     "deer-signals": "C0AL1KEHQM6",
     "saturday-morning": "C0AKAV1Q9RS",
     "longhouse": "C0AKL90CAGH",
+    "sky-events": "C0AVALJD05Q",
+    "sky-lightning": "C0AVALHJJ2W",
 }
 
 # ---------------------------------------------------------------------------
