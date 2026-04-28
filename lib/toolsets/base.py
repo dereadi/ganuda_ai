@@ -127,18 +127,28 @@ class ToolSet:
         try:
             conn = get_db_connection()
             cur = conn.cursor()
+            # LMC-15 Stage 3 — drop to claude_tooling for sag_events INSERT (least-privilege)
+            cur.execute("SET ROLE claude_tooling;")
+            # Schema fix: actual sag_events columns are tier/category/title/source/metadata —
+            # event_type/event_data/source_node never existed; this INSERT was silently
+            # failing every call before the fix.
             cur.execute("""
-                INSERT INTO sag_events (event_type, event_data, source_node, created_at)
-                VALUES ('tool_call', %s, 'redfin', NOW())
-            """, (json.dumps({
-                "domain": self.domain,
-                "tool": result.tool_name,
-                "success": result.success,
-                "latency_ms": result.latency_ms,
-                "audit_hash": result.audit_hash,
-                "args_keys": list(args.keys()),
-                "error": result.error or None,
-            }),))
+                INSERT INTO sag_events (tier, category, title, source, metadata)
+                VALUES ('FYI', 'tool_call', %s, %s, %s::jsonb)
+            """, (
+                f"{self.domain}.{result.tool_name}",
+                self.domain,
+                json.dumps({
+                    "event_type": "tool_call",
+                    "domain": self.domain,
+                    "tool": result.tool_name,
+                    "success": result.success,
+                    "latency_ms": result.latency_ms,
+                    "audit_hash": result.audit_hash,
+                    "args_keys": list(args.keys()),
+                    "error": result.error or None,
+                }),
+            ))
             conn.commit()
             cur.close()
             conn.close()
