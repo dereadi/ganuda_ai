@@ -6,6 +6,7 @@ SENSE (parse args) → REACT (execute) → EVALUATE (validate result)
 Adapted from MyBrain ToolSet pattern. Council vote #798ad0b7.
 """
 
+import os
 import time
 import hashlib
 import json
