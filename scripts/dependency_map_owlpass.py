@@ -223,6 +223,9 @@ def main():
         conn = psycopg2.connect(host="192.168.132.222", port=5432, dbname="zammad_production",
                                 user="claude", password=secrets.get("CHEROKEE_DB_PASS", ""))
         cur = conn.cursor()
+        # LMC-15 Stage 3 — drop to claude_tooling (least-privilege INSERT-only on thermal_memory_archive)
+        # Full role migration to direct claude_tooling connect deferred until pg_hba.conf updated
+        cur.execute("SET ROLE claude_tooling;")
         cur.execute("""INSERT INTO thermal_memory_archive
             (original_content, temperature_score, sacred_pattern, memory_hash, domain_tag, tags, metadata)
             VALUES (%s, 75, false, %s, 'dependency_map', %s, %s::jsonb)
