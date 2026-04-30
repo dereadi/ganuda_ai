@@ -39,6 +39,15 @@ from dataclasses import dataclass, field
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import traceback
 
+# DC-14 Phase 2 BUILD (Council vote f31887eceb6981c9): Fokker-Planck retrieval-heats-memory.
+# Replaces three +3.0 linear bumps below with stochastic Euler-Maruyama promotion.
+# Crawdad CRITICAL: import wrapped, fail-silent → caller falls back to legacy linear bump.
+try:
+    from lib.thermal_dynamics import promote_on_retrieval as _fp_promote
+    _FP_PROMOTE_AVAILABLE = True
+except Exception:
+    _FP_PROMOTE_AVAILABLE = False
+
 # Foundation Agents GAP 1: Emotion State (Longhouse c4e68ce0fcea60a3)
 try:
     from lib.council_emotion import build_emotion_prompt_modifier, update_emotions_from_vote
@@ -439,15 +448,28 @@ def query_thermal_memory_semantic(question: str, limit: int = 15, min_temperatur
         rows = cur.fetchall()
 
         # Phase 0: Log retrieval access for reconsolidation tracking (#1813)
+        # DC-14 Phase 2: F-P stochastic promotion via lib.thermal_dynamics
         if rows:
             mem_ids = [r[0] for r in rows]
-            cur.execute("""
-                UPDATE thermal_memory_archive
-                SET access_count = COALESCE(access_count, 0) + 1,
-                    last_access = NOW(),
-                    temperature_score = LEAST(COALESCE(temperature_score, 50.0) + 3.0, 100.0)
-                WHERE id = ANY(%s)
-            """, (mem_ids,))
+            if _FP_PROMOTE_AVAILABLE:
+                try:
+                    _fp_promote(mem_ids, conn=conn)
+                except Exception:
+                    cur.execute("""
+                        UPDATE thermal_memory_archive
+                        SET access_count = COALESCE(access_count, 0) + 1,
+                            last_access = NOW(),
+                            temperature_score = LEAST(COALESCE(temperature_score, 50.0) + 3.0, 100.0)
+                        WHERE id = ANY(%s)
+                    """, (mem_ids,))
+            else:
+                cur.execute("""
+                    UPDATE thermal_memory_archive
+                    SET access_count = COALESCE(access_count, 0) + 1,
+                        last_access = NOW(),
+                        temperature_score = LEAST(COALESCE(temperature_score, 50.0) + 3.0, 100.0)
+                    WHERE id = ANY(%s)
+                """, (mem_ids,))
 
             # Phase 3: Log co-retrieval group for contamination window detection (#1813)
             # Records which memories were retrieved together in the same query.
@@ -649,15 +671,28 @@ def _ripple_retrieve(primary_hashes: list, conn, max_hops: int = 2, decay: float
         results.append((mem_id, content, temp, activation))
 
     # Log ripple access for Phase 0 tracking
+    # DC-14 Phase 2: F-P stochastic promotion via lib.thermal_dynamics
     if results:
         ripple_ids = [r[0] for r in results]
-        cur.execute("""
-            UPDATE thermal_memory_archive
-            SET access_count = COALESCE(access_count, 0) + 1,
-                last_access = NOW(),
-                temperature_score = LEAST(COALESCE(temperature_score, 50.0) + 3.0, 100.0)
-            WHERE id = ANY(%s)
-        """, (ripple_ids,))
+        if _FP_PROMOTE_AVAILABLE:
+            try:
+                _fp_promote(ripple_ids, conn=conn)
+            except Exception:
+                cur.execute("""
+                    UPDATE thermal_memory_archive
+                    SET access_count = COALESCE(access_count, 0) + 1,
+                        last_access = NOW(),
+                        temperature_score = LEAST(COALESCE(temperature_score, 50.0) + 3.0, 100.0)
+                    WHERE id = ANY(%s)
+                """, (ripple_ids,))
+        else:
+            cur.execute("""
+                UPDATE thermal_memory_archive
+                SET access_count = COALESCE(access_count, 0) + 1,
+                    last_access = NOW(),
+                    temperature_score = LEAST(COALESCE(temperature_score, 50.0) + 3.0, 100.0)
+                WHERE id = ANY(%s)
+            """, (ripple_ids,))
         conn.commit()
 
     # Sort by activation descending, limit to top 3
@@ -683,15 +718,28 @@ def _keyword_fallback(question: str, limit: int = 5) -> str:
         rows = cur.fetchall()
 
         # Phase 0: Log retrieval access for reconsolidation tracking (#1813)
+        # DC-14 Phase 2: F-P stochastic promotion via lib.thermal_dynamics
         if rows:
             mem_ids = [r[0] for r in rows]
-            cur.execute("""
-                UPDATE thermal_memory_archive
-                SET access_count = COALESCE(access_count, 0) + 1,
-                    last_access = NOW(),
-                    temperature_score = LEAST(COALESCE(temperature_score, 50.0) + 3.0, 100.0)
-                WHERE id = ANY(%s)
-            """, (mem_ids,))
+            if _FP_PROMOTE_AVAILABLE:
+                try:
+                    _fp_promote(mem_ids, conn=conn)
+                except Exception:
+                    cur.execute("""
+                        UPDATE thermal_memory_archive
+                        SET access_count = COALESCE(access_count, 0) + 1,
+                            last_access = NOW(),
+                            temperature_score = LEAST(COALESCE(temperature_score, 50.0) + 3.0, 100.0)
+                        WHERE id = ANY(%s)
+                    """, (mem_ids,))
+            else:
+                cur.execute("""
+                    UPDATE thermal_memory_archive
+                    SET access_count = COALESCE(access_count, 0) + 1,
+                        last_access = NOW(),
+                        temperature_score = LEAST(COALESCE(temperature_score, 50.0) + 3.0, 100.0)
+                    WHERE id = ANY(%s)
+                """, (mem_ids,))
             conn.commit()
 
         conn.close()
@@ -1958,6 +2006,10 @@ class SpecialistCouncil:
         council_type: 'inner' (tech council, default), 'outer' (market/legal/hr),
                       'full' (both councils), 'joint' (alias for full)
         """
+        # Conway-Smith Phase 1 instrumentation (Council vote 8762850ef4b652c7,
+        # ticket #2165). Wall-clock vote start for deliberation_latency_ms.
+        import time as _vote_time
+        vote_start_ms = int(_vote_time.time() * 1000)
         responses = []
 
         # Foundation Agents GAP 1: Open shared emotion connection for this vote cycle
@@ -2175,7 +2227,7 @@ class SpecialistCouncil:
             print(f"[TWO WOLVES] Audit log error: {e}")
 
         # Log to database with routing manifest + rubric data
-        self._log_vote(vote, routing_manifest=routing_manifest, rubric_data=rubric_data)
+        self._log_vote(vote, routing_manifest=routing_manifest, rubric_data=rubric_data, vote_start_ms=vote_start_ms)
 
         # Constructal Law: Extract structured facts from deliberation (Council Vote #0352a767)
         # One vLLM call per vote — compresses prose into searchable fact triples.
@@ -3072,8 +3124,27 @@ class SpecialistCouncil:
         except Exception as e:
             print(f"DB logging error: {e}")
 
-    def _log_vote(self, vote: CouncilVote, routing_manifest: dict = None, rubric_data: dict = None):
-        """Log vote to thermal memory and council_votes table — Two Wolves audit + Rubric scores"""
+    def _log_vote(self, vote: CouncilVote, routing_manifest: dict = None, rubric_data: dict = None, vote_start_ms: int = None):
+        """Log vote to thermal memory and council_votes table — Two Wolves audit + Rubric scores
+
+        vote_start_ms: optional Conway-Smith Phase 1 instrumentation (ticket #2165,
+        Council vote 8762850ef4b652c7). When provided, captures wall-clock
+        deliberation latency. total_token_cost computed from response text lengths.
+        """
+        # Conway-Smith Phase 1 — fail-closed (Spider concern: telemetry must not
+        # break vote logging if it errors). Compute outside the try; safe defaults.
+        deliberation_latency_ms = None
+        total_token_cost = None
+        try:
+            if vote_start_ms is not None:
+                import time as _log_time
+                deliberation_latency_ms = int(_log_time.time() * 1000) - vote_start_ms
+            # Rough token estimate: 1 token ≈ 4 chars across English text
+            total_token_cost = sum(
+                (len(r.response) // 4) for r in vote.responses if r.response
+            )
+        except Exception:
+            pass  # telemetry never breaks vote logging
         try:
             conn = psycopg2.connect(**DB_CONFIG)
             cur = conn.cursor()
@@ -3099,11 +3170,12 @@ class SpecialistCouncil:
                     "response_time_ms": resp.response_time_ms if hasattr(resp, 'response_time_ms') else None,
                 }
 
-            # Log to council_votes with metacognition + responses + consensus
+            # Log to council_votes with metacognition + responses + consensus.
+            # Conway-Smith Phase 1: deliberation_latency_ms + total_token_cost added.
             cur.execute("""
-                INSERT INTO council_votes (audit_hash, question, recommendation, confidence, concern_count, responses, concerns, consensus, metacognition, voted_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
-            """, (vote.audit_hash, vote.question, vote.recommendation, vote.confidence, len(vote.concerns), json.dumps(responses_dict), json.dumps(vote.concerns), vote.consensus, json.dumps(metacognition) if metacognition else None))
+                INSERT INTO council_votes (audit_hash, question, recommendation, confidence, concern_count, responses, concerns, consensus, metacognition, deliberation_latency_ms, total_token_cost, voted_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            """, (vote.audit_hash, vote.question, vote.recommendation, vote.confidence, len(vote.concerns), json.dumps(responses_dict), json.dumps(vote.concerns), vote.consensus, json.dumps(metacognition) if metacognition else None, deliberation_latency_ms, total_token_cost))
 
             # Log to thermal memory
             metadata = {

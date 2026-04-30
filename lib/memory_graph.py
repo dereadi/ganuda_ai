@@ -24,9 +24,16 @@ DB_CONFIG = {
 
 class MemoryGraph:
     """Manages stigmergic relationships between thermal memories"""
-    
+
     def __init__(self):
         self.conn = psycopg2.connect(**DB_CONFIG)
+        # LMC-15 Stage 4 — drop to claude_thermal for memory_relationships ops
+        # (least-privilege per #2147). Try/except per Spider loose-coupling.
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("SET ROLE claude_thermal;")
+        except Exception:
+            pass
     
     def add_relationship(self, source_hash: str, target_hash: str, 
                          rel_type: str, strength: float = 1.0,

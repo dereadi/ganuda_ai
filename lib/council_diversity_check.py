@@ -102,6 +102,12 @@ def compute_dcr(window: int = 20) -> Optional[DCRReport]:
             password=os.environ.get('CHEROKEE_DB_PASS', '')
         )
         cur = conn.cursor()
+        # LMC-15 Stage 4 — drop to claude_council for council_votes SELECT
+        # (least-privilege, post-vote analysis, read-only). #2147 cred-hygiene.
+        try:
+            cur.execute("SET ROLE claude_council;")
+        except Exception:
+            pass  # if role unavailable, continue as claude (compat with non-LMC-15 envs)
 
         # Get recent votes that have stored responses
         cur.execute("""

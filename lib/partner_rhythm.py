@@ -38,8 +38,19 @@ _shared_conn = None
 
 
 def _get_conn():
-    """Get a database connection."""
-    return psycopg2.connect(**DB_CONFIG, connect_timeout=10)
+    """Get a database connection.
+
+    LMC-15 Stage 4 — drops to claude_session for partner_rhythm read-only
+    analytics across thermal_memory_archive, duyuktv_tickets, council_votes.
+    Per #2147 cred-hygiene. Try/except per Spider loose-coupling.
+    """
+    conn = psycopg2.connect(**DB_CONFIG, connect_timeout=10)
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SET ROLE claude_session;")
+    except Exception:
+        pass
+    return conn
 
 
 def _get_shared_conn():

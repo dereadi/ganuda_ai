@@ -71,7 +71,19 @@ CREATE INDEX IF NOT EXISTS idx_curiosity_stubs_created ON curiosity_stubs(create
 
 
 def _get_conn():
-    return psycopg2.connect(**DB_CONFIG)
+    """Open a DB connection.
+
+    LMC-15 Stage 4: drops to claude_session for curiosity_stubs operations
+    (least-privilege per #2147 cred-hygiene). Try/except per Spider loose-coupling.
+    Setup-database (DDL) path remains as claude — DDL needs more privilege.
+    """
+    conn = psycopg2.connect(**DB_CONFIG)
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SET ROLE claude_session;")
+    except Exception:
+        pass
+    return conn
 
 
 def setup_database():

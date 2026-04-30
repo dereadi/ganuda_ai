@@ -259,7 +259,19 @@ class MAROrchestrator:
         self.debate_log: List[DebateEntry] = []
 
     def _get_connection(self):
-        return psycopg2.connect(**self.db_config)
+        """Open connection.
+
+        LMC-15 Stage 4 — drops to claude_council for council_debate_rounds /
+        council_reflections ops (least-privilege per #2147). Try/except per
+        Spider loose-coupling.
+        """
+        conn = psycopg2.connect(**self.db_config)
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SET ROLE claude_council;")
+        except Exception:
+            pass
+        return conn
 
     def _call_llm(self, system_prompt: str, user_prompt: str,
                   temperature: float = 0.7, max_tokens: int = 800) -> str:

@@ -32,8 +32,19 @@ MIN_INTENSITY_THRESHOLD = 0.01  # Remove pheromones below this
 
 
 def get_connection():
-    """Get database connection."""
-    return psycopg2.connect(**DB_CONFIG)
+    """Get database connection.
+
+    LMC-15 Stage 4: connection drops to claude_tooling for stigmergy_pheromones
+    operations (least-privilege per #2147 cred-hygiene). Try/except per Spider
+    loose-coupling.
+    """
+    conn = psycopg2.connect(**DB_CONFIG)
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SET ROLE claude_tooling;")
+    except Exception:
+        pass
+    return conn
 
 
 def deposit_pheromone(

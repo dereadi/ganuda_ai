@@ -1,6 +1,7 @@
 """Metacognitive Self-Healing: Monitors council vote quality.
 Detects confidence drift, concern inflation, and specialist stagnation."""
 
+import os
 import subprocess
 from datetime import datetime
 
@@ -9,6 +10,7 @@ import psycopg2
 DB_CONFIG = {
     "host": os.environ.get('CHEROKEE_DB_HOST', '10.100.0.2'),
     "user": "claude",
+    "password": os.environ.get('CHEROKEE_DB_PASS', ''),
     "dbname": "zammad_production"
 }
 
@@ -29,6 +31,12 @@ def check_council_health():
     """Returns dict of council health metrics. Call periodically."""
     conn = psycopg2.connect(**DB_CONFIG)
     cur = conn.cursor()
+    # LMC-15 Stage 4 — drop to claude_thermal for council_votes read + thermal_memory_archive INSERT.
+    # #2147 cred-hygiene. Try/except per Spider loose-coupling.
+    try:
+        cur.execute("SET ROLE claude_thermal;")
+    except Exception:
+        pass
     cur.execute("""
         SELECT confidence, concern_count, responses, voted_at
         FROM council_votes

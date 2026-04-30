@@ -94,6 +94,13 @@ class ReconstructionMonitor:
             user=self._db_user,
             password=self._db_pass,
         )
+        # LMC-15 Stage 4 — drop to claude_council for consultation_exposure_log read.
+        # #2147 cred-hygiene. Try/except per Spider loose-coupling.
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SET ROLE claude_council;")
+        except Exception:
+            pass
         return conn
 
     # ------------------------------------------------------------------

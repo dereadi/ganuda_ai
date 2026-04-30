@@ -106,8 +106,19 @@ class MCTSNode:
 
 
 def get_db_connection():
-    """Get database connection."""
-    return psycopg2.connect(**DB_CONFIG)
+    """Get database connection.
+
+    LMC-15 Stage 4 — drops to claude_council for council_refined_prompts /
+    council_mcts_nodes / council_agent_instances ops (least-privilege per #2147).
+    Try/except per Spider loose-coupling.
+    """
+    conn = psycopg2.connect(**DB_CONFIG)
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SET ROLE claude_council;")
+    except Exception:
+        pass
+    return conn
 
 
 def query_llm(system_prompt: str, user_message: str,
