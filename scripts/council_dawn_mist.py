@@ -285,10 +285,55 @@ def observability_health_summary(cur) -> str:
     return "OBSERVABILITY PULSE:\n" + "\n".join(items)
 
 
+def conway_smith_fit_summary() -> str:
+    """Generate nightly Conway-Smith Phase 1 power-law fit (ticket #2165, vote 8762850ef4b652c7).
+
+    Runs the fit script as a subprocess so any errors don't break the standup.
+    Returns a one-paragraph digest pointing at the full report file.
+    """
+    import subprocess
+    from datetime import datetime as _dt
+    try:
+        result = subprocess.run(
+            ["/home/dereadi/cherokee_venv/bin/python", "/ganuda/scripts/council_powerlaw_fit.py"],
+            capture_output=True, text=True, timeout=120,
+        )
+        if result.returncode != 0:
+            return f"CONWAY-SMITH FIT — fit script errored: {result.stderr[:200]}"
+        report_path = f"/ganuda/docs/research/COUNCIL-POWERLAW-FIT-{_dt.utcnow().strftime('%Y-%m-%d')}.md"
+        return (
+            f"CONWAY-SMITH POWER-LAW FIT — daily report at {report_path}. "
+            "Phase 1 instrumentation per Council vote 8762850ef4b652c7 (ticket #2165). "
+            "Watch for: avg_concerns decay with recurrence_index (proceduralization signal); "
+            "deliberation_latency_ms + total_token_cost populate as go-forward data accumulates."
+        )
+    except Exception as exc:
+        return f"CONWAY-SMITH FIT — generation failed: {type(exc).__name__}: {str(exc)[:200]}"
+
+
+def refresh_docs_index() -> None:
+    """Refresh /ganuda/docs/INDEX.md per-lane file counts (ticket #2170).
+
+    Fail-silent — never breaks the standup if the script errors.
+    """
+    import subprocess
+    try:
+        subprocess.run(
+            ["/home/dereadi/cherokee_venv/bin/python", "/ganuda/scripts/refresh_docs_index.py"],
+            capture_output=True, text=True, timeout=30, check=False,
+        )
+    except Exception:
+        pass  # docs-index refresh is non-critical; do not break standup
+
+
 def run_standup():
     """Gather items, run council vote, store results."""
     conn = None
     try:
+        # Refresh nightly docs index BEFORE gathering standup sections so any
+        # standup section that references docs/ has fresh counts.
+        refresh_docs_index()
+
         conn = get_connection()
         cur = get_dict_cursor(conn)
 
@@ -299,6 +344,7 @@ def run_standup():
         attractors = attractor_metrics(cur)
         rhythm = partner_rhythm_report(cur)
         obs_health = observability_health_summary(cur)
+        cs_fit = conway_smith_fit_summary()
 
         digest = (
             f"DAWN MIST STANDUP — {datetime.now().strftime('%A %B %d, %Y')}\n\n"
@@ -306,6 +352,7 @@ def run_standup():
             f"{('\n\n' + attractors) if attractors else ''}"
             f"{('\n\n' + obs_health) if obs_health else ''}"
             f"{('\n\n' + rhythm) if rhythm else ''}"
+            f"{('\n\n' + cs_fit) if cs_fit else ''}"
             "\n\nCouncil: Review this morning's standup. Flag anything that needs "
             "deeper attention today. Keep it brief — this is a standup, not a deliberation."
         )

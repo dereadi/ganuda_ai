@@ -25,7 +25,7 @@ sys.path.insert(0, '/ganuda/config')
 from ganuda_db import get_connection
 
 # Forgetting criteria
-TEMP_THRESHOLD = 10          # below this = cold
+TEMP_THRESHOLD = 30          # below this = cold (Apr 24 2026: bumped from 10 — see #2099 diagnostic)
 ACCESS_COUNT_THRESHOLD = 3   # below this = rarely used
 AGE_DAYS = 30                # must be this old
 REINDEX_THRESHOLD = 1000     # reindex HNSW if more than this many rows removed
