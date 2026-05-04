@@ -14,6 +14,7 @@ Latency target: <50ms p95 (excluding network latency to LLM).
 """
 
 import logging
+import os
 import time
 import re
 import requests
@@ -178,7 +179,14 @@ class Tier1Reflex:
         )
 
     def _build_prompt(self, request: HarnessRequest) -> str:
-        """Build the prompt from the config template and request data."""
+        """Build the prompt from the config template and request data.
+
+        Council vote f1a7cb2600c08630 (May 4 2026) priority (2): wire ethos
+        enrichment. If ETHOS_ENRICHMENT_ENABLED env var is unset or true, retrieves
+        federation ethos records relevant to the query and prepends them as a
+        canonical-source block before the templated prompt. Failure mode (service
+        down): silently returns un-enriched prompt — never blocks the harness path.
+        """
         context_str = ""
         if request.context:
             # Flatten context dict to readable string
@@ -191,6 +199,29 @@ class Tier1Reflex:
             query=request.query,
             context=context_str if context_str else "No additional context provided.",
         )
+
+        # --- Ethos enrichment (Council priority (2) wiring) ---
+        if os.environ.get("ETHOS_ENRICHMENT_ENABLED", "true").lower() != "false":
+            try:
+                from lib.ethos_harness_client import fetch_relevant_ethos, format_ethos_block
+                records = fetch_relevant_ethos(request.query, top_k=4)
+                if records:
+                    block = format_ethos_block(records)
+                    # Eagle Eye [VISIBILITY]: log the enrichment so silent bypass is detectable
+                    logger.info(
+                        "ethos_enrichment: request_id=%s records=%d sacred=%d",
+                        request.request_id,
+                        len(records),
+                        sum(1 for r in records if r.get("sacred_pattern")),
+                    )
+                    prompt = block + "\n\n" + prompt
+                else:
+                    logger.debug("ethos_enrichment: request_id=%s records=0 (no match)",
+                                 request.request_id)
+            except Exception as e:
+                # Service unreachable / module missing — never block the harness
+                logger.warning("ethos_enrichment failed (non-blocking): %s", e)
+
         return prompt
 
     def _call_endpoint(

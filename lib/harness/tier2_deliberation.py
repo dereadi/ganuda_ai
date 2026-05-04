@@ -11,6 +11,7 @@ Longhouse #b940f09b18605c97 (UNANIMOUS).
 """
 
 import logging
+import os
 import time
 import hashlib
 import re
@@ -285,9 +286,14 @@ class Tier2Deliberation:
                     + "% confidence:\n" + t1.answer[:500]
                 )
 
+        # --- Ethos enrichment (Council priority (2) wiring) ---
+        # Fetch once per request, prepend to each specialist's user_prompt.
+        # Failure mode: silent — never block the harness path.
+        ethos_block = self._get_ethos_block(request)
+
         # --- Query specialists in parallel ---
         responses = self._query_specialists_parallel(
-            selected, request, prior_context
+            selected, request, prior_context, ethos_block
         )
 
         if not responses:
@@ -384,11 +390,41 @@ class Tier2Deliberation:
     # Parallel LLM Queries
     # -------------------------------------------------------------------
 
+    def _get_ethos_block(self, request: HarnessRequest) -> str:
+        """Fetch ethos enrichment block for the query (Council priority (2)).
+
+        Returns an empty string when ETHOS_ENRICHMENT_ENABLED=false, when no
+        records match, or when the ethos service is unreachable. Eagle Eye
+        [VISIBILITY]: logs the count + sacred count so silent bypass is
+        detectable in operations.
+        """
+        if os.environ.get("ETHOS_ENRICHMENT_ENABLED", "true").lower() == "false":
+            return ""
+        try:
+            from lib.ethos_harness_client import fetch_relevant_ethos, format_ethos_block
+            records = fetch_relevant_ethos(request.query, top_k=4)
+            if not records:
+                logger.debug("ethos_enrichment: request_id=%s records=0 (no match)",
+                             request.request_id)
+                return ""
+            block = format_ethos_block(records)
+            logger.info(
+                "ethos_enrichment: request_id=%s tier=2 records=%d sacred=%d",
+                request.request_id,
+                len(records),
+                sum(1 for r in records if r.get("sacred_pattern")),
+            )
+            return block
+        except Exception as e:
+            logger.warning("ethos_enrichment failed (non-blocking): %s", e)
+            return ""
+
     def _query_specialists_parallel(
         self,
         specialists: List[SpecialistDomain],
         request: HarnessRequest,
         prior_context: str,
+        ethos_block: str = "",
     ) -> Dict[str, str]:
         """Query selected specialists in parallel using ThreadPoolExecutor.
 
@@ -398,6 +434,7 @@ class Tier2Deliberation:
             specialists: List of selected specialist domains.
             request: The harness request.
             prior_context: Optional context from prior tier results.
+            ethos_block: Optional federation ethos reference block to prepend.
 
         Returns:
             Dict mapping specialist key -> response text. Only includes
@@ -412,6 +449,8 @@ class Tier2Deliberation:
                 query=request.query,
                 context=self._format_context(request.context) + prior_context,
             )
+            if ethos_block:
+                prompt = ethos_block + "\n\n" + prompt
             answer = self._call_endpoint(
                 self.config.primary_endpoint,
                 spec.system_prompt,

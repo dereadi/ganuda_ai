@@ -14,6 +14,7 @@ Longhouse: #b940f09b18605c97 (UNANIMOUS)
 """
 
 import logging
+import os
 import time
 from typing import Optional, List, Dict, Any
 
@@ -175,6 +176,11 @@ class Tier3Council:
         When prior tiers have already attempted the query, their answers
         and confidence levels are included so specialists can build on
         (or disagree with) earlier reasoning.
+
+        Council priority (2): also prepends the federation ethos reference
+        block so every Council member sees canonical ethos records during
+        deliberation. Highest-stakes path — ethos grounding most load-bearing
+        here. Failure mode: silent — never blocks the Council.
         """
         query = request.query
 
@@ -204,6 +210,28 @@ class Tier3Council:
                 "Please provide a thorough, high-confidence council analysis."
             )
             query = query + "\n".join(escalation_lines)
+
+        # --- Ethos enrichment (Council priority (2) wiring) ---
+        if os.environ.get("ETHOS_ENRICHMENT_ENABLED", "true").lower() != "false":
+            try:
+                from lib.ethos_harness_client import fetch_relevant_ethos, format_ethos_block
+                # Tier 3 is the moat — pull more records (top_k=6) so the Council
+                # has the full ethos texture during high-stakes deliberation.
+                records = fetch_relevant_ethos(request.query, top_k=6)
+                if records:
+                    block = format_ethos_block(records)
+                    logger.info(
+                        "ethos_enrichment: request_id=%s tier=3 records=%d sacred=%d",
+                        request.request_id,
+                        len(records),
+                        sum(1 for r in records if r.get("sacred_pattern")),
+                    )
+                    query = block + "\n\n" + query
+                else:
+                    logger.debug("ethos_enrichment: request_id=%s tier=3 records=0",
+                                 request.request_id)
+            except Exception as e:
+                logger.warning("ethos_enrichment failed (non-blocking): %s", e)
 
         return query
 
