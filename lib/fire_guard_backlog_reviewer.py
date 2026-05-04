@@ -108,23 +108,54 @@ _VALID_CLASSES = (
 
 
 def _build_classifier_prompt(title: str, description: str, days_stale: int, taxonomy: dict) -> str:
-    """Constrained-output prompt. Returns one of the taxonomy classes + a one-line rationale."""
+    """Constrained-output prompt. Returns one of the taxonomy classes + a one-line rationale.
+
+    LMC-17.A (May 4 2026): rewrote to use few-shot examples instead of <placeholder>
+    syntax. Qwen3.6 reasoning-mode was echoing the literal placeholder string
+    ("<category>") back in the response instead of substituting a real class.
+    Few-shot examples show the model the exact output shape with real values.
+    """
     title_safe = _sanitize_for_classifier(title, 200)
     desc_safe = _sanitize_for_classifier(description, 1500)
     classes = taxonomy["definition"]["classes"]
     class_block = "\n".join(f"  - {k}: {v}" for k, v in classes.items())
-    return f"""You are a federation kanban backlog triage classifier. Given a backlog ticket, classify it into ONE of the categories below, then provide a one-sentence rationale.
+    return f"""You are a federation kanban backlog triage classifier. Given a backlog ticket, classify it into ONE of the five categories below, then provide a one-sentence rationale.
 
-CATEGORIES:
+CATEGORIES (you MUST pick exactly one):
 {class_block}
 
-TICKET:
+EXAMPLES of valid output shape (use these as your output template):
+
+Example 1:
+  TICKET:
+    Title: VetAssist: Calculator results not saved to user
+    Days since last update: 106
+    Description: Calculator computes claim values but does not persist results to user profile. Needs simple writeback to user_calculations table.
+  OUTPUT:
+{{"classification": "still_relevant", "rationale": "Active VetAssist feature gap with clear scope; remains in product roadmap."}}
+
+Example 2:
+  TICKET:
+    Title: Trading Desk Prototype — SA Reflex + Optimization Deliberation
+    Days since last update: 57
+    Description: 13 SP epic combining simulated annealing reflex layer with optimization-tier deliberation. DC-11 Phase 2 deferred per parent KB.
+  OUTPUT:
+{{"classification": "needs_decomposition", "rationale": "13-SP scope is too large for a single ticket; should be broken into atomic Jr-shaped child tickets."}}
+
+Example 3:
+  TICKET:
+    Title: LinkedIn Post Approval Queue Table
+    Days since last update: 57
+    Description: Tracking table for LinkedIn post drafts pending approval. Superseded by Deer slate workflow + Slack approval chain.
+  OUTPUT:
+{{"classification": "close_as_stale", "rationale": "Superseded by another mechanism that already ships the same capability."}}
+
+NOW CLASSIFY THIS TICKET:
   Title: {title_safe}
   Days since last update: {days_stale}
-  Description (truncated): {desc_safe}
+  Description: {desc_safe}
 
-OUTPUT FORMAT (strict JSON, no other text):
-{{"classification": "<one of: still_relevant | needs_decomposition | close_as_stale | active_epic_continuation | backlog_candidate>", "rationale": "<one short sentence>"}}
+OUTPUT (strict JSON object only, no other text, no markdown fences):
 """
 
 
