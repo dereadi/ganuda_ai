@@ -110,7 +110,14 @@ def backward_look(cur) -> str:
 
 
 def health_pulse(cur) -> str:
-    """Quick vitals."""
+    """Quick vitals — federation memory state + recent alerts + notifications.
+
+    Surfaces alerts from thermal_memory_archive and tpm_notifications so the
+    cluster's existing alert paths actually reach Partner attention. Closes
+    the visibility gap diagnosed by Council vote 782198bac4be42dd (May 4 2026,
+    Spider [INTEGRATION]: 'alert_manager writes to thermal memory, but Dawn
+    Mist does not read it').
+    """
     stats = {}
 
     cur.execute("SELECT COUNT(*) as cnt FROM thermal_memory_archive")
@@ -131,12 +138,90 @@ def health_pulse(cur) -> str:
     """)
     stats['votes_24h'] = cur.fetchone()['cnt']
 
-    return (
+    # --- Service-down alerts last 24h (health_monitor → thermal_memory_archive) ---
+    cur.execute("""
+        SELECT
+            COALESCE(metadata->>'node', '?') AS node,
+            COALESCE(metadata->>'service', '?') AS service,
+            COUNT(*) AS firings,
+            MAX(created_at) AS most_recent
+        FROM thermal_memory_archive
+        WHERE original_content ILIKE 'ALERT:%'
+          AND created_at > NOW() - INTERVAL '24 hours'
+        GROUP BY 1, 2
+        ORDER BY most_recent DESC
+        LIMIT 10
+    """)
+    recent_alerts = cur.fetchall()
+
+    # --- Unacknowledged TPM notifications (health_monitor + Raven backlog + others) ---
+    cur.execute("""
+        SELECT
+            COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '24 hours') AS new_24h,
+            COUNT(*) AS total_unacked,
+            MAX(created_at) AS most_recent
+        FROM tpm_notifications
+        WHERE acknowledged = FALSE
+    """)
+    notif = cur.fetchone()
+
+    cur.execute("""
+        SELECT priority, category, title
+        FROM tpm_notifications
+        WHERE acknowledged = FALSE
+          AND created_at > NOW() - INTERVAL '24 hours'
+        ORDER BY
+          CASE priority WHEN 'P1' THEN 1 WHEN 'P2' THEN 2 ELSE 3 END,
+          created_at DESC
+        LIMIT 5
+    """)
+    new_notifs = cur.fetchall()
+
+    # --- Service-health degraded entries (suppression-aware) ---
+    cur.execute("""
+        SELECT node_name, service_name, status, consecutive_failures, last_check
+        FROM service_health
+        WHERE status NOT IN ('healthy', 'unknown')
+          AND last_check > NOW() - INTERVAL '24 hours'
+          AND COALESCE(suppressed, FALSE) = FALSE
+        ORDER BY consecutive_failures DESC
+        LIMIT 5
+    """)
+    degraded = cur.fetchall()
+
+    # --- Build digest ---
+    lines = [
         f"HEALTH PULSE: {stats['thermal_memories']:,} thermal memories "
         f"({stats['sacred']:,} sacred), "
         f"{stats['jr_pending']} Jr tasks pending, "
         f"{stats['votes_24h']} council votes in last 24h"
-    )
+    ]
+
+    if recent_alerts:
+        lines.append(f"\nALERTS LAST 24H ({len(recent_alerts)} services):")
+        for a in recent_alerts:
+            lines.append(f"  • {a['service']} on {a['node']} — {a['firings']}x (most recent {a['most_recent'].strftime('%H:%M')})")
+    elif notif['new_24h'] == 0:
+        lines.append("\nALERTS LAST 24H: clean — no service-down alerts fired")
+
+    if notif['new_24h'] or notif['total_unacked']:
+        lines.append(
+            f"\nNOTIFICATIONS: {notif['new_24h']} new in 24h, "
+            f"{notif['total_unacked']:,} total unacked backlog"
+        )
+        if new_notifs:
+            for n in new_notifs:
+                lines.append(f"  • [{n['priority']}/{n['category']}] {n['title'][:80]}")
+
+    if degraded:
+        lines.append(f"\nSERVICE_HEALTH DEGRADED ({len(degraded)}):")
+        for d in degraded:
+            lines.append(
+                f"  • {d['service_name']} on {d['node_name']} — "
+                f"{d['status']} ({d['consecutive_failures']} consecutive)"
+            )
+
+    return "\n".join(lines)
 
 
 def attractor_metrics(cur) -> str:
