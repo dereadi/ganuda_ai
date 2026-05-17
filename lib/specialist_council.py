@@ -55,6 +55,60 @@ try:
 except ImportError:
     _EMOTION_AVAILABLE = False
 
+# ---------------------------------------------------------------------------
+# DC-15 / DC-16 / DC-17 — Governance framework metadata
+# Council Vote: #f0bd704f4d2c43e9 (Raven: NOW. Unanimous on governance.)
+# Restored 2026-05-17 TPM-inline per Council vote c63480d22cbf3e9a after Jr
+# stub-deliverable corruption (KB-JR-STUB-PASSES-VERIFIER-MAY16-2026 + KB-JR-
+# CAPABILITY-GAPS-EXECUTION-MODE-PLAN-PARSER-MAY15-2026). Original Jr edit
+# duplicated existing constants, introduced phantom specialists (fox/hawk/wren
+# with no persona definitions), used typo COYOTE_DISSSENT_* (triple-S), and
+# left `# ... (rest of the code)` placeholder. This restoration extracts only
+# the load-bearing intent.
+# ---------------------------------------------------------------------------
+
+# DC-15: MODEL AGNOSTICISM
+# The governance layer (voting protocol, concern evaluation, diversity scoring,
+# Coyote adversarial dissent) operates identically regardless of underlying LLM
+# (Qwen, Llama, Nemotron, GPT, Claude). Test: swap model, governance quality
+# unchanged. This IS the sovereignty guarantee.
+DC15_MODEL_AGNOSTIC = True
+
+# DC-16: INSTITUTIONAL MEMORY AS SOVEREIGN MOAT
+# Code can be open-sourced. The thermal memory archive and the council's
+# evolved voting patterns (concern evaluations, diversity scores, Coyote hit
+# rate) cannot be replicated. Competitors can copy structure; they cannot
+# copy experience. This IS the moat.
+DC16_INSTITUTIONAL_MEMORY = True
+
+# DC-17: STOCHASTIC GOVERNANCE (COYOTE PRINCIPLE)
+# Adversarial dissent is error correction, not noise. Mathematically equivalent
+# to NVIDIA's stochastic rounding: calibrated noise preventing systematic drift.
+# Without Coyote: sycophancy → groupthink → drift → failure.
+# With Coyote: dissent → correction → stability → coherence.
+DC17_STOCHASTIC_GOVERNANCE = True
+
+# Coyote: adversarial dissent injection rate (calibrated noise parameter).
+# 0.0 = no dissent (high sycophancy risk); 1.0 = maximum dissent.
+# Default 0.15 empirically optimal — correction without destabilization.
+COYOTE_DISSENT_RATE = 0.15
+
+# Coyote: classification thresholds for "active Coyote" specialist tracking.
+# A specialist must dissent on at least COYOTE_MIN_DISSENT_THRESHOLD of the
+# last COYOTE_DISSENT_WINDOW votes to be classified as active.
+COYOTE_MIN_DISSENT_THRESHOLD = 3
+COYOTE_DISSENT_WINDOW = 20
+
+# DERsnTt²: Divergence Evaluation & Resolution — stochastic, temperature-tuned,
+# two-substrate. Protocol: run the same question on two independent substrates,
+# compare outputs, document agreement/divergence/contradiction/emergence zones.
+DERsnTt2_ENABLED = True
+DERsnTt2_SUBSTRATES = ["redfin", "bmasass"]
+
+# Note: COUNCIL_QUORUM_SIZE, COUNCIL_VOTE_THRESHOLD, SPECIALIST_GOVERNANCE_PROTOCOL,
+# COYOTE_SPECIALIST, and DERsnTt2_BACKEND_PAIRS are defined further down in this
+# module — do NOT redefine them here.
+
 # LM-OPENCLAW-OTEL Phase 3 (Council vote 84beb73ee61cf993): traces + metrics
 try:
     from lib.ganuda_otel import get_tracer, get_meter, redact_sensitive
