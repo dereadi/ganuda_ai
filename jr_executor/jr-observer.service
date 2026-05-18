@@ -1,0 +1,27 @@
+[Unit]
+Description=Cherokee Jr Self-Observer Daemon — The Second Consciousness Check (Adaptive Resonance Theory, Grossberg)
+Documentation=See /ganuda/jr_executor/jr_observer.py
+Documentation=Council vote audit d6b73288f7c4aabd (Option B+ Day 2, May 18 2026)
+After=network.target postgresql.service jr-orchestrator.service
+
+[Service]
+EnvironmentFile=/ganuda/config/secrets.env
+Type=simple
+User=dereadi
+Group=dereadi
+WorkingDirectory=/ganuda/jr_executor
+Environment=PATH=/home/dereadi/cherokee_venv/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/ganuda/lib:/ganuda/jr_executor
+ExecStart=/home/dereadi/cherokee_venv/bin/python3 -u /ganuda/jr_executor/jr_observer.py --interval 300 --jr-name it_triad_jr
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jr-observer
+
+# Resource limits (lighter than executors — observer does no LLM inference itself)
+MemoryMax=1G
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

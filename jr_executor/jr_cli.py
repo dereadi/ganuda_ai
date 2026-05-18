@@ -210,6 +210,42 @@ class JrExecutor:
             # TaskExecutor handles: reading instructions, LLM extraction, execution
             result = self.executor.process_queue_task(task)
 
+            # R-dispatcher T0 (Council vote 3487bdbbbc1824c6, May 18 2026):
+            # Gen 1 unified-verifier path — same claim_verifier gate Gen 3 uses.
+            # Closes Shape 5 cross-gen asymmetry from KB-DARK-FACTORY-MAY18-2026-PM.
+            if result.get('success'):
+                try:
+                    from jr_executor.claim_verifier import verify_jr_task_result
+                    verification = verify_jr_task_result(task, result)
+                    if not verification.verified:
+                        if verification.hallucination_flag:
+                            reason = (
+                                f"HALLUCINATION: success claimed with "
+                                f"{len(result.get('steps_executed', []) or [])} steps but "
+                                f"zero artifacts/files and zero verifiable claims"
+                            )
+                        else:
+                            reason = (
+                                f"{verification.failed}/{verification.total_claims} claims failed: "
+                                f"{verification.mismatches[:3]}"
+                            )
+                        self._log(f"CLAIM-VERIFIER FAILED [gen1]: {reason}")
+                        result['success'] = False
+                        result['error'] = f"Claim verifier: {reason}"
+                        result['claim_verification'] = verification.as_dict()
+                        result['gen_tracking'] = {'gen': 1, 'worker': 'jr_cli.py', 'jr_name': self.jr_name}
+                    else:
+                        self._log(
+                            f"Claim verifier PASSED [gen1] "
+                            f"({verification.passed}/{verification.total_claims} claims)"
+                        )
+                        result.setdefault('claim_verification', verification.as_dict())
+                        result.setdefault('gen_tracking', {'gen': 1, 'worker': 'jr_cli.py', 'jr_name': self.jr_name})
+                except ImportError:
+                    self._log("Claim verifier not available (non-fatal)")
+                except Exception as _cv_err:
+                    self._log(f"Claim verifier error (non-fatal): {_cv_err}")
+
             if result.get('success'):
                 # Generate meaningful summary from actual work done
                 steps_executed = result.get('steps_executed', [])
