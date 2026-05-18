@@ -311,4 +311,51 @@ def build_federation_registry() -> ToolRegistry:
         safety_class="read",
     )
 
+    # --- RECOVERY ENZYMES (SEV1-prevention first-cohort, May 17 2026) ---
+    # Codifies KB-JR-SEV1-DISARM-AND-VERIFY-PLAYBOOK-MAY17-2026 as callable
+    # enzymes. Pure-Python deterministic ops per
+    # RESEARCH-MINI-MODEL-WORKFORCE-COHERENCE-MAY17-2026 ("is there a spec?"
+    # heuristic — these have specs, route to tool not model).
+    reg.register_tool(
+        name="find_backup",
+        description="Locate sibling .backup_* and .broken-* files for a damaged path",
+        module_path="lib.duplo.recovery_enzymes",
+        function_name="find_backup",
+        parameters={
+            "file_path": {"type": "str", "required": True, "description": "Path to damaged file"},
+        },
+        return_type="list",
+        safety_class="read",
+    )
+
+    reg.register_tool(
+        name="surgical_restore",
+        description="Restore damaged file from backup, optionally splicing a section by regex markers; always preserves damaged version as .broken-<timestamp>",
+        module_path="lib.duplo.recovery_enzymes",
+        function_name="surgical_restore",
+        parameters={
+            "damaged_path": {"type": "str", "required": True, "description": "Path to damaged file"},
+            "backup_path": {"type": "str", "required": True, "description": "Path to known-good backup"},
+            "section_start_pattern": {"type": "str", "required": False, "description": "Regex marking start of section to splice (text files only)"},
+            "section_end_pattern": {"type": "str", "required": False, "description": "Regex marking end of section to splice"},
+            "preserve_broken": {"type": "bool", "required": False, "description": "Save damaged as .broken-<timestamp> (default True)"},
+        },
+        return_type="dict",
+        safety_class="write",
+    )
+
+    reg.register_tool(
+        name="quarantine",
+        description="Move suspect file to dated quarantine dir with metadata sidecar; recoverable (move not delete)",
+        module_path="lib.duplo.recovery_enzymes",
+        function_name="quarantine",
+        parameters={
+            "file_path": {"type": "str", "required": True, "description": "Path to suspect file"},
+            "reason": {"type": "str", "required": False, "description": "Why quarantined (recorded in sidecar)"},
+            "quarantine_root": {"type": "str", "required": False, "description": "Override quarantine root dir"},
+        },
+        return_type="dict",
+        safety_class="write",
+    )
+
     return reg
